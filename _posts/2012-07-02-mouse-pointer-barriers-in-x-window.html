@@ -22,7 +22,7 @@ author:
   first_name: ''
   last_name: ''
 ---
-<p>그놈3 데스크탑 환경을 사용할때 불편했던 점 중 하나는,  프로그램을 실행하는 등의 창 작업을 위해 화면 상단 왼쪽 구석으로 마우스를 이동했을때 듀얼 모니터에서 마우스가 미끌어져 버리는 현상이었습니다. 그런데, 어느 날부터인가 이 현상, 즉 마우스를 화면 구석으로 이동해도 마우스가 다음 모니터로 미끌어져 넘어가는 현상이 발생하지 않았습니다. 제가 '어느 날'이라는 표현을 사용한 이유는, <a href="http://sunjinyang.wordpress.com/2011/02/21/migrated-to-arch-linux/">아치 리눅스로 이전</a>한 이후로 아직까지 한 번도 시스템을 재설치하지 않고, 생각날 때마다 최소 2~3일에 한 번씩 패키지를 업그레이드하는 습관 때문입니다.</p>
+<p>그놈3 데스크탑 환경을 사용할때 불편했던 점 중 하나는,  프로그램을 실행하는 등의 창 작업을 위해 화면 상단 왼쪽 구석으로 마우스를 이동했을때 듀얼 모니터에서 마우스가 미끌어져 버리는 현상이었습니다. 그런데, 어느 날부터인가 이 현상, 즉 마우스를 화면 구석으로 이동해도 마우스가 다음 모니터로 미끌어져 넘어가는 현상이 발생하지 않았습니다. 제가 '어느 날'이라는 표현을 사용한 이유는, <a href="/2011/02/21/migrated-to-arch-linux/">아치 리눅스로 이전</a>한 이후로 아직까지 한 번도 시스템을 재설치하지 않고, 생각날 때마다 최소 2~3일에 한 번씩 패키지를 업그레이드하는 습관 때문입니다.</p>
 <p>그러다가 최근 <a href="http://lwn.net/Articles/500747/">LWN.net의 X11R7.7 릴리스 기사</a>에서 이런 내용을 읽게 되었습니다.</p>
 <blockquote><p><strong>Pointer barriers</strong> were added by X Fixes extension Version 5.0. Compositing managers and desktop environments may have UI elements in particular screen locations such that for a single-headed display they correspond to easy targets, for example, the top left corner. For a multi-headed environment these corners should still be semi-impermeable. Pointer barriers allow the application to define additional constraint on cursor motion so that these areas behave as expected even in the face of multiple displays.</p></blockquote>
 <p>즉, X Fixes 확장 기능 5.0 버전에 포인터 장벽(?)이라는게 추가되었는데, 어플리케이션이 커서 움직임에 제한을 더할 수 있도록 했다는 겁니다. 그리고 이를 이용하면 바로 정확하게 제가 경험한 것과 같은 멀티 모니터에서의 구석 마우스 미끄러짐 현상을 없앨 수 있다는 점도 부연하고 있습니다.</p>
