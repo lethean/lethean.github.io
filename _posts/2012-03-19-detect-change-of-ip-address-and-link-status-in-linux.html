@@ -1,0 +1,241 @@
+---
+layout: post
+title: "리눅스 IP 주소 / 링크 상태 변경 여부 감지하기"
+date: 2012-03-19 20:48:18.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- GLib
+- glibc
+- Linux
+- Network
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  original_post_id: '1919'
+  _wp_old_slug: '1919'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>리눅스에서 IP 주소가 변경되었거나 링크 상태 변경 여부(예를 들어 랜선이 꽂히거나 빠졌을때)를 자동으로 감지하는 C 코드입니다. <code>ifconfig</code> 명령등의 결과를 파싱하는 방법이 아닌 리눅스 커널 <code><a href="http://www.kernel.org/doc/man-pages/online/pages/man7/rtnetlink.7.html">rtnetlink(7)</a></code> 프로토콜과 <code><a href="http://www.kernel.org/doc/man-pages/online/pages/man3/getifaddrs.3.html">getifaddrs()</a></code> 함수를 이용해 직접 처리합니다. 참조한 소스는 여러군데가 있는데 모두 구글링이 가능하므로 결과물만 기록으로 남겨둡니다.</p>
+<pre>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;ifaddrs.h&gt;
+#include &lt;net/if.h&gt;
+#include &lt;netdb.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;linux/netlink.h&gt;
+#include &lt;linux/rtnetlink.h&gt;
+
+static int
+create_sock (const char *nic)
+{
+  struct sockaddr_nl addr;
+  int                sock;
+
+  memset (&amp;addr, 0, sizeof (addr));
+  addr.nl_family = AF_NETLINK;
+  addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR | RTMGRP_IPV6_IFADDR;
+
+  sock = socket (PF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (sock &lt; 0)
+    {
+      fprintf (stderr, "failed to open NETLINK_ROUTE socket for %s - %s(%d)",
+               nic, strerror (errno), errno);
+      return -1;
+    }
+
+  if (bind (sock, (struct sockaddr *)&amp;addr, sizeof(addr)) &lt; 0)
+    {
+      fprintf (stderr, "failed to bind NETLINK_ROUTE socket for %s - %s(%d)",
+                 nic, strerror (errno), errno);
+      close (sock);
+      return -1;
+    }
+
+  return sock;
+}
+
+static int
+ip_changed (int         sock,
+            const char *nic)
+{
+  struct nlmsghdr   *nlh;
+  char               buffer[4096];
+  int                len;
+  int                idx;
+  int                found;
+
+  len = recv (sock, buffer, sizeof (buffer), 0);
+  if (len &lt;= 0)
+    {
+      fprintf (stderr, "NETLINK_ROUTE socket recv() failedn");
+      return -1;
+    }
+
+  found = 0;
+  idx = if_nametoindex (nic);
+
+  for (nlh = (struct nlmsghdr *)buffer;
+       NLMSG_OK (nlh, len);
+       nlh = NLMSG_NEXT (nlh, len))
+    {
+      if (nlh-&gt;nlmsg_type == NLMSG_DONE)
+        break;
+      if (nlh-&gt;nlmsg_type == NLMSG_ERROR)
+        continue;
+      if (!(NLMSG_OK (nlh, len)))
+        continue;
+
+      switch (nlh-&gt;nlmsg_type)
+        {
+        case RTM_NEWADDR:
+          {
+            struct ifaddrmsg *ifa = (struct ifaddrmsg *)NLMSG_DATA (nlh);
+
+            if (ifa-&gt;ifa_index == idx)
+              found = 1;
+          }
+          break;
+        case RTM_NEWLINK:
+          {
+            struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA (nlh);
+
+            if (ifi-&gt;ifi_index == idx)
+              found = 1;
+          }
+          break;
+        default:
+          break;
+        }
+    }
+
+  return found;
+}
+
+static int
+get_nic_addr (const char     *nic,
+              struct ifaddrs *ifaddr,
+              int             wanted_family,
+              char           *host,
+              int             host_len,
+              int            *active)
+{
+  struct ifaddrs *ifa;
+
+  for (ifa = ifaddr; ifa != NULL; ifa = ifa-&gt;ifa_next)
+    {
+      int family;
+      int s;
+
+      if (ifa-&gt;ifa_addr == NULL)
+        continue;
+
+      if (strcmp (ifa-&gt;ifa_name, nic))
+        continue;
+
+      /* Skip unwanted families. */
+      family = ifa-&gt;ifa_addr-&gt;sa_family;
+      if (family != wanted_family)
+        continue;
+
+      *active = (ifa-&gt;ifa_flags &amp; IFF_RUNNING) ? 1 : 0;
+
+      s = getnameinfo (ifa-&gt;ifa_addr,
+                       family == AF_INET ? sizeof (struct sockaddr_in) :
+                                           sizeof (struct sockaddr_in6),
+                       host,
+                       host_len,
+                       NULL,
+                       0,
+                       NI_NUMERICHOST);
+      if (s != 0)
+        {
+          fprintf (stderr, "failed to getnameinfo() for '%s - %s(%d)",
+                   ifa-&gt;ifa_name, strerror (errno), errno);
+          continue;
+        }
+
+      /* Get the address of only the first network interface card. */
+      return 1;
+    }
+
+  return 0;
+}
+
+static void
+print_ip (const char *nic)
+{
+  struct ifaddrs *ifaddr;
+  char            addr[NI_MAXHOST];
+  int             active;
+
+  if (getifaddrs (&amp;ifaddr) == -1)
+    {
+      fprintf (stderr, "failed to getifaddrs() - %s(%d)", strerror (errno), errno);
+      return;
+    }
+
+  if (!get_nic_addr (nic, ifaddr, AF_INET, addr, sizeof (addr), &amp;active))
+    if (!get_nic_addr (nic, ifaddr, AF_INET6, addr, sizeof (addr), &amp;active))
+      {
+        strcpy (addr, "127.0.0.1");
+        active = 0;
+      }
+
+  freeifaddrs (ifaddr);
+
+  fprintf (stdout, "%s is %s (link %s)n",
+           nic, addr, active ? "active" : "inactive");
+}
+
+int
+main (void)
+{
+  char *nic = "eth0";
+  int   sock;
+
+  print_ip (nic);
+
+  sock = create_sock (nic);
+  if (sock &lt; 0)
+    return -1;
+
+  while (1)
+    {
+      int ret;
+
+      ret = ip_changed (sock, nic);
+      if (ret &lt; 0)
+        return -1;
+
+      if (ret)
+        print_ip (nic);
+    }
+
+  close (sock);
+
+  return 0;
+}
+
+/*
+  Local Variables:
+   mode:c
+   c-file-style:"gnu"
+   indent-tabs-mode:nil
+  End:
+  vim:autoindent:filetype=c:expandtab:shiftwidth=2:softtabstop=2:tabstop=8
+*/</pre>
+<p>참고로 위 소스에서 네트웍 인터페이스 설정 변경을 감지하기 위해 사용한 소켓 파일 디스크립터(socket file descriptor)는 <code><a href="http://www.kernel.org/doc/man-pages/online/pages/man2/select.2.html">select()</a></code> / <code><a href="http://www.kernel.org/doc/man-pages/online/pages/man2/poll.2.html">poll()</a></code> 등을 이용해 비동기적으로 감시하는 것도 가능합니다. 당연하지만, <a href="http://sunjinyang.wordpress.com/2009/09/21/using-glib-mainloop/">GLib 메인루프</a>의 <code><a href="http://developer.gnome.org/glib/stable/glib-IO-Channels.html#g-io-add-watch">g_io_add_watch()</a></code> 등을 이용해도 됩니다.</p>
+<p><strong>[UPDATE 2012-03-21]</strong> <code><a href="http://www.kernel.org/doc/man-pages/online/pages/man7/rtnetlink.7.html">rtnetlink(7)</a></code> 프로토콜의 기반이 되는 <code><a href="http://www.kernel.org/doc/man-pages/online/pages/man7/netlink.7.html">netlink(7)</a></code> 프로토콜에 대해 더 자세히 알고 싶다면 <a href="http://www.infradead.org/~tgr/libnl/doc/core.html#core_netlink_fundamentals">Netlink 라이브러리의 Netlink 프로토콜 기초 문서</a>를 참고하기 바랍니다.</p>

@@ -1,15 +1,9 @@
 ---
 layout: page
-title: About
+title: lethean
 permalink: /about/
 ---
 
-Some information about you!
+a. Of or pertaining to Lethe; resembling in effect the water of Lethe. --Milton. Barrow. [1913 Webster]
 
-### More Information
-
-A place to include any other types of information that you'd like to include about yourself. 
-
-### Contact me
-
-[email@domain.com](mailto:email@domain.com)
+a. 망각의 강의;과거를 잊게 하는

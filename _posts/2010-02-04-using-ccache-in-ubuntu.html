@@ -1,0 +1,36 @@
+---
+layout: post
+title: "우분투에서 ccache 사용하기"
+date: 2010-02-04 13:30:53.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- GCC
+- Ubuntu
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  lightboxoff: 'false'
+  _edit_last: '3788329'
+  original_post_id: '1222'
+  _wp_old_slug: '1222'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p><a href="http://www.google.co.kr/search?hl=ko&amp;newwindow=1&amp;q=ccache&amp;btnG=%EA%B2%80%EC%83%89&amp;lr=lang_ko&amp;aq=f&amp;oq=">ccache</a>는 워낙 유명하고 오래된 개발 도구라서, 검색해보면 우리말로 된 글도 많이 찾을 수 있으므로 자세한 설명은 생략하고, 최근에 다른 개발 장비를 구축할 일이 있어서 검토해보다가, 페도라는 이미 기본으로 ccache를 사용하도록 되어 있고, 우분투 / 데비안 계열에서도 매우 쉽게 사용할 수 있도록 되어 있는 걸 알게 되었습니다. 그래서 다시 한 번 정리합니다.</p>
+<p>먼저 패키지를 설치합니다.</p>
+<pre>$ sudo apt-get install ccache</pre>
+<p><code>/etc/environment</code> 파일을 열어 <code>PATH</code> 변수 맨 앞에 <code>'/usr/lib/ccache'</code> 를 추가합니다. 예를 들어 아래와 같다면</p>
+<pre>PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games"</pre>
+<p>다음과 같이 변경합니다.</p>
+<pre>PATH="/usr/lib/ccache:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games"</pre>
+<p>다시 로그인하면 모든 gcc, g++ 명령은 자동으로 ccache를 이용하게 됩니다.</p>
+<p>물론 본인 계정에서만 사용하고 싶다면, 홈디렉토리 밑의 <code>.bashrc</code> 또는 <code>.bash_profile</code>, <code>.profile</code> 파일에 다음과 같은 내용을 추가하면 됩니다.</p>
+<pre>export PATH="/usr/lib/ccache:$PATH"</pre>
+<p>GCC가 느리다고 불평하는 일이 조금 줄어들까요?</p>

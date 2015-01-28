@@ -1,0 +1,28 @@
+---
+layout: post
+title: 'VMWare rtc: lost some interrupts'
+date: 2007-06-11 19:33:00.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- Linux
+- VMware
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  original_post_id: '133'
+  _wp_old_slug: '133'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>64비트 장비에 우분투 서버를 설치하고 VMware를 가동하면 다음과 같은 에러가 발생한다.</p>
+<pre>[16825.988196] printk: 246 messages suppressed.
+[16825.988201] rtc: lost some interrupts at 2048Hz.</pre>
+<p>구글링을 통해 알게된 <a href="http://chxo.com/be2/20060821_3333.html">사이트</a>에서 <tt>/etc/vmware/config</tt> 파일에 <tt>host.useFastClock = FALSE</tt> 항목을 추가하면 된다는 걸 알았는데, 문제는 시각 동기화가 잘 안되어 VMware로 실행하는 이미지 내부에서 ntp 데몬 등을 이용하여 시각동기화를 해주어야 한다.</p>

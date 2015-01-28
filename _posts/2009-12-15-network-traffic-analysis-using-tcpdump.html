@@ -1,0 +1,53 @@
+---
+layout: post
+title: tcpdump를 이용한 네트워크 사용량 측정하기
+date: 2009-12-15 15:30:24.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- Linux
+- MacOSX
+- Network
+- Shell
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  lightboxoff: 'false'
+  _wp_old_slug: '1152'
+  original_post_id: '1152'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>업무상 실제 패킷 사용량을 측정할 필요때문에 여러가지 도구를 찾던 중 마땅한 걸 찾지 못해 직접 측정한 방식을 정리해 봅니다. 물론 이보다 더 좋은 방법들이 당연히 있을테지만, tcpdump 프로그램만 겨우 사용할 수 있는 환경에서 측정하는 법을 정리한 문서를 찾지 못해 남겨둡니다.</p>
+<p>우선 어떤 방식으로든 해당 장비에 tcpdump 프로그램을 설치합니다.</p>
+<p>그리고 측정하려는 과정이나 단계가 시작하는 동시에 다음과 같이 tcpdump 프로그램을 실행합니다.</p>
+<pre>$ tcpdump -qvtttt dst xxx.xxx.xxx.xxx &gt; packet-dump.txt</pre>
+<p>여기서 <code>xxx.xxx.xxx.xxx</code>는 측정에 사용할 대상 장비입니다. 즉, 위 예제는 특정 IP로 전송하는 패킷량만 캡쳐하여 <code>packet-dump.txt</code> 파일에 저장합니다. 중요한 점은 앞의 옵션인데, 이 옵셥을 사용해야 아래에서 사용하는 스크립트가 분석할 수 있는 형태의 결과물로 저장됩니다. 그리고, 필요하다면, 저장한 파일을 리눅스 또는 맥 장비로 복사합니다.</p>
+<p>저장한 파일을 <code>conv2csv.sh</code> 스크립트를 이용해 엑셀이나 오픈오피스에서 읽어들일 수 있는 CSV 파일 형태로 변환합니다.</p>
+<pre>$ ./conv2csv.sh packet-dump.txt</pre>
+<p>변환된 <code>packet-dump.csv</code> 파일은 한 행에 '<strong>TIMESTAMP BYTES Kbps</strong>' 형태로 각 초당 데이터가 저장되어 있습니다. 따라서 이 파일을 액셀이나 오픈오피스에서 공백(space)을 구분자로 해서 읽어들인 후 3번째 컬럼을 사용하면 됩니다. 참고로 여기서 측정한 크기는 IP/TCP/UDP 헤더까지 포함한 크기입니다.</p>
+<p>다음은 이렇게 변환한 데이터를 구글 스프레드시트를 이용해 만든 차트입니다.</p>
+<p><img src="/figures/packet-traffic-analysis.png" /></p>
+<p>위에서 언급한 <code>conv2csv.sh</code> 스크립트는 다음과 같습니다.</p>
+<pre>#!/bin/sh
+
+CSVFILE="$(dirname $1)/$(basename $1 .txt).csv"
+
+awk '{ print $2, $18 }' $1 | 
+  tr '.)' '  ' | 
+  awk 'BEGIN { last = ""; sum = 0; } 
+       { if (last == $1) 
+           { sum += $3 } 
+         else 
+           { print last, sum, sum * 8 / 1000; 
+             last = $1; 
+             sum = $3; } 
+       }' &gt; $CSVFILE</pre>
+<p>;)</p>

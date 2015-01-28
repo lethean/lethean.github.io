@@ -1,0 +1,130 @@
+---
+layout: post
+title: "우분투 10.10 한글 글꼴 설정"
+date: 2010-08-06 21:41:56.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- FontConfig
+- Hangul
+- Ubuntu
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  original_post_id: '1372'
+  _wp_old_slug: '1372'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>Btrfs 파일 시스템을 사용해 보려고 새로 나온 우분투 10.10 버전을 설치했습니다. 그런데, 아니나 다를까 한글 글꼴 설정은 여전히 맘에 들지 않는군요. 예전에는 이것 저것 쉽게 찾아 고쳤는데, 시간이 점점 흘러서 그 과정을 자꾸 잊어버리게 되다 보니 오늘은 조금 더 많이 헤매게 되어 기록해 두려고 합니다.</p>
+<p>먼저 메인 글꼴로 사용하는 나눔글꼴은 우분투 저장소에 패키지(ttf-nanum, ttf-nanum-coding)가 이미 올라와 있어서 그대로 설치해서 사용했습니다. 더불어 기본적인 MS 글꼴 패키지(ttf-mscorefonts-installer)를 설치하고, 터미널 글꼴로 사용하는 드로이드 글꼴(ttf-droid)을 설치하고 <a href="http://sunjinyang.wordpress.com/2010/07/19/hinting-for-different-fonts/">cairo 라이브러리 패치 작업을 한 뒤</a> '<strong>시스템-기본 설정-모양</strong>'은 다음 그림과 같이 설정했습니다.</p>
+<p><img src="/figures/gnome-appearance-properties.jpg" /></p>
+<p>이제 글꼴 설정 파일을 건드려야 하는데, 제일  먼저 <code>/etc/fonts/conf.d/</code> 디렉토리에서 <span style="text-decoration:line-through;"><code>10-hinting-slight.conf</code> 파일과</span> <code>29-language-selector-ko-kr.conf</code> 파일을 삭제합니다. 그래야 일반적인 영문 / 한글 글꼴에 대한 힌팅이 예쁘게 동작합니다. 그 다음에 같은 디렉토리의 <code>69-language-selector-ko-kr.conf</code> 파일을 다음과 같이 수정합니다.</p>
+<pre>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE fontconfig SYSTEM "fonts.dtd"&gt;
+&lt;fontconfig&gt;
+
+&lt;!-- Set preferred Korean fonts --&gt;
+&lt;match target="pattern"&gt;
+  &lt;test qual="any" name="family"&gt;
+    &lt;string&gt;sans-serif&lt;/string&gt;
+  &lt;/test&gt;
+  &lt;edit name="family" mode="prepend" binding="strong"&gt;
+    &lt;string&gt;DejaVu Sans&lt;/string&gt;
+    &lt;string&gt;나눔고딕&lt;/string&gt;
+    &lt;string&gt;UnDotum&lt;/string&gt;
+  &lt;/edit&gt;
+&lt;/match&gt;
+
+&lt;match target="pattern"&gt;
+  &lt;test qual="any" name="family"&gt;
+    &lt;string&gt;serif&lt;/string&gt;
+  &lt;/test&gt;
+  &lt;edit name="family" mode="prepend" binding="strong"&gt;
+    &lt;string&gt;DejaVu Serif&lt;/string&gt;
+    &lt;string&gt;나눔명조&lt;/string&gt;
+    &lt;string&gt;UnBatang&lt;/string&gt;
+  &lt;/edit&gt;
+&lt;/match&gt;
+
+&lt;match target="pattern"&gt;
+  &lt;test qual="any" name="family"&gt;
+    &lt;string&gt;monospace&lt;/string&gt;
+  &lt;/test&gt;
+  &lt;edit name="family" mode="prepend" binding="strong"&gt;
+    &lt;string&gt;Droid Sans Mono&lt;/string&gt;
+    &lt;string&gt;DejaVu Sans Mono&lt;/string&gt;
+    &lt;string&gt;나눔고딕코딩&lt;/string&gt;
+    &lt;string&gt;Guseul&lt;/string&gt;
+    &lt;string&gt;UnDotum&lt;/string&gt;
+  &lt;/edit&gt;
+&lt;/match&gt;
+
+&lt;match target="font"&gt;
+   &lt;test name="family"&gt;
+    &lt;string&gt;나눔고딕&lt;/string&gt;
+    &lt;string&gt;NanumGothic&lt;/string&gt;
+    &lt;string&gt;나눔고딕코딩&lt;/string&gt;
+    &lt;string&gt;NanumGothicCoding&lt;/string&gt;
+    &lt;string&gt;맑은 고딕&lt;/string&gt;
+    &lt;string&gt;Malgun Gothic&lt;/string&gt;
+    &lt;string&gt;UnDotum&lt;/string&gt;
+    &lt;string&gt;UnBatang&lt;/string&gt;
+  &lt;/test&gt;
+  &lt;edit name="hintstyle" mode="assign"&gt;
+    &lt;const&gt;hintmedium&lt;/const&gt;
+  &lt;/edit&gt;
+&lt;/match&gt;
+
+&lt;match target="font"&gt;
+  &lt;test name="family"&gt;
+    &lt;string&gt;나눔명조&lt;/string&gt;
+    &lt;string&gt;NanumMyeongjo&lt;/string&gt;
+  &lt;/test&gt;
+  &lt;edit name="hintstyle" mode="assign"&gt;
+    &lt;const&gt;hintslight&lt;/const&gt;
+  &lt;/edit&gt;
+&lt;/match&gt;
+
+&lt;match target="font"&gt;
+  &lt;test name="family"&gt;
+    &lt;string&gt;DejaVu Sans Mono&lt;/string&gt;
+    &lt;string&gt;Droid Sans Mono&lt;/string&gt;
+  &lt;/test&gt;
+  &lt;edit name="hintstyle" mode="assign"&gt;
+    &lt;const&gt;hintslight&lt;/const&gt;
+  &lt;/edit&gt;
+&lt;/match&gt;
+
+&lt;match target="font"&gt;
+ &lt;test name="family"&gt;
+ &lt;string&gt;Andale Mono&lt;/string&gt;
+ &lt;string&gt;Arial Black&lt;/string&gt;
+ &lt;string&gt;Arial&lt;/string&gt;
+ &lt;string&gt;Comic Sans MS&lt;/string&gt;
+ &lt;string&gt;Courier New&lt;/string&gt;
+ &lt;string&gt;Georgia&lt;/string&gt;
+ &lt;string&gt;Impact&lt;/string&gt;
+ &lt;string&gt;Tahoma&lt;/string&gt;
+ &lt;string&gt;Times New Roman&lt;/string&gt;
+ &lt;string&gt;Trebuchet MS&lt;/string&gt;
+ &lt;string&gt;Verdana&lt;/string&gt;
+ &lt;string&gt;Webdings&lt;/string&gt;
+ &lt;/test&gt;
+ &lt;edit name="hintstyle" mode="assign"&gt;
+ &lt;const&gt;hintmedium&lt;/const&gt;
+ &lt;/edit&gt;
+&lt;/match&gt;
+
+&lt;/fontconfig&gt;</pre>
+<p>뭐, ﻿대충 이 정도만 설정해도 깔끔한 모양의 글꼴을 볼 수 있습니다.</p>
+<p>사족) Btrfs 파일 시스템은 많은 디스크 I/O가 동시에 걸리면 시스템 전체가 느려지는 듯한 느낌이 여전히 듭니다. 뭐, 앞으로 조금씩 더 좋아지겠지요.</p>
+<p><strong>[UPDATE-2010.12.23]</strong> 이 포스트를 작성하는 시점에서는 아직 Ubuntu 글꼴이 패포판에 포함되지 않았던 시점이라서 이를 사용한 fontconfig 설정으로 업데이트 했습니다.</p>
+<p><strong>[UPDATE-2011.01.04]</strong> 한동안 크로미엄 브라우저만 사용하다가 최근 다시 파이어폭스를 사용하다보니 MS 글꼴이 이쁘게 나오지 않는 걸 확인하고 이를 반영했습니다.</p>

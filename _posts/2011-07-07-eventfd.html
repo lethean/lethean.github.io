@@ -1,0 +1,29 @@
+---
+layout: post
+title: eventfd 소개
+date: 2011-07-07 17:36:13.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- glibc
+- Linux
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  _wp_old_slug: '1731'
+  original_post_id: '1731'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>리눅스에서 비단 부모 자식 프로세스간 통신 뿐 아니라, 쓰레드간 메시지 전달에도 <a href="http://www.kernel.org/doc/man-pages/online/pages/man2/pipe.2.html">pipe()</a>를 자주 이용합니다. 읽거나 쓸때 별도로 뮤텍스로 보호해줄 필요가 없기 때문이기도 하지만, 무엇보다도 poll(), select(), epoll() 등과 함께 사용할 수 있기 때문입니다. 예를 들어 예전에 적었던 <a href="http://sunjinyang.wordpress.com/2008/08/06/glib-thread-programming/">GLib 쓰레드 프로그래밍</a>에서 쓰레드간 통신에 g_async_queue()를 이용하는데, 이 방법의 단점은 쓰레드가 오직 이 메시지가 도착했을때만 깨어난다는 점입니다. 만일 이 쓰레드가 네트웍 소켓 작업이나 파일 읽기 쓰기 작업을 비동기적으로 계속 처리해야 한다면 타임아웃을 주어 처리하거나 반대로 다시 주기적으로 메시지큐를 검사하는 방법밖에 없습니다. 하지만, 리눅스에서 모든 소켓 작업, 파일 작업은 디스크립터(descriptor)로 단일화되어 있기 때문에 pipe()로 생성된 디스크립터와 실제 작업 디스크립터를 한꺼번에 epoll() 등을 이용해 처리하면 불필요한 오버헤드 없이 정확하게 작업을 처리해야할 시점에 깨어나 필요한 작업을 처리하게 됩니다. 즉, 메시지큐에 실제 메시지를 넣고 파이프의 쓰기 디스크립터에 더미 데이터를 쓰면, 작업 쓰레드에서는 파이프 읽기 디스크립터에 내용이 있을 경우 poll() 등이 감지하기 때문에 자동으로 깨어나 처리하는 방식입니다. 심지어, 파이프 전송시 더미 데이터가 아닌 메시지 내용 혹은 주소(pointer)를 쓰고, 읽는 쓰레드에서 이를 읽어 처리하면 별도의 메시지큐도 불필요하게 됩니다.</p>
+<p>이 글에서 소개하려는 <a href="http://www.kernel.org/doc/man-pages/online/pages/man2/eventfd.2.html">eventfd()</a>는 파이프 역할을 어느 정도 대체하기 위해 최근(?) 리눅스 커널에 추가된 API입니다. 읽고 쓰기에 각각 다른 두 개의 파일 디스크립터를 사용하는 파이프와 달리 eventfd는 한 개의 파일 디스크립터를 가지고 동시에 읽고 쓰기 작업을 처리합니다. 또한 별도 커널 버퍼와 복사 과정이 필요한 파이프와 달리 정수 값을 더하고(쓰고) 읽는 작업만 처리하기 때문에 성능도 훨씬 좋다고 합니다. 물론 파일 디스크립터이기 때문에 poll() 등과 함께 사용할 수 있습니다.</p>
+<p>동작 방식을 간단하게 설명하면, write() 호출시 64비트 정수값을 쓰면 내부 버퍼 값에 더하면서, read() 호출시 내부 버퍼 값이 0일 경우 기다리다가, 값이 바뀌면 그 값을 읽어오고 0으로 초기화합니다.(세마포어 방식일 경우 1을 읽어오고 그 값에서 1을 감소합니다) 즉, 읽기 작업에 대한 poll() 호출은 내부 버퍼 값이 0일 경우 입력이 없는 것으로, 1 이상의 값일 경우 입력이 있는 것으로 간주하고 디스크립터를 감지하게 됩니다. (예제 코드는 매뉴얼 페이지에 포함된 코드를 확인하시길... 물론 예제 코드는 쓰레드간 통신에도 잘 동작합니다)</p>
+<p>매뉴얼에 의하면 리눅스 커널 2.6.22, glibc 2.8 버전부터 eventfd() 함수를 지원합니다. 대부분의 요즘 리눅스 데스크탑 / 서버 배포판에서는 당연히 사용할 수 있지만 임베디드 시스템에서는 버전을 확인해야할 필요가 있습니다. 물론, eventfd가 메시지 내용 자체를 전송할 수 없다는 단점도 있지만, 이와 함께 리눅스 커널이 제공하는 <a href="http://www.kernel.org/doc/man-pages/online/pages/man2/signalfd.2.html">signalfd()</a>, <a href="http://www.kernel.org/doc/man-pages/online/pages/man2/timerfd_create.2.html">timerfd()</a>, <a href="http://linux.die.net/man/4/epoll">epoll()</a> 등을 함께 사용하면 고전 유닉스 프로그래밍의 한계에서 벗어나 마음껏 이벤트 기반 코드를 만들 수 있습니다.</p>
+<p>물론 이미 잘 만들어진 <a href="http://sunjinyang.wordpress.com/2009/09/21/using-glib-mainloop/">GLib 메인루프</a>나 <a href="http://bebop.emstone.com/2011/05/18/libevent/">libevent</a> 등과 같은 라이브러리를 사용하는 것도 좋지만... :)</p>

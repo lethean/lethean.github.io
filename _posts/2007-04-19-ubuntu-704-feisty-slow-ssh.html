@@ -1,0 +1,28 @@
+---
+layout: post
+title: Ubuntu 7.04 (feisty) 느린 SSH 접속
+date: 2007-04-19 18:52:00.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- Linux
+- Ubuntu
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  lightboxoff: 'false'
+  _wp_old_slug: '129'
+  original_post_id: '129'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>Ubuntu 7.04에서 ssh 접속 등을 시도할때 다른 시스템보다 초기 접속이 느린 이유가 <a href="https://bugs.launchpad.net/ubuntu/+source/avahi/+bug/94940">avahi-daemon 관련 설정 때문</a>이라고 한다. 그래서 /etc/nsswitch.conf 파일에서 'hosts:' 부분을 다음과 같이 수정해보았더니, 역시 빨리 접속된다.</p>
+<pre>hosts:          files dns</pre>
+<p>정식 릴리스에 반영되기에는 시간이 촉박한 것 같다...</p>

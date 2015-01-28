@@ -1,0 +1,29 @@
+---
+layout: post
+title: Pango 1.15.2 한글 표시 문제
+date: 2006-12-23 23:26:00.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- GTK+
+- OpenSource
+- Ubuntu
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  lightboxoff: 'false'
+  _wp_old_slug: '118'
+  original_post_id: '118'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>한글 메일링 리스트에서 pango 라이브러리 최적화 논의가 오고 가더니 그 결과가 최신 버전에 이미 반영된 모양이다. 엊그제(?) 우분투 개발 버전에 새로 1.15.2-0ubuntu1 버전 패키지가 올라왔는데, 릴리스 변동 사항에 포함되어 있었다. 문제는 몇몇 한글 글자가 흩어져서(?) 표시되는 현상이 발생하길래, 조금 있으면 버그가 수정되어 올라오겠지 기다리다가 참지 못하고 오늘 결국 직접 원인을 찾아보았더니, 의외로 빨리 해결책을 얻을 수 있었다.</p>
+<p>그놈 버그질라에 이미 '<a href="http://bugzilla.gnome.org/show_bug.cgi?id=388581">Composing jamo is broken in pango-1.15.2'</a> 항목으로 같은 현상이 보고되어 있었고 거기에 추가된 패치를 적용해보니 다시 정상적으로 한글이 표시된다.</p>
+<p>이런 경우가 내겐, 오픈소스의 매력을 느끼는 순간이다.</p>

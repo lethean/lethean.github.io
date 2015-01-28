@@ -1,0 +1,36 @@
+---
+layout: post
+title: DBus or Upstart
+date: 2007-07-25 16:12:00.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- Linux
+- Ubuntu
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  original_post_id: '135'
+  _wp_old_slug: '135'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>Dbus를 이용해 이제는 시스템 데몬과 같은 프로그램까지 실행할 수 있게 될 것 같다.(<a href="http://hughsient.livejournal.com/31169.html">Dbus System Activation is upstream</a> 참고) 디자인 문서를 보니,  다음과 같이 서비스 파일을 정의하면 해당 메시지가 발생했을때 해당 서버가 동작하는 방식이다.</p>
+<pre>[D-BUS Service]
+Name=org.me.test
+Exec=/usr/sbin/dbus-test-server.py
+User=ftp</pre>
+<p>다음과 같이 직접 실행할 수도 있다.</p>
+<pre>dbus-send --system --print-reply 
+ --dest=org.freedesktop.DBus 
+ /org/freedesktop/DBus 
+ org.freedesktop.DBus.StartServiceByName 
+ string:org.freedesktop.Hal uint32:0</pre>
+<p>이렇게 되면 현재 Ubuntu 시스템의 기반이 되는 upstart나 기존의 sysvinit 등과 같은 시스템 초기화 시스템도 불필요해질 수있다고 하는데, 단순히 메시지 기반 병렬 실행 기능만으로는 서비스간 의존성이나 초기화 과정의 많은 예외처리까지는 어렵지 않을까 싶다.</p>

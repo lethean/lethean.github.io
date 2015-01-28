@@ -1,0 +1,37 @@
+---
+layout: post
+title: doxy2dbook 업그레이드
+date: 2009-07-20 14:21:13.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- DocBook
+- doxy2dbook
+- Doxygen
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  lightboxoff: 'false'
+  _edit_last: '3788329'
+  _wp_old_slug: '778'
+  original_post_id: '778'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>지난 번에 공개한 <a href="http://sunjinyang.wordpress.com/2009/07/06/doxy2dbook-doxygen-to-docbook-converter/">Doxygen -&gt; DocBook 변환기</a> doxy2dbook 프로그램의 업그레이드 버전입니다. 20090706 버전 이후 변경 사항은 다음과 같습니다.</p>
+<ul>
+<li>함수 인수(parameters) 이름 줄맞춤 (indent)</li>
+<li>struct / enum 에 속성(attributes) 이름 줄맞춤 (indent)</li>
+<li>'inline' 함수 + 'union' 형 문서화 지원</li>
+<li>링크에 사용하는 ID를 doxygen ID가 아닌 읽기 쉬운 API 이름을 그대로 사용</li>
+<li>&lt;indexterm&gt; 태그 추가 (DocBook 문서에 '&lt;index/&gt;' 태그를 넣으면 C/C++ API 색인이 자동으로 생성됨)</li>
+</ul>
+<p>사용법은 안에 들어있는 README 파일을 참고하시기 바랍니다.</p>
+<p>이 프로그램은 업무상 회사에서 작성한 코드이기 때문에 저작권은 당연히 회사에게 있습니다. 라이센스는 GPL입니다.</p>
+<p>다운로드 :  <a href="https://sunjinyang.files.wordpress.com/2009/07/doxy2dbook-20090720-tar.gz">doxy2dbook-20090720.tar.gz</a></p>

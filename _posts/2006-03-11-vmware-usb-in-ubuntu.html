@@ -1,0 +1,27 @@
+---
+layout: post
+title: VMWare USB in Ubuntu
+date: 2006-03-11 14:13:00.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- Ubuntu
+- VMware
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  original_post_id: '91'
+  _wp_old_slug: '91'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>우분투 리눅스는 항상 최신 아키텍쳐를 반영하기 때문에 기존 API나 아키텍쳐를 기반으로 동작하는 써드파티 어플리케이션이 동작 안하는 경우가 가끔 있는데, VMWare도 그 중 하나인 것 같다.</p>
+<p>언젠가부터 USB 장치를 VMWare 윈도우즈에서 인식을 못한다고 생각했는데, 오늘 검색해 보니 VMWare가 근거로 하는 <code>/proc/bus/usb</code> 디렉토리 내용이 없어서였다. 다음 줄을 <code>/etc/fstab</code> 파일에 추가해 주고 재부팅하거나, <code>mount -a</code> 명령으로 마운트해준 다음 VMWare를 재시작하면 정상적으로 USB 장치를 인식하게 된다.</p>
+<pre>none        /proc/bus/usb    usbfs  defaults      0    0</pre>

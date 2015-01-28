@@ -1,0 +1,51 @@
+---
+layout: post
+title: "리눅스 커널 2.6.32 릴리스"
+date: 2009-12-18 15:39:59.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- Kernel
+- Linux
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  lightboxoff: 'false'
+  _edit_last: '3788329'
+  original_post_id: '1149'
+  _wp_old_slug: '1149'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p><a href="http://lwn.net/Articles/364927/">리눅스 커널 2.6.32 릴리스 소식</a>을 들은지 한참 지난 지금에서야 정리해 봅니다. 모든 일이 그렇지만, 언제 이 버전의 커널을 프로젝트에 사용할지 모르는 일이므로 게으름부리지 말아야겠다는 생각이 다시 들고 있는 요즘입니다.</p>
+<p>언제나 그렇듯이 제가 관심있는 내용만 정리합니다.</p>
+<p><strong>CFQ IO 스케쥴러 새 기능</strong></p>
+<p>리눅스 커널의 기본 IO 스케쥴러인 CFQ 스케쥴러에 새 기능이 추가되었습니다. 백그라운드 IO 작업이 다른 작업에 영향을 덜 끼치도록 하여 데스크탑 관련 프로세스나 미디어 재생 프로그램의 상호작용성(interactiveness)을 향상시키는 기능인데, 반대로 IO 처리율(throughput) 성능을 떨어뜨릴 수도 있습니다.</p>
+<p>따라서 IO 성능이 더 중요한 시스템, 예를 들어 서버나 GUI 기능이 필요없는 시스템이라면 다음처럼 이 기능을 꺼야 합니다. (/dev/sda 장치의 경우)</p>
+<pre>$ echo 0 &gt; /sys/class/block/sda/queue/iosched/low_latency</pre>
+<p>아마도 배포판의 경우 서버 / 데스크탑별로 자체 튜닝을 하지 않을까 싶습니다. 더 자세한 내용은 <a href="http://lwn.net/Articles/355904/">LWN.net 페이지</a>를 참고하시기 바랍니다.</p>
+<p><strong>KVM 성능 향상</strong></p>
+<p>가상화 관련되어서는 KSM(kernel shared memory) 기술이 도입되어 KVM과 같은 가상환경의 메모리 사용량을 더 줄였습니다. 예를 들어 여러 가상머신을 실행하고 있을때 이들이 동일한 소프트웨어 라이브러리나 프로그램을 사용할 경우 이를 하나의 메모리에 공유해서 사용하도록 하여 실제 메모리 사용량을 줄이는 기술입니다. 사용하려면 명시적으로 다음과 같이 실행해야 합니다.</p>
+<pre>$ echo 1 &gt; /sys/kernel/mm/ksm/run</pre>
+<p><strong>Devtmpfs 파일시스템</strong></p>
+<p>/dev 디렉토리를 메모리파일시스템(tmpfs)을 이용해 처리할 수 있도록 devtmpfs 파일시스템이 추가되었습니다. 'devfs 2.0'이라고도 불릴수 있는데, 커널 자신이 부팅하면서 램디스크를 만들어 마운트하고 장치 파일을 만들기 때문에 부팅시간을 줄일 수 있을 뿐 아니라 udev 등을 사용하지 않아도 되고, 이를 위한 initrd 파일시스템 없이 부팅할 수 있도록 도와줍니다.</p>
+<p><strong>X86 플랫폼 지원 향상</strong></p>
+<p>인텔 무어스타운(Moorestown) 플랫폼을 공식적으로 추가되고 아톰(Atom)이 하나의 프로세서로 분리되면서 더 최적화된 지원을 하게 되었습니다. 더불어 인텔의 <a href="http://simplefirmware.org/">SFI(Simple Firmware Interface)</a>를 지원한다고 하는데, ACPI를 대체하기 위해 인텔이 만든 것이라고 합니다. 무어스타운 플랫폼 자체가 스마트폰, MID(Mobile Internet Device) 등과 같은 임베디드 환경을 목표로 하므로 향후 이 플랫폼을 활용하려면 어쩔 수 없이 이 버전 이후 커널을 사용해야 할 것 같습니다.</p>
+<p>ACPI 4.0 지원이 추가된 것은 물론 최신 메인 보드의 I/O 장치가 제공하는 실행중 전원 절약 기능을 충분히 사용하도록 개선되면서 전원 관리 기능도 대폭 향상되었습니다.</p>
+<p><strong>성능 분석 도구 추가</strong></p>
+<p>성능 카운터(Performance Counters)가 성능 이벤트(Performance Events)로 이름이 바뀌면서 매우 많은 기능이 추가되었습니다. 프로세스 스케쥴러를 분석하는 작업을 쉽게 해주는 "<a href="http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff;h=0a02ad9331dd4db56c29c60db2e99c4daaad8a48">perf sched</a>" 도구라든지, "perf record"를 이용해 기록한 내용을 SVG 그래픽파일로 변환해주는 "<a href="http://blog.fenrus.org/?p=5">Timechart</a>" 도구 등이 그것입니다. Timechart는 bootchart와도 비슷하지만, 커널 레벨에서 수집하는 정보를 사용하기 때문에 부팅 시간 단축을 위한 측정에도 유용할 것 같습니다.</p>
+<p><strong>CFS 스케쥴러 성능 개선</strong></p>
+<p>안드로이드(Android)를 비롯한 리눅스 커널을 사용하는 몇몇 프로젝트에서는 이미 반영하고 있어 요즘 이슈가 되고 있는 <a href="http://ck.kolivas.org/patches/bfs/sched-BFS.txt">BFS</a> 스케쥴러와 관련된 패치도 있군요. 오픈소스 H.264 인코더 라이브러리 X264 개발자가 <a href="http://x264dev.multimedia.cx/?p=185">블로그</a>에서 밝힌 것처럼, 멀티코어 시스템에서 x264 인코딩을 실행하면 BFS 스케쥴러를 사용하는 경우가 리눅스 기본 CFS 스케쥴러보다 80% 정도 성능 향상이 있다는 내용을 리눅스 커널 메일링 리스트에 올리자마자 커널 개발자들이 이를 흔쾌히 받아들여 기존 CFS 스케쥴러의 버그를 수정했다고 하는데, 이번 커널 릴리스에 반영되었습니다.</p>
+<p><strong>'localmodconfig' 설정 옵션 추가</strong></p>
+<p>커널 빌드를 위해 설정할때 'make localmodconfig' 명령을 실행하면, 현재 실행중인 커널과 실제로 로드된 커널 모듈 목록만을 가지로 자동으로 최적화된 커널 설정 파일을 만들어주는 기능입니다. 자주 커널을 테스트하는 사람에게 매우 유용한 옵션일 것 같습니다. 비슷하지만 모든 모듈을 컴파일하여 커널에 내장시키도록 해주는 'make localyesconfig' 명령도 추가되었습니다.</p>
+<p><strong>그외</strong></p>
+<p>btrfs 파일시스템을 많이 개선했고, 블럭 레이어 확장성(scalability)을 위한 개선 작업이 이루어졌습니다. 하지만 아직 사용하고 있지 않아 별로 감흥은...</p>
+<p>AMD/ATI 2000,300,4000 라데온 그래픽카드에 대한 커널모드스위치(KMS)와 3D그래픽 지원이 추가되었습니다. 인텔 칩셋은 항상 가장 먼저 지원되므로, 이제 메이저 칩셋 중에서는 NVIDIA 쪽만 남은 것 같기도 하고... 인텔 드라이버는 프레임버퍼 압축 기능을 지원하여 Idle 상태에서 전원을 0.5W 정도 절약한다고 합니다.</p>
+<p>VMware 설치시에 빌드하던 vmxnet3 기상 이더넷 드라이버가 커널에 공식적으로 포함되었습니다. 하지만 요즘은 VirtualBox를 사용하고 있어서 그다지...</p>
+<p>아무튼 ALSA 오디오 드라이버 / 비디오 / 이더넷 / 스토리지 등 많은 드라이버가 업데이트되었다고 하니, 더 자세한 내용이 궁금하신 분은 <a href="http://kernelnewbies.org/Linux_2_6_32">커널뉴비 페이지</a>를 참고하시기 바랍니다. 커널뉴비 페이지가 너무 길다면 '<a href="http://www.h-online.com/open/features/What-s-new-in-Linux-2-6-32-872271.html">What's new in Linux 2.6.32</a>' 기사를 보셔도 될 것 같습니다.</p>

@@ -1,0 +1,27 @@
+---
+layout: post
+title: GObject Property Binding 기능이 필요함
+date: 2009-04-20 14:16:39.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- GLib
+- GTK+
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  lightboxoff: 'false'
+  _edit_last: '3788329'
+  original_post_id: '564'
+  _wp_old_slug: '564'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>맥 코코아 프레임웍을 공부하면서 GTK+ / GObject 라이브러리에도 있으면 참 좋겠다고 생각한 것 중 하나가 특정 속성(property)을 다른 객체의 속성과 결합하는(binding) 개념입니다. 이를 이용해 자동으로 모델과 뷰를 클릭 몇 번으로 연결하고, 더 나아가 객체 배열은 물론 선택한 항목까지 자동으로 동기화되는 걸 보면서 정말 잘 만들어진 프레임웍이라는 걸 새삼 느낍니다. 또한 사용자가 직접 설계한 클래스를 인터페이스 빌더의 객체로 등록해서 마우스 클릭만으로 자연스럽게 연결이 되는 걸 보면 정말 부럽습니다.</p>
+<p>물론 GObject  객체의 속성 묶기(property binding)를 지원하기 위해 <a href="http://sunjinyang.wordpress.com/2008/12/15/exobinding/">ExoBinding</a>과 같은 라이브러리도 존재하지만, 이 역시 개발자가 직접 코드를 추가해주어야 하는 방식일 뿐 Glade와 같은 인터페이스 빌더에서 직접 사용할 수는 없습니다. 아쉽게도 <a href="http://mail.gnome.org/archives/gtk-devel-list/2009-April/msg00048.html">GTK+ 3.0 로드맵</a> / <a href="http://mail.gnome.org/archives/gtk-devel-list/2009-February/msg00039.html">GLib 2.22 예정</a>에도 없는 걸 보면 GTK+ 개발자들은 아무래도 직접 코딩하는 걸 더 선호하거나 혹은 필요성을 못 느끼거나, 또는 아직 괜찮다고 생각하는 구현이 없는 거라고 생각하고 싶을 뿐입니다.</p>

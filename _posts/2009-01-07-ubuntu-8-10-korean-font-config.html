@@ -1,0 +1,123 @@
+---
+layout: post
+title: Ubuntu 한글 글꼴 설정
+date: 2009-01-07 13:03:10.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- Hangul
+- Ubuntu
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  lightboxoff: 'false'
+  _wp_old_slug: '350'
+  original_post_id: '350'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>Ubuntu 설치시 한국어를 선택하면 한글을 사용하는데 별 문제가 없는 것 같지만, 글꼴이나 입력기 등이 조금 문제가 있기 때문에 '시스템' -&gt; '관리' -&gt; '언어' 설정에서 '지원되는 언어'에 '한국어'를 선택하고, 기본 언어로 '한국어'를 선택해주면 한글 관련 패키지와 설정이 자동으로 설치됩니다.</p>
+<p>하지만 이렇게 해도 기본 한글 글꼴 설정이 별로 미려하지 않은데, 제 경우 기본 글꼴 설정을 다음과 같이 변경해서 사용하고 있습니다.</p>
+<p>먼저 <code>/etc/fonts/conf.d/29-language-selector-ko-kr.conf</code> 파일은 다음과 같습니다.</p>
+<pre>&lt;fontconfig&gt;
+
+&lt;!-- Turn on antialias and hinting with hintmedium for ttf-Unfonts --&gt;
+&lt;match target="font"&gt;
+        &lt;test name="family" compare="contains"&gt;
+                &lt;string&gt;Un&lt;/string&gt;
+        &lt;/test&gt;
+        &lt;edit name="antialias" mode="assign"&gt;
+        &lt;bool&gt;true&lt;/bool&gt;
+    &lt;/edit&gt;
+        &lt;edit name="hinting" mode="assign"&gt;
+        &lt;bool&gt;true&lt;/bool&gt;
+    &lt;/edit&gt;
+    &lt;edit name="hintsytle" mode="assign"&gt;
+        &lt;const&gt;hintmedium&lt;/const&gt;
+    &lt;/edit&gt;
+&lt;/match&gt;
+
+&lt;!-- Turn off antialias and autohint for ttf-alee depending on pixelsize --&gt;
+&lt;match target="font"&gt;
+        &lt;test name="family"&gt;
+                &lt;string&gt;Guseul&lt;/string&gt;
+        &lt;/test&gt;
+        &lt;edit name="autohint" mode="assign"&gt;
+        &lt;bool&gt;true&lt;/bool&gt;
+    &lt;/edit&gt;
+&lt;/match&gt;
+&lt;match target="font"&gt;
+        &lt;test name="family"&gt;
+                &lt;string&gt;Guseul&lt;/string&gt;
+                &lt;string&gt;Guseul Mono&lt;/string&gt;
+        &lt;/test&gt;
+    &lt;test name="pixelsize" compare="more"&gt;
+        &lt;int&gt;11&lt;/int&gt;
+    &lt;/test&gt;
+    &lt;test name="pixelsize" compare="less"&gt;
+        &lt;int&gt;16&lt;/int&gt;
+    &lt;/test&gt;
+    &lt;edit name="antialias" mode="assign"&gt;
+        &lt;bool&gt;false&lt;/bool&gt;
+    &lt;/edit&gt;
+        &lt;edit name="autohint" mode="assign"&gt;
+        &lt;bool&gt;false&lt;/bool&gt;
+    &lt;/edit&gt;
+&lt;/match&gt;
+
+&lt;/fontconfig&gt;</pre>
+<p>두번째로 <code>/etc/fonts/conf.d/69-language-selector-ko-kr.conf</code> 파일은 다음과 같습니다.</p>
+<pre>&lt;fontconfig&gt;
+
+&lt;!-- Set preferred Korean fonts --&gt;
+    &lt;match target="pattern"&gt;
+        &lt;test qual="any" name="family"&gt;
+            &lt;string&gt;serif&lt;/string&gt;
+        &lt;/test&gt;
+        &lt;edit name="family" mode="prepend" binding="strong"&gt;
+            <strong>&lt;string&gt;DejaVu Serif&lt;/string&gt;</strong>
+            <strong>&lt;string&gt;NanumMyeongjo&lt;/string&gt;</strong>
+            &lt;string&gt;UnBatang&lt;/string&gt;
+        &lt;/edit&gt;
+    &lt;/match&gt;
+    &lt;match target="pattern"&gt;
+        &lt;test qual="any" name="family"&gt;
+            &lt;string&gt;sans-serif&lt;/string&gt;
+        &lt;/test&gt;
+        &lt;edit name="family" mode="prepend" binding="strong"&gt;
+            <strong>&lt;string&gt;DejaVu Sans&lt;/string&gt;</strong>
+            <strong>&lt;string&gt;NanumGothic&lt;/string&gt;</strong>
+            &lt;string&gt;UnDotum&lt;/string&gt;
+            &lt;string&gt;Guseul&lt;/string&gt;
+        &lt;/edit&gt;
+    &lt;/match&gt;
+    &lt;match target="pattern"&gt;
+        &lt;test qual="any" name="family"&gt;
+            &lt;string&gt;monospace&lt;/string&gt;
+        &lt;/test&gt;
+        &lt;edit name="family" mode="prepend" binding="strong"&gt;
+            <strong>&lt;string&gt;DejaVu Sans Mono&lt;/string&gt;</strong>
+            <strong>&lt;string&gt;Guseul&lt;/string&gt;</strong>
+            &lt;string&gt;UnDotum&lt;/string&gt;
+        &lt;/edit&gt;
+    &lt;/match&gt;
+
+&lt;!-- Bind EunGuseul Mono with Bitstream Vera Sans Mono --&gt;
+&lt;match target="pattern"&gt;
+    &lt;test name="family"&gt;
+        &lt;string&gt;Guseul&lt;/string&gt;
+    &lt;/test&gt;
+    &lt;edit mode="append" binding="strong" name="family"&gt;
+        &lt;string&gt;DejaVu Sans Mono&lt;/string&gt;
+    &lt;/edit&gt;
+&lt;/match&gt; 
+
+&lt;/fontconfig&gt;</pre>
+<p>위에서는 기본 글꼴로 영문은 DejaVu Sans 글꼴 계열, 한국어는 네이버 나눔 글꼴 계열을 사용하고 있습니다. 참고로, Adobe 플래시에서 한글이 깨지지 않게 하려면 한글 글꼴을 영문 글꼴보다 위에 두면 됩니다.</p>

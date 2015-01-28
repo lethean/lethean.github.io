@@ -1,0 +1,26 @@
+---
+layout: post
+title: FontConfig 2.4 in Ubuntu Feisty
+date: 2006-11-30 01:02:00.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- Ubuntu
+- Xorg
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  original_post_id: '107'
+  _wp_old_slug: '107'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>그렇다. 한동안 잠잠하더니 fontconfig 패키지가 2.4.1 버전으로 올라가면서 폰트 관련 설정이 대폭 변경되었다.</p>
+<p><tt>/etc/fonts/language-selector.conf</tt> 파일은 아예 참조도 안하고, 설정 파일도 철저하게(?) 분리되고 위치도 <tt>/etc/fonts/conf.d</tt>와 <tt>/etc/fonts/conf.avail</tt>로 나뉘어 설치와 사용을 구분하고 있다.  폰트 캐시 파일은 폰트가 위치한 각 디렉토리에 <tt>fonts.cache-1</tt>로 유지하더니 이제는 <tt>/var/cache/fontconfig</tt>로 통합되었다. 변동사항을 보니 이렇게 한군데로 모은뒤 메모리맵핑된 영역을 모든 프로세스가 공유하는 방식으로 바뀌면서 전체적인 어플리케이션 시작 속도 향상을 꾀한 것도 같다.</p>

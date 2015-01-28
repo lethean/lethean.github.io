@@ -1,0 +1,30 @@
+---
+layout: post
+title: "아주 잠시 Btrfs 파일시스템을 사용해보고"
+date: 2010-01-25 22:42:49.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- Kernel
+- Linux
+- Ubuntu
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  lightboxoff: 'false'
+  _edit_last: '3788329'
+  original_post_id: '1207'
+  _wp_old_slug: '1207'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>요즘 여기<a href="http://www.phoronix.com/scan.php?page=article&amp;item=ext4_btrfs_2633&amp;num=1">저기</a>서 Btrfs 파일시스템 얘기가 많아서, 한번 써봐야겠다 싶어 우분투 개발버전(lucid, linux kernel 2.6.32) 저장소를 확인해보니 패키지 하나만(btrfs-tools) 설치하면 되길래 홈디렉토리를 btrfs 파일시스템으로 교체해 보았습니다. 그리고 스트레스 테스트를 위해 회사에서 유지하는 모든 프로젝트의 Git 저장소를 내려받고(clone) 동시에 컴파일을 해봤습니다.</p>
+<p>그리고 지금, 다시 Ext4 파일시스템으로 되돌린 상태에서 동일하게 Git 저장소를 내려받으며 이 글을 적고 있습니다. 체감 속도가 느린 것은 물론, 오랜만에 마우스 움직임이 끊기는 현상까지 경험했습니다. CPU 리소스 점유율은 또 얼마나 높은지...(압축 옵션을 사용하지 않았음에도 불구하고) 적어도 읽기 성능은 좋다고 하던데, 여러 프로세스가 동시에 접근할 때는 형편없이 저하되는 걸 목격했습니다.</p>
+<p>뭐, 물론 아직도 활발하게 개발중이고, 좋은 기능도 많이  있는 것 같지만(그래서 그만큼의 리소스가 더 필요한 걸지도...), 경험적 결론은, 아직 서버나 제품에 사용하기에는 시기상조라는 겁니다.</p>
+<p>기회가 되면  SSD 디스크에서도 테스트해보고 싶은데, 가난한 개발자라서... (술값만 줄여도 되려나...?)</p>

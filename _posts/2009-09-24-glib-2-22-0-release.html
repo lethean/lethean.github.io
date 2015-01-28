@@ -1,0 +1,28 @@
+---
+layout: post
+title: GLib 2.22.0 출시
+date: 2009-09-24 01:16:16.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- GLib
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  lightboxoff: 'false'
+  _edit_last: '3788329'
+  _wp_old_slug: '1096'
+  original_post_id: '1096'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p><a href="http://mail.gnome.org/archives/gtk-devel-list/2009-September/msg00053.html">GLib 2.22.0 안정버전 출시 소식</a>이 도착했습니다. 물론 <a href="http://mail.gnome.org/archives/gtk-devel-list/2009-September/msg00054.html">GTK+ 2.18.0 버전도 함께 출시</a>되었지만 이 포스트에서는 일단 GLib에 대한 내용만 다루고, GTK+ 변경사항은 다른 포스트에서 정리할 예정입니다. 물론 그대로 우리말로 옮기는 건 지루하고 재미없는 작업이라, 한두가지 눈에 띄는 것만 정리합니다.</p>
+<p>제일 먼저 눈에 띄는 추가 사항은, <a href="http://sunjinyang.wordpress.com/2009/09/21/using-glib-mainloop/">이전 포스트</a>에서 언급했던 GMainContext 객체를 쓰레드별로 자동 관리해주는 API가 추가되었다는 점입니다. 새로 추가된 <a href="http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#g-main-context-get-thread-default">g_main_context_get_thread_default ()</a> 함수는 쓰레드별 GMainContext 객체를 돌려주는데, 이 객체는 자동으로 생성되는 건 아니고, 쓰레드가 생성되자마자 바로 <a href="http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#g-main-context-push-thread-default">g_main_context_push_thread_default ()</a> 함수를 이용해 등록해야 합니다. 그럼 별로 달라지는 게 없는 게 아니냐고 생각할 수도 있지만, 일단 이 API를 사용하면 쓰레드별 컨텍스트 객체나 메인루프 객체를 프로그래머가 관리해야하는 수고를 조금 덜어줍니다. 하지만 그보다 더 좋은 예는, 어떤 작업을 처리하는 비동기 호출 함수가 여러 쓰레드에서 호출될 수 있을때,  하지만 비동기 작업 자체는 호출한 쓰레드의 메인 루프에서 실행되기를 원한다면, 그 함수에서는 그저 <a href="http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#g-main-context-get-thread-default">g_main_context_get_thread_default ()</a> 함수가 돌려주는 컨텍스트에 원하는 소스를 추가하기만 하면 되므로 코드가 상당히 간결하고 명료해집니다. 동일한 작업의 효율을 위해 비동기 방식으로 복수 쓰레드에 분산시키는 구조로 설계된 코드라면 특히 더 편해질 수 있습니다. (참고로 이번 버전의 GIO 모듈을 구현하는데 많이 사용하고 있습니다. 아마도 그쪽을 구현하다 보니 필요해져서 새로 추가된 API가 아닐까 추측해봅니다)</p>
+<p>그리고 위 내용을 포함한 몇몇 객체에 대한 참조 카운터 지원과 소소한 변경사항을 제외하면, 이번 릴리스는 대부분 GIO 모듈에 대한 기능 추가가 대부분인 것 같습니다. 특히 엄청나게 많은 네트워크 관련 API가 새로 추가되었는데, IP 주소와 유닉스 도메인 소켓 주소 관리,  비동기 방식으로 도메인 이름에 대한 주소를 얻어오거나 혹은 반대로 주소에 대한 도메인 이름을 얻어오기, 일반적인 소켓 / 유닉스 도메인 소켓 API 지원 등은 놀라울 따름입니다. 만일 리눅스 뿐 아니라 GLib 라이브러리가 동작하는 모든 플랫폼에서 문제없이 동작한다면, 향후 개발하는 네트워크 관련 프로젝트에서 이 API를 적극 이용할 용의가 있음도 물론입니다. 다만, GLib 라이브러리 기본 모듈이 아닌 GIO 모듈에 추가되었다는 점이 큰 아쉬움이긴 하지만... ( GLib 라이브러리에는 고작 문자열이 IPv4 또는 IPv6 주소 형식인지 검사해주는 <a href="http://library.gnome.org/devel/glib/stable/glib-Hostname-Utilities.html#g-hostname-is-ip-address">g_hostname_is_ip_address ()</a> 등과 같은 함수들만 몇 개 추가되었을 뿐이니...)</p>
+<p>아무튼, 별로 내용이 길지 않은 릴리스 원문과 더불어 각 모듈별 매뉴얼 목차 마지막에 있는 `Index of new symbols in 2.22' 페이지도 꼭 확인하시기 바랍니다.</p>

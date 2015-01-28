@@ -1,0 +1,35 @@
+---
+layout: post
+title: Process Memory in Linux
+date: 2006-12-18 20:05:00.000000000 +09:00
+categories:
+- "카스탈리엔"
+tags:
+- Linux
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _edit_last: '3788329'
+  original_post_id: '113'
+  _wp_old_slug: '113'
+author:
+  login: fan4326
+  email: fan4326@gmail.com
+  display_name: fan4326
+  first_name: ''
+  last_name: ''
+---
+<p>리눅스에서 일반적으로 <tt>top</tt>, <tt>ps</tt> 명령어를 통해 얻을 수 있는 프로세스의 메모리 정보는 다음과 같이 요약할 수 있다.</p>
+<ul>
+<li><span style="font-weight:bold;">SIZE(VSZ, VIRT)</span> : 프로세스의 주소 공간 크기. 즉, 프로세스가 맵핑한 메모리의 전체 크기를 나타낸다.</li>
+<li><span style="font-weight:bold;">RSS(RES, Resident Set Size)</span> : 실제 메모리에 올라와 있는 메모리 크기. 물론 스왑(swapped out)된 메모리는 제외된다. RSS는 프로세스에게 유일한 메모리 공간과 다른 프로세스와 공유된 공간도 포함한다. 리눅스 환경에서는 대부분 공유 라이브러리가 차지한다. libc 라이브러리가 대표적이다.</li>
+<li><span style="font-weight:bold;">SHARE(SHR)</span> : RSS에서 다른 프로세스가 공유된 메모리 크기.</li>
+</ul>
+<p>따라서 어플리케이션이 실제 사용하고 있는 메모리는 RSS에서 SHARE를 뺀 크기다. 물론 공유 라이브러리를 하나의 프로세스가 사용하고 있다면 그 크기도 실제 사용량에 포함되겠지만.</p>
+<p>참고:</p>
+<ol>
+<li><a href="http://bmaurer.blogspot.com/2006/03/memory-usage-with-smaps.html">Memory Usage with smaps</a></li>
+<li><a href="http://mail.gnome.org/archives/gnome-list/1999-September/msg00036.html">Re: Can anything be done to reduce memory usage?</a></li>
+</ol>
