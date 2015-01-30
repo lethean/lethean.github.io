@@ -19,14 +19,14 @@ avatar: https://avatars1.githubusercontent.com/u/93894
 footer-links:
   dribbble: 
   email: fan4326@gmail.com
-  facebook: fan4326
-  flickr: fan4326
+  facebook:
+  flickr:
   github: lethean
   instagram: 
   linkedin: 
   pinterest: 
   rss: # just type anything here for a working RSS icon, make sure you set the "url" above!
-  twitter: fan4326
+  twitter:
   stackoverflow: # your stackoverflow profile, e.g. "users/50476/bart-kiers"
 
 # Your disqus shortname, entering this will enable commenting on posts
