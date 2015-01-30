@@ -10,59 +10,61 @@ tags: [ glibc,  Linux ]
 
 다음은 도메인 이름을 인수로 주면 해당 도메인의 MX 레코드, 즉 메일서버 호스트를 glibc API를 이용해 작성한 코드입니다.
 
-    #include <netinet/in.h>
-    #include <arpa/nameser.h>
-    #include <resolv.h>
+```c
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <resolv.h>
 
-    static char *
-    lookup_mx (const char *name)
-    {
-      unsigned char response[NS_PACKETSZ];  /* big enough, right? */
-      ns_msg        handle;
-      int           ns_index;
-      int           len;
+static char *
+lookup_mx (const char *name)
+{
+  unsigned char response[NS_PACKETSZ];  /* big enough, right? */
+  ns_msg        handle;
+  int           ns_index;
+  int           len;
 
-      len = res_search (name, C_IN, T_MX, response, sizeof (response));
-      if (len < 0)
-        {
-          /* failed to search MX records */
-          return strdup (name);
-        }
-      if (ns_initparse (response, len, &handle) < 0)
-        {
-          /* failed to parse MX records for '%s'", name); */
-          return strdup (name);
-        }
-      len = ns_msg_count (handle, ns_s_an);
-      if (len <= 0)
-        {
-          /* no mx records */
-          return strdup (name);
-        }
-      for (ns_index = 0; ns_index < len; ns_index++)
-        {
-          ns_rr rr;
-          char  dispbuf[4096];
-
-          if (ns_parserr (&handle, ns_s_an, ns_index, &rr))
-            {
-              /* WARN: ns_parserr failed */
-              continue;
-            }
-          ns_sprintrr (&handle, &rr, NULL, NULL, dispbuf, sizeof (dispbuf));
-          if (ns_rr_class (rr) == ns_c_in && ns_rr_type (rr) == ns_t_mx)
-            {
-              char mxname[MAXDNAME];
-
-              dn_expand (ns_msg_base (handle),
-                         ns_msg_base (handle) + ns_msg_size (handle),
-                         ns_rr_rdata(rr) + NS_INT16SZ,
-                         mxname,
-                         sizeof (mxname));
-              return strdup (mxname);
-            }
-        }
+  len = res_search (name, C_IN, T_MX, response, sizeof (response));
+  if (len < 0)
+    {
+      /* failed to search MX records */
       return strdup (name);
-    }
+    }
+  if (ns_initparse (response, len, &handle) < 0)
+    {
+      /* failed to parse MX records for '%s'", name); */
+      return strdup (name);
+    }
+  len = ns_msg_count (handle, ns_s_an);
+  if (len <= 0)
+    {
+      /* no mx records */
+      return strdup (name);
+    }
+  for (ns_index = 0; ns_index < len; ns_index++)
+    {
+      ns_rr rr;
+      char  dispbuf[4096];
+
+      if (ns_parserr (&handle, ns_s_an, ns_index, &rr))
+        {
+          /* WARN: ns_parserr failed */
+          continue;
+        }
+      ns_sprintrr (&handle, &rr, NULL, NULL, dispbuf, sizeof (dispbuf));
+      if (ns_rr_class (rr) == ns_c_in && ns_rr_type (rr) == ns_t_mx)
+        {
+          char mxname[MAXDNAME];
+
+          dn_expand (ns_msg_base (handle),
+                     ns_msg_base (handle) + ns_msg_size (handle),
+                     ns_rr_rdata(rr) + NS_INT16SZ,
+                     mxname,
+                     sizeof (mxname));
+          return strdup (mxname);
+        }
+    }
+  return strdup (name);
+}
+```
 
 관련 자료는 [Stack Overflow](http://stackoverflow.com/)에서 본 것 같기도 하고... 아무튼, 명색이 전문 리눅스 C 프로그래머로서 15년 넘게 버티고 있으면서도 아직까지도 기본 C 라이브러리가 제공하는 함수도 제대로 알지 못하는 스스로를 돌아보게 됩니다. :(

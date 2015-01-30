@@ -8,46 +8,50 @@ tags: [ Agile,  GLib ]
 
 GObject 기반 객체 지향 프로그래밍에서 싱글턴 패턴을 사용하려면 대개 다음과 같은 함수를 추가합니다.
 
-    FooBar*
-    foo_bar_get_default (void)
-    {
-      static FooBar *self = NULL;
+```c
+FooBar*
+foo_bar_get_default (void)
+{
+  static FooBar *self = NULL;
 
-      if (self == NULL)
-        self = foo_bar_new ();
+  if (self == NULL)
+    self = foo_bar_new ();
 
-      return self;
-    }
+  return self;
+}
+```
 
 하지만 이렇게 구현할 경우 몇가지 단점이 있는데, 돌려받은 객체를 실수로 해제할 경우 문제를 일으킬 수 있고, 프로그램이 종료할때까지 객체가 소멸되지 않아 메모리 누수가 발생할 수 있습니다. 또한 사용자가 `g_object_new(FOO_TYPE_BAR, NULL)` 방식으로 객체를 생성하면 결국 새 객체가 만들어지기 때문에 싱글턴 객체로 동작하지 않습니다.
 
 그래서, [Empathy](http://live.gnome.org/Empathy) 프로젝트에서는 다음과 같이 싱글턴 객체를 구현하고 있습니다.
 
-    static GObject*
-    constructor (GType type,
-                 guint n_construct_params,
-                 GObjectConstructParam *construct_params)
+```c
+static GObject*
+constructor (GType type,
+             guint n_construct_params,
+             GObjectConstructParam *construct_params)
+{
+  static GObject *self = NULL;
+
+  if (self == NULL)
     {
-      static GObject *self = NULL;
-
-      if (self == NULL)
-        {
-          self = G_OBJECT_CLASS (foo_bar_parent_class)->constructor (
-            type, n_construct_params, construct_params);
-          g_object_add_weak_pointer (self, (gpointer) &self);
-          return self;
-        }
-
-      return g_object_ref (self);
+      self = G_OBJECT_CLASS (foo_bar_parent_class)->constructor (
+        type, n_construct_params, construct_params);
+      g_object_add_weak_pointer (self, (gpointer) &self);
+      return self;
     }
 
-    static void
-    foo_bar_class_init (FooBarClass *klass)
-    {
-      GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  return g_object_ref (self);
+}
 
-      object_class->constructor = constructor;
-    }
+static void
+foo_bar_class_init (FooBarClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->constructor = constructor;
+}
+```
 
 이 방식을 이용하면 `g_object_new()`를 이용해 객체를 만들어도 항상 동일한 객체를 돌려줍니다. 더불어 객체의 참조카운터를 증가해서 돌려주기 때문에, 일반 객체처럼, 사용이 끝나면 `g_object_unref()`를 호출해 객체를 해제하면 됩니다. 물론 마지막 사용이 끝나는 시점에서는 자동으로 객체가 소멸되고 객체 포인터도 NULL값으로 초기화됩니다.([g\_object\_add\_weak\_pointer()](http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-add-weak-pointer) 함수가 이 역할을 합니다)
 

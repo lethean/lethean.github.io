@@ -8,8 +8,8 @@ tags: [ Clutter ]
 
 아무튼 그래서, 지금까지 겪은 경험 중 몇 가지를 정리해 보았습니다. 당연하지만, 아직 OpenGL에 대한 이해가 부족해 틀린 내용이 있을 수도 있으니, 감안해 주시기 바랍니다.
 
-<span class="Apple-style-span" style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;">1.
- </span>클러터 라이브러리는 계속 버전업 되는데 예전에 작성된 튜토리얼이나 예제는 갱신되지 않아 잘못되거나 사용을 권장하지 않는(deprecated) API를 사용하는 경우가 많이 있습니다. 가능한 클러터 개발자들이 라이브러리와 함께 직접 업데이트하는 [클러터 해설서(The Clutter Cookbook)](http://docs.clutter-project.org/docs/clutter-cookbook/1.0/)를 참고하는게 가장 정확했습니다.
+1.
+ 클러터 라이브러리는 계속 버전업 되는데 예전에 작성된 튜토리얼이나 예제는 갱신되지 않아 잘못되거나 사용을 권장하지 않는(deprecated) API를 사용하는 경우가 많이 있습니다. 가능한 클러터 개발자들이 라이브러리와 함께 직접 업데이트하는 [클러터 해설서(The Clutter Cookbook)](http://docs.clutter-project.org/docs/clutter-cookbook/1.0/)를 참고하는게 가장 정확했습니다.
 
 2.
  OpenGL 기반 클러터 라이브러리 동작 방식은 일반적인 2D GUI 프로그래밍과 달리 화면, 즉 스테이지(stage)에 조그만 변화라도 있으면 그때마다 스테이지를 다시 그립니다. 즉, 클러터의 기본 단위인 액터(actor) 하나가 다시 그려져야 하면 액터가 속한 스테이지의 모든 액터를 다시 그립니다. 그리고 이로 인해 스테이지에 보이는 모든 액터의 [`paint()`](http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActorClass) 함수가 매번 호출되기 때문에 이 함수를 최적화하는 게 매우 중요합니다.
@@ -46,6 +46,6 @@ tags: [ Clutter ]
 
 이해에 도움이 될까 싶어, 아직 프로토타입이고 많은 기능이 빠져있지만, 현재 개발 중인 시스템의 동작 화면을 녹화한 영상을 보여드립니다. 녹화에 사용한 프로그램은 [gtk-recordMyDesktop](http://recordmydesktop.sourceforge.net/about.php)입니다.
 
-[youtube http://www.youtube.com/watch?v=1w0fjm0MYo8?hl=en&fs=1]
+<iframe width="480" height="360" src="http://www.youtube.com/embed/1w0fjm0MYo8"></iframe>
 
 GUI 프로그래밍을 할 때마다 느끼는 점은 구현하기 위한 기술도 중요하지만, 결국 사용자를 배려하면서도 아름다움을 잃지 않는 참신한 아이디어 기반의 디자인이 더 중요하다는 점입니다. 물론 그렇기 때문에 디자이너라는 직업이 따로 있는 것이겠지만, 좋은 프로그램과 삶의 다양한 모습을 많이 보고, 많이 경험하고, 많이 참고해야 하는 지적 즐거움을 언제부터인가 프로그래머들은 남의 영역이라 멀리한 채 무미건조한 기술에만 전념하고 있는 건 아닌지 모르겠습니다.

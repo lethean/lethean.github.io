@@ -30,18 +30,22 @@ tags: [ Cairo,  FontConfig,  Ubuntu ]
 
 그래서 다음과 같은 과정을 거쳐 직접 빌드한 패키지를 설치해서 사용하고 있습니다.
 
-    $ apt-get source libcairo2 # 패키지 소스 내려받기
-    $ sudo apt-get build-dep libcairo2 # 빌드를 위한 패키지 내려받기
-    $ cd cairo-*
-    $ vi src/cairo-ft-font.c # 위 버그질라에 등록된 패치 적용
-    $ vi debian/changelog # 패키지 버전 올림
-    $ dpkg-buildpackage -rfakeroot # 패키지 생성
-    $ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
+```sh
+$ apt-get source libcairo2 # 패키지 소스 내려받기
+$ sudo apt-get build-dep libcairo2 # 빌드를 위한 패키지 내려받기
+$ cd cairo-*
+$ vi src/cairo-ft-font.c # 위 버그질라에 등록된 패치 적용
+$ vi debian/changelog # 패키지 버전 올림
+$ dpkg-buildpackage -rfakeroot # 패키지 생성
+$ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
+```
 
 패키지 생성 방법을 익힌게 거의 10년 전 쯤 데비안 사용 시절이라 요즘은 어떻게 만드는지 잘 모르겠지만, 다행히도 위 방식도 제대로 동작하는 것 같아 그냥 사용하고 있습니다. 요즘은 우분투 PPA도 활성화되었고, 빌드 방식도 더 간단해진 것 같긴 한데, 게을러서... :)
 
 결론은, Droid Sans Mono 글꼴을 터미널 글꼴로 잘 사용하고 있습니다. 참, 이 글꼴 역시 다음과 같이 쉽게 설치할 수 있습니다.
 
-    $ sudo apt-get install ttf-droid
+```sh
+$ sudo apt-get install ttf-droid
+```
 
 그런데, 위 패치가 아직까지도 최근 cairo 소스에는 반영되지 않은 것 같아 약간 아쉽군요.

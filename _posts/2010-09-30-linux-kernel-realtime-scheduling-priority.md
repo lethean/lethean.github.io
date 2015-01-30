@@ -12,15 +12,17 @@ tags: [ Kernel,  Linux,  Schedule ]
 
 만일 프로세스(process)가 아닌 쓰레드(thread)의 스케줄링 속성을 변경하려면, `gettid()` 시스템콜을 호출해서 얻은 tid 값을 프로세스 pid 대신 넘겨주면 됩니다. 하지만 `gettid()` 시스템콜은 C 라이브러리에 대응하는 함수가 없기 때문에 다음과 같이 직접 `syscall()` 함수를 이용해 호출해야 합니다.[2]
 
-    #define _GNU_SOURCE      /* or _BSD_SOURCE or _SVID_SOURCE */
-    #include <unistd.h>
-    #include <sys/syscall.h> /* For SYS_xxx definitions */
-    #include <sys/types.h>   /* For pid_t */
+```c
+#define _GNU_SOURCE      /* or _BSD_SOURCE or _SVID_SOURCE */
+#include <unistd.h>
+#include <sys/syscall.h> /* For SYS_xxx definitions */
+#include <sys/types.h>   /* For pid_t */
 
-    static inline pid_t gettid (void)
-    {
-      return (pid_t) syscall (SYS_gettid); /* or __NR_gettid */
-    }
+static inline pid_t gettid (void)
+{
+  return (pid_t) syscall (SYS_gettid); /* or __NR_gettid */
+}
+```
 
 위와 같이 직접 프로그래밍하지 않아도 [`chrt`](http://linux.die.net/man/1/chrt) 유틸리티를 사용하면 셸(shell)이나 스크립트에서 직접 다른 태스크의 실시간 스케줄링 속성을 변경할 수도 있습니다.
 

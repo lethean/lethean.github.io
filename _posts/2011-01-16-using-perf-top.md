@@ -10,11 +10,15 @@ tags: [ Kernel,  Linux,  Perf ]
 
 우분투 리눅스에서 perf 도구를 사용하려면 제일 먼저 다음과 같이 해당 패키지를 설치해야 합니다.
 
-    $ sudo apt-get install linux-tools
+```sh
+$ sudo apt-get install linux-tools
+```
 
 실행하기 위해서 반드시 perf 이벤트 접근 권한이 있어야 하므로 루트 계정 또는 `sudo` 명령을 이용해 다음과 같이 무작정 실행하면 됩니다.
 
-    $ sudo perf top
+```sh
+$ sudo perf top
+```
 
 ![](/figures/perf-top-screenshot.png)
 

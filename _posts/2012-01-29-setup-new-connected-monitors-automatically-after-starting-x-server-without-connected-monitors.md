@@ -8,19 +8,25 @@ tags: [ Linux,  Udev,  Xorg ]
 
 요즘 X 서버는 연결된 모니터가 없고, `/etc/X11/xorg.conf` 파일에 수직/수평 주파수가 정의되어 있지 않다고 하더라도 일단 정상적으로 실행됩니다. 다만, 초기 해상도가 320x200 처럼 매우 작을 수 있습니다. 그런데 나중에 필요에 의해 모니터를 연결했는데 화면이 보이지 않는 경우가 발생합니다. 이 경우, 네트웍으로 접속해서 다음 명령어를 실행합니다.
 
-    $ export DISPLAY=:0.0
-    $ xrandr --auto
+```sh
+$ export DISPLAY=:0.0
+$ xrandr --auto
+```
 
 그러면 X 서버가 알아서 연결되어 있는 모니터를 출력으로 재설정하고 가장 선호하는(preferred) 해상도와 주파수를 선택합니다. 그런데 이를 자동으로 동작하게 하려면 udev 데몬의 도움을 받아야 합니다. 그래서 `/etc/udev/rules.d` 디렉토리에 확장자가 `'.rules'`인 파일을 생성하고 다음과 같이 내용을 채웁니다.
 
-    ACTION=="change", SUBSYSTEM=="drm", KERNEL=="card*", RUN+="/usr/bin/auto-xrandr.sh"
+```sh
+ACTION=="change", SUBSYSTEM=="drm", KERNEL=="card*", RUN+="/usr/bin/auto-xrandr.sh"
+```
 
 그리고 `/usr/bin/auto-xrandr.sh` 파일을 아래와 같이 작성한뒤 실행권한을 줍니다.
 
-    #!/bin/sh
-    [ "$DISPLAY" = "" ] && export DISPLAY=:0.0
-    xrandr --auto
-    xrandr --dpi 96
+```sh
+#!/bin/sh
+[ "$DISPLAY" = "" ] && export DISPLAY=:0.0
+xrandr --auto
+xrandr --dpi 96
+```
 
 그러면 이제부터 모니터 연결시 자동으로 연결을 재설정하게 됩니다.
 

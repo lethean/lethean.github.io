@@ -19,47 +19,55 @@ GLib 라이브러리 2.16 버전부터 지원하는 [테스트 프레임워크](
 
 물론 GLib은 정교하게 테스트 슈트와 테스트 케이스, 픽스쳐를 구성할 수 있는 많은 API를 제공하지만, 복잡한 과정을 API 호출 하나로 처리할 수 있는 기능도 제공합니다.
 
-    g_test_add_func ("/onvif/nvc-connections", test_onvif_nvc_connections);
+```c
+g_test_add_func ("/onvif/nvc-connections", test_onvif_nvc_connections);
+```
 
 위 예제에서 [`g_test_add_func()`](http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add-func) 함수는 "onvif" 테스트 슈트 밑에 "nvc-connections" 이름의 테스트 케이스를 추가합니다. 테스트시 실행할 함수는 사용자가 직접 구현한 `test_onvif_nvc_connections()` 함수입니다. `g_test_add_func()` 함수가 테스트 슈트를 자동으로 생성해 주기 때문에 별도의 추가 작업이 불필요합니다. 비슷한 기능의 [`g_test_add_data_func()`](http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add-data-func) 함수는 테스트 함수에 데이터를 전달할 수 있어서, 한 함수로 데이터만 바꿔서 테스트하고자 할때 유용합니다. 하지만, 두 API는 픽스쳐를 지정할 수 없으므로, 픽스쳐를 사용하려면 [`g_test_add()`](http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add) 함수를 이용해야 합니다.일단, 간단한 예제 코드를 보여드리면 다음과 같습니다. ("[Writing Unit Tests with GLib](http://blogs.gnome.org/timj/2008/06/24/23062008-writing-unit-tests-with-glib/)" 글에서 발췌했습니다)
 
-    #include <glib.h>
+```c
+#include <glib.h>
 
-    static void
-    simple_test_case (void)
-    {
-      /* a suitable test */
-      g_assert (g_bit_storage (1) == 1);
+static void
+simple_test_case (void)
+{
+  /* a suitable test */
+  g_assert (g_bit_storage (1) == 1);
 
-      /* a test with verbose error message */
-      g_assert_cmpint (g_bit_storage (1), ==, 1);
-    }
+  /* a test with verbose error message */
+  g_assert_cmpint (g_bit_storage (1), ==, 1);
+}
 
-    int
-    main (int argc, char **argv)
-    {
-      /* initialize test program */
-      g_test_init (&argc, &argv, NULL);
+int
+main (int argc, char **argv)
+{
+  /* initialize test program */
+  g_test_init (&argc, &argv, NULL);
 
-      /* hook up your test functions */
-      g_test_add_func ("/Simple Test Case", simple_test_case);
+  /* hook up your test functions */
+  g_test_add_func ("/Simple Test Case", simple_test_case);
 
-      /* run tests from the suite */
-      return g_test_run ();
-    }
+  /* run tests from the suite */
+  return g_test_run ();
+}
+```
 
 이 코드를 `g-test-sample1.c` 파일로 저장하고 컴파일 후 실행하면 다음과 같은 결과를 볼 수 있습니다.
 
-    $ gcc -o g-test-sample1 g-test-sample1.c `pkg-config --cflags --libs glib-2.0`
-    $ ./g-test-sample1
-    /Simple Test Case: OK
+```sh
+$ gcc -o g-test-sample1 g-test-sample1.c `pkg-config --cflags --libs glib-2.0`
+$ ./g-test-sample1
+/Simple Test Case: OK
+```
 
 이 결과를 재활용하기 위해 XML 형식으로 저장하거나, HTML 문서로 만들고 싶다면 [gtester](http://library.gnome.org/devel/glib/stable/gtester.html) / [gtester-report](http://library.gnome.org/devel/glib/stable/gtester-report.html) 프로그램을 사용하면 됩니다.
 
-    $ gtester -o sample-log.xml g-test-sample1
-    TEST: g-test-sample1... (pid=2771)
-    PASS: g-test-sample1
-    $ gtester-report sample-log.xml > sample-log.html
+```sh
+$ gtester -o sample-log.xml g-test-sample1
+TEST: g-test-sample1... (pid=2771)
+PASS: g-test-sample1
+$ gtester-report sample-log.xml > sample-log.html
+```
 
 위와 같이 실행하여 생성한 HTML 문서 결과는 다음과 같습니다.
 
@@ -71,23 +79,29 @@ GLib 라이브러리 2.16 버전부터 지원하는 [테스트 프레임워크](
 
 테스트 함수를 보면 [`g_assert_cmpint()`](http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-assert-cmpint)라는 다소 생소한 API가 보이는데, GLib은 테스트 코드를 위해 이와 비슷한 매크로를 더 제공합니다.
 
-    #define g_assert             (expr)
-    #define g_assert_not_reached ()
-    #define g_assert_cmpstr      (s1, cmp, s2)
-    #define g_assert_cmpint      (n1, cmp, n2)
-    #define g_assert_cmpuint     (n1, cmp, n2)
-    #define g_assert_cmphex      (n1, cmp, n2)
-    #define g_assert_cmpfloat    (n1,cmp,n2)
-    #define g_assert_no_error    (err)
-    #define g_assert_error       (err, dom, c)
+```c
+#define g_assert             (expr)
+#define g_assert_not_reached ()
+#define g_assert_cmpstr      (s1, cmp, s2)
+#define g_assert_cmpint      (n1, cmp, n2)
+#define g_assert_cmpuint     (n1, cmp, n2)
+#define g_assert_cmphex      (n1, cmp, n2)
+#define g_assert_cmpfloat    (n1,cmp,n2)
+#define g_assert_no_error    (err)
+#define g_assert_error       (err, dom, c)
+```
 
 위 매크로를 사용하여 테스트 코드를 작성하면 더 친절하고 자세한 에러 메시지를 출력합니다. 예를 들어 다음 코드는,
 
-    gchar *string = "foo"; g_assert_cmpstr (string, ==, "bar");
+```c
+gchar *string = "foo"; g_assert_cmpstr (string, ==, "bar");
+```
 
 이런 메시지를 출력합니다.
 
-    ERROR: assertion failed (string == "bar"): ("foo" ==  "bar")
+```c
+ERROR: assertion failed (string == "bar"): ("foo" ==  "bar")
+```
 
 물론 기본적으로 실패한 경우에만 메시지를 보여줍니다.
 

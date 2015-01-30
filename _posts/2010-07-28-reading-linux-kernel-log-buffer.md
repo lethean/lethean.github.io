@@ -8,11 +8,15 @@ tags: [ Kernel,  Linux ]
 
 그런데 이 kernelooops 소스를 검토하던 중 커널 로그 버퍼(보통 dmesg 명령 결과)를 가져오기 위해 다음과 같은 시스템콜을 직접 호출하는 것을 발견했습니다. (kerneloops 패키지 소스 안에 `dmesg.c:423`)
 
-    syscall(__NR_syslog, 3, buffer, getpagesize());
+```c
+syscall(__NR_syslog, 3, buffer, getpagesize());
+```
 
 이 시스템 콜 사용법이 궁금해서 dmesg 소스를 확인해 보니 여기서는 다음과 같은 C 라이브러리 함수를 사용합니다. (util-linux 패키지 소스 안에 `sys-utils/dmesg.c:120`)
 
-    n = klogctl(3, buf, sz); /* read only */
+```c
+n = klogctl(3, buf, sz); /* read only */
+```
 
 그래서 매뉴얼을 찾아보니(`man klogctl`) 둘 모두 같은 동작을 하는 것은 물론, 지금껏 모르고 있었던 몇가지 기능도 알 수 있었습니다.
 

@@ -19,23 +19,25 @@ tags: [ Kernel,  Linux,  Schedule ]
 
 각 스케줄러 모듈은 스케줄링 클래스 구조체(`struct sched_class`)가 제안하는 기능을 콜백 함수처럼 구현합니다. 다음은 리눅스 커널 2.6.23 버전에서 정의된 스케줄링 클래스 구조입니다.
 
-    struct sched_class { /* Defined in 2.6.23:/usr/include/linux/sched.h */
-      struct sched_class *next;
-      void (*enqueue_task) (struct rq *rq, struct task_struct *p, int wakeup);
-      void (*dequeue_task) (struct rq *rq, struct task_struct *p, int sleep);
-      void (*yield_task) (struct rq *rq, struct task_struct *p);
-      void (*check_preempt_curr) (struct rq *rq, struct task_struct *p);
-      struct task_struct * (*pick_next_task) (struct rq *rq);
-      void (*put_prev_task) (struct rq *rq, struct task_struct *p);
-      unsigned long (*load_balance) (struct rq *this_rq, int this_cpu,
-                     struct rq *busiest,
-                     unsigned long max_nr_move, unsigned long max_load_move,
-                     struct sched_domain *sd, enum cpu_idle_type idle,
-                     int *all_pinned, int *this_best_prio);
-      void (*set_curr_task) (struct rq *rq);
-      void (*task_tick) (struct rq *rq, struct task_struct *p);
-      void (*task_new) (struct rq *rq, struct task_struct *p);
-    };
+```c
+struct sched_class { /* Defined in 2.6.23:/usr/include/linux/sched.h */
+  struct sched_class *next;
+  void (*enqueue_task) (struct rq *rq, struct task_struct *p, int wakeup);
+  void (*dequeue_task) (struct rq *rq, struct task_struct *p, int sleep);
+  void (*yield_task) (struct rq *rq, struct task_struct *p);
+  void (*check_preempt_curr) (struct rq *rq, struct task_struct *p);
+  struct task_struct * (*pick_next_task) (struct rq *rq);
+  void (*put_prev_task) (struct rq *rq, struct task_struct *p);
+  unsigned long (*load_balance) (struct rq *this_rq, int this_cpu,
+                 struct rq *busiest,
+                 unsigned long max_nr_move, unsigned long max_load_move,
+                 struct sched_domain *sd, enum cpu_idle_type idle,
+                 int *all_pinned, int *this_best_prio);
+  void (*set_curr_task) (struct rq *rq);
+  void (*task_tick) (struct rq *rq, struct task_struct *p);
+  void (*task_new) (struct rq *rq, struct task_struct *p);
+};
+```
 
 위 구조체에서 중요한 함수를 살펴보면 다음과 같습니다.
 

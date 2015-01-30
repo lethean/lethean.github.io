@@ -12,8 +12,10 @@ tags: [ ArchLinux,  Linux,  Ubuntu ]
 
 하지만 요즘은 그것도 귀찮아서 `exiv2` / `rename` 명령어를 이용해 한꺼번에 변경해 버립니다. [`exiv2`](http://www.exiv2.org/) 프로그램을 이용해 EXIF 정보에 들어있는 촬영 시각을 기준으로 사진 파일 이름을 변경하고,  `rename` 명령어를 이용해 대문자로 된 `.JPG` 확장자를 소문자 `.jpg` 확장자로 한번에 변경합니다. 예를 들어 위에서 설명한 예처럼 파일 이름을 변경하려면 사진 파일이 들어 있는 디렉토리에서 다음과 같이 실행하면 됩니다.
 
-    $ rename .JPG .jpg *.JPG
-    $ exiv2 -r '%Y%m%d-%H%M%S-photo' -k rename *.jpg
+```sh
+$ rename .JPG .jpg *.JPG
+$ exiv2 -r '%Y%m%d-%H%M%S-photo' -k rename *.jpg
+```
 
 `rename` 명령어는 대부분 배포판에 기본으로 설치되어 있으나 `exiv2` 프로그램은 수동으로 패키지를 설치해야 할 수도 있습니다. 게다가, 우분투의 `rename` 명령어는 perl 패키지에 포함되어 있는 버전인데 아치 리눅스는 util-linux 패키지에 포함되어 있는 거라 사용법이 조금 다릅니다. 참고로 위 예제는 아치 리눅스 버전입니다. 하지만 `exiv2`, `rename` 명령어 모두 매뉴얼 페이지를 보면 자세한 사용 예제가 있으므로 쉽게 사용할 수 있습니다.
 

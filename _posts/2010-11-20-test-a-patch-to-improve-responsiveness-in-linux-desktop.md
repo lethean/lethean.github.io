@@ -12,6 +12,8 @@ tags: [ Kernel,  Linux,  Schedule ]
 
 **[업데이트-2010.11.22]** 예를 들어 제 경우, 구형 노트북에서 조금이라도 그래픽 성능 향상을 얻을 수 있을까 해서 ﻿`/etc/gdm/Init/Default` 파일 마지막 라인 '`exit 0`' 전에 다음과 같은 항목을 추가해서 체감 속도 변화를 느껴보려고 노력 중입니다.
 
-    #chrt -rr -p 10 $(pidof X)
-    mkdir -m 0700 -p /mnt/cgroups/cpu/Xorg
-    echo $(pidof X) > /mnt/cgroups/cpu/Xorg/tasks
+```sh
+#chrt -rr -p 10 $(pidof X)
+mkdir -m 0700 -p /mnt/cgroups/cpu/Xorg
+echo $(pidof X) > /mnt/cgroups/cpu/Xorg/tasks
+```

@@ -12,19 +12,21 @@ I/O 스케줄링 클래스와 우선순위는 읽기 작업과 동기화 쓰기 
 
 `ioprio_set()`, `ioprio_get()` 시스템콜은 리눅스 표준 C 라이브러리에 대응하는 함수가 없기 때문에 다음과 같이 직접 `syscall()` 함수를 이용해 호출해야 합니다.[2]
 
-    #define _GNU_SOURCE      /* or _BSD_SOURCE or _SVID_SOURCE */
-    #include <unistd.h>
-    #include <sys/syscall.h> /* For SYS_xxx definitions */
+```c
+#define _GNU_SOURCE      /* or _BSD_SOURCE or _SVID_SOURCE */
+#include <unistd.h>
+#include <sys/syscall.h> /* For SYS_xxx definitions */
 
-    static inline int ioprio_set (int which, int who, int ioprio)
-    {
-      return syscall (__NR_ioprio_set, which, who, ioprio);
-    }
+static inline int ioprio_set (int which, int who, int ioprio)
+{
+  return syscall (__NR_ioprio_set, which, who, ioprio);
+}
 
-    static inline int ioprio_get (int which, int who)
-    {
-      return syscall (__NR_ioprio_get, which, who);
-    }
+static inline int ioprio_get (int which, int who)
+{
+  return syscall (__NR_ioprio_get, which, who);
+}
+```
 
 위와 같이 프로그램 소스 코드를 수정하지 않아도 [`ionice`](http://linux.die.net/man/1/ionice) 프로그램을 이용하면 셸(shell)이나 스크립트에서 직접 다른 태스크의 I/O 스케줄링 클래스와 우선순위를  변경할 수도 있습니다.
 
