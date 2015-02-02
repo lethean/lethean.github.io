@@ -18,7 +18,7 @@ layout: default
         </ul>
       </div>
       <div class="content">
-        {{ post.content | strip_html | truncatewords:40 }}
+        <p>{{ post.content | strip_html | truncatewords:40 }}</p>
       </div>
       <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">더 읽기...</a>
     </article>
