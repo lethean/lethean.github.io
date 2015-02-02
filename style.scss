@@ -255,6 +255,8 @@ nav {
   border-bottom: none;
 }
 
+.posts 
+
 .post {
   blockquote {
     margin: 1.8em .8em;
@@ -292,4 +294,4 @@ footer {
 @import "_highlights";
 @import "_svg-icons";
 @import "_pagination";
-
+@import "_tags";
