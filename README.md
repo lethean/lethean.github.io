@@ -2,6 +2,6 @@
 
 [lethean.github.io](http://lethean.github.io/)
 
-from [sunjinyang.wordpress.kr](https://sunjinyang.wordpress.kr/)
+from [sunjinyang.wordpress.com](https://sunjinyang.wordpress.com/)
 
 from [lethean.pe.kr](http://lethean.pe.kr/)
