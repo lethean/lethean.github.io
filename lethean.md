@@ -1,7 +1,7 @@
 ---
 layout: page
 title: lethean
-permalink: /about/
+permalink: /lethean/
 ---
 
 a. Of or pertaining to Lethe; resembling in effect the water of Lethe. --Milton. Barrow. [1913 Webster]
