@@ -1,6 +1,7 @@
 ---
 layout: post
 title: 리눅스에서 이더넷 프레임 보내고 받기
+tags: [ Linux, Network ]
 ---
 
 다음에 진행할 프로젝트를 위해 [이더넷 프레임](http://en.wikipedia.org/wiki/Ethernet_frame) 패킷을 리눅스에서 소켓 API를 이용해 직접 읽고 쓰는 방법이 필요해서 조사한 결과를 남겨봅니다.
