@@ -255,17 +255,17 @@ nav {
   border-bottom: none;
 }
 
-.posts 
-
-.post {
-  blockquote {
+.post blockquote {
     margin: 1.8em .8em;
     border-left: 2px solid $gray;
     padding: 0.1em 1em;
     color: $gray;
-    font-size: 22px;
     font-style: italic;
   }
+
+.posts 
+
+.post {
 
   .comments {
     margin-top: 10px;
