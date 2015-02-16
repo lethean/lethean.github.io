@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 리눅스에서 시간 변경 여부 감지하기
+title: 리눅스에서 시간 변경 감지하기
 tags: [ Linux, glibc ]
 ---
 
@@ -12,7 +12,7 @@ tags: [ Linux, glibc ]
 > If this flag is set for a CLOCK_REALTIME absolute (TFD_TIMER_ABSTIME) timer,
 >  then the timer is expired if the clock is reset.
 
-즉, 커널 내부 시계(clock)가 초기화(reset)되면 타이머가 만기되어(expired) 이벤트가 발생한다는 내용입니다. 그리고 눈으로 읽는 것만으로는 역시 잊어버릴 것 같아서, [예제 프로그램을 간단하게 수정](https://gist.github.com/lethean/446cea944b7441228298#file-timechange-c)해서 시간이 변경되는 여러 경우를 실험해보니, 직접 시간을 변경하거나 NTP 시간 동기화로 인한 시간 변경은 감지하는데, 시간대(time zone) 변경은 감지하지 못하는군요. 게다가 사람이 보기에는 같지만 아주 조금만 달라져도, 추측하기에는 시간 변경 함수가 호출만 되어도, 이벤트가 발생합니다. 게다가 시간이 앞으로 이동했는지 뒤로 이동했는지도 알 방법이 없고.
+즉, 커널 내부 시계(clock)가 초기화(reset)되면 타이머가 만기되어(expired) 이벤트가 발생한다는 내용입니다. 그리고 눈으로 읽는 것만으로는 역시 잊어버릴 것 같아서, [예제 프로그램을 간단하게 수정](https://gist.github.com/lethean/446cea944b7441228298#file-timechange-c)해서 시간이 변경되는 여러 경우를 실험해보니, 직접 시간을 변경하거나 NTP 시간 동기화로 인한 시간 변경은 감지하는데, 시간대(time zone) 변경은 감지하지 못하는군요. 게다가 사람이 보기에는 같지만 아주 조금만 달라져도, 추측하기에는 시간 변경 함수가 호출만 되어도, 이벤트가 발생합니다. 게다가 시간이 앞으로 이동했는지 뒤로 이동했는지도 알 방법이 없고...
 
 아무튼, 오늘도 역시 여전히 아는 것보다 모르는 게 더 많다는 사실을 새삼 깨닫게 된 하루입니다.
 
