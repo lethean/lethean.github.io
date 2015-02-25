@@ -22,7 +22,11 @@
   </head>
 
   <body>
-    <div class="wrapper-masthead">
+    <div id="main" role="main" class="container">
+      {{ content }}
+    </div>
+
+    <div class="wrapper-footer">
       <div class="container">
         <header class="masthead clearfix">
           <!-- <a href="{{ site.baseurl }}/" class="site-avatar"><img src="{{ site.avatar }}" /></a> -->
@@ -37,17 +41,10 @@
             <a href="{{ site.baseurl }}/archive/">Archive</a>
           </nav>
         </header>
-      </div>
-    </div>
-
-    <div id="main" role="main" class="container">
-      {{ content }}
-    </div>
-
-    <div class="wrapper-footer">
-      <div class="container">
         <footer class="footer">
           {% include svg-icons.html %}
+
+	  <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="크리에이티브 커먼즈 라이선스" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a>
         </footer>
       </div>
     </div>
