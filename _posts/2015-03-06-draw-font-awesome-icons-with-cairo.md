@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Cairo 라이브러리를 이용해 Font Awesome 아이콘 그리기
-tags: [ Cairo, FontAwesome ]
+tags: [ Cairo, Clutter, FontAwesome ]
 ---
 
 요즘 웹에는 글꼴 아이콘(font icon)을 많이 사용합니다. 벡터 그래픽 방식이라 확대해도 좋은 품질을 보여주고, 자주 사용되는 다양한 모양도 많이 제공됩니다. 덕분에 작은 규모의 팀에서 간단한 웹 사이트나 웹앱을 개발할 때, 디자이너의 도움(?)이 없어도 되기 때문에, 시간과 노력을 많이 절약하게 됩니다. 특히 라이센스도 자유로우면서 다양한 아이콘을 제공하는 글꼴 아이콘도 많은데, 대표적으로 [Font Awesome](http://fortawesome.github.io/Font-Awesome/), [WebHostingHub Glyphs](http://www.webhostinghub.com/glyphs/) 등이 있습니다. 물론 [구글 검색을 해보면](https://www.google.co.kr/search?q=font+icon) 유료 제품도 있고, 직접 만들어주는 도구까지 있습니다.
