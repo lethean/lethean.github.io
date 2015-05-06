@@ -24,6 +24,9 @@ tags: [ Cairo, Clutter, FontAwesome ]
 글꼴 디렉터리나 사용자 글꼴 디렉터리에 복사하는 방식은 번거롭기도 하고 불가능한
 경우도 있어서 가능하다면 글꼴 파일을 직접 사용하는 방법을 찾아보았습니다.
 
+(*2015-05-06 업데이트*: Pango 개발자가 더 자세히 설명한
+[Pango를 이용한 사용자 폰트 사용하기][3] 문서를 참고해도 됩니다)
+
 그래서 찾은 방법은 다음과 같습니다.
 
 먼저 [FreeType] 라이브러리를 이용해 글꼴 파일을 읽은 후
@@ -180,6 +183,7 @@ draw_icon_content (ClutterCanvas *canvas,
 
 [1]: https://www.google.co.kr/search?q=font+icon
 [2]: https://gist.github.com/lethean/bdd5a657f103b6cb0c23
+[3]: http://mces.blogspot.kr/2015/05/how-to-use-custom-application-fonts.html
 [cairo_ft_font_face_create_for_ft_face()]: http://cairographics.org/manual/cairo-FreeType-Fonts.html#cairo-ft-font-face-create-for-ft-face
 [Cairo]: http://cairographics.org/
 [ClutterCanvas::draw]: https://developer.gnome.org/clutter/stable/ClutterCanvas.html#ClutterCanvas-draw
