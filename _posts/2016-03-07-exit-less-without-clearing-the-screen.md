@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Less 명령어가 끝나도 내용을 지우지 않게 하기
+title: less 명령어가 끝나도 내용을 지우지 않게 하기
 tags: [ Git, Less, Zsh ]
 ---
 
