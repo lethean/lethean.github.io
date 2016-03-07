@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 'Oh My Zsh' 사용하면서 Less 명령어가 끝나도 내용을 지우지 않게 하기
+title: Oh My Zsh 사용하면서 Less 명령어가 끝나도 내용을 지우지 않게 하기
 tags: [ Git, Less, Zsh ]
 ---
 
@@ -26,7 +26,6 @@ export LESS="-R -F -X"
 구글링으로 참조한 링크는 아래와 같습니다.
 
 * ['less' command clearing screen upon exit - how to switch it off?](http://superuser.com/questions/106637/less-command-clearing-screen-upon-exit-how-to-switch-it-off)
-
 * [Is there any way to exit “less” without clearing the screen?](http://unix.stackexchange.com/questions/38634/is-there-any-way-to-exit-less-without-clearing-the-screen)
 
 :)
