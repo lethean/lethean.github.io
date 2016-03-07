@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Oh My Zsh 사용하면서 Less 명령어가 끝나도 내용을 지우지 않게 하기
+title: Less 명령어가 끝나도 내용을 지우지 않게 하기
 tags: [ Git, Less, Zsh ]
 ---
 
