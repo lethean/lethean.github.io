@@ -8,7 +8,7 @@ tags: [ Git, Linux ]
 
 정상적으로 동작하는 리눅스 커널 4.2.5 버전에서는 `rr272x_1x` 모듈이 인터럽트 16을 할당받아 동작하는데,
 
-```
+```sh
 $ cat /proc/interrupts
 ...
  16:      13629       3699       2326       1683  IR-IO-APIC  16-fasteoi   ehci_hcd:usb1, rr272x_1x
@@ -22,7 +22,7 @@ $ dmesg | grep rr272x
 
 오동작하는 리눅스 커널 4.4.1 버전에서는 인터럽트 11을 할당받지만 실제 인터럽트xi는 발생하지 않고,
 
-```
+```sh
 $ cat /proc/interrupts
 ...
  11:          0          0          0          0  IR-IO-APIC  11-edge      rr272x_1x
