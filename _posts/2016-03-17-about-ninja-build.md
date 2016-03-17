@@ -6,7 +6,7 @@ tags: [ Ninja, Build ]
 
 '[2015년 주목받은 신인 오픈소스 SW 11선](http://www.bloter.net/archives/252083)' 기사와 Dropbox 클라이언트의 다음 버전을 [Rust](https://www.rust-lang.org/) 언어와 [Bazel](http://bazel.io/)로 만든다는 [글](https://www.reddit.com/r/rust/comments/4adabk/the_epic_story_of_dropboxs_exodus_from_the_amazon/)을 보고 궁금증이 생겨 잠시 Bazel 빌드 도구를 살펴보았다. 하지만 아직 윈도 플랫폼을 지원하지 않고 ~~Java 언어로 구현되어 있어서~~ 당분간 사용을 보류했다.
 
-그러다가 문득 요즘에는 어떤 빌드 시스템이 인기 있는지 궁금해서 조사해 보니, 지난 몇 년 사이에 [Ninja](https://ninja-build.org)라는 빌드 도구가 계속 언급된다. [CMake](https://cmake.org/), [GYP](https://code.google.com/p/gyp/) 같은 전통의 빌드 시스템이 Make용 빌드 파일뿐 아니라 Ninja용 빌드 파일도 생성한다. 심지어 [Chromium 브라우저 빌드](https://www.chromium.org/developers/how-tos/build-instructions-chromeos)도 Ninja를 사용하는 방식으로 변경되었다.
+그러다가 문득 요즘에는 어떤 빌드 시스템이 인기 있는지 궁금해서 조사해 보니, 지난 몇 년 사이에 [Ninja](https://ninja-build.org)라는 빌드 도구가 계속 언급된다. [CMake](https://cmake.org/), [GYP](https://code.google.com/p/gyp/) 같은 전통의 빌드 시스템이 Make 빌드 파일뿐 아니라 Ninja 빌드 파일도 생성한다. 심지어 [Chromium 브라우저 빌드](https://www.chromium.org/developers/how-tos/build-instructions-chromeos)도 Ninja를 사용하는 방식으로 변경되었다.
 
 반나절 정도 걸려 한 프로젝트에 대한 Ninja 빌드 파일을 만들어 실행해 본 소감은 기대 반 실망 반인 것 같다. 항상 [ccache](https://ccache.samba.org/)를 사용하기 때문에 이와 맞물려 더한 감도 있지만, 체감 빌드 속도는 대만족이다. 하지만 단순한 기능을 보완하려면 별도의 도구가 더 필요한 점은 아쉽다.
 
