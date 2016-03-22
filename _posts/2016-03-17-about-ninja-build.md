@@ -4,11 +4,11 @@ title: Ninja 빌드 도구 소개
 tags: [ Ninja, Build ]
 ---
 
-'[2015년 주목받은 신인 오픈소스 SW 11선](http://www.bloter.net/archives/252083)' 기사와 Dropbox 클라이언트의 다음 버전을 [Rust](https://www.rust-lang.org/) 언어와 [Bazel](http://bazel.io/)로 만든다는 [글](https://www.reddit.com/r/rust/comments/4adabk/the_epic_story_of_dropboxs_exodus_from_the_amazon/)을 보고 궁금증이 생겨 잠시 Bazel 빌드 도구를 살펴보았다. 하지만 아직 윈도 플랫폼을 지원하지 않고 ~~Java 언어로 구현되어 있어서~~ 당분간 사용을 보류했다.
+'[2015년 주목받은 신인 오픈소스 SW 11선](http://www.bloter.net/archives/252083)' 기사와 Dropbox 클라이언트의 다음 버전을 [Rust](https://www.rust-lang.org/) 언어와 [Bazel](http://bazel.io/)로 만든다는 [글](https://www.reddit.com/r/rust/comments/4adabk/the_epic_story_of_dropboxs_exodus_from_the_amazon/)을 보고 궁금증이 생겨 잠시 Bazel 빌드 도구를 살펴보았다. 하지만 아직 윈도 플랫폼을 지원하지 않고 ~~Java 언어로 구현되어 있어서~~ 당분간 사용을 보류.
 
-그러다가 문득 요즘에는 어떤 빌드 시스템이 인기 있는지 궁금해서 조사해 보니, 지난 몇 년 사이에 [Ninja](https://ninja-build.org)라는 빌드 도구가 계속 언급된다. [CMake](https://cmake.org/), [GYP](https://code.google.com/p/gyp/) 같은 전통의 빌드 시스템이 Make 빌드 파일뿐 아니라 Ninja 빌드 파일도 생성한다. 심지어 [Chromium 브라우저 빌드](https://www.chromium.org/developers/how-tos/build-instructions-chromeos)도 Ninja를 사용하는 방식으로 변경되었다.
+그러다가 문득 요즘에는 어떤 빌드 시스템이 인기 있는지 궁금해서 조사해 보니, 지난 몇 년 사이에 [Ninja](https://ninja-build.org)라는 빌드 도구가 계속 언급되는 걸 발견했다. [CMake](https://cmake.org/), [GYP](https://code.google.com/p/gyp/) 같은 전통의 빌드 시스템이 Make 빌드 파일뿐 아니라 Ninja 빌드 파일도 생성한다. 심지어 [Chromium 브라우저 빌드](https://www.chromium.org/developers/how-tos/build-instructions-chromeos)도 Ninja를 사용하는 방식으로 변경되었다.
 
-반나절 정도 걸려 한 프로젝트에 대한 Ninja 빌드 파일을 만들어 실행해 본 소감은 기대 반 실망 반인 것 같다. 항상 [ccache](https://ccache.samba.org/)를 사용하기 때문에 이와 맞물려 더한 감도 있지만, 체감 빌드 속도는 대만족이다. 하지만 단순한 기능을 보완하기 위해 별도의 도구가 더 필요한 점은 아쉽다.
+반나절 정도 걸려 Ninja 빌드 파일을 만들고 실행해 본 소감은 만족 반 실망 반인 것 같다. 항상 [ccache](https://ccache.samba.org/)를 사용하기 때문에 이와 맞물려 더한 감도 있지만, 체감 빌드 속도는 대만족이다. 하지만 단순한 기능을 보완하기 위해 별도의 도구가 더 필요한 점은 아쉽다.
 
 Ninja의 장점은 빠른 빌드 속도와 리눅스 / 윈도 / 맥 운영체제를 포함하는 멀티 플랫폼 지원이다. 빠른 속도를 얻기 위해 시스템에 장착된 모든 CPU를 모두 사용해서 병렬로 작업을 처리한다. `make -jN` 명령에서 `N`에 시스템 CPU 갯수를 지정한 것과 같은 셈이다. 하지만 조금 다뤄보니 병렬 작업에 대한 고려를 많이 했다는 느낌을 받는다. 병렬 처리되는 작업의 결과 내용을 섞어서 표시하지 않고 버퍼링 했다가 따로따로 출력한다거나 Make처럼 세심하게 신경 쓰지 않아도 대부분 작업을 병렬로 잘 처리한다.
 
