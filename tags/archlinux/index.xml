@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ArchLinux | 대체로 무해함</title>
+    <link>/tags/archlinux/</link>
+      <atom:link href="/tags/archlinux/index.xml" rel="self" type="application/rss+xml" />
+    <description>ArchLinux</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 22 Feb 2011 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>ArchLinux</title>
+      <link>/tags/archlinux/</link>
+    </image>
+    
+    <item>
+      <title>사진 파일 이름 변경하기</title>
+      <link>/2011/02/22/2011-02-22-renaming-photo-files/</link>
+      <pubDate>Tue, 22 Feb 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/02/22/2011-02-22-renaming-photo-files/</guid>
+      <description>&lt;p&gt;요즘 디지털 카메라나 휴대폰으로 촬영한 JPEG 파일에는 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/EXIF&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;EXIF&lt;/a&gt;
+ 정보가 삽입되어 있어서 나름 유용할 때가 많습니다. 카메라에 대한 자세한 사양(?) 정보에는 관심이 없지만, 촬영한 시각이라든지 카메라를 세워서 촬영했는지 여부는 물론, 카메라 GPS 옵션을 켜면 기록되는 촬영 장소의 정확한 좌표는 가끔 두려울 때도 있습니다.&lt;/p&gt;
+&lt;p&gt;아무튼 요즘은 윈도우나 맥 부럽지 않은 리눅스 사진 관리 프로그램들이 많이 있어서 편하긴 한데, 이런 프로그램들이 존재하기 전부터, EXIF 정보가 포함되지도 않았던 시절부터 디렉토리별로 관리해오던 습관을 버리지 못하는 게 문제입니다. 예를 들어 폴더는 알아보기 쉽게 &lt;code&gt;YYYYMMDD-장소또는이벤트이름&lt;/code&gt; 식으로 이름짓고, 안에 들어있는 JPEG 파일은 &lt;code&gt;YYYYMMDD-hhmmss-photo.jpg&lt;/code&gt;, 동영상 파일은 &lt;code&gt;YYYYMMDD-hhmmss-movie.mp4&lt;/code&gt; 식으로 이름을 지어 줍니다.&lt;/p&gt;
+&lt;p&gt;물론, 이런 작업을 모두 수작업으로 하지는 않습니다. EXIF 정보에 문외한이던 시절에는 
+&lt;a href=&#34;http://live.gnome.org/gthumb&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gthumb&lt;/a&gt;
+ 같은 프로그램의 이름일괄변경(&lt;code&gt;Rename...&lt;/code&gt;) 기능을 이용해 자동으로 날짜 뒤에 일련번호를 붙이기도 했습니다.&lt;/p&gt;
+&lt;p&gt;하지만 요즘은 그것도 귀찮아서 &lt;code&gt;exiv2&lt;/code&gt; / &lt;code&gt;rename&lt;/code&gt; 명령어를 이용해 한꺼번에 변경해 버립니다. 
+&lt;a href=&#34;http://www.exiv2.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;exiv2&lt;/code&gt;&lt;/a&gt;
+ 프로그램을 이용해 EXIF 정보에 들어있는 촬영 시각을 기준으로 사진 파일 이름을 변경하고,  &lt;code&gt;rename&lt;/code&gt; 명령어를 이용해 대문자로 된 &lt;code&gt;.JPG&lt;/code&gt; 확장자를 소문자 &lt;code&gt;.jpg&lt;/code&gt; 확장자로 한번에 변경합니다. 예를 들어 위에서 설명한 예처럼 파일 이름을 변경하려면 사진 파일이 들어 있는 디렉토리에서 다음과 같이 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ rename .JPG .jpg *.JPG
+$ exiv2 -r &#39;%Y%m%d-%H%M%S-photo&#39; -k rename *.jpg
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;rename&lt;/code&gt; 명령어는 대부분 배포판에 기본으로 설치되어 있으나 &lt;code&gt;exiv2&lt;/code&gt; 프로그램은 수동으로 패키지를 설치해야 할 수도 있습니다. 게다가, 우분투의 &lt;code&gt;rename&lt;/code&gt; 명령어는 perl 패키지에 포함되어 있는 버전인데 아치 리눅스는 util-linux 패키지에 포함되어 있는 거라 사용법이 조금 다릅니다. 참고로 위 예제는 아치 리눅스 버전입니다. 하지만 &lt;code&gt;exiv2&lt;/code&gt;, &lt;code&gt;rename&lt;/code&gt; 명령어 모두 매뉴얼 페이지를 보면 자세한 사용 예제가 있으므로 쉽게 사용할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;그리고 이 글은 사실, 나이가 들수록 자꾸만 옵션을 잊어버려 다시 찾기 귀찮아서 기록하고 있습니다&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>아치 리눅스(Arch Linux)로 갈아타다</title>
+      <link>/2011/02/21/2011-02-21-migrated-to-arch-linux/</link>
+      <pubDate>Mon, 21 Feb 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/02/21/2011-02-21-migrated-to-arch-linux/</guid>
+      <description>&lt;p&gt;1996년부터 리눅스를 사용하면서 
+&lt;a href=&#34;http://slackware.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;슬랙웨어&lt;/a&gt;
+, 
+&lt;a href=&#34;http://www.redhat.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;레드햇&lt;/a&gt;
+, 
+&lt;a href=&#34;http://www.debian.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;데비안&lt;/a&gt;
+을 거쳐 
+&lt;a href=&#34;http://www.ubuntu.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;우분투&lt;/a&gt;
+ 배포판을 사용해 오다가 최근 
+&lt;a href=&#34;http://www.archlinux.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;아치 리눅스&lt;/a&gt;
+로 갈아 탔습니다. 우분투가 여러 이유로 편하긴 하지만, 어느 순간부터 점점 무거워지다가(mono, python 기반 기본 프로그램 때문?), 별로 사용하지 않고 원하지도 않는 기능들이 추가되는가 싶더니만(Ubuntu One 등) 급기야 2011.4 버전부터 그놈 3(GNOME 3) 프로젝트의 공식 셸(GNOME Shell) 대신 자체 유나이티(Unity) 셸을 채택한다고 하는 순간, 아 이제 우분투와 이별의 순간이 다가왔구나 깨달았습니다. 그놈 셸이 유나이티보다 UX 측면에서 완성도가 더 높다고 생각하고 있었고, 개인적으로 더 선호하는 스타일이었기 때문이기도 하지만, 역시 상업 회사가 이끄는 배포판은 장점도 많지만 이런 단점도 있을 수 있다는 걸 다시 한 번 깨달았기 때문이기도 합니다. 물론 지금까지 우분투에 불만이 없었던 건 아니지만, 대부분 다른 장점에 의해 묻혀버렸는데, 이번 일을 계기로 쌓였던 불만이 한꺼번에 노출된 것 같기도 합니다.&lt;/p&gt;
+&lt;p&gt;그렇다고 데비안이나 페도라, 젠투 배포판으로 가기에는 별로 재미가 없을 것 같아서 여기 저기 확인해보다가 아치 리눅스를 선택하게 되었습니다. 여러가지 이유가 있지만, 32비트 버전의 경우 패키지 바이너리가 i686에 최적화되어 있고, 패키지 시스템이 의외로 빠르고 단순명료하게 동작하면서, 6개월마다 시스템을 갈아 엎을 일 없이 계속 조금씩 업그레이드 되어(rolling release) 최신 소프트웨어를 항상 바로 사용할 수 있다는 점이 맘에 들었습니다. 더 이상 우분투 개발 버전을 사용하면서 X가 실행되지 않는다든지, 부팅이 안된다든지, 잘 돌던 소프트웨어가 동작하지 않는다든지 걱정할 필요가 없어진 셈입니다. 게다가 아치 사용자 저장소(Arch User Repository; AUR)와 yaourt 프로그램을 사용하니 기존에 별도로 설치했던 dropbox, android-sdk, eclipse, openproj 등도 쉽게 패키지로 설치할 수 있어 더 편했습니다. 물론 GUI 방식 패키지 관리자가 없고 패키지 설치만으로 모든 설정이 자동으로 되는게 아니라 어느 정도 리눅스 경험자가 아니면 불편한 점도 많지만, 오히려 중급 사용자 이상일 경우 원리를 하나씩 알아가면서 설치하는 재미도 쏠쏠합니다. 게다가 별도 문서가 불필요할 정도로 아치리눅스 위키 페이지 정리가 잘 되어 있어 굳이 다른 구글링도 필요없는 것 같습니다. 물론, 한글 글꼴 패키지의 부족이나 부족한 그놈 테마 패키지 등 못마땅한 점이 없는 건 아니지만, 어차피 단점 없는 배포판은 없는 법, 나름 오랜만에 커스터마이징에 즐거운 시간을 보낸 것 같습니다.&lt;/p&gt;
+&lt;p&gt;인증 스크린샷이라도 하나 올리려다가, 별로 다른게 없어서 그만 두었습니다. 사용하는 배포판이 무엇이든, 어차피 설치 이후에는 결국 동일한 리눅스일 뿐이기 때문입니다. 여담이지만, 오래된 저사양 노트북에서도 동일한 그놈 환경인데 우분투보다 더 빨리 실행되는 듯한 느낌을 받고 있습니다. 물론 정신적인 영향이 더 큰 것 같기도 하지만&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

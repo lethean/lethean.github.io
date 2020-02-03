@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Schedule | 대체로 무해함</title>
+    <link>/tags/schedule/</link>
+      <atom:link href="/tags/schedule/index.xml" rel="self" type="application/rss+xml" />
+    <description>Schedule</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Sat, 20 Nov 2010 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Schedule</title>
+      <link>/tags/schedule/</link>
+    </image>
+    
+    <item>
+      <title>리눅스 데스크탑 반응속도 향상 패치 테스트</title>
+      <link>/2010/11/20/2010-11-20-test-a-patch-to-improve-responsiveness-in-linux-desktop/</link>
+      <pubDate>Sat, 20 Nov 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/11/20/2010-11-20-test-a-patch-to-improve-responsiveness-in-linux-desktop/</guid>
+      <description>&lt;p&gt;며칠전부터 리눅스 커뮤니티와 관련 뉴스 사이트에서 리눅스 데스크탑 반응속도(reponsiveness)를 획기적으로 향상시킨다는 
+&lt;a href=&#34;http://marc.info/?l=linux-kernel&amp;amp;m=128978361700898&amp;amp;w=2&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;233라인짜리 패치&lt;/a&gt;
+에 대한 
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=article&amp;amp;item=linux_2637_video&amp;amp;num=1&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;소식&lt;/a&gt;
+이 끊임없이 흘러다니고 있습니다. 리누스 토발즈가 극찬을 해서 더 유명해진 것 같기도 한데, 아마도 원래 아이디어를 본인이 제안해서 그런게 아닌가 싶기도 하고, 커널 컴파일과 동시에 웹브라우징, 동영상 재생을 하는 것처럼 극단적인 환경과 멀티코어 시스템에만 적용될 뿐이라고 
+&lt;a href=&#34;http://psankar.blogspot.com/2010/11/cpu-or-io-what-matters-most.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그리 대단하게 않게 보는 사람&lt;/a&gt;
+들도 있는 것 같습니다. 게다가 한 터미널(tty)에서 파생한 프로세스를 모두 하나의 태스크 그룹으로 묶어 다른 태스크 그룹과 공평한 스케줄링이 되도록 한다는 아이디어가 근본적으로 cgroup 파일시스템을 이용하기 때문에 특별한 커널 패치 없이 
+&lt;a href=&#34;http://blog.glock.co.za/cgroup-user-space-speed-patch&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;cgroup 데몬과 스크립트를 이용해 동일한 효과를 얻는 기법&lt;/a&gt;
+도 등장했습니다.&lt;/p&gt;
+&lt;p&gt;직접 느껴보려고 일단 회사 개발 장비에 적용해 보았는데, 사양이 너무 좋아서인지 별로 차이점을 느끼지 못했습니다. 그래서 오래된 노트북 PC와 상대적으로 낮은 사양의 데스크탑 장비에도 적용해봤습니다. 하지만, 아이디어 자체가 터미널 작업과 다른 작업을 다른 그룹으로 나누는 것 뿐이라서 그런지, 터미널을 열어 다른 작업을 안했더니 별로 반응속도가 달라지는 건 느끼지 못하고 있습니다.&lt;/p&gt;
+&lt;p&gt;그럼에도 불구하고, 스케줄링 정책만으로 데스크탑 반응성을 향상할 수 있다는 아이디어를 조금만 더 확장하면 더 좋은 아이디어만 알고리즘이 나오지 않을까 기대해 봅니다. 아니나 다를까, 
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=news_item&amp;amp;px=ODc5OQ&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;페도라 15에서 시작 데몬으로 탑재할 SystemD 데몬에서 이미 사용자 세션, 서비스별로 각각의 태스크 그룹을 분리하도록 적용&lt;/a&gt;
+하는 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[업데이트-2010.11.22]&lt;/strong&gt; 예를 들어 제 경우, 구형 노트북에서 조금이라도 그래픽 성능 향상을 얻을 수 있을까 해서 ﻿&lt;code&gt;/etc/gdm/Init/Default&lt;/code&gt; 파일 마지막 라인 &amp;lsquo;&lt;code&gt;exit 0&lt;/code&gt;&amp;rsquo; 전에 다음과 같은 항목을 추가해서 체감 속도 변화를 느껴보려고 노력 중입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#chrt -rr -p 10 $(pidof X)
+mkdir -m 0700 -p /mnt/cgroups/cpu/Xorg
+echo $(pidof X) &amp;gt; /mnt/cgroups/cpu/Xorg/tasks
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 스케줄링 영역과 클래스</title>
+      <link>/2010/10/06/2010-10-06-linux-kernel-scheduling-domains-and-classes/</link>
+      <pubDate>Wed, 06 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/10/06/2010-10-06-linux-kernel-scheduling-domains-and-classes/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;스케줄링 영역 (Scheduling Domain)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;멀티 프로세서 시스템에서 스케줄러의 중요한 역할 중 하나는 모든 CPU의 부하를 균등하게 맞추는 일입니다. 이를 위해 스케줄러는 한 CPU에서 동작하던 태스크를 다른 CPU로 이동해야 하는 경우, 각 아키텍쳐의 특성을 고려해야 합니다.  왜냐하면, 한 CPU에서 동작하던 태스크를 다른 CPU로 옮기면(migration) 캐시 불일치 등으로 인한 오버헤드가 발생하는 것은 물론 아키텍쳐에 따라 심각한 성능 저하를 일으킬 수도 있기 때문입니다.[1]&lt;/p&gt;
+&lt;p&gt;예를 들어, 하이퍼 쓰레드 프로세서는 하나의 프로세서 안에 논리적인 CPU가 여러 개 포함된 구조이기 때문에 여러 논리 CPU는 모두 캐시와 메모리를 모두 공유합니다. 따라서 이 논리 CPU간에는 태스크를 이동하는데 오버헤드가 없습니다. SMP(Symmectric Multi Processor) 시스템이나 멀티 코어(Multi Core) 프로세서에는 하나의 물리 CPU 안에 한 개 이상의 CPU 코어가 장착되어 있습니다. 이 CPU 코어는 각각 캐시(cache)를 가지고 있지만, 메모리는 모두 공유합니다. 따라서 프로세서간 태스크 이동(migration)이 가능한 적을수록 좋은 성능을 얻을 수 있습니다. NUMA 아키텍쳐는 여러 노드로 구성되는데, 한 노드는 하나의 CPU와 메모리, 캐시로 구성됩니다. 그리고 한 CPU가 같은 노드의 메모리를 접근할 때는 속도가 다른 노드의 메모리를 접근할 때보다 훨씬 빠릅니다. 그러므로 CPU간 태스크 이동은 정책적으로 반드시 필요한 경우에만 일어나야 합니다. 최근 출시되는 프로세서는 대부분 멀티 코어이면서 각 프로세서 코어가 다시 하이퍼 쓰레드를 통해 논리 CPU를 지원하고, NUMA 아키텍쳐에서 한 노드의 프로세서가 하이퍼 쓰레드를 지원하기도 합니다.&lt;/p&gt;
+&lt;p&gt;이처럼 다양한 구조의 시스템을 효율적으로 지원하기 위해 리눅스 커널 2.6 버전부터 스케줄링 영역(scheduling domains) 기능이 추가되었습니다. 스케줄링 영역은 스케줄링 그룹 자료구조와 함께 구성되며 계층적인 방식으로 전체 시스템의 영역을 구성합니다. 스케줄링 영역(&lt;code&gt;struct sched_domain&lt;/code&gt;)은 속성(properties)과 정책(policies)을 공유하는 CPU 집합이기 때문에, 해당 CPU 간에 부하가 균등하게 조절됩니다. 스케줄링 그룹(&lt;code&gt;struct sched_group&lt;/code&gt;)은 CPU별로 할당되면서 동시에 영역의 여러 CPU를 묶어서 구성되기도 합니다. 스케줄링 영역은 스케줄링 그룹을 한 개 이상 포함하기 때문에 스케줄러가 한 영역 내에서 균형을 유지하려할 때 그룹 안에서 발생하는 상황을 걱정하지 않고 그룹의 부하(load)를 다른 그룹으로 이동합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;스케줄링 클래스 (Scheduling Class)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;리눅스 커널 2.6.23 버전에서 기존 O(1) 스케줄러를 대체한 CFS(Completely Fair Scheduler) 스케줄러를 구현하면서 함께 도입된 스케줄링 클래스(Scheduling Class)는 리눅스 커널의 다양한 스케줄링 정책을 캡슐화해서 기본 스케줄러를 확장하기 쉽도록 도와줍니다. 하지만 스케줄러 메인 코드가 모듈 방식으로 구현된 건 아니기 때문에 새 스케줄러를 일반 커널 모듈처럼 쉽게 넣거나 뺄 수 있는 건 아닙니다. 다만 POSIX 표준에서 요구하는 &lt;code&gt;SCHED_RR&lt;/code&gt;, &lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_NORMAL&lt;/code&gt;, &lt;code&gt;SCHED_BATCH&lt;/code&gt;, &lt;code&gt;SCHED_IDLE&lt;/code&gt; 등과 같은 정책을 분리해서 구현하기 위해 도입된 구조입니다.[2] 하지만, 새 스케줄러 모듈을 추가하는 작업이 예전에 비해 쉬어진 것은 사실입니다.&lt;/p&gt;
+&lt;p&gt;스케줄링 클래스는 코어 스케줄러를 돕는 여러 모듈을 연결해 놓은 고리처럼 볼 수 있습니다. 가장 앞에 있는 스케줄러 모듈이 먼저 실행되고, 실행할 태스크가 없으면 다음 스케줄러 모듈을 실행하는 방식으로 동작합니다. 실제로, 스케줄링 클래스에는 실시간 스케줄러(&lt;code&gt;sched_rt.c&lt;/code&gt;), CFS 스케줄러(&lt;code&gt;sched_fair.c&lt;/code&gt;), 유휴 스케줄러(&lt;code&gt;sched_idletask.c&lt;/code&gt;) 순으로 단일 연결 목록에 등록되어 있어 순서대로 스케줄러 모듈을 실행합니다.&lt;/p&gt;
+&lt;p&gt;각 스케줄러 모듈은 스케줄링 클래스 구조체(&lt;code&gt;struct sched_class&lt;/code&gt;)가 제안하는 기능을 콜백 함수처럼 구현합니다. 다음은 리눅스 커널 2.6.23 버전에서 정의된 스케줄링 클래스 구조입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;struct sched_class { /* Defined in 2.6.23:/usr/include/linux/sched.h */
+  struct sched_class *next;
+  void (*enqueue_task) (struct rq *rq, struct task_struct *p, int wakeup);
+  void (*dequeue_task) (struct rq *rq, struct task_struct *p, int sleep);
+  void (*yield_task) (struct rq *rq, struct task_struct *p);
+  void (*check_preempt_curr) (struct rq *rq, struct task_struct *p);
+  struct task_struct * (*pick_next_task) (struct rq *rq);
+  void (*put_prev_task) (struct rq *rq, struct task_struct *p);
+  unsigned long (*load_balance) (struct rq *this_rq, int this_cpu,
+                 struct rq *busiest,
+                 unsigned long max_nr_move, unsigned long max_load_move,
+                 struct sched_domain *sd, enum cpu_idle_type idle,
+                 int *all_pinned, int *this_best_prio);
+  void (*set_curr_task) (struct rq *rq);
+  void (*task_tick) (struct rq *rq, struct task_struct *p);
+  void (*task_new) (struct rq *rq, struct task_struct *p);
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 구조체에서 중요한 함수를 살펴보면 다음과 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;enqueue_task()&lt;/code&gt; : 태스크가 실행 가능한 상태로 진입할 때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dequeue_task()&lt;/code&gt; : 태스크가 더 이상 실행 가능한 상태가 아닐때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;yield_task()&lt;/code&gt; : 태스크가 스스로 &lt;code&gt;yield()&lt;/code&gt; 시스템콜을 실행했을 때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;check_preempt_curr()&lt;/code&gt; : 현재 실행 중인 태스크를 선점(preempt)할 수 있는지 검사합니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;pick_next_task()&lt;/code&gt; : 실행할 다음 태스크를 선택합니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;put_prev_task()&lt;/code&gt; : 실행중인 태스크를 다시 내부 자료구조에 넣을때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;load_balance()&lt;/code&gt; : 코어 스케줄러가 태스크 부하를 분산하고자 할때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;set_curr_task()&lt;/code&gt; : 태스크의 스케줄링 클래스나 태스크 그룹을 바꿀때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;task_tick()&lt;/code&gt; : 타이머 틱 함수가 호출합니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;task_new()&lt;/code&gt; : 새 태스크가 생성되었을때 그룹 스케줄링을 위해 호출됩니다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;스케줄링 클래스 구조는 기본 CFS 스케줄러에서 사용하는 내부 자료구조와 밀접하게 연관되어 있습니다. 예를 들어 각 CPU별로 유지하면서 콜백 함수의 인수로 넘겨지는 실행 큐(&lt;code&gt;struct rq&lt;/code&gt;)는 CFS 스케줄러를 위해 채택한 레드-블랙 트리(red-black tree) 자료구조를 사용하기  때문에 새 스케줄러 모듈을 구현하려면 반드시 기존 CFS 스케줄러 동작 방식과 구조를 어느정도 자세히 알고 있어야 합니다.[3]&lt;/p&gt;
+&lt;p&gt;[1] 
+&lt;a href=&#34;http://lwn.net/Articles/80911/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Jonathan Corbet, &amp;ldquo;Scheduling domains&amp;rdquo;, LWN.net, 2004
+&lt;/a&gt;
+[2] 
+&lt;a href=&#34;http://www.ibm.com/developerworks/linux/library/l-cfs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Avinesh Kumar, Multiprocessing with the Completely Fair Scheduler, IBM developerWorks, 2008
+&lt;/a&gt;
+[3] 
+&lt;a href=&#34;http://www.ibm.com/developerworks/linux/library/l-completely-fair-scheduler/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;M. Tim Jones, Inside the Linux 2.6 Completely Fair Scheduler, IBM developerWorks, 2009&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 I/O 스케줄링 우선순위</title>
+      <link>/2010/10/05/2010-10-05-linux-kernel-io-scheduler-priority/</link>
+      <pubDate>Tue, 05 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/10/05/2010-10-05-linux-kernel-io-scheduler-priority/</guid>
+      <description>&lt;p&gt;리눅스 커널 CPU 스케줄링과 마찬가지로 I/O 스케줄링에 적용되는 스케줄링 클래스와 우선순위도 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/ioprio_set.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ioprio_set()&lt;/code&gt;&lt;/a&gt;
+ 시스템콜을 이용해 사용자가 제어할 수 있습니다. 하지만 리눅스 커널이 제공하는 여러가지 I/O 스케줄러 중에서 CFQ(Completely Fair Queuing) 스케줄러에서만 사용할 수 있습니다. 물론 리눅스 커널은 블럭 장치마다 다른 I/O 스케줄러를 사용할 수 있도록 허용하므로 필요한 경우 적절하게 시스템을 구성하는 것도 가능합니다.[1]&lt;/p&gt;
+&lt;p&gt;I/O 스케줄링 클래스는 CPU 스케줄링과 비슷하게 나누어집니다. 첫번재 &lt;code&gt;IOPRIO_CLASS_RT(1)&lt;/code&gt; 클래스는 실시간(real-time) I/O 클래스로서, 이 클래스에 속한 태스크는 다른 클래스에 속한 태스크보다 항상 디스크에 먼저 접근합니다. 클래스 내부 우선순위는 가장 높은 0부터 가장 낮은 7까지 지정할 수 있습니다. 두번째 &lt;code&gt;IOPRIO_CLASS_BE(2)&lt;/code&gt; 클래스는 최선노력(best-effort) I/O 클래스로서, 특별히 I/O 우선순위를 지정하지 않은 대부분의 태스크가 이 클래스에 속합니다. 첫번째 클래스와 마찬가지로 0부터 7까지 내부 우선순위를 지정할 수 있으며, 이 우선순위에 따라 얼마나 많은 I/O 대역폭을 할당할지 결정합니다. 마지막 &lt;code&gt;IOPRIO_CLASS_IDLE(3)&lt;/code&gt; 클래스에 속한 태스크는 위의 두 클래스에 속한 어떤 태스크도 해야할 I/O 작업이 없을때만 I/O 작업을 수행하고, 내부 우선순위는 무시됩니다.&lt;/p&gt;
+&lt;p&gt;I/O 스케줄링 클래스와 우선순위는 읽기 작업과 동기화 쓰기 작업(&lt;code&gt;O_DIRECT&lt;/code&gt;, &lt;code&gt;O_SYNC&lt;/code&gt;)에만 반영됩니다. 즉, 일반적인 비동기 쓰기 작업에는 적용되지 않습니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ioprio_set()&lt;/code&gt;, &lt;code&gt;ioprio_get()&lt;/code&gt; 시스템콜은 리눅스 표준 C 라이브러리에 대응하는 함수가 없기 때문에 다음과 같이 직접 &lt;code&gt;syscall()&lt;/code&gt; 함수를 이용해 호출해야 합니다.[2]&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define _GNU_SOURCE      /* or _BSD_SOURCE or _SVID_SOURCE */
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/syscall.h&amp;gt; /* For SYS_xxx definitions */
+
+static inline int ioprio_set (int which, int who, int ioprio)
+{
+  return syscall (__NR_ioprio_set, which, who, ioprio);
+}
+
+static inline int ioprio_get (int which, int who)
+{
+  return syscall (__NR_ioprio_get, which, who);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위와 같이 프로그램 소스 코드를 수정하지 않아도 
+&lt;a href=&#34;http://linux.die.net/man/1/ionice&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ionice&lt;/code&gt;&lt;/a&gt;
+ 프로그램을 이용하면 셸(shell)이나 스크립트에서 직접 다른 태스크의 I/O 스케줄링 클래스와 우선순위를  변경할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;이와 더불어 리눅스 커널 cgroups 시스템의 blkio 서브시스템을 이용하면 태스크 / 디스크별 대역폭(bandwidth)을 할당하거나 그룹별로 더 다양한 I/O 정책을 세밀하게 적용할 수 있습니다.[3]&lt;/p&gt;
+&lt;p&gt;[1] 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/ioprio_set.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ioprio_set(), Linux Programmer&amp;rsquo;s Manual&lt;/a&gt;
+
+[2] 
+&lt;a href=&#34;http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=Documentation/block/ioprio.txt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Block IO Priorities, Linux Kernel Source Documentation&lt;/a&gt;
+
+[3] 
+&lt;a href=&#34;http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=Documentation/cgroups/blkio-controller.txt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Block IO Controller, Linux Kernel Source Documentation&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 실시간 스케줄링 우선순위</title>
+      <link>/2010/09/30/2010-09-30-linux-kernel-realtime-scheduling-priority/</link>
+      <pubDate>Thu, 30 Sep 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/09/30/2010-09-30-linux-kernel-realtime-scheduling-priority/</guid>
+      <description>&lt;p&gt;&lt;code&gt;SCHED_OTHER&lt;/code&gt;, &lt;code&gt;SCHED_IDLE&lt;/code&gt;, &lt;code&gt;SCHED_BATCH&lt;/code&gt; 스케줄링 정책(policy)에 속하는 일반 태스크는 스케줄링 우선순위(priority)는 항상 0입니다. 하지만 &lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_RR&lt;/code&gt; 등과 같은 실시간 스케줄링 정책에 속하는 태스크는 가장 낮은 1부터 가장 높은 99까지의 우선순위가 부여됩니다.&lt;/p&gt;
+&lt;p&gt;리눅스 커널 스케줄러는 태스크 우선순위별로 실행 가능한 태스크 목록을 유지하고,  가장 높은 우선순위부터 차례대로 각 우선순위별 태스크 목록이 비어있는지 검사해서 태스크가 있을 경우 목록의 첫번째 태스크를 다음에 실행할 태스크로 선택합니다. 따라서, 항상 가장 높은 우선순위가 부여된 실시간 태스크가 실행되고, 결과적으로 일반 태스크는 항상 실시간 태스크보다 나중에 스케줄링됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_RR&lt;/code&gt; 정책은 우선순위가 같을 경우 태스크를 목록 어디에 삽입할 지를 결정하는데 사용합니다. &lt;code&gt;SCHED_FIFO&lt;/code&gt; 정책에 속하는 태스크는 실행 가능 상태가 되면 우선순위 태스크 목록의 마지막에 삽입됩니다. 이 태스크는 I/O 요청을 기다리거나, 우선순위가 더 높은 태스크에 의해 선점(preempted)되는 경우, 직접 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/sched_yield.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;sched_yield(2)&lt;/code&gt;&lt;/a&gt;
+ 시스템콜을 호출하는 경우가 아니면 계속 실행됩니다. 반면에 &lt;code&gt;SCHED_RR&lt;/code&gt; 정책은 &lt;code&gt;SCHED_FIFO&lt;/code&gt; 정책과 비슷하지만 각 태스크에게 할당된 최대 실행 시간(maximum time quantum)이 지나면 자동으로 우선순위 태스크 목록 마지막으로 이동됩니다.[1]&lt;/p&gt;
+&lt;p&gt;만일 프로세스(process)가 아닌 쓰레드(thread)의 스케줄링 속성을 변경하려면, &lt;code&gt;gettid()&lt;/code&gt; 시스템콜을 호출해서 얻은 tid 값을 프로세스 pid 대신 넘겨주면 됩니다. 하지만 &lt;code&gt;gettid()&lt;/code&gt; 시스템콜은 C 라이브러리에 대응하는 함수가 없기 때문에 다음과 같이 직접 &lt;code&gt;syscall()&lt;/code&gt; 함수를 이용해 호출해야 합니다.[2]&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define _GNU_SOURCE      /* or _BSD_SOURCE or _SVID_SOURCE */
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/syscall.h&amp;gt; /* For SYS_xxx definitions */
+#include &amp;lt;sys/types.h&amp;gt;   /* For pid_t */
+
+static inline pid_t gettid (void)
+{
+  return (pid_t) syscall (SYS_gettid); /* or __NR_gettid */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위와 같이 직접 프로그래밍하지 않아도 
+&lt;a href=&#34;http://linux.die.net/man/1/chrt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;chrt&lt;/code&gt;&lt;/a&gt;
+ 유틸리티를 사용하면 셸(shell)이나 스크립트에서 직접 다른 태스크의 실시간 스케줄링 속성을 변경할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;하지만 리눅스 커널은 실시간 태스크 스케줄링에 필수적인 스케쥴링 지연시간(scheduling latency), 인터럽트 지연시간(interrupt latency)을 보장하지(guarantee) 않기 때문에 이를 개선하기 위해서는 별도의 패치를 적용한 커널을 사용해야 합니다.[3][4]&lt;/p&gt;
+&lt;p&gt;[1] 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/sched_setscheduler.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;sched_setscheduler(), Linux Programmer&amp;rsquo;s Manual&lt;/a&gt;
+
+[2] 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/gettid.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gettid(), Linux man-pages&lt;/a&gt;
+
+[3] 
+&lt;a href=&#34;https://rt.wiki.kernel.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Real-time Linux Wiki&lt;/a&gt;
+
+[4] 
+&lt;a href=&#34;https://www.osadl.org/Realtime-Linux.projects-realtime-linux.0.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;OSADL Project: Real-time Linux&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>libuv | 대체로 무해함</title>
+    <link>/tags/libuv/</link>
+      <atom:link href="/tags/libuv/index.xml" rel="self" type="application/rss+xml" />
+    <description>libuv</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 08 Mar 2016 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>libuv</title>
+      <link>/tags/libuv/</link>
+    </image>
+    
+    <item>
+      <title>libuv 사용기</title>
+      <link>/2016/03/08/2016-03-08-note-about-libuv/</link>
+      <pubDate>Tue, 08 Mar 2016 00:00:00 +0000</pubDate>
+      <guid>/2016/03/08/2016-03-08-note-about-libuv/</guid>
+      <description>&lt;p&gt;요즘은 비동기 이벤트 루프가 필요하면 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/GLib&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib&lt;/a&gt;
+ 라이브러리 대신 
+&lt;a href=&#34;http://libuv.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libuv&lt;/a&gt;
+ 라이브러리를 주로 사용한다.&lt;/p&gt;
+&lt;p&gt;GLib 라이브러리의 기능은 거의 완벽하다. 하지만 아주 가끔 멀티 스레드 환경에서 idle 함수가 이유 없이 실행되지 않는다. 또한 여러 기능이 점점 추가되고 통합되면서 점점 무거워지고 있다. 게다가 이제는 단순히 리눅스 / 윈도 플랫폼뿐 아니라 Mac OS / iOS / Android 등과 같은 모바일 플랫폼까지 고려해야 하는데 GLib 라이브러리는 이 부분에서 매우 취약하다. 이로 인해 네트워킹에 특화되어 있으면서 상대적으로 더 가볍고 멀티 플랫폼에서 성능과 안정성이 더 많이 검증된 libuv 라이브러리를 사용하게 된다.&lt;/p&gt;
+&lt;p&gt;libuv 라이브러리는, 이미 대세를 지나 조금씩 거품이 빠지고 있는지도 모르는, 
+&lt;a href=&#34;https://nodejs.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Node.js&lt;/a&gt;
+의 핵심 엔진이다. 
+&lt;a href=&#34;https://plus.google.com/&amp;#43;SunjinYang/posts/7yTEjEv3VC4&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;처음 관심을 가졌던 때&lt;/a&gt;
+와 달리 지금은 
+&lt;a href=&#34;http://libuv.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;공식 사이트&lt;/a&gt;
+와 
+&lt;a href=&#34;http://docs.libuv.org/en/v1.x/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;API 문서&lt;/a&gt;
+도 매우 잘 정리되어 있다.&lt;/p&gt;
+&lt;p&gt;하지만 지난 몇 년간 libuv 라이브러리를 여기저기 사용해보니, 역시나 완벽한 소프트웨어는 없다고, 처음에는 좋은 점만 보이더니 이제는 아쉬움이 더해간다. 물론 그래도 당분간은 다른 대안이 없어서 계속 사용할 예정이기 때문에 그동안 틈틈이 적었던 기록(이라 적어 놓고 불만이라고 읽는 기록)을 정리해 본다.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;비동기 이벤트 핸들에 우선순위 개념이 없어서 조금 아쉽다. 물론 GLib 메인 루프에만 있는 개념이고 대부분 비동기 이벤트 라이브러리에도 없기 때문에 필요하면 직접 구현해야 한다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;uv_idle_t&lt;/code&gt;와 &lt;code&gt;uv_prepare_t&lt;/code&gt; / &lt;code&gt;uv_check_t&lt;/code&gt; 핸들의 차이는 무엇일까? &lt;code&gt;uv_idle_t&lt;/code&gt;는 I/O 또는 &lt;code&gt;uv_timer_t&lt;/code&gt;가 없어도 실행되도록 하기 위해 
+&lt;a href=&#34;http://docs.libuv.org/en/v1.x/idle.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;I/O 대기 시간(polling time)이 항상 0이 되어&lt;/a&gt;
+ CPU 사용률이 100%가 된다. 하지만, &lt;code&gt;uv_prepare_t&lt;/code&gt; / &lt;code&gt;uv_check_t&lt;/code&gt; 핸들은 I/O가 있을 때만 I/O 앞과 뒤에서 실행된다. 즉, I/O 작업이 없으면 아예 호출되지 않는다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;uv_fs_*()&lt;/code&gt; 함수를 실행한 다음에 &lt;code&gt;uv_fs_req_cleanup()&lt;/code&gt; 함수를 호출하지 않으면 메모리 누수 귀신을 만나게 된다. 파일 입출력을 TCP / UDP처럼 스트림 기반 비동기 방식으로 만들지 않은 이유를 모르겠다. 윈도 플랫폼에서 소켓과 파일이 전혀 다르기 때문에 그럴 수도 있지만 유닉스 기반에서는 오히려 더 좋은 성능을 보여줄 텐데 말이다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;uv_timer_t&lt;/code&gt;에 반복(repeat)을 지정하면 정확한 주기에 동작한다. 예를 들어 5초 반복인데 콜백 함수가 2초간 실행되면 3초 후에 다시 실행된다. GLib의 &lt;code&gt;g_timeout_*()&lt;/code&gt; 함수는 5초 간격(interval)이라면 콜백 함수가 2초간 실행되어도 5초 이후에 다시 실행된다.&lt;/p&gt;
+&lt;p&gt;리눅스에서 시리얼 장치처럼 libuv가 직접 지원하지 않는 파일 디스크립터를 연결하려면 &lt;code&gt;uv_poll_t&lt;/code&gt;를 사용하면 된다. &lt;code&gt;uv_tty_t&lt;/code&gt;는 터미널이나 콘솔에만 사용해야 한다.&lt;/p&gt;
+&lt;p&gt;다른 스레드가 특정 지점에 도달할 때까지 기다려야 한다면 &lt;code&gt;uv_barrier_t&lt;/code&gt;를 사용하면 편리하다. 예를 들어 새 스레드를 생성하고 그 스레드가 특정 위치까지 실행될 때까지 대기하는 목적으로 사용하면 된다.&lt;/p&gt;
+&lt;p&gt;하나의 &lt;code&gt;uv_loop_t&lt;/code&gt; 개체와 연결된 모든 libuv 함수는 &lt;code&gt;uv_run()&lt;/code&gt; 함수가 실행된 스레드에서만 호출되어야 한다. 심지어 &lt;code&gt;uv_*_init()&lt;/code&gt; 함수도 같은 스레드에서 호출해야 한다. &lt;code&gt;uv_async_send()&lt;/code&gt; 함수가 유일한 예외인데, 이것만 사용해서 스레드 간에 통신하기에는 조금 부족하다. 스레드 간 통신에 TCP / UDP / 파이프 등을 이용해도 되지만 오버헤드가 발생할 수밖에 없다. 예를 들어 GLib 같은 경우 특정 스레드에서 어떤 함수를 호출하고 싶으면 해당 스레드에서 실행 중인 루프의 콘텍스트에 &lt;code&gt;g_idle_add()&lt;/code&gt; / &lt;code&gt;g_timeout_add()&lt;/code&gt; 종류의 함수를 이용해서 쉽게 추가할 수 있다. 하지만 libuv에서는 메시지 큐 또는 채널 같은 자료구조를 구현해서 메시지를 전달하면 그 메시지를 해독해서 특정 함수를 실행하거나 작업을 진행해야 한다. 어쩌면 libuv / Node.js 개발자가 멀티 스레드를 지양하고 멀티 프로세스를 지향하는 구조를 선호하기 때문일 수도 있다. C 언어의 특성상 다양한 방식이 존재하기 때문에 필요에 따라 직접 구현해서 사용하기를 권장하는 건지도 모르겠다. 하지만 적어도 
+&lt;a href=&#34;https://gobyexample.com/channels&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Go 언어의 채널&lt;/a&gt;
+이나 
+&lt;a href=&#34;http://rustbyexample.com/std_misc/channels.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Rust 언어의 채널&lt;/a&gt;
+처럼 널리 사용되는 스레드 간 통신 방법을 libuv 라이브러리가 제공해주면 더 좋을 것 같다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;uv_close()&lt;/code&gt; 함수를 호출해도 핸들의 리소스가 실제로 해제되는 시점이 &lt;code&gt;uv_run()&lt;/code&gt; 루프 내부라는 점도 불편하다. 이 때문에 핸들과 연관된 리소스를 해제하기 위해 콜백 함수라는 한 단계를 더 거쳐야 한다. 이는 매우 귀찮은 작업인데, 수많은 libuv 예제 소스에는 리소스 해제를 고려하지 않고 대부분 static 변수를 사용하지만, 실전에서는 메모리 누수와 개체의 라이프 사이클을 신경 써야 하기 때문이다. 예를 들어 현재 TCP 연결을 끊고 나서 다른 정보로 다시 TCP 연결을 생성해야 할 때, 콜백 함수가 호출되기 전까지의 그 위험한 순간에 TCP 연결에 대한 핸들을 가리키는 변수에 접근하게 되면 재앙이 발생한다.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://ko.wikipedia.org/wiki/Misra_c&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;안전한 C 프로그래밍&lt;/a&gt;
+을 하고 싶어도 동적인 메모리 할당 / 해제 작업을 피할 수가 없다. 물론 &lt;code&gt;uv_read_start()&lt;/code&gt; 함수는 읽기 작업 전에 버퍼를 할당해야 하는 것처럼 보이지만 큰 버퍼를 미리 할당하고 포인터와 크기만 잘 조작해도 된다. 하지만 핸들 자체가 실행 중에 다른 인수로 다시 시작해야 하는 경우처럼 복잡한 단계를 거쳐야 하는 건 어쩔 수 없다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;uv_read_start()&lt;/code&gt; 함수는 매우 편리하다. 그런데 연결이 끊기거가 에러가 발생했을때 
+&lt;a href=&#34;http://docs.libuv.org/en/v1.x/stream.html#c.uv_read_cb&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;문서&lt;/a&gt;
+와 다른 패턴을 종종 경험한다.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

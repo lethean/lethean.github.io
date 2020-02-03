@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Windows | 대체로 무해함</title>
+    <link>/tags/windows/</link>
+      <atom:link href="/tags/windows/index.xml" rel="self" type="application/rss+xml" />
+    <description>Windows</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Wed, 08 Feb 2012 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Windows</title>
+      <link>/tags/windows/</link>
+    </image>
+    
+    <item>
+      <title>Dr. Memory 메모리 오류 / 누수 감지 도구</title>
+      <link>/2012/02/08/2012-02-08-detect-memory-leaks-and-corruption-with-dr-memory/</link>
+      <pubDate>Wed, 08 Feb 2012 00:00:00 +0000</pubDate>
+      <guid>/2012/02/08/2012-02-08-detect-memory-leaks-and-corruption-with-dr-memory/</guid>
+      <description>&lt;p&gt;대부분의 작업을 리눅스 환경에서 진행하지만 가끔은 어쩔 수 없이 윈도우 프로그램을 디버깅합니다. 그런데 메모리 오류를 디버깅할 때 리눅스에서 애용하는 
+&lt;a href=&#34;http://valgrind.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Valgrind&lt;/a&gt;
+ 같은 괜찮은 무료(!) 도구가 없어서 아쉬었는데, 오늘 발견한 
+&lt;a href=&#34;http://code.google.com/p/drmemory/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Dr. Memory&lt;/a&gt;
+ 덕분에 매우 수월하게 메모리 오류 디버깅을 진행할 수 있었습니다. 또한, 리눅스에서도 사용할 수 있다고 하니 계속 디버깅에 사용해 볼 생각입니다.&lt;/p&gt;
+&lt;p&gt;사실, 이 포스팅은, 사용하기 쉬우면서도 
+&lt;a href=&#34;http://valgrind.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Valgrind&lt;/a&gt;
+ 만큼 강력한 
+&lt;a href=&#34;http://code.google.com/p/drmemory/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Dr. Memory&lt;/a&gt;
+ 덕분에 해묵은 버그와 오류까지 모조리 잡을 수 있게 되어, 그 고마움을 표시하고 싶어서 남기는 글입니다. 따라서, 사용법 같은 자세한 내용이 궁금하신 분은 홈페이지를 방문해 보시길&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>2010년 1학기에 작성한 프로그램</title>
+      <link>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</link>
+      <pubDate>Tue, 28 Sep 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</guid>
+      <description>&lt;p&gt;뭐, 전혀 관심 없는 분이 대부분이겠지만, 제 하드 디스크에서 묵히는 것보다 누군가에게 도움이 되는 편이 좋을 것 같아, 별로 품질이 좋은 소스는 아니지만, 오픈 소스만 사용해도 무난하게 과제 수행에 문제가 없음을 보여주기 위해, 지난 학기 수업 과제물로 제출했던 과제물의 문서와 프로그램 소스를 공개합니다.&lt;/p&gt;
+&lt;p&gt;참고로, 앞의 두 프로그램은 GTK+ 라이브러리를 이용해서 리눅스에서 개발했지만, 과제 시연을 위해 윈도우에서도 문제없이 컴파일되고 실행되도록 만들었습니다. 그리고, 안드로이드 뷰어는 라이브 보기만 구현된 소스입니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. Image Histogram Viewer&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;﻿﻿이 프로그램은 JPEG 이미지 파일을 읽어들여 화면에 표시하고 파일의 이름, 생성일시, 수정일시 등과 같은 속성을 보여주고, 이미지의 히스토그램을 분석하여 그래프로 표시합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2. Photo Mosaic Builder&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;이 프로그램은 원본 사진을 동일한 크기의 작은 영역으로 쪼갠뒤 복수의 다른 사진으로 다시 구성하여 최종 모자이크 사진을 생성합니다. 복수의 사진은 작은 썸네일(thumbnail) 사진으로 변환되며 각 영역의 색 속성과 가장 유사한 썸네일 사진으로 채워집니다. 이 과정에 복수의 사진을 한번만 사용할 지 여부를 선택할 수 있으 며, 최종 사진을 파일로 다시 저장할 수도 있습니다. 이 모든 과정을 처리하는데 걸리는 시간을 측정하여, OpenMP 라이브러리를 이용한 성능 최적화 정도를 확인할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3. 안드로이드 IP 카메라 뷰어 설계 및 구현&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;안드로이드 IP 카메라 뷰어는 휴대폰 같은 안드로이드(Android) 장비에서 네트워크에 연결된 IP 카메라에 접속하여 라이브 영상과 음성을 재생하고 카메라 동작을 제어합니다. 또한 사용자에게 친숙한 안드로이드폰의 다른 기능과 유기적으로 연동하여 언제 어디서나 쉽고 빠르게 긴급상황에 대처할 수 있도록 도와줍니다. 이를 위해 원격에서 비디오 스트리밍 데이터를 수신하여 디코딩한 후 색상 공간(color space) 변환까지 마친 후 화면에 표시하는 작업에 안드로이드 NDK(Native Development Kit) 방식 C/C++ 코드를 활용합니다. 또한 네이티브 C 모듈과 자바 언어와의 통신 오버헤드를 줄이기 위해 메모리 공유 기법을 이용하여 제한된 하드웨어의 성능을 최대화합니다.&lt;/p&gt;
+&lt;p&gt;P.S. 새 학기가 시작되었는데, 오히려 지난 첫 학기보다 더 험난한 시절을 보내고 있습니다. 요즘은 술 사준다고 연락하는 사람도 점점 뜸해지고&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GCC 미리 정의된 매크로 얻기</title>
+      <link>/2010/01/09/2010-01-09-getting-predefined-macros-in-gcc/</link>
+      <pubDate>Sat, 09 Jan 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/01/09/2010-01-09-getting-predefined-macros-in-gcc/</guid>
+      <description>&lt;p&gt;멀티플랫폼에서 동작하는 C/C++ 코드를 gcc를 이용해 컴파일할때 플랫폼이나 운영체제를 확인하는 방법 중 하나는 gcc 툴체인이 만들어질때 정의되는 매크로를 사용하는 것입니다. 그런데 이번에 MacOS X / iPhone 플랫폼에 기존 코드를 포팅하면서 이 방법을 이용하려 하는데, 너무 오래 전에 했던 작업이라 (역시나) 명령어를 기억할 수 없었습니다. 그래서 겨우 구글링해서 다시 알게된 내용을 기록해 둡니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ gcc -E -dM -x c /dev/null
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 이 방법을 이용해 사용한 최종 코드는 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#if defined(_WIN32)
+#include &amp;quot;lib-win32/config.h&amp;quot;
+#elif defined(_WIN64)
+#include &amp;quot;lib-win64/config.h&amp;quot;
+#elif defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__)
+#include &amp;quot;lib-iphone/config.h&amp;quot;
+#elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) /* or __APPLE__ */
+#include &amp;quot;lib-macosx/config.h&amp;quot;
+#else /* linux */
+#include &amp;quot;config.h&amp;quot;
+#endif
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;사실은, 더 깔끔한 다른 방법이 있을지 궁금하기도 합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>윈도우 심볼 패키지 사용하기</title>
+      <link>/2009/02/12/2009-02-12-using-windows-symbol-packages/</link>
+      <pubDate>Thu, 12 Feb 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/02/12/2009-02-12-using-windows-symbol-packages/</guid>
+      <description>&lt;p&gt;윈도우 비주얼 스튜디오 환경에서 디버깅을 하다보면 시스템에서 기본으로 제공하는 DLL 라이브러리에 대한 디버깅 심볼 정보가 없어 불편한 경우가 많습니다. 이 문제를 해결하려면 DLL 라이브러리에 대한 디버깅 심볼을 설치하면 됩니다.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://www.microsoft.com/whdc/DevTools/Debugging/debugstart.mspx&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이 사이트&lt;/a&gt;
+에서 자신의 운영체제와 서비스 팩에 맞는 윈도우 심볼 패키지(Windows Symbol Packages)를 다운로드해서 설치한 뒤 &amp;lsquo;호출 스택(Call Stack)&amp;lsquo;을 확인해 보면, 아래 그림과 같이, 전과 다르게 ntdll.dll, kernel32.dll, user32.dll 등의 함수 이름이 표시됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/call-stacks-with-symbols.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;참고로, 위 사이트에 보면 비주얼 스튜디오를 설치하지 않아도(되는지 확인은 안해보았지만) 실행 중인 프로그램을 디버깅할 수 있도록 도와주는 WinDbg 디버깅 도구도 다운로드할 수 있습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

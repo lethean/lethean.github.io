@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Web | 대체로 무해함</title>
+    <link>/tags/web/</link>
+      <atom:link href="/tags/web/index.xml" rel="self" type="application/rss+xml" />
+    <description>Web</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Mon, 02 May 2011 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Web</title>
+      <link>/tags/web/</link>
+    </image>
+    
+    <item>
+      <title>libmicrohttpd 내장 웹서버 라이브러리</title>
+      <link>/2011/05/02/2011-05-02-libmicrohttpd-embedded-web-server-library/</link>
+      <pubDate>Mon, 02 May 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/05/02/2011-05-02-libmicrohttpd-embedded-web-server-library/</guid>
+      <description>&lt;p&gt;최근 프로젝트에서 내장 웹서버를 운영하기 위해 
+&lt;a href=&#34;http://www.gnu.org/software/libmicrohttpd/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libmicrohttpd&lt;/a&gt;
+ 라이브러리를 적용해 보았습니다. 물론, 임베디드 시스템에서 많이 사용하는 
+&lt;a href=&#34;http://www.goahead.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GoAhead&lt;/a&gt;
+ 등과 같은 상용 라이브러리를 사용하거나, 
+&lt;a href=&#34;http://www.busybox.net/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;BusyBox&lt;/a&gt;
+ 내장 웹서버, 또는 다른 많은 오픈소스 라이브러리를 사용할 수도 있지만, 라이센스도(LGPL 또는 eCos) 괜찮고, 성능과 API 구성이 단순하고 명쾌한 것 같아서 시도해 보았습니다. (물론 아직도 주변에는 라이센스 무시하고 상용 라이브러리 몰래 사용하는 곳이 많긴 하지만&amp;hellip; :-) 참고로, 이 라이브러리는 
+&lt;a href=&#34;http://xbmc.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;XBMC&lt;/a&gt;
+ 프로젝트를 들여다보다가 내부에서 사용하는 걸 우연하게 발견했습니다.&lt;/p&gt;
+&lt;p&gt;내장 웹서버 라이브러리를 사용하면 얻을 수 있는 가장 좋은 장점은 MJPEG, RTSP-over-HTTP 등과 같은 웹기반 스트리밍 서버를 만들때 매우 편리하다는 점입니다. 한 프로세스 안에서 웹서버 + 스트리밍 생성 루틴이 함께 동작하므로 메모리 복사 오버헤드가 줄어들고 프로그래밍 복잡도 역시 감소합니다. 또한 CGI 프로세스가 따로 동작할 필요가 없으므로 웹을 통해 설정을 변경해도 별도의 프로세스간 통신이 불필요합니다.&lt;/p&gt;
+&lt;p&gt;물론, 내장 웹서버 방식이 장점만 있는 건 아닙니다. 기존 스탠드얼론 웹서버가 알아서 자동으로 해주던 부분, 예를 들어 디렉토리 인덱스 파일 생성, 동시 접속 클라이언트 수 관리, 클라이언트 캐시를 위한 수정 시각 고려 등을 프로그래머가 직접 작성해야 합니다. 특히 libmicrohttpd 라이브리는 GoAhead 등과 같은 상용 라이브러리에 비하면 자동화 부분이 조금 부족합니다. 예를 들어 파일 시스템의 일반 파일에 대한 웹서비스 처리도 직접 만들어야 합니다. 물론, 대부분 필요한 기능은 예제 소스를 참고하면 어렵지 않게 구현할 수 있습니다. 하지만 제 생각에는, 웹서버 라이브러리가 너무 많은 기능을 자동화하지 않는게 오히려 더 맞다고 생각하는데, 왜냐하면 대부분 응용 프로그램에서 웹서버를 내장하는 경우는 특수한 용도(RESTful / SOAP)이거나 필요한 기능만 구현하기 위해서이기 때문에 나머지는 모두 개발자가 제어하는게 라이브러리의 제 역할이 아닌가 생각합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>lighttpd 웹 서버</title>
+      <link>/2007/04/08/2007-04-08-lighttpd-web-server/</link>
+      <pubDate>Sun, 08 Apr 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/04/08/2007-04-08-lighttpd-web-server/</guid>
+      <description>&lt;p&gt;&amp;lsquo;
+&lt;a href=&#34;http://www.onlamp.com/pub/a/onlamp/2007/04/05/the-lighttpd-web-server.html&#34; title=&#34;The lighttpd Web Server&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The lighttpd Web Server&amp;rsquo;&lt;/a&gt;
+라는 글을 읽다 보니 
+&lt;a href=&#34;http://www.lighttpd.net/&#34; title=&#34;lighttpd&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;lighttpd&lt;/a&gt;
+ 웹서버가 물건 취급을 받을만 하다는 생각이 든다. 전세계 웹서버 통계에서 Apache, IIS, Unknown(?), iPlanet 다음으로 5번째 점유율을 차지하고, YouTube, Wikipedia 등과 같은 굵직한 사이트에서 메인 서버로 사용할 만큼 검증받은 웹서버라는 점만으로도 일단 흥미를 가질만 하다.&lt;/p&gt;
+&lt;p&gt;최신 리눅스 커널에서 지원하는 epoll, sendfile, aio 등과 같은 API를 충분히 활용하여 멀티 쓰레드 방식보다 더 좋은 성능을 낼 수 있도록 구현한 점도 매력적이지만, Apache가 지원하는 대부분의 기능을 그대로 지원한다는 점도 눈여겨볼 만 하다. 다중 사용자 인증 / 접근 권한, 대역폭 제한, 연결 제한, 프록시, 가상 호스팅 등은 물론 FastCGI 방식의 PHP까지도 거뜬히 소화한다.&lt;/p&gt;
+&lt;p&gt;하지만 무엇보다도 마음에 드는 건 다양한 플랫폼 지원과, 작은 실행 크기(바이너리 이미지 + 메모리)이다. 현재 개발중인 제품 중에서 웹서버를 탑재한 것 모두를 lighttpd 서버로 교체하고 싶은 생각이 들 정도다. 단순하다는 이유만으로 성능도 안좋고, 기능도 미약한 boa, busybox의 httpd 데몬이여 이제 안녕~&lt;/p&gt;
+&lt;p&gt;물론 여러가지 사용되는 라이브러리가 임베디드 환경에 맞추려면 조금 어려울 수도 있지만, 프로젝트의 로드맵이 지향하는 바도 그렇고 앞으로가 더욱 더 기대되는 프로젝트이다.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

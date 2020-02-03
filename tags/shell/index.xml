@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Shell | 대체로 무해함</title>
+    <link>/tags/shell/</link>
+      <atom:link href="/tags/shell/index.xml" rel="self" type="application/rss+xml" />
+    <description>Shell</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Fri, 01 Jan 2010 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Shell</title>
+      <link>/tags/shell/</link>
+    </image>
+    
+    <item>
+      <title>SSH 디렉토리 백업하기</title>
+      <link>/2010/01/01/2010-01-01-backup-directories-using-ssh/</link>
+      <pubDate>Fri, 01 Jan 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/01/01/2010-01-01-backup-directories-using-ssh/</guid>
+      <description>&lt;p&gt;시간이 갈수록 자주 사용하는 명령어를 기억하지 못해 동일한 검색어로 구글링을 반복하는 경우가 점점 많아져서, 그런 수고를 덜기 위해 여기에 적어두는 글입니다.&lt;/p&gt;
+&lt;p&gt;SSH 원격 셸 명령어를 이용하여 디렉토리 전체를 복사하고자 할 때, 특히 파일의 수정일시, 권한, 심볼릭 링크 등을 그대로 이전하고자 할때 다음과 같이 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ tar czpf - . | ssh lethean@hades &amp;quot;tar xzpvf - -C /home/lethean/backup&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 명령어는 현재 디렉토리의 모든 내용을 그대로 &lt;code&gt;hades&lt;/code&gt; 서버에 &lt;code&gt;lethean&lt;/code&gt; 계정으로 접속해서 &lt;code&gt;/home/lethean/backup&lt;/code&gt; 디렉토리에 복사합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATED]&lt;/strong&gt; 네트웍 속도가 충분하고 CPU 점유율을 낮춘 상태로 빨리 복사하고 싶다면 다음과 같이 압축 옵션을 사용하지 않아도 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ tar cpf - . | ssh lethean@hades &amp;quot;tar xpvf - -C /home/lethean/backup&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;:)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>tcpdump를 이용한 네트워크 사용량 측정하기</title>
+      <link>/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/</link>
+      <pubDate>Tue, 15 Dec 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/</guid>
+      <description>&lt;p&gt;업무상 실제 패킷 사용량을 측정할 필요때문에 여러가지 도구를 찾던 중 마땅한 걸 찾지 못해 직접 측정한 방식을 정리해 봅니다. 물론 이보다 더 좋은 방법들이 당연히 있을테지만, tcpdump 프로그램만 겨우 사용할 수 있는 환경에서 측정하는 법을 정리한 문서를 찾지 못해 남겨둡니다.&lt;/p&gt;
+&lt;p&gt;우선 어떤 방식으로든 해당 장비에 tcpdump 프로그램을 설치합니다.&lt;/p&gt;
+&lt;p&gt;그리고 측정하려는 과정이나 단계가 시작하는 동시에 다음과 같이 tcpdump 프로그램을 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ tcpdump -qvtttt dst xxx.xxx.xxx.xxx &amp;gt; packet-dump.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 &lt;code&gt;xxx.xxx.xxx.xxx&lt;/code&gt;는 측정에 사용할 대상 장비입니다. 즉, 위 예제는 특정 IP로 전송하는 패킷량만 캡쳐하여 &lt;code&gt;packet-dump.txt&lt;/code&gt; 파일에 저장합니다. 중요한 점은 앞의 옵션인데, 이 옵셥을 사용해야 아래에서 사용하는 스크립트가 분석할 수 있는 형태의 결과물로 저장됩니다. 그리고, 필요하다면, 저장한 파일을 리눅스 또는 맥 장비로 복사합니다.&lt;/p&gt;
+&lt;p&gt;저장한 파일을 &lt;code&gt;conv2csv.sh&lt;/code&gt; 스크립트를 이용해 엑셀이나 오픈오피스에서 읽어들일 수 있는 CSV 파일 형태로 변환합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ./conv2csv.sh packet-dump.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;변환된 &lt;code&gt;packet-dump.csv&lt;/code&gt; 파일은 한 행에 &amp;lsquo;&lt;strong&gt;TIMESTAMP BYTES Kbps&lt;/strong&gt;&amp;rsquo; 형태로 각 초당 데이터가 저장되어 있습니다. 따라서 이 파일을 액셀이나 오픈오피스에서 공백(space)을 구분자로 해서 읽어들인 후 3번째 컬럼을 사용하면 됩니다. 참고로 여기서 측정한 크기는 IP/TCP/UDP 헤더까지 포함한 크기입니다.&lt;/p&gt;
+&lt;p&gt;다음은 이렇게 변환한 데이터를 구글 스프레드시트를 이용해 만든 차트입니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/packet-traffic-analysis.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;위에서 언급한 &lt;code&gt;conv2csv.sh&lt;/code&gt; 스크립트는 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+
+CSVFILE=&amp;quot;$(dirname $1)/$(basename $1 .txt).csv&amp;quot;
+
+awk &#39;{ print $2, $18 }&#39; $1 | 
+  tr &#39;.)&#39; &#39;  &#39; | 
+  awk &#39;BEGIN { last = &amp;quot;&amp;quot;; sum = 0; } 
+       { if (last == $1) 
+           { sum += $3 } 
+         else 
+           { print last, sum, sum * 8 / 1000; 
+             last = $1; 
+             sum = $3; } 
+       }&#39; &amp;gt; $CSVFILE
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;;)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>실행 안되는 crontab 작업 디버깅하기</title>
+      <link>/2009/07/17/2009-07-17-debugging-crontab-job-not-running/</link>
+      <pubDate>Fri, 17 Jul 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/07/17/2009-07-17-debugging-crontab-job-not-running/</guid>
+      <description>&lt;p&gt;리눅스를 비롯한 유닉스 방식 운영체제에서 주기적인 작업을 수행하기 위해 cron 데몬을 많이 사용합니다. 루트 권한으로 시스템 관리에 필요한 작업을 예약할 수도 있지만, 일반 사용자 계정도 &amp;lsquo;&lt;code&gt;crontab -e&lt;/code&gt;&amp;rsquo; 명령으로 작업 예약이 가능합니다. 현재 활발하게 개발 중인 프로젝트의 일일 빌드(daily build)를 위해 crontab 작업을 다음과 같이 예약했는데, 문제는 동일한 설정이 한 장비에서만 동작을 안한다는 점입니다. (dooly 계정으로 작업한다고 가정합니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# m h  dom mon dow   command
+0 23 * * * /home/dooly/build-cms.sh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;빌드 스크립트(&lt;code&gt;/home/dooly/build-cms.sh&lt;/code&gt;) 내용은 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+cd /home/dooly/svn/dooly
+svn update &amp;amp;&amp;amp; 
+sudo make install-depends &amp;amp;&amp;amp; 
+make clean &amp;amp;&amp;amp; 
+make &amp;amp;&amp;amp; 
+make packages &amp;amp;&amp;amp; 
+make upload
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;인터넷을 찾아보니 다음과 같이 수정하여 로그 파일을 분석하라고 해서 따라해 보았습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# m h  dom mon dow   command
+* * * * * /home/dooly/build-cms.sh &amp;gt;&amp;gt; /home/dooly/cron.log 2&amp;gt;&amp;amp;1
+* * * * * env &amp;gt; /home/dooly/env.log 2&amp;gt;&amp;amp;1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;로그 파일을 분석하니, 환경 변수 LANG이 ko_KR.UTF-8 로 설정되지 않아서 서브버전 갱신(update) 도중 에러가 발생하고 있었습니다. 그래서 스크립트를 다음과 같이 수정해서 일단 문제는 해결했습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+export LANG=ko_KR.UTF-8
+cd /home/dooly/svn/dooly
+svn update &amp;amp;&amp;amp; 
+sudo make install-depends &amp;amp;&amp;amp; 
+make clean &amp;amp;&amp;amp; 
+make &amp;amp;&amp;amp; 
+make packages &amp;amp;&amp;amp; 
+make upload
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;하지만 향후 문제 발생시 디버깅을 위해 다음과 같이 crontab 항목도 아예 변경해 두었습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# m h  dom mon dow   command
+0 23 * * * /home/dooly/build-cms.sh &amp;gt; /home/dooly/cron.log 2&amp;gt;&amp;amp;1
+#* * * * * env &amp;gt; /home/dooly/env.log 2&amp;gt;&amp;amp;1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;물론, 자동으로 메일을 전송하도록 하거나 하는 다른 추가 기능도 가능하겠지만, 일단 이 정도 수준에서 만족하고 현재는 잘 동작하고 있습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>파일 목록에서 최근 버전 얻기</title>
+      <link>/2009/01/05/2009-01-05-extract-latest-version-file/</link>
+      <pubDate>Mon, 05 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/05/2009-01-05-extract-latest-version-file/</guid>
+      <description>&lt;p&gt;이름이 &amp;lsquo;메이저버전-마이너버전-릴리스날짜&amp;rsquo; 식으로 구성된 파일 목록이, 예를 들어, 다음과 같이 주어졌을때(list.txt),&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;2.0-10-20100101
+2.0-2-20080101
+2.0-9-20090101
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;셸(shell)에서 가장 최신 마이너 버전을 얻는 방법은 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sort -t- -k2,3 -n list.txt | tail -1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;sort 명령 옵션을 설명하면, &amp;lsquo;-t&#39;는 필드 구분자, &amp;lsquo;-k&#39;는 정렬 기준으로 사용할 필드 시작,끝 번호, &amp;lsquo;-n&amp;rsquo; 옵션은 필드를 문자가 아닌 숫자로 여겨서 판단하도록 하는 것입니다. 차이점이 궁금하신 분은 아래 두 명령의 결과를 비교해 보시길.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sort -t- -k2,3 -n list.txt
+$ sort -t- -k2,3 list.txt
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

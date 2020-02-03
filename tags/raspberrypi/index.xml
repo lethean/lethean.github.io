@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>RaspberryPi | 대체로 무해함</title>
+    <link>/tags/raspberrypi/</link>
+      <atom:link href="/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
+    <description>RaspberryPi</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Mon, 16 Feb 2015 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>RaspberryPi</title>
+      <link>/tags/raspberrypi/</link>
+    </image>
+    
+    <item>
+      <title>Raspberry Pi &#43; X11 &#43; Clutter(&#43; Cogl)</title>
+      <link>/2015/02/16/2015-02-16-try-cogl-with-x11-on-raspberry-pi/</link>
+      <pubDate>Mon, 16 Feb 2015 00:00:00 +0000</pubDate>
+      <guid>/2015/02/16/2015-02-16-try-cogl-with-x11-on-raspberry-pi/</guid>
+      <description>&lt;p&gt;결론부터 말하자면 실패한 해킹에 대한 기록입니다.&lt;/p&gt;
+&lt;p&gt;Raspberry Pi 2 장비를 하나 얻게 되어, 이삼일 정도 클러터(Clutter) 라이브러리가 제대로 동작하도록 삽질을 했습니다.&lt;/p&gt;
+&lt;p&gt;구글에는 X 서버, 즉 X 윈도 없이 리눅스 프레임 버퍼 위에서 EGL + GLES2 API를 이용하는 방법은 많이 나와 있는데, X11 + EGL + GLES2 조합은 없어서 여기저기 구글링을 통해 얻은 정보를 이용해 Cogl 예제 디렉터리에 있는 프로그램들이, 비록 전체화면 방식이기는 하지만, 문제없이 실행되게 하는 데까지는 성공했습니다. (
+&lt;a href=&#34;https://gist.github.com/lethean/ac21450495dddc597f79#file-cogl-1-8-raspberrypi-patch&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;패치 파일&lt;/a&gt;
+과 
+&lt;a href=&#34;https://gist.github.com/lethean/ac21450495dddc597f79#file-cogl-build-sh&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;빌드 스크립트&lt;/a&gt;
+)&lt;/p&gt;
+&lt;p&gt;하지만 Clutter 예제 프로그램을 돌리면 여러 가지 경고를 내고 멈추거나 아무 메시지도 출력하지 않고 CPU 점유율만 차지하는 경우가 발생합니다. EGL + Raspberry Pi API가 전혀 생소한 것은 물론 Cogl + Clutter 연결 고리도 잘 모르지만, 다른 할 일도 많고, 내일모레부터는 설 연휴이기도 하고, 당장 급한 일도 아니라 일단 이 상태에서 작업을 멈추었습니다.&lt;/p&gt;
+&lt;p&gt;혹시 Clutter / Cogl 라이브러리를 Raspberry Pi 상에서 깔끔하게 돌아가게 하는 패치나 소스를 알고 계신 분 있나요? 아마도 회사에서 업무로 Raspberry Pi를 건드리는 분 중에는 분명 이미 작업한 분이 있을 것 같은데&amp;hellip;&lt;/p&gt;
+&lt;p&gt;시간이 지날수록 구글링 실력도 점점 줄어드는 것 같고&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

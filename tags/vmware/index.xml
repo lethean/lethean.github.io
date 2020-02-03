@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>VMware | 대체로 무해함</title>
+    <link>/tags/vmware/</link>
+      <atom:link href="/tags/vmware/index.xml" rel="self" type="application/rss+xml" />
+    <description>VMware</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Wed, 21 Jan 2009 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>VMware</title>
+      <link>/tags/vmware/</link>
+    </image>
+    
+    <item>
+      <title>리눅스에서 VMware 방향키 문제 해결하기</title>
+      <link>/2009/01/21/2009-01-21-vmware-arrow-keys-in-linux-host/</link>
+      <pubDate>Wed, 21 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/21/2009-01-21-vmware-arrow-keys-in-linux-host/</guid>
+      <description>&lt;p&gt;리눅스에서 VMware 사용시 방향키를 제대로 인식하지 못하고 오동작한다면 다음과 같이 처리하면 됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;~/.vmware/config&lt;/code&gt; 파일이나 &lt;code&gt;/etc/vmware/config&lt;/code&gt; 파일에 다음 내용을 추가합니다. (파일이 없다면 새 파일을 만듭니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;xkeymap.noKeycodeMap = &amp;quot;TRUE&amp;quot;
+xkeymap.keycode.93 = 0x076
+xkeymap.keycode.97 = 0x073
+xkeymap.keycode.98 = 0x078
+xkeymap.keycode.99 = 0x077
+xkeymap.keycode.100 = 0x079
+xkeymap.keycode.101 = 0x070
+xkeymap.keycode.102 = 0x07b
+xkeymap.keycode.103 = 0x05c
+xkeymap.keycode.104 = 0x11c
+xkeymap.keycode.105 = 0x11d
+xkeymap.keycode.106 = 0x135
+xkeymap.keycode.107 = 0x137
+xkeymap.keycode.108 = 0x138
+xkeymap.keycode.109 = 0x000
+xkeymap.keycode.110 = 0x147
+xkeymap.keycode.111 = 0x148
+xkeymap.keycode.112 = 0x149
+xkeymap.keycode.113 = 0x14b
+xkeymap.keycode.114 = 0x14d
+xkeymap.keycode.115 = 0x14f
+xkeymap.keycode.116 = 0x150
+xkeymap.keycode.117 = 0x151
+xkeymap.keycode.118 = 0x152
+xkeymap.keycode.119 = 0x153
+xkeymap.keycode.120 = 0x16f
+xkeymap.keycode.121 = 0x120
+xkeymap.keycode.122 = 0x12e
+xkeymap.keycode.123 = 0x130
+xkeymap.keycode.124 = 0x15e
+xkeymap.keycode.125 = 0x059
+xkeymap.keycode.126 = 0x14e
+xkeymap.keycode.127 = 0x100
+xkeymap.keycode.128 = 0x000
+xkeymap.keycode.129 = 0x07e
+xkeymap.keycode.130 = 0x000
+xkeymap.keycode.131 = 0x000
+xkeymap.keycode.132 = 0x07d
+xkeymap.keycode.133 = 0x15b
+xkeymap.keycode.134 = 0x15c
+xkeymap.keycode.135 = 0x15d
+xkeymap.keycode.136 = 0x168
+xkeymap.keycode.146 = 0x131
+xkeymap.keycode.148 = 0x121
+xkeymap.keycode.150 = 0x15f
+xkeymap.keycode.151 = 0x163
+xkeymap.keycode.160 = 0x10a
+xkeymap.keycode.163 = 0x16c
+xkeymap.keycode.164 = 0x166
+xkeymap.keycode.165 = 0x16b
+xkeymap.keycode.166 = 0x16a
+xkeymap.keycode.167 = 0x169
+xkeymap.keycode.171 = 0x119
+xkeymap.keycode.172 = 0x122
+xkeymap.keycode.173 = 0x110
+xkeymap.keycode.174 = 0x124
+xkeymap.keycode.180 = 0x132
+xkeymap.keycode.181 = 0x167
+xkeymap.keycode.191 = 0x05d
+xkeymap.keycode.192 = 0x05e
+xkeymap.keycode.193 = 0x05f
+xkeymap.keycode.199 = 0x133
+xkeymap.keycode.220 = 0x10b
+xkeymap.keycode.225 = 0x165
+xkeymap.keycode.234 = 0x16d
+xkeymap.keycode.244 = 0x109
+xkeymap.keycode.246 = 0x157
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고한 문서는 다음과 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://kb.vmware.com/selfservice/microsites/search.do?cmd=displayKC&amp;amp;docType=kc&amp;amp;externalId=1007439&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Linux Hosts That Use the evdev Driver for Keyboards Do Not Map Keys Correctly in Any Guest&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.vmware.com/support/ws55/doc/ws_devices_keymap_linux.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Keyboard Mapping on a Linux Host&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>VMWare rtc: lost some interrupts</title>
+      <link>/2007/06/11/2007-06-11-vmware-rtc-lost-some-interrupts/</link>
+      <pubDate>Mon, 11 Jun 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/06/11/2007-06-11-vmware-rtc-lost-some-interrupts/</guid>
+      <description>&lt;p&gt;64비트 장비에 우분투 서버를 설치하고 VMware를 가동하면 다음과 같은 에러가 발생한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[16825.988196] printk: 246 messages suppressed.
+[16825.988201] rtc: lost some interrupts at 2048Hz.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;구글링을 통해 알게된 
+&lt;a href=&#34;http://chxo.com/be2/20060821_3333.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;사이트&lt;/a&gt;
+에서 &lt;code&gt;/etc/vmware/config&lt;/code&gt; 파일에 &lt;code&gt;host.useFastClock = FALSE&lt;/code&gt; 항목을 추가하면 된다는 걸 알았는데, 문제는 시각 동기화가 잘 안되어 VMware로 실행하는 이미지 내부에서 ntp 데몬 등을 이용하여 시각동기화를 해주어야 한다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>VMWare USB in Ubuntu</title>
+      <link>/2006/03/11/2006-03-11-vmware-usb-in-ubuntu/</link>
+      <pubDate>Sat, 11 Mar 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/03/11/2006-03-11-vmware-usb-in-ubuntu/</guid>
+      <description>&lt;p&gt;우분투 리눅스는 항상 최신 아키텍쳐를 반영하기 때문에 기존 API나 아키텍쳐를 기반으로 동작하는 써드파티 어플리케이션이 동작 안하는 경우가 가끔 있는데, VMWare도 그 중 하나인 것 같다.&lt;/p&gt;
+&lt;p&gt;언젠가부터 USB 장치를 VMWare 윈도우즈에서 인식을 못한다고 생각했는데, 오늘 검색해 보니 VMWare가 근거로 하는 &lt;code&gt;/proc/bus/usb&lt;/code&gt; 디렉토리 내용이 없어서였다. 다음 줄을 &lt;code&gt;/etc/fstab&lt;/code&gt; 파일에 추가해 주고 재부팅하거나, &lt;code&gt;mount -a&lt;/code&gt; 명령으로 마운트해준 다음 VMWare를 재시작하면 정상적으로 USB 장치를 인식하게 된다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;none        /proc/bus/usb    usbfs  defaults      0    0
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>VMware /dev/parport0 in Ubuntu</title>
+      <link>/2006/02/28/2006-02-28-vmware-devparport0-in-ubuntu/</link>
+      <pubDate>Tue, 28 Feb 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/02/28/2006-02-28-vmware-devparport0-in-ubuntu/</guid>
+      <description>&lt;p&gt;Ubuntu 리눅스에서 VMware를 돌리고, 그 안에서 JTAG 케이블을 이용해 부트로더를 올리는 작업을 하기 위해서는 무엇보다 VMware가 &lt;code&gt;/dev/parport0&lt;/code&gt; 를 찾을 수 있도록 해주어야 한다. 매번 반복되면서 기록을 남기지 않아 오늘도 다시 고생&amp;hellip; 여기에 그 방법을 남겨 놓는다.&lt;/p&gt;
+&lt;p&gt;먼저 ppdev 커널 모듈을 올린다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;modprobe ppdev
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아예 &lt;code&gt;/etc/modules&lt;/code&gt; 에 등록시켜 두는 것이 좋다.
+일반 계정으로 접근이 가능하도록 &lt;code&gt;/etc/group&lt;/code&gt; 에서 lp 부분을 다음과 같이 수정한다. (여기 lethean이 일반 계정이다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;lp❌7:cupsys,lethean
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이게 전부다.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

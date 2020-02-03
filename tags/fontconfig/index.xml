@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>FontConfig | 대체로 무해함</title>
+    <link>/tags/fontconfig/</link>
+      <atom:link href="/tags/fontconfig/index.xml" rel="self" type="application/rss+xml" />
+    <description>FontConfig</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Fri, 06 Aug 2010 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>FontConfig</title>
+      <link>/tags/fontconfig/</link>
+    </image>
+    
+    <item>
+      <title>우분투 10.10 한글 글꼴 설정</title>
+      <link>/2010/08/06/2010-08-06-ubuntu-10-10-korean-font-configuration/</link>
+      <pubDate>Fri, 06 Aug 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/08/06/2010-08-06-ubuntu-10-10-korean-font-configuration/</guid>
+      <description>&lt;p&gt;Btrfs 파일 시스템을 사용해 보려고 새로 나온 우분투 10.10 버전을 설치했습니다. 그런데, 아니나 다를까 한글 글꼴 설정은 여전히 맘에 들지 않는군요. 예전에는 이것 저것 쉽게 찾아 고쳤는데, 시간이 점점 흘러서 그 과정을 자꾸 잊어버리게 되다 보니 오늘은 조금 더 많이 헤매게 되어 기록해 두려고 합니다.&lt;/p&gt;
+&lt;p&gt;먼저 메인 글꼴로 사용하는 나눔글꼴은 우분투 저장소에 패키지(ttf-nanum, ttf-nanum-coding)가 이미 올라와 있어서 그대로 설치해서 사용했습니다. 더불어 기본적인 MS 글꼴 패키지(ttf-mscorefonts-installer)를 설치하고, 터미널 글꼴로 사용하는 드로이드 글꼴(ttf-droid)을 설치하고 
+&lt;a href=&#34;/2010/07/19/hinting-for-different-fonts/&#34;&gt;cairo 라이브러리 패치 작업을 한 뒤&lt;/a&gt;
+ &amp;lsquo;&lt;strong&gt;시스템-기본 설정-모양&lt;/strong&gt;&amp;lsquo;은 다음 그림과 같이 설정했습니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/gnome-appearance-properties.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이제 글꼴 설정 파일을 건드려야 하는데, 제일  먼저 &lt;code&gt;/etc/fonts/conf.d/&lt;/code&gt; 디렉토리에서 &lt;span style=&#34;text-decoration:line-through;&#34;&gt;&lt;code&gt;10-hinting-slight.conf&lt;/code&gt; 파일과&lt;/span&gt; &lt;code&gt;29-language-selector-ko-kr.conf&lt;/code&gt; 파일을 삭제합니다. 그래야 일반적인 영문 / 한글 글꼴에 대한 힌팅이 예쁘게 동작합니다. 그 다음에 같은 디렉토리의 &lt;code&gt;69-language-selector-ko-kr.conf&lt;/code&gt; 파일을 다음과 같이 수정합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot;?&amp;gt;
+&amp;lt;!DOCTYPE fontconfig SYSTEM &amp;quot;fonts.dtd&amp;quot;&amp;gt;
+&amp;lt;fontconfig&amp;gt;
+
+&amp;lt;!-- Set preferred Korean fonts --&amp;gt;
+&amp;lt;match target=&amp;quot;pattern&amp;quot;&amp;gt;
+  &amp;lt;test qual=&amp;quot;any&amp;quot; name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;sans-serif&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;family&amp;quot; mode=&amp;quot;prepend&amp;quot; binding=&amp;quot;strong&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;DejaVu Sans&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;UnDotum&amp;lt;/string&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;pattern&amp;quot;&amp;gt;
+  &amp;lt;test qual=&amp;quot;any&amp;quot; name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;serif&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;family&amp;quot; mode=&amp;quot;prepend&amp;quot; binding=&amp;quot;strong&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;DejaVu Serif&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔명조&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;UnBatang&amp;lt;/string&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;pattern&amp;quot;&amp;gt;
+  &amp;lt;test qual=&amp;quot;any&amp;quot; name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;monospace&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;family&amp;quot; mode=&amp;quot;prepend&amp;quot; binding=&amp;quot;strong&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;Droid Sans Mono&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;DejaVu Sans Mono&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕코딩&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;Guseul&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;UnDotum&amp;lt;/string&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+   &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumGothic&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕코딩&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumGothicCoding&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;맑은 고딕&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;Malgun Gothic&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;UnDotum&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;UnBatang&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+    &amp;lt;const&amp;gt;hintmedium&amp;lt;/const&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+  &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;나눔명조&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumMyeongjo&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+    &amp;lt;const&amp;gt;hintslight&amp;lt;/const&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+  &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;DejaVu Sans Mono&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;Droid Sans Mono&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+    &amp;lt;const&amp;gt;hintslight&amp;lt;/const&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+ &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+ &amp;lt;string&amp;gt;Andale Mono&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Arial Black&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Arial&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Comic Sans MS&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Courier New&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Georgia&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Impact&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Tahoma&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Times New Roman&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Trebuchet MS&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Verdana&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Webdings&amp;lt;/string&amp;gt;
+ &amp;lt;/test&amp;gt;
+ &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+ &amp;lt;const&amp;gt;hintmedium&amp;lt;/const&amp;gt;
+ &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;/fontconfig&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;뭐, ﻿대충 이 정도만 설정해도 깔끔한 모양의 글꼴을 볼 수 있습니다.&lt;/p&gt;
+&lt;p&gt;사족) Btrfs 파일 시스템은 많은 디스크 I/O가 동시에 걸리면 시스템 전체가 느려지는 듯한 느낌이 여전히 듭니다. 뭐, 앞으로 조금씩 더 좋아지겠지요.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE-2010.12.23]&lt;/strong&gt; 이 포스트를 작성하는 시점에서는 아직 Ubuntu 글꼴이 패포판에 포함되지 않았던 시점이라서 이를 사용한 fontconfig 설정으로 업데이트 했습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE-2011.01.04]&lt;/strong&gt; 한동안 크로미엄 브라우저만 사용하다가 최근 다시 파이어폭스를 사용하다보니 MS 글꼴이 이쁘게 나오지 않는 걸 확인하고 이를 반영했습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>글꼴마다 다른 힌팅 사용하기</title>
+      <link>/2010/07/19/2010-07-19-hinting-for-different-fonts/</link>
+      <pubDate>Mon, 19 Jul 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/07/19/2010-07-19-hinting-for-different-fonts/</guid>
+      <description>&lt;p&gt;구글 리더를 읽다가 어떤 분이 
+&lt;a href=&#34;http://blog.digital-scurf.org/2010/07/13#dev-fonts&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;터미널 글꼴로 &amp;lsquo;Droid Sans Mono&amp;rsquo; 사용한 포스트&lt;/a&gt;
+를 보고 따라해 보았습니다. 그런데, 이상하게도 글꼴이 예쁘지 않아서 확인해 보니 폰트 설정에서 힌팅(hinting)을 살짝(slight)만 사용하도록 설정해야 했습니다. 사실, 대부분의 영문 폰트는 힌팅을 살짝 주어야 원래 의도대로 멋지게 표시되는 경우가 많습니다. (아래 그림에서 폰트 설정 화면 참조)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/gnome-font-properties.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;그런데 문제는, 이 설정을 이용하면 나눔글꼴과 같은 일부 한글 글꼴이 오히려 안 이쁘게 표시됩니다. 특히 나눔고딕은 힌팅을 중간(hintmedium)이나 충분히(hintfull) 사용해야 합니다. 그런데 위 그림을 보면 나눔고딕 역시 정상적으로 표시되고 있습니다. 이 포스트는 그 과정을 정리한 것입니다. 사용환경은 우분투 10.04 배포판이고, 
+&lt;a href=&#34;http://packages.debian.org/sid/ttf-nanum&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;나눔글꼴&lt;/a&gt;
+과 
+&lt;a href=&#34;http://packages.debian.org/sid/ttf-nanum-coding&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;나눔고딕코딩&lt;/a&gt;
+ 글꼴은 데비안 패키지를 직접 내려받아 설치했습니다. 우분투 저장소에도 조만간 반영되겠지요.&lt;/p&gt;
+&lt;p&gt;먼저 폰트별로 다른 힌팅 스타일을 사용하기 위해 폰트 설정에서, 나눔글꼴 계열 힌팅 스타일을 충분히(hintfull)로 변경합니다. &lt;code&gt;~/.fonts.conf&lt;/code&gt; 파일을 편집해도 되지만, 제 경우 그냥 ﻿﻿&lt;code&gt;﻿/etc/fonts/conf.avail/69-language-selector-ko-kr.conf&lt;/code&gt; 파일에 다음 내용을 추가했습니다. 그래야 루트 사용자를 포함한 모든 사용자가 사용할 수 있고, 다른 설정 항목도 모두 거기 있어서 나중에 다시 설치할때 파일 하나만 복사해서 사용하기 때문입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+  &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumGothic&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔명조&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumMyeongjo&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕코딩&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumGothicCoding&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+    &amp;lt;const&amp;gt;hintfull&amp;lt;/const&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그런데 문제는, 이 설정이 먹혀들지 않는다는 점입니다. 이상하게도 파이어폭스나 크롬브라우저, KDE 등에서는 잘 적용되는데, 정작 그놈 터미널이나 모든 그놈 프로그램에서는 적용이 되지 않았습니다. 검색해보니, GTK+ 툴킷을 포함한 대부분 그놈 프로그램이 사용하는 카이로(cairo) 라이브러리에 
+&lt;a href=&#34;http://bugs.freedesktop.org/show_bug.cgi?id=11838&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;관련 버그&lt;/a&gt;
+가 이미 보고되어 있는데 아직 패키가 반영되지 않은 상태였습니다. 카이로 라이브러리가 힌팅의 경우 FontConfig 설정을 따르지 않고 무조건 그놈 글꼴 설정, 더 정확히 말하면 X 리소스의 Xft.hintstyle 값만 사용하기 때문이었습니다.&lt;/p&gt;
+&lt;p&gt;그래서 다음과 같은 과정을 거쳐 직접 빌드한 패키지를 설치해서 사용하고 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ apt-get source libcairo2 # 패키지 소스 내려받기
+$ sudo apt-get build-dep libcairo2 # 빌드를 위한 패키지 내려받기
+$ cd cairo-*
+$ vi src/cairo-ft-font.c # 위 버그질라에 등록된 패치 적용
+$ vi debian/changelog # 패키지 버전 올림
+$ dpkg-buildpackage -rfakeroot # 패키지 생성
+$ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;패키지 생성 방법을 익힌게 거의 10년 전 쯤 데비안 사용 시절이라 요즘은 어떻게 만드는지 잘 모르겠지만, 다행히도 위 방식도 제대로 동작하는 것 같아 그냥 사용하고 있습니다. 요즘은 우분투 PPA도 활성화되었고, 빌드 방식도 더 간단해진 것 같긴 한데, 게을러서&amp;hellip; :)&lt;/p&gt;
+&lt;p&gt;결론은, Droid Sans Mono 글꼴을 터미널 글꼴로 잘 사용하고 있습니다. 참, 이 글꼴 역시 다음과 같이 쉽게 설치할 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo apt-get install ttf-droid
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그런데, 위 패치가 아직까지도 최근 cairo 소스에는 반영되지 않은 것 같아 약간 아쉽군요.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

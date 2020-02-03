@@ -1,0 +1,1330 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>/tags/reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2019/05/28/2019-05-28-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2019/04/23/2019-04-23-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2019/03/22/2019-03-22-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2019/02/25/2019-02-25-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2019/02/18/2019-02-18-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2019/01/04/2019-01-04-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2018/12/27/2018-12-27-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2018/12/15/2018-12-15-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2018/11/30/2018-11-30-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2018/11/23/2018-11-23-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2018/11/16/2018-11-16-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2018/11/01/2018-11-01-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2018/10/29/2018-10-29-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2018/09/16/2018-09-16-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2018/09/14/2018-09-14-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2018/09/12/2018-09-12-reading/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/build/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/ninja/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/03/17/2016-03-17-about-ninja-build/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/git/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/03/09/2016-03-09-git-bisect-linux-pci-driver-debugging/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/linux/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/glib/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/libuv/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/03/08/2016-03-08-note-about-libuv/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/less/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/03/07/2016-03-07-exit-less-without-clearing-the-screen/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/zsh/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/cairo/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/03/06/2015-03-06-draw-font-awesome-icons-with-cairo/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/clutter/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/fontawesome/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/glibc/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/02/17/2015-02-17-detect-time-change-with-timerfd-in-linux/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/02/16/2015-02-16-try-cogl-with-x11-on-raspberry-pi/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/raspberrypi/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/network/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/02/10/2015-02-10-send-receive-raw-ethernet-frames-with-custom-ether-type-in-linux/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/01/28/2015-01-28-migration-to-github-page/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2012/11/01/2012-11-01-blog-is-moved-here/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2012/07/02/2012-07-02-evolus-pencil-gui-prototyping-tool/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/gtk&#43;/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/gui/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2012/07/02/2012-07-02-mouse-pointer-barriers-in-x-window/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/xorg/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2012/03/19/2012-03-19-detect-change-of-ip-address-and-link-status-in-linux/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/agile/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/coding/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2012/02/24/2012-02-24-oop-with-gobject-5/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2012/02/08/2012-02-08-detect-memory-leaks-and-corruption-with-dr-memory/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/windows/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/udev/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2012/01/29/2012-01-29-setup-new-connected-monitors-automatically-after-starting-x-server-without-connected-monitors/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/09/28/2011-09-28-clutter-memory-leak-debugging/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/09/15/2011-09-15-note-about-using-clutter/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/gnome/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/07/15/2011-07-15-gnome-development-screencasts-and-tutorials/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/gstreamer/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/07/07/2011-07-07-eventfd/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/vala/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/06/15/2011-06-15-vala-language-introduction/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/06/10/2011-06-10-lasagna-code/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/embedded/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/05/30/2011-05-30-pcd-process-control-daemon/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/05/02/2011-05-02-libmicrohttpd-embedded-web-server-library/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/web/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/ice/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/04/05/2011-04-05-ice-internet-communication-engine/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/04/05/2011-04-05-get-domain-mx-host-name/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/03/07/2011-03-07-using-gudev/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/archlinux/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/02/22/2011-02-22-renaming-photo-files/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/02/21/2011-02-21-migrated-to-arch-linux/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/kernel/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/perf/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/01/16/2011-01-16-using-perf-top/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2011/01/12/2011-01-12-allocate-file-space-in-advance/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/12/23/2010-12-23-the-board-project-introduction/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/schedule/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/11/20/2010-11-20-test-a-patch-to-improve-responsiveness-in-linux-desktop/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/android/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/11/19/2010-11-19-real-time-on-android-os/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/10/06/2010-10-06-linux-kernel-scheduling-domains-and-classes/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/10/05/2010-10-05-linux-kernel-io-scheduler-priority/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/10/02/2010-10-02-glib-2-26-0-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/09/30/2010-09-30-linux-kernel-realtime-scheduling-priority/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/08/09/2010-08-09-sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/sound/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/fontconfig/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/hangul/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/08/06/2010-08-06-ubuntu-10-10-korean-font-configuration/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/07/28/2010-07-28-reading-linux-kernel-log-buffer/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/07/19/2010-07-19-hinting-for-different-fonts/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/07/10/2010-07-10-old-man-who-was-coding/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/05/16/2010-05-16-btrfs-as-the-default-filesystem-in-ubuntu-10-10/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/04/23/2010-04-23-gource-source-visualization/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/04/07/2010-04-07-serialize-gobject-properties/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/03/14/2010-03-14-linux-kernel-2-6-33-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/eclipse/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/02/12/2010-02-12-using-glib-test-framework/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/wireshark/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/02/12/2010-02-12-google-protocol-buffers/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/02/11/2010-02-11-how-to-make-a-gobject-singleton/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/gcc/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/02/04/2010-02-04-using-ccache-in-ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/01/29/2010-01-29-0mq-a-new-approach-to-messaging/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/opensource/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/01/25/2010-01-25-power-of-10-rules-for-developing-safety-critical-code/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/01/25/2010-01-25-btrfs-for-a-while/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/01/20/2010-01-20-using-multiple-mouses-with-xor/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/01/09/2010-01-09-getting-predefined-macros-in-gcc/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/iphone/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/macosx/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/shell/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2010/01/01/2010-01-01-backup-directories-using-ssh/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/12/27/2009-12-27-get-number-of-cpu-on-linux-and-macosx/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/12/18/2009-12-18-linux-kernel-2-6-32-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/10/06/2009-10-06-fix-broken-hangul-filename-from-mac-os-x-in-linux/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/10/01/2009-10-01-migration-projects-from-subversion-to-git/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/09/24/2009-09-24-glib-2-22-0-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/09/21/2009-09-21-using-glib-mainloop/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/09/17/2009-09-17-glib-mainloop-vs-libdispatch-of-apple-gcd/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/09/14/2009-09-14-linux-kernel-2-6-31-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/09/08/2009-09-08-clutter-and-gtk/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/08/24/2009-08-24-oop-with-gobject-4/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/08/18/2009-08-18-oop-with-gobject-3/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/08/14/2009-08-14-oop-with-gobject-2/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/08/14/2009-08-14-init-eth-dev-number-when-lan-card-changes-in-ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/08/10/2009-08-10-oop-with-gobject-1/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/chromium/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/08/03/2009-08-03-avoid-common-user-interface-bloopers/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/08/03/2009-08-03-chromium-browser-in-ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/08/03/2009-08-03-clutter-1-0-animation-api/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/07/25/2009-07-25-2009-guadec-clutter-slides/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/07/23/2009-07-23-iphone-augmented-reality-application/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/docbook/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/doxy2dbook/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/07/20/2009-07-20-doxy2dbook/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/doxygen/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/07/17/2009-07-17-debugging-crontab-job-not-running/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/subversion/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/07/16/2009-07-16-manage-subversion-repositories-in-ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/07/13/2009-07-13-x-window-video-acceleration-api-overview/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/moblin/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/07/07/2009-07-07-clutter-and-moblin/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/07/06/2009-07-06-doxy2dbook-doxygen-to-docbook-converter/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/07/06/2009-07-06-how-to-code-well/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/06/12/2009-06-12-linux-kernel-2-6-30-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/06/02/2009-06-02-gnome-3-shell/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/04/29/2009-04-29-tcmalloc-google-perftools/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/04/23/2009-04-23-ubuntu-904-release-however/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/04/20/2009-04-20-gobject-property-binding-required/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/04/08/2009-04-08-pthread-man-pages-in-ubuntu-or-debian/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/04/01/2009-04-01-glib-gtk-moved-to-git/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/03/26/2009-03-26-linux-kernel-2629-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/03/23/2009-03-23-gtk-216-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/03/06/2009-03-06-gtk-outline-label/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/02/12/2009-02-12-using-windows-symbol-packages/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/02/06/2009-02-06-using-subversion-switch-command/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/02/06/2009-02-06-engineers-scientists-and-histroians/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/02/03/2009-02-03-review-board/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/02/03/2009-02-03-location-aware-softwares-in-linux/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/21/2009-01-21-mpx-gtk-multi-pointer-x-support/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/vmware/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/21/2009-01-21-vmware-arrow-keys-in-linux-host/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/16/2009-01-16-implementing-clutter-actors/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/16/2009-01-16-using-clutter-5/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/16/2009-01-16-using-clutter-6/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/15/2009-01-15-using-clutter-2/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/15/2009-01-15-using-clutter-3/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/15/2009-01-15-using-clutter-4/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/14/2009-01-14-gtk-osd-semi-transparent/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/14/2009-01-14-gtk-transparent-background-osd-effect/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/14/2009-01-14-vbindiff-binary-diff/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/14/2009-01-14-using-clutter-1/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/09/2009-01-09-linux-union-mount/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/07/2009-01-07-skip-sudo-password-prompt/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/07/2009-01-07-ubuntu-8-10-korean-font-config/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2009/01/05/2009-01-05-extract-latest-version-file/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/12/28/2008-12-28-gtk-memory-management/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/12/26/2008-12-26-linux-kernel-2628-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/12/23/2008-12-23-reduce-accesing-overhead-for-gobject-private-data/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/12/17/2008-12-17-presenter-first-development/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/12/15/2008-12-15-exobinding/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/12/01/2008-12-01-understanding-gtktreeview-cellrenderer/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/11/19/2008-11-19-wireshark-tcpdump/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/11/17/2008-11-17-wireshark-bad-checksum/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/11/14/2008-11-14-tracing-gtk-glib-warning-messages/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/08/11/2008-08-11-eclipse-with-remote-ssh-server/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/08/06/2008-08-06-glib-thread-programming/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/wordpress/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/08/06/2008-08-06-adding-category-rss-link/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/07/24/2008-07-24-glade-catalog/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/07/21/2008-07-21-x-window-auto-login/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/07/16/2008-07-16-linux-2626-memory-test-function/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/07/15/2008-07-15-leveraging-gtktreemodel/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2008/07/12/2008-07-12-moved-to-wordpress/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/09/21/2007-09-21-thinkpad-x40-ubuntu-power-saving/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/08/09/2007-08-09-root-filesystem-mount-options-in-ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/07/25/2007-07-25-dbus-or-upstart/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/07/25/2007-07-25-gtk-animation-effects/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/06/11/2007-06-11-vmware-rtc-lost-some-interrupts/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/05/22/2007-05-22-reactable/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/04/26/2007-04-26-linux-kernel-2621-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/04/19/2007-04-19-ubuntu-704-feisty-slow-ssh/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/04/08/2007-04-08-lighttpd-web-server/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/02/16/2007-02-16-multi-touch-screen-and-x-server/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/02/13/2007-02-13-ubuntu-feisty-compiz-black-window/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/02/05/2007-02-05-gobject-glib-object-system/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/02/05/2007-02-05-linux-kernel-2620-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/01/10/2007-01-10-macosx-inside-iphone-appletv/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2007/01/03/2007-01-03-qemu-fast-portable-dynamic-translator/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/12/23/2006-12-23-pango-1152-hangul-display-problem/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/12/21/2006-12-21-linux-multithread-futex-call-debugging/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/12/19/2006-12-19-upstart-03/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/12/19/2006-12-19-uio-linux-userspace-kernel-driver/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/12/18/2006-12-18-gtk-for-epaper-device/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/12/18/2006-12-18-process-memory-in-linux/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/12/18/2006-12-18-apple-illuminous-interface/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/12/01/2006-12-01-fontconfig-24-in-ubuntu-feisty-2/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/11/30/2006-11-30-fontconfig-24-in-ubuntu-feisty/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/11/30/2006-11-30-i810-compiz-in-ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/11/30/2006-11-30-linux-kernel-2619-release/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/10/20/2006-10-20-slow-subversion-server-response/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/09/14/2006-09-14-ssh-port-forwarding-to-access-intranet-servers/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/09/08/2006-09-08-upstart-in-universe-of-ubuntu-edgy/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/07/20/2006-07-20-dual-monitors-xrandr/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/07/03/2006-07-03-manage-source-code-using-git/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/07/03/2006-07-03-home-automation-using-x10/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/07/03/2006-07-03-devfs-removed-from-linux-kernel/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/05/09/2006-05-09-celf-2006-conference/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/05/08/2006-05-08-porting-linux-applications-to-64-bit-systems/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/04/11/2006-04-11-10-minute-guide-to-project-management/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/03/17/2006-03-17-glibc-memory-allocation-tune/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/03/13/2006-03-13-optimizing-applications-with-gcc-and-glibc/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/03/11/2006-03-11-vmware-usb-in-ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/02/28/2006-02-28-vmware-devparport0-in-ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/02/24/2006-02-24-good-practices-in-library-design-implementation-and-maintenance/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/02/18/2006-02-18-crazy-multi-input-touch-screen/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/31/2006-01-31-gcc-symbol-visibility-patch/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/apache/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/20/2006-01-20-aprapache-portable-runtime/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/20/2006-01-20-using-gcc-extensions/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/20/2006-01-20-printf-pitfall/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/20/2006-01-20-multi-thread-gtk-programming/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/20/2006-01-20-cookers-writers-and-programmers/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/17/2006-01-17-linux-gateso1/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/12/2006-01-12-scim-in-ubuntu/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/12/2006-01-12-advantages-of-free-software-and-open-source-in-embedded-systems/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/bugzilla/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/11/2006-01-11-duffs-device/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2006/01/11/2006-01-11-trac-and-bugzilla/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2005/12/15/2005-12-15-gnome-or-kde/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2005/11/20/2005-11-20-multi-thread-programming-rules/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2005/11/19/2005-11-19-xorg-i810915g-lg-flatron-l2010p/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2005/11/15/2005-11-15-quake3-source-skimming/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2019-05-06T17:54:11+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/lethean/</loc>
+    <lastmod>2020-02-03T19:56:33+09:00</lastmod>
+  </url>
+  
+</urlset>

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="리눅스에서 메모리 침범이나 메모리 누수, 혹은 복잡한 메모리 접근 관련 오류를 디버깅할때는 대부분 Valgrind 도구를 이용합니다. 하지만 Valgrind는 많은 메모리를">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/">
+  <meta property="og:title" content="TCMalloc 구글 성능 도구를 이용한 메모리 누수 디버깅 | 대체로 무해함">
+  <meta property="og:description" content="리눅스에서 메모리 침범이나 메모리 누수, 혹은 복잡한 메모리 접근 관련 오류를 디버깅할때는 대부분 Valgrind 도구를 이용합니다. 하지만 Valgrind는 많은 메모리를"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2009-06-18T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T19:56:33&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/"
+  },
+  "headline": "TCMalloc 구글 성능 도구를 이용한 메모리 누수 디버깅",
+  
+  "datePublished": "2009-06-18T00:00:00Z",
+  "dateModified": "2020-02-03T19:56:33+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "리눅스에서 메모리 침범이나 메모리 누수, 혹은 복잡한 메모리 접근 관련 오류를 디버깅할때는 대부분 Valgrind 도구를 이용합니다. 하지만 Valgrind는 많은 메모리를"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>TCMalloc 구글 성능 도구를 이용한 메모리 누수 디버깅 | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>TCMalloc 구글 성능 도구를 이용한 메모리 누수 디버깅</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>리눅스에서 메모리 침범이나 메모리 누수, 혹은 복잡한 메모리 접근 관련 오류를 디버깅할때는 대부분 
+<a href="http://valgrind.org/" target="_blank" rel="noopener">Valgrind</a>
+ 도구를 이용합니다. 하지만 Valgrind는 많은 메모리를 사용하고 실행 속도가 현저하게 느려지기 때문에, 별도의 타겟 장비에서 제한된 조건으로 동작하는 어플리케이션에는 조금 무리가 있습니다. 게다가 Valgrind의 메모리 검사 도구는 프로그램이 종료된 시점에서 누수된 메모리만 찾기 때문에, 실행 중에는 엄청나게 메모리를 사용하다가 정상적인 객체 해제 루틴이 호출되면 모든 메모리가 정리되어 찾을 수 없는 경우는 발견하지 못합니다.</p>
+<p>
+<a href="/2009/04/29/tcmalloc-google-perftools/">구글 성능 도구</a>
+를 다시 검토하고 사용하게 된 이유도 바로 여기에 있습니다. 현재 디버깅 중인 프로그램의 문제가 대략 이렇습니다. 몇날 며칠이고 문제없이 가동해야 하는 프로그램이 특정 설정을 적용한 후에는, 자고 일어나면 10~20메가씩 메모리 점유율이 한꺼번에 올라갑니다. 하지만 Valgrind 도구를 사용해도 어느 부분이 문제인지 찾을 수가 없습니다. 지난 글에서 TCMalloc 메모리 할당자로 교체한 후 문제가 해결된 줄 알았던 바로 그 패턴이기도 합니다. 그래서 이번에는 프로파일 기능을 이용해 직접 메모리 누수를 디버깅 해보고, 나중을 위해 그 과정을 정리해 보았습니다.</p>
+<p><strong>디버깅 환경</strong></p>
+<p>디버깅 환경은 우분투 9.04 x86_32 플랫폼입니다. x86_64 플랫폼에서는 이상하게 호출 그래프가 그려지지 않아서 일단 무시했습니다. 사용한 버전은 
+<a href="http://code.google.com/p/google-perftools/" target="_blank" rel="noopener">공식 홈페이지</a>
+에서 다운로드 받은 1.2 버전입니다. 1.3 버전은 이상하게 프로파일 기능이 동작하지 않아 역시 무시했습니다.</p>
+<p><strong>TCMalloc 도구 설치 및 연결</strong></p>
+<p>호출 그래프를 생성하기 위해 <code>dot</code> 프로그램이 필요한데 이 프로그램은 graphviz 패키지에 들어있으므로 설치해야 합니다.</p>
+<pre><code>$ sudo apt-get install graphviz
+</code></pre>
+<p>우선, 공식 홈페이지에서 google-perftools 압축 파일을 다운로드 한 뒤 다음과 같이 빌드하고 설치합니다. <strong>[2011.05.02 추가]</strong> INSTALL 문서에도 명시되어 있듯이, x86_64 환경에서는 
+<a href="http://www.nongnu.org/libunwind/" target="_blank" rel="noopener">libunwind</a>
+ 라이브러리를 미리 설치한 뒤 빌드해야 정상적으로 동작합니다.</p>
+<pre><code>$ cd google-perftools*
+$ ./configure --prefix=/usr
+$ make
+$ sudo make install
+</code></pre>
+<p>TCMalloc 라이브러리를 연결하는 방법은 
+<a href="http://google-perftools.googlecode.com/svn/trunk/doc/heapprofile.html" target="_blank" rel="noopener">공식 문서</a>
+에도 나와 있듯이 디버깅할 프로그램 링크 마지막에 &lsquo;<code>-ltcmalloc</code>&rsquo; 옵션을 추가하거나, 실행할때 프로그램 앞에 &lsquo;<code>LD_PRELOAD=/usr/lib/libtcmalloc.so execute-file</code>&rsquo; 처럼 라이브러리를 먼저 로드해주면 됩니다. <del>저는 첫번째 방법을 사용했습니다.</del> <strong>[2011.05.02 갱신]</strong> 언제부터인지는 확실치 않지만 첫번째 방법은 동작하지 않고 두번째 방법으로 해야 메모리 프로파일이 정상적으로 동작합니다.</p>
+<p>참고로, 디버깅할 프로그램을 컴파일할때는 디버깅 심볼 옵션(<code>-g</code>)이 있어야 호출 그래프에서 정확한 함수 이름이 표시됩니다. 또한 최적화 옵션(<code>-O2</code> 등)을 사용 안하면 더 정확한 함수 호출 그래프를 얻을 수 있습니다.</p>
+<p><strong>프로파일 데이터 얻기</strong></p>
+<p>TCMalloc 라이브러리를 연결해도 기본적으로 프로파일 기능은 동작하지 않습니다. <code>HEAPPROFILE</code> 환경변수에 프로파일 정보를 주기적으로 덤프할 파일 이름 접두사(prefix)를 지정해야만 동작합니다.</p>
+<pre><code>$ HEAPPROFILE=/tmp/profile execute-file
+</code></pre>
+<p>접두사는 파일 절대 경로로 디렉토리를 포함할 수 있습니다.</p>
+<p>만일 덤프 파일이 너무 자주 생성되거나 반대로 너무 드물게 생성된다면 환경 변수를 통해 간격을 조절할 수 있습니다.</p>
+<pre><code>$ HEAPPROFILE=/tmp/profile 
+  HEAP_PROFILE_ALLOCATION_INTERVAL=107374182400 
+  execute-file
+</code></pre>
+<p>더 자세한 옵션은 
+<a href="http://google-perftools.googlecode.com/svn/trunk/doc/heapprofile.html" target="_blank" rel="noopener">공식 문서</a>
+를 확인해 보시기 바랍니다.</p>
+<p>위 예제에서 지정한 방식대로 프로그램을 실행하면 <code>/tmp/profile.0001.heap</code>, <code>/tmp/profile.0002.heap</code>, <code>/tmp/profile.0003.heap</code> 등과 같은 프로파일 덤프 파일이 실행 도중 계속 생성됩니다.</p>
+<p><strong>결과 그래프 얻기</strong></p>
+<p>포스트스크립트(PostScript) 파일 형식으로 메모리 프로파일 정보를 포함한 함수 호출 그래프를 얻으려면 다음과 같이 형식으로 pprof 프로그램을 실행하면 됩니다.</p>
+<pre><code>$ pprof --ps --lines 
+    execute-file 
+    /tmp/profile.0001.heap 
+    &gt; profile-0001.ps
+</code></pre>
+<p>프로파일 덤프 파일에 대하여 하나씩 그래프를 생성해 직접 눈과 손으로 비교하는 것도 나쁘지 않지만, 두 프로파일의 차이점만 그래프로 만들어주는 옵션이 있으므로 이를 사용하면 더 편리합니다. 즉, 시간대별 메모리 사용량의 달라진 부분이 정확하게 어느 함수 호출 때문인지 알 수 있게 해줍니다.</p>
+<pre><code>$ pprof --ps --lines 
+    --base /tmp/profile.0001.heap 
+    execute-file 
+    /tmp/profile.0002.heap 
+    &gt; profile-0002-diff.ps
+</code></pre>
+<p>물론, PDF(<code>--pdf</code>), GIF(<code>--gif</code>) 등과 같은 다른 형식으로 그래프 파일을 얻을 수도 있습니다. 더 자세한 옵션은 &lsquo;<code>pprof --help</code>'를 참고하시면 됩니다.</p>
+<p><strong>결론</strong></p>
+<p>며칠간 디버깅에 적용해보니 문제가 발생한 패턴이 무엇이었는지도 찾아내고, 간과했던 작은 메모리 누수 버그들도 함께 발견할 수 있었습니다. 하지만, 언제나 그렇듯이, 디버깅 사태까지 오기 전에 더 튼튼하게 설계하고, 더 꼼꼼하게 프로그래밍하고, 더 철저하게 코드 리뷰와 테스트를 거치는 게 정도임을 새삼 깨닫습니다.</p>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/coding/">Coding</a>
+  
+  <a class="badge badge-light" href="/tags/glibc/">glibc</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/&amp;text=TCMalloc%20%ea%b5%ac%ea%b8%80%20%ec%84%b1%eb%8a%a5%20%eb%8f%84%ea%b5%ac%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a9%94%eb%aa%a8%eb%a6%ac%20%eb%88%84%ec%88%98%20%eb%94%94%eb%b2%84%ea%b9%85" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/&amp;t=TCMalloc%20%ea%b5%ac%ea%b8%80%20%ec%84%b1%eb%8a%a5%20%eb%8f%84%ea%b5%ac%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a9%94%eb%aa%a8%eb%a6%ac%20%eb%88%84%ec%88%98%20%eb%94%94%eb%b2%84%ea%b9%85" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=TCMalloc%20%ea%b5%ac%ea%b8%80%20%ec%84%b1%eb%8a%a5%20%eb%8f%84%ea%b5%ac%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a9%94%eb%aa%a8%eb%a6%ac%20%eb%88%84%ec%88%98%20%eb%94%94%eb%b2%84%ea%b9%85&amp;body=/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/&amp;title=TCMalloc%20%ea%b5%ac%ea%b8%80%20%ec%84%b1%eb%8a%a5%20%eb%8f%84%ea%b5%ac%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a9%94%eb%aa%a8%eb%a6%ac%20%eb%88%84%ec%88%98%20%eb%94%94%eb%b2%84%ea%b9%85" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=TCMalloc%20%ea%b5%ac%ea%b8%80%20%ec%84%b1%eb%8a%a5%20%eb%8f%84%ea%b5%ac%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a9%94%eb%aa%a8%eb%a6%ac%20%eb%88%84%ec%88%98%20%eb%94%94%eb%b2%84%ea%b9%85%20/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/&amp;title=TCMalloc%20%ea%b5%ac%ea%b8%80%20%ec%84%b1%eb%8a%a5%20%eb%8f%84%ea%b5%ac%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a9%94%eb%aa%a8%eb%a6%ac%20%eb%88%84%ec%88%98%20%eb%94%94%eb%b2%84%ea%b9%85" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2009/04/29/2009-04-29-tcmalloc-google-perftools/">TCMalloc, 구글 성능 도구</a></li>
+      
+      <li><a href="/2009/04/08/2009-04-08-pthread-man-pages-in-ubuntu-or-debian/">우분투에서 C 라이브러리 맨페이지(manpage) 설치하기</a></li>
+      
+      <li><a href="/2006/02/24/2006-02-24-good-practices-in-library-design-implementation-and-maintenance/">라이브러리 설계, 구현, 유지에 좋은 습관</a></li>
+      
+      <li><a href="/2009/02/12/2009-02-12-using-windows-symbol-packages/">윈도우 심볼 패키지 사용하기</a></li>
+      
+      <li><a href="/2008/12/17/2008-12-17-presenter-first-development/">Presenter First 개발</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="&lsquo; 2015년 주목받은 신인 오픈소스 SW 11선 &rsquo; 기사와 Dropbox 클라이언트의 다음 버전을 Rust 언어와 Bazel 로 만든다는 글 을 보고 궁금증이 생겨 잠시 Bazel 빌드 도구를 살펴보았다.">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2016/03/17/2016-03-17-about-ninja-build/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2016/03/17/2016-03-17-about-ninja-build/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2016/03/17/2016-03-17-about-ninja-build/">
+  <meta property="og:title" content="Ninja 빌드 도구 소개 | 대체로 무해함">
+  <meta property="og:description" content="&lsquo; 2015년 주목받은 신인 오픈소스 SW 11선 &rsquo; 기사와 Dropbox 클라이언트의 다음 버전을 Rust 언어와 Bazel 로 만든다는 글 을 보고 궁금증이 생겨 잠시 Bazel 빌드 도구를 살펴보았다."><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2016-03-17T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T19:56:33&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2016/03/17/2016-03-17-about-ninja-build/"
+  },
+  "headline": "Ninja 빌드 도구 소개",
+  
+  "datePublished": "2016-03-17T00:00:00Z",
+  "dateModified": "2020-02-03T19:56:33+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "\u0026lsquo; 2015년 주목받은 신인 오픈소스 SW 11선 \u0026rsquo; 기사와 Dropbox 클라이언트의 다음 버전을 Rust 언어와 Bazel 로 만든다는 글 을 보고 궁금증이 생겨 잠시 Bazel 빌드 도구를 살펴보았다."
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>Ninja 빌드 도구 소개 | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Ninja 빌드 도구 소개</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>&lsquo;
+<a href="http://www.bloter.net/archives/252083" target="_blank" rel="noopener">2015년 주목받은 신인 오픈소스 SW 11선</a>
+&rsquo; 기사와 Dropbox 클라이언트의 다음 버전을 
+<a href="https://www.rust-lang.org/" target="_blank" rel="noopener">Rust</a>
+ 언어와 
+<a href="http://bazel.io/" target="_blank" rel="noopener">Bazel</a>
+로 만든다는 
+<a href="https://www.reddit.com/r/rust/comments/4adabk/the_epic_story_of_dropboxs_exodus_from_the_amazon/" target="_blank" rel="noopener">글</a>
+을 보고 궁금증이 생겨 잠시 Bazel 빌드 도구를 살펴보았다. 하지만 아직 윈도 플랫폼을 지원하지 않고 <del>Java 언어로 구현되어 있어서</del> 당분간 사용을 보류.</p>
+<p>그러다가 문득 요즘에는 어떤 빌드 시스템이 인기 있는지 궁금해서 조사해 보니, 지난 몇 년 사이에 
+<a href="https://ninja-build.org" target="_blank" rel="noopener">Ninja</a>
+라는 빌드 도구가 계속 언급되는 걸 발견했다. 
+<a href="https://cmake.org/" target="_blank" rel="noopener">CMake</a>
+, 
+<a href="https://code.google.com/p/gyp/" target="_blank" rel="noopener">GYP</a>
+ 같은 전통의 빌드 시스템이 Make 빌드 파일뿐 아니라 Ninja 빌드 파일도 생성한다. 심지어 
+<a href="https://www.chromium.org/developers/how-tos/build-instructions-chromeos" target="_blank" rel="noopener">Chromium 브라우저 빌드</a>
+도 Ninja를 사용하는 방식으로 변경되었다.</p>
+<p>반나절 정도 걸려 Ninja 빌드 파일을 만들고 실행해 본 소감은 만족 반 실망 반인 것 같다. 항상 
+<a href="https://ccache.samba.org/" target="_blank" rel="noopener">ccache</a>
+를 사용하기 때문에 이와 맞물려 더한 감도 있지만, 체감 빌드 속도는 대만족이다. 하지만 단순한 기능을 보완하기 위해 별도의 도구가 더 필요한 점은 아쉽다.</p>
+<p>Ninja의 장점은 빠른 빌드 속도와 리눅스 / 윈도 / 맥 운영체제를 포함하는 멀티 플랫폼 지원이다. 빠른 속도를 얻기 위해 시스템에 장착된 모든 CPU를 모두 사용해서 병렬로 작업을 처리한다. <code>make -jN</code> 명령에서 <code>N</code>에 시스템 CPU 갯수를 지정한 것과 같은 셈이다. 하지만 조금 다뤄보니 병렬 작업에 대한 고려를 많이 했다는 느낌을 받는다. 병렬 처리되는 작업의 결과 내용을 섞어서 표시하지 않고 버퍼링 했다가 따로따로 출력한다거나 Make처럼 세심하게 신경 쓰지 않아도 대부분 작업을 병렬로 잘 처리한다.</p>
+<p>쉬운 문법과 사용법도 장점이다. 1~2시간 정도면 매뉴얼을 다 읽을 수 있을 정도로 문법이 단순하고 양도 적다. 
+<a href="https://www.gnu.org/software/make/manual/html_node/Implicit-Rules.html" target="_blank" rel="noopener">Make의 암묵적인 규칙</a>
+ 같은 게 전혀 없어서 외우거나 혼란스러운 것도 없다. 하지만 이 단순함은 반대로 치명적인 단점이기도 하다.</p>
+<p>예를 들어 Make에서는 <code>A = $(shell pkg-config --cflags libuv)</code>처럼 명령어 실행 결과를 변수에 담거나, <code>A += $(B)</code>, <code>A ?= src</code> 같이 다양한 조건을 이용해 변수를 조작할 수 있는데 Ninja에서는 <code>a = $b</code> 단순 대입 문법이 전부다. 심지어 환경 변수도 사용할 수 없다. 조건문 같은 건 상상도 할 수 없다. 다양한 운영체제를 지원하기 위해 유닉스 셸 실행 기능이 빠진 건 이해할 수 있지만, 환경 변수나 조건문이 없다는 건 Make처럼 혼자서 모든 다양한 경우에 대한 작업을 다 할 수 없다는 뜻이기도 하다. 그래서 홈페이지에도 Ninja를 직접 사용하지 말고 
+<a href="https://github.com/ninja-build/ninja/wiki/List-of-generators-producing-ninja-build-files" target="_blank" rel="noopener">Ninja 빌드 파일을 자동으로 만드는 다른 도구</a>
+를 추천하는 것 같다.</p>
+<p>참고로 Sublime Text 같은 텍스트 에디터에서 Ninja 문법을 지원하거나 
+<a href="https://www.chromium.org/developers/sublime-text#TOC-Building-with-ninja" target="_blank" rel="noopener">빌드 명령어 실행</a>
+을 위한 설정 방법은 대부분 구글에서 검색하면 쉽게 발견된다. 다음은 리눅스에서 Sublime Text를 사용할 때 필요한 Ninja 빌드 시스템 내용인데, 따로 적어두는 이유는 Chromium 사이트의 내용과 조금 다르기 때문이다.</p>
+<pre><code class="language-python">{
+ &quot;shell_cmd&quot;: &quot;ninja&quot;,
+ // ${folder} or ${file_path}
+ &quot;working_dir&quot;: &quot;${folder}&quot;,
+ // (file_path):(line_number):(column):(error_message)
+ &quot;file_regex&quot;: &quot;^([^:\n]*):([0-9]+):?([0-9]+)?:? (.*)$&quot;  
+}
+</code></pre>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/ninja/">Ninja</a>
+  
+  <a class="badge badge-light" href="/tags/build/">Build</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2016/03/17/2016-03-17-about-ninja-build/&amp;text=Ninja%20%eb%b9%8c%eb%93%9c%20%eb%8f%84%ea%b5%ac%20%ec%86%8c%ea%b0%9c" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2016/03/17/2016-03-17-about-ninja-build/&amp;t=Ninja%20%eb%b9%8c%eb%93%9c%20%eb%8f%84%ea%b5%ac%20%ec%86%8c%ea%b0%9c" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Ninja%20%eb%b9%8c%eb%93%9c%20%eb%8f%84%ea%b5%ac%20%ec%86%8c%ea%b0%9c&amp;body=/2016/03/17/2016-03-17-about-ninja-build/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2016/03/17/2016-03-17-about-ninja-build/&amp;title=Ninja%20%eb%b9%8c%eb%93%9c%20%eb%8f%84%ea%b5%ac%20%ec%86%8c%ea%b0%9c" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=Ninja%20%eb%b9%8c%eb%93%9c%20%eb%8f%84%ea%b5%ac%20%ec%86%8c%ea%b0%9c%20/2016/03/17/2016-03-17-about-ninja-build/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2016/03/17/2016-03-17-about-ninja-build/&amp;title=Ninja%20%eb%b9%8c%eb%93%9c%20%eb%8f%84%ea%b5%ac%20%ec%86%8c%ea%b0%9c" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,3287 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>GLib | 대체로 무해함</title>
+    <link>/tags/glib/</link>
+      <atom:link href="/tags/glib/index.xml" rel="self" type="application/rss+xml" />
+    <description>GLib</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 08 Mar 2016 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>GLib</title>
+      <link>/tags/glib/</link>
+    </image>
+    
+    <item>
+      <title>libuv 사용기</title>
+      <link>/2016/03/08/2016-03-08-note-about-libuv/</link>
+      <pubDate>Tue, 08 Mar 2016 00:00:00 +0000</pubDate>
+      <guid>/2016/03/08/2016-03-08-note-about-libuv/</guid>
+      <description>&lt;p&gt;요즘은 비동기 이벤트 루프가 필요하면 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/GLib&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib&lt;/a&gt;
+ 라이브러리 대신 
+&lt;a href=&#34;http://libuv.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libuv&lt;/a&gt;
+ 라이브러리를 주로 사용한다.&lt;/p&gt;
+&lt;p&gt;GLib 라이브러리의 기능은 거의 완벽하다. 하지만 아주 가끔 멀티 스레드 환경에서 idle 함수가 이유 없이 실행되지 않는다. 또한 여러 기능이 점점 추가되고 통합되면서 점점 무거워지고 있다. 게다가 이제는 단순히 리눅스 / 윈도 플랫폼뿐 아니라 Mac OS / iOS / Android 등과 같은 모바일 플랫폼까지 고려해야 하는데 GLib 라이브러리는 이 부분에서 매우 취약하다. 이로 인해 네트워킹에 특화되어 있으면서 상대적으로 더 가볍고 멀티 플랫폼에서 성능과 안정성이 더 많이 검증된 libuv 라이브러리를 사용하게 된다.&lt;/p&gt;
+&lt;p&gt;libuv 라이브러리는, 이미 대세를 지나 조금씩 거품이 빠지고 있는지도 모르는, 
+&lt;a href=&#34;https://nodejs.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Node.js&lt;/a&gt;
+의 핵심 엔진이다. 
+&lt;a href=&#34;https://plus.google.com/&amp;#43;SunjinYang/posts/7yTEjEv3VC4&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;처음 관심을 가졌던 때&lt;/a&gt;
+와 달리 지금은 
+&lt;a href=&#34;http://libuv.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;공식 사이트&lt;/a&gt;
+와 
+&lt;a href=&#34;http://docs.libuv.org/en/v1.x/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;API 문서&lt;/a&gt;
+도 매우 잘 정리되어 있다.&lt;/p&gt;
+&lt;p&gt;하지만 지난 몇 년간 libuv 라이브러리를 여기저기 사용해보니, 역시나 완벽한 소프트웨어는 없다고, 처음에는 좋은 점만 보이더니 이제는 아쉬움이 더해간다. 물론 그래도 당분간은 다른 대안이 없어서 계속 사용할 예정이기 때문에 그동안 틈틈이 적었던 기록(이라 적어 놓고 불만이라고 읽는 기록)을 정리해 본다.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;비동기 이벤트 핸들에 우선순위 개념이 없어서 조금 아쉽다. 물론 GLib 메인 루프에만 있는 개념이고 대부분 비동기 이벤트 라이브러리에도 없기 때문에 필요하면 직접 구현해야 한다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;uv_idle_t&lt;/code&gt;와 &lt;code&gt;uv_prepare_t&lt;/code&gt; / &lt;code&gt;uv_check_t&lt;/code&gt; 핸들의 차이는 무엇일까? &lt;code&gt;uv_idle_t&lt;/code&gt;는 I/O 또는 &lt;code&gt;uv_timer_t&lt;/code&gt;가 없어도 실행되도록 하기 위해 
+&lt;a href=&#34;http://docs.libuv.org/en/v1.x/idle.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;I/O 대기 시간(polling time)이 항상 0이 되어&lt;/a&gt;
+ CPU 사용률이 100%가 된다. 하지만, &lt;code&gt;uv_prepare_t&lt;/code&gt; / &lt;code&gt;uv_check_t&lt;/code&gt; 핸들은 I/O가 있을 때만 I/O 앞과 뒤에서 실행된다. 즉, I/O 작업이 없으면 아예 호출되지 않는다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;uv_fs_*()&lt;/code&gt; 함수를 실행한 다음에 &lt;code&gt;uv_fs_req_cleanup()&lt;/code&gt; 함수를 호출하지 않으면 메모리 누수 귀신을 만나게 된다. 파일 입출력을 TCP / UDP처럼 스트림 기반 비동기 방식으로 만들지 않은 이유를 모르겠다. 윈도 플랫폼에서 소켓과 파일이 전혀 다르기 때문에 그럴 수도 있지만 유닉스 기반에서는 오히려 더 좋은 성능을 보여줄 텐데 말이다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;uv_timer_t&lt;/code&gt;에 반복(repeat)을 지정하면 정확한 주기에 동작한다. 예를 들어 5초 반복인데 콜백 함수가 2초간 실행되면 3초 후에 다시 실행된다. GLib의 &lt;code&gt;g_timeout_*()&lt;/code&gt; 함수는 5초 간격(interval)이라면 콜백 함수가 2초간 실행되어도 5초 이후에 다시 실행된다.&lt;/p&gt;
+&lt;p&gt;리눅스에서 시리얼 장치처럼 libuv가 직접 지원하지 않는 파일 디스크립터를 연결하려면 &lt;code&gt;uv_poll_t&lt;/code&gt;를 사용하면 된다. &lt;code&gt;uv_tty_t&lt;/code&gt;는 터미널이나 콘솔에만 사용해야 한다.&lt;/p&gt;
+&lt;p&gt;다른 스레드가 특정 지점에 도달할 때까지 기다려야 한다면 &lt;code&gt;uv_barrier_t&lt;/code&gt;를 사용하면 편리하다. 예를 들어 새 스레드를 생성하고 그 스레드가 특정 위치까지 실행될 때까지 대기하는 목적으로 사용하면 된다.&lt;/p&gt;
+&lt;p&gt;하나의 &lt;code&gt;uv_loop_t&lt;/code&gt; 개체와 연결된 모든 libuv 함수는 &lt;code&gt;uv_run()&lt;/code&gt; 함수가 실행된 스레드에서만 호출되어야 한다. 심지어 &lt;code&gt;uv_*_init()&lt;/code&gt; 함수도 같은 스레드에서 호출해야 한다. &lt;code&gt;uv_async_send()&lt;/code&gt; 함수가 유일한 예외인데, 이것만 사용해서 스레드 간에 통신하기에는 조금 부족하다. 스레드 간 통신에 TCP / UDP / 파이프 등을 이용해도 되지만 오버헤드가 발생할 수밖에 없다. 예를 들어 GLib 같은 경우 특정 스레드에서 어떤 함수를 호출하고 싶으면 해당 스레드에서 실행 중인 루프의 콘텍스트에 &lt;code&gt;g_idle_add()&lt;/code&gt; / &lt;code&gt;g_timeout_add()&lt;/code&gt; 종류의 함수를 이용해서 쉽게 추가할 수 있다. 하지만 libuv에서는 메시지 큐 또는 채널 같은 자료구조를 구현해서 메시지를 전달하면 그 메시지를 해독해서 특정 함수를 실행하거나 작업을 진행해야 한다. 어쩌면 libuv / Node.js 개발자가 멀티 스레드를 지양하고 멀티 프로세스를 지향하는 구조를 선호하기 때문일 수도 있다. C 언어의 특성상 다양한 방식이 존재하기 때문에 필요에 따라 직접 구현해서 사용하기를 권장하는 건지도 모르겠다. 하지만 적어도 
+&lt;a href=&#34;https://gobyexample.com/channels&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Go 언어의 채널&lt;/a&gt;
+이나 
+&lt;a href=&#34;http://rustbyexample.com/std_misc/channels.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Rust 언어의 채널&lt;/a&gt;
+처럼 널리 사용되는 스레드 간 통신 방법을 libuv 라이브러리가 제공해주면 더 좋을 것 같다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;uv_close()&lt;/code&gt; 함수를 호출해도 핸들의 리소스가 실제로 해제되는 시점이 &lt;code&gt;uv_run()&lt;/code&gt; 루프 내부라는 점도 불편하다. 이 때문에 핸들과 연관된 리소스를 해제하기 위해 콜백 함수라는 한 단계를 더 거쳐야 한다. 이는 매우 귀찮은 작업인데, 수많은 libuv 예제 소스에는 리소스 해제를 고려하지 않고 대부분 static 변수를 사용하지만, 실전에서는 메모리 누수와 개체의 라이프 사이클을 신경 써야 하기 때문이다. 예를 들어 현재 TCP 연결을 끊고 나서 다른 정보로 다시 TCP 연결을 생성해야 할 때, 콜백 함수가 호출되기 전까지의 그 위험한 순간에 TCP 연결에 대한 핸들을 가리키는 변수에 접근하게 되면 재앙이 발생한다.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://ko.wikipedia.org/wiki/Misra_c&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;안전한 C 프로그래밍&lt;/a&gt;
+을 하고 싶어도 동적인 메모리 할당 / 해제 작업을 피할 수가 없다. 물론 &lt;code&gt;uv_read_start()&lt;/code&gt; 함수는 읽기 작업 전에 버퍼를 할당해야 하는 것처럼 보이지만 큰 버퍼를 미리 할당하고 포인터와 크기만 잘 조작해도 된다. 하지만 핸들 자체가 실행 중에 다른 인수로 다시 시작해야 하는 경우처럼 복잡한 단계를 거쳐야 하는 건 어쩔 수 없다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;uv_read_start()&lt;/code&gt; 함수는 매우 편리하다. 그런데 연결이 끊기거가 에러가 발생했을때 
+&lt;a href=&#34;http://docs.libuv.org/en/v1.x/stream.html#c.uv_read_cb&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;문서&lt;/a&gt;
+와 다른 패턴을 종종 경험한다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 IP 주소 / 링크 상태 변경 여부 감지하기</title>
+      <link>/2012/03/19/2012-03-19-detect-change-of-ip-address-and-link-status-in-linux/</link>
+      <pubDate>Mon, 19 Mar 2012 00:00:00 +0000</pubDate>
+      <guid>/2012/03/19/2012-03-19-detect-change-of-ip-address-and-link-status-in-linux/</guid>
+      <description>&lt;p&gt;리눅스에서 IP 주소가 변경되었거나 링크 상태 변경 여부(예를 들어 랜선이 꽂히거나 빠졌을때)를 자동으로 감지하는 C 코드입니다. &lt;code&gt;ifconfig&lt;/code&gt; 명령등의 결과를 파싱하는 방법이 아닌 리눅스 커널 &lt;code&gt;rtnetlink(7)&lt;/code&gt; 프로토콜과 &lt;code&gt;getifaddrs()&lt;/code&gt; 함수를 이용해 직접 처리합니다. 참조한 소스는 여러군데가 있는데 모두 구글링이 가능하므로 결과물만 기록으로 남겨둡니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+#include &amp;lt;errno.h&amp;gt;
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/types.h&amp;gt;
+#include &amp;lt;sys/socket.h&amp;gt;
+#include &amp;lt;ifaddrs.h&amp;gt;
+#include &amp;lt;net/if.h&amp;gt;
+#include &amp;lt;netdb.h&amp;gt;
+#include &amp;lt;netinet/in.h&amp;gt;
+#include &amp;lt;linux/netlink.h&amp;gt;
+#include &amp;lt;linux/rtnetlink.h&amp;gt;
+
+static int
+create_sock (const char *nic)
+{
+  struct sockaddr_nl addr;
+  int                sock;
+
+  memset (&amp;amp;addr, 0, sizeof (addr));
+  addr.nl_family = AF_NETLINK;
+  addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR | RTMGRP_IPV6_IFADDR;
+
+  sock = socket (PF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (sock &amp;lt; 0)
+    {
+      fprintf (stderr, &amp;quot;failed to open NETLINK_ROUTE socket for %s - %s(%d)&amp;quot;,
+               nic, strerror (errno), errno);
+      return -1;
+    }
+
+  if (bind (sock, (struct sockaddr *)&amp;amp;addr, sizeof(addr)) &amp;lt; 0)
+    {
+      fprintf (stderr, &amp;quot;failed to bind NETLINK_ROUTE socket for %s - %s(%d)&amp;quot;,
+                 nic, strerror (errno), errno);
+      close (sock);
+      return -1;
+    }
+
+  return sock;
+}
+
+static int
+ip_changed (int         sock,
+            const char *nic)
+{
+  struct nlmsghdr   *nlh;
+  char               buffer[4096];
+  int                len;
+  int                idx;
+  int                found;
+
+  len = recv (sock, buffer, sizeof (buffer), 0);
+  if (len &amp;lt;= 0)
+    {
+      fprintf (stderr, &amp;quot;NETLINK_ROUTE socket recv() failedn&amp;quot;);
+      return -1;
+    }
+
+  found = 0;
+  idx = if_nametoindex (nic);
+
+  for (nlh = (struct nlmsghdr *)buffer;
+       NLMSG_OK (nlh, len);
+       nlh = NLMSG_NEXT (nlh, len))
+    {
+      if (nlh-&amp;gt;nlmsg_type == NLMSG_DONE)
+        break;
+      if (nlh-&amp;gt;nlmsg_type == NLMSG_ERROR)
+        continue;
+      if (!(NLMSG_OK (nlh, len)))
+        continue;
+
+      switch (nlh-&amp;gt;nlmsg_type)
+        {
+        case RTM_NEWADDR:
+          {
+            struct ifaddrmsg *ifa = (struct ifaddrmsg *)NLMSG_DATA (nlh);
+
+            if (ifa-&amp;gt;ifa_index == idx)
+              found = 1;
+          }
+          break;
+        case RTM_NEWLINK:
+          {
+            struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA (nlh);
+
+            if (ifi-&amp;gt;ifi_index == idx)
+              found = 1;
+          }
+          break;
+        default:
+          break;
+        }
+    }
+
+  return found;
+}
+
+static int
+get_nic_addr (const char     *nic,
+              struct ifaddrs *ifaddr,
+              int             wanted_family,
+              char           *host,
+              int             host_len,
+              int            *active)
+{
+  struct ifaddrs *ifa;
+
+  for (ifa = ifaddr; ifa != NULL; ifa = ifa-&amp;gt;ifa_next)
+    {
+      int family;
+      int s;
+
+      if (ifa-&amp;gt;ifa_addr == NULL)
+        continue;
+
+      if (strcmp (ifa-&amp;gt;ifa_name, nic))
+        continue;
+
+      /* Skip unwanted families. */
+      family = ifa-&amp;gt;ifa_addr-&amp;gt;sa_family;
+      if (family != wanted_family)
+        continue;
+
+      *active = (ifa-&amp;gt;ifa_flags &amp;amp; IFF_RUNNING) ? 1 : 0;
+
+      s = getnameinfo (ifa-&amp;gt;ifa_addr,
+                       family == AF_INET ? sizeof (struct sockaddr_in) :
+                                           sizeof (struct sockaddr_in6),
+                       host,
+                       host_len,
+                       NULL,
+                       0,
+                       NI_NUMERICHOST);
+      if (s != 0)
+        {
+          fprintf (stderr, &amp;quot;failed to getnameinfo() for &#39;%s - %s(%d)&amp;quot;,
+                   ifa-&amp;gt;ifa_name, strerror (errno), errno);
+          continue;
+        }
+
+      /* Get the address of only the first network interface card. */
+      return 1;
+    }
+
+  return 0;
+}
+
+static void
+print_ip (const char *nic)
+{
+  struct ifaddrs *ifaddr;
+  char            addr[NI_MAXHOST];
+  int             active;
+
+  if (getifaddrs (&amp;amp;ifaddr) == -1)
+    {
+      fprintf (stderr, &amp;quot;failed to getifaddrs() - %s(%d)&amp;quot;, strerror (errno), errno);
+      return;
+    }
+
+  if (!get_nic_addr (nic, ifaddr, AF_INET, addr, sizeof (addr), &amp;amp;active))
+    if (!get_nic_addr (nic, ifaddr, AF_INET6, addr, sizeof (addr), &amp;amp;active))
+      {
+        strcpy (addr, &amp;quot;127.0.0.1&amp;quot;);
+        active = 0;
+      }
+
+  freeifaddrs (ifaddr);
+
+  fprintf (stdout, &amp;quot;%s is %s (link %s)n&amp;quot;,
+           nic, addr, active ? &amp;quot;active&amp;quot; : &amp;quot;inactive&amp;quot;);
+}
+
+int
+main (void)
+{
+  char *nic = &amp;quot;eth0&amp;quot;;
+  int   sock;
+
+  print_ip (nic);
+
+  sock = create_sock (nic);
+  if (sock &amp;lt; 0)
+    return -1;
+
+  while (1)
+    {
+      int ret;
+
+      ret = ip_changed (sock, nic);
+      if (ret &amp;lt; 0)
+        return -1;
+
+      if (ret)
+        print_ip (nic);
+    }
+
+  close (sock);
+
+  return 0;
+}
+
+/*
+  Local Variables:
+   mode:c
+   c-file-style:&amp;quot;gnu&amp;quot;
+   indent-tabs-mode:nil
+  End:
+  vim:autoindent:filetype=c:expandtab:shiftwidth=2:softtabstop=2:tabstop=8
+*/
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고로 위 소스에서 네트웍 인터페이스 설정 변경을 감지하기 위해 사용한 소켓 파일 디스크립터(socket file descriptor)는 &lt;code&gt;select()&lt;/code&gt; / &lt;code&gt;poll()&lt;/code&gt; 등을 이용해 비동기적으로 감시하는 것도 가능합니다. 당연하지만, 
+&lt;a href=&#34;/2009/09/21/using-glib-mainloop/&#34;&gt;GLib 메인루프&lt;/a&gt;
+의 &lt;code&gt;g_io_add_watch()&lt;/code&gt; 등을 이용해도 됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE 2012-03-21]&lt;/strong&gt; &lt;code&gt;rtnetlink(7)&lt;/code&gt; 프로토콜의 기반이 되는 &lt;code&gt;netlink(7)&lt;/code&gt; 프로토콜에 대해 더 자세히 알고 싶다면 
+&lt;a href=&#34;http://www.infradead.org/~tgr/libnl/doc/core.html#core_netlink_fundamentals&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Netlink 라이브러리의 Netlink 프로토콜 기초 문서&lt;/a&gt;
+를 참고하기 바랍니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GObject 객체 지향 프로그래밍 (5)</title>
+      <link>/2012/02/24/2012-02-24-oop-with-gobject-5/</link>
+      <pubDate>Fri, 24 Feb 2012 00:00:00 +0000</pubDate>
+      <guid>/2012/02/24/2012-02-24-oop-with-gobject-5/</guid>
+      <description>&lt;p&gt;거의 2년만에 GObject 객체 지향 프로그래밍 연재 글을 포스팅합니다. 사실 이 글의 일부는 예전에 작성해 둔 것인데, 이번 
+&lt;a href=&#34;http://gnome-kr.blogspot.com/2012/02/2-gnome-tech-talks.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME Tech Talks&lt;/a&gt;
+에서 발표 하나를 맡게 되면서, 슬라이드 자료를 따로 만들 시간은 없고 그렇다고 오래된 자료를 재탕하는 건 실례인 것 같아 조금 보완해서 작성했습니다. 참고로, GObject 개념을 잘 모르는 분이라면 이전 연재 글을 먼저 읽어 보시면 도움이 될 수 있습니다. :)&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2009/08/10/oop-with-gobject-1/&#34; title=&#34;GObject 객체 지향 프로그래밍 (1)&#34;&gt;GObject 객체 지향 프로그래밍 (1)&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2009/08/14/oop-with-gobject-2/&#34; title=&#34;GObject 객체 지향 프로그래밍 (2)&#34;&gt;GObject 객체 지향 프로그래밍 (2)&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2009/08/18/oop-with-gobject-3/&#34; title=&#34;GObject 객체 지향 프로그래밍 (3)&#34;&gt;GObject 객체 지향 프로그래밍 (3)&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2009/08/24/oop-with-gobject-4/&#34; title=&#34;GObject 객체 지향 프로그래밍 (4)&#34;&gt;GObject 객체 지향 프로그래밍 (4)&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2010/02/11/how-to-make-a-gobject-singleton/&#34; title=&#34;싱글턴(Singleton) GObject 객체 만들기&#34;&gt;싱글턴(Singleton) GObject 객체 만들기&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2010/04/07/serialize-gobject-properties/&#34; title=&#34;GObject 속성 직렬화(Serialization)하기&#34;&gt;GObject 속성 직렬화(Serialization)하기&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;GObject 객체 지향 시스템을 구성하는 여러가지 개념 중 상속(inheritance), 참고 카운터(reference counting), 속성(properties) 등에 대해서는 지난 글에서 이미 소개했습니다. 아직 GObject 라이브러리에서 소개하지 않은 개념이 아직 많이 남아 있지만, 그 중에서 가장 중요한 것 중 하나는 바로 시그널(signals)이 아닐까 생각합니다. 속성이 변경되었을때 자동으로 호출되는 콜백 함수를 등록해서 사용하는 방법을 설명할 때 약간 소개했지만, 아무래도 그걸로는 부족하기 때문에 이번 글은 시그널의 개념과 사용 방법, 그리고 속성 바인딩을 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;간단한 클러터 기반 시계&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/myclock-screenshot.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;언제나 그렇듯이 재미없는 예제 소스를 먼저 보여드립니다. 이 소스를 컴파일해서 실행하면 위 그림과 같은 시계가 동작합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;/* myclock1.c */
+
+/*****************************************************************************/
+
+#include &amp;lt;glib-object.h&amp;gt;
+
+#define MY_TYPE_CLOCK (my_clock_get_type ())
+#define MY_CLOCK(obj) 
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MY_TYPE_CLOCK, MyClock))
+#define MY_CLOCK_CLASS(klass) 
+  (G_TYPE_CHECK_CLASS_CAST ((klass), MY_TYPE_CLOCK, MyClockClass))
+#define MY_IS_CLOCK(obj) 
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MY_TYPE_CLOCK))
+#define MY_IS_CLOCK_CLASS(klass) 
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), MY_TYPE_CLOCK))
+#define MY_CLOCK_GET_CLASS(obj) 
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), MY_TYPE_CLOCK, MyClockClass))
+
+typedef struct _MyClock        MyClock;
+typedef struct _MyClockClass   MyClockClass;
+typedef struct _MyClockPrivate MyClockPrivate;
+
+struct _MyClock
+{
+  GObject         parent;
+  MyClockPrivate *priv;
+};
+
+struct _MyClockClass
+{
+  GObjectClass parent_class;
+};
+
+enum
+{
+  PROP_0,
+  PROP_DATE_TIME,
+  PROP_LAST
+};
+
+struct _MyClockPrivate
+{
+  GDateTime *datetime;
+  guint      timeout;
+};
+
+G_DEFINE_TYPE (MyClock, my_clock, G_TYPE_OBJECT);
+
+static GParamSpec *props[PROP_LAST];
+
+GDateTime *
+my_clock_get_date_time (MyClock *clock_)
+{
+  g_return_val_if_fail (MY_IS_CLOCK (clock_), NULL);
+
+  return g_date_time_ref (clock_-&amp;gt;priv-&amp;gt;datetime);
+}
+
+static void
+my_clock_set_date_time (MyClock   *clock_,
+                        GDateTime *datetime)
+{
+  g_date_time_unref (clock_-&amp;gt;priv-&amp;gt;datetime);
+  clock_-&amp;gt;priv-&amp;gt;datetime = g_date_time_ref (datetime);
+  g_object_notify_by_pspec (G_OBJECT (clock_), props[PROP_DATE_TIME]);
+}
+
+static gboolean
+my_clock_update (gpointer data)
+{
+  MyClock   *clock_ = data;
+  GTimeVal   now;
+  GDateTime *datetime;
+  guint      interval;
+
+  g_get_current_time (&amp;amp;now);
+
+  datetime = g_date_time_new_from_timeval_local (&amp;amp;now);
+  my_clock_set_date_time (clock_, datetime);
+  g_date_time_unref (datetime);
+
+  interval = (1000000L - now.tv_usec) / 1000L;
+  clock_-&amp;gt;priv-&amp;gt;timeout =
+    g_timeout_add_full (G_PRIORITY_HIGH_IDLE,
+                        interval,
+                        my_clock_update,
+                        g_object_ref (clock_),
+                        g_object_unref);
+
+  return FALSE;
+}
+
+static void
+my_clock_set_property (GObject      *object,
+                       guint         param_id,
+                       const GValue *value,
+                       GParamSpec   *pspec)
+{
+  switch (param_id)
+    {
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, param_id, pspec);
+      break;
+    }
+}
+
+static void
+my_clock_get_property (GObject   *object,
+                       guint      param_id,
+                       GValue     *value,
+                       GParamSpec *pspec)
+{
+  MyClock *clock_ = MY_CLOCK (object);
+
+  switch (param_id)
+    {
+    case PROP_DATE_TIME:
+      g_value_set_boxed (value, clock_-&amp;gt;priv-&amp;gt;datetime);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, param_id, pspec);
+      break;
+    }
+}
+
+static void
+my_clock_finalize (GObject *gobject)
+{
+  MyClockPrivate *priv = MY_CLOCK (gobject)-&amp;gt;priv;
+
+  g_date_time_unref (priv-&amp;gt;datetime);
+  g_source_remove (priv-&amp;gt;timeout);
+
+  G_OBJECT_CLASS (my_clock_parent_class)-&amp;gt;finalize (gobject);
+}
+
+static void
+my_clock_class_init (MyClockClass *klass)
+{
+  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
+  GParamSpec   *pspec;
+
+  obj_class-&amp;gt;set_property = my_clock_set_property;
+  obj_class-&amp;gt;get_property = my_clock_get_property;
+  obj_class-&amp;gt;finalize     = my_clock_finalize;
+
+  g_type_class_add_private (klass, sizeof (MyClockPrivate));
+
+  pspec = g_param_spec_boxed (&amp;quot;datetime&amp;quot;,
+                              &amp;quot;Date and Time&amp;quot;,
+                              &amp;quot;The date and time to show in the clock&amp;quot;,
+                              G_TYPE_DATE_TIME,
+                              G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+  props[PROP_DATE_TIME] = pspec;
+  g_object_class_install_property (obj_class, PROP_DATE_TIME, pspec);
+}
+
+static void
+my_clock_init (MyClock *clock_)
+{
+  MyClockPrivate *priv;
+
+  priv = clock_-&amp;gt;priv =
+    G_TYPE_INSTANCE_GET_PRIVATE (clock_,
+                                 MY_TYPE_CLOCK,
+                                 MyClockPrivate);
+
+  priv-&amp;gt;datetime = g_date_time_new_now_local ();
+  priv-&amp;gt;timeout = 0;
+
+  my_clock_update (clock_);
+}
+
+MyClock *
+my_clock_new (void)
+{
+  return g_object_new (MY_TYPE_CLOCK, NULL);
+}
+
+/*****************************************************************************/
+
+#include &amp;lt;clutter/clutter.h&amp;gt;
+
+static void
+clock_datetime_changed (GObject    *object,
+                        GParamSpec *pspec,
+                        gpointer    data)
+{
+  MyClock      *clock_ = MY_CLOCK (object);
+  ClutterActor *text   = data;
+  GDateTime    *datetime;
+  gchar        *str;
+
+  datetime = my_clock_get_date_time (clock_);
+  str = g_date_time_format (datetime, &amp;quot;%xn%H:%M:%S&amp;quot;);
+
+  clutter_text_set_text (CLUTTER_TEXT (text), str);
+
+  g_free (str);
+  g_date_time_unref (datetime);
+}
+
+int
+main (int    argc,
+      char **argv)
+{
+  ClutterActor      *stage;
+  ClutterActor      *text;
+  ClutterConstraint *constraint;
+  MyClock           *clock_;
+
+  if (clutter_init (&amp;amp;argc, &amp;amp;argv) != CLUTTER_INIT_SUCCESS)
+    return -1;
+
+  /* stage */
+  stage = clutter_stage_get_default ();
+  clutter_actor_set_size (stage, 320, 240);
+  clutter_stage_set_color (CLUTTER_STAGE (stage), CLUTTER_COLOR_Black);
+  clutter_stage_set_user_resizable (CLUTTER_STAGE (stage), TRUE);
+
+  /* text */
+  text = clutter_text_new_full (&amp;quot;Sans Bold 20&amp;quot;,
+                                &amp;quot;NOW&amp;quot;,
+                                CLUTTER_COLOR_LightButter);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), text);
+  clutter_text_set_line_alignment (CLUTTER_TEXT (text), PANGO_ALIGN_CENTER);
+
+  /* align text in center of stage */
+  constraint =
+    clutter_align_constraint_new (stage, CLUTTER_ALIGN_X_AXIS, 0.5);
+  clutter_actor_add_constraint (text, constraint);
+
+  constraint =
+    clutter_align_constraint_new (stage, CLUTTER_ALIGN_Y_AXIS, 0.5);
+  clutter_actor_add_constraint (text, constraint);
+
+  /* clock */
+  clock_ = my_clock_new ();
+  g_signal_connect (clock_,
+                    &amp;quot;notify::datetime&amp;quot;,
+                    G_CALLBACK (clock_datetime_changed),
+                    text);
+
+  clutter_actor_show (stage);
+
+  clutter_main ();
+
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;소스 코드를 간단하게 설명하면, &lt;code&gt;MyClock&lt;/code&gt; 객체가 1초 간격으로 현재 시간을 얻어와 자신의 &lt;code&gt;datetime&lt;/code&gt; 속성을 갱신하면[&lt;code&gt;my_clock_update()&lt;/code&gt;], 속성이 변경되었을때(&lt;code&gt;notify::datetime&lt;/code&gt;) 자동으로 호출되는 콜백 함수를[&lt;code&gt;clock_datetime_changed()&lt;/code&gt;] 등록해 자동으로 클러터 텍스트(&lt;code&gt;ClutterText&lt;/code&gt;)를 이용해 화면에 표시합니다.&lt;/p&gt;
+&lt;p&gt;이제 이 소스 코드를 두 가지 방법으로 확장하려고 합니다. 첫번째 방법은 속성 바인딩(property binding)을 이용해 시그널을 사용하지 않는 방법이고, 두번째 방법은 시간이 변경되었을때 호출되는 진짜(!) 시그널을 추가하는 것입니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;속성 바인딩 (Property Binding)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;속성 바인딩(property binding)이란 두 GObject 객체간의 두 속성을 묶는 걸 말합니다. 여기서 묶는다는 의미는, 한 객체의 속성 값이 변하면 다른 객체의 속성 값도 자동으로 변한다는 의미입니다. 물론 묶으려는 두 속성은 같은 형(type)이어야 합니다. 그런데, 위 예제의 경우 &lt;code&gt;MyClock:``datetime&lt;/code&gt; 속성과 
+&lt;a href=&#34;http://developer.gnome.org/clutter/stable/ClutterText.html#ClutterText--text&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ClutterText:``text&lt;/code&gt;&lt;/a&gt;
+ 속성은 형(type)이 다릅니다. 그래서, 위 소스를 다음과 같이 수정합니다. (변경된 부분만 보여 드립니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;/* myclock2.c */
+
+/* ... */
+
+enum
+{
+  PROP_0,
+  PROP_DATE_TIME,
+  PROP_TEXT,
+  PROP_LAST
+};
+
+struct _MyClockPrivate
+{
+  GDateTime *datetime;
+  guint      timeout;
+  gchar     *text;
+};
+
+/* ... */
+
+const gchar *
+my_clock_get_text (MyClock *clock_)
+{
+  g_return_val_if_fail (MY_IS_CLOCK (clock_), NULL);
+
+  return clock_-&amp;gt;priv-&amp;gt;text;
+}
+
+static void
+my_clock_set_date_time (MyClock   *clock_,
+                        GDateTime *datetime)
+{
+  g_date_time_unref (clock_-&amp;gt;priv-&amp;gt;datetime);
+  clock_-&amp;gt;priv-&amp;gt;datetime = g_date_time_ref (datetime);
+  g_object_notify_by_pspec (G_OBJECT (clock_), props[PROP_DATE_TIME]);
+
+  g_free (clock_-&amp;gt;priv-&amp;gt;text);
+  clock_-&amp;gt;priv-&amp;gt;text = g_date_time_format (datetime, &amp;quot;%xn%H:%M:%S&amp;quot;);
+  g_object_notify_by_pspec (G_OBJECT (clock_), props[PROP_TEXT]);
+}
+
+/* ... */
+
+static void
+my_clock_finalize (GObject *gobject)
+{
+  /* ... */
+  g_free (priv-&amp;gt;text);
+  /* ... */
+}
+
+static void
+my_clock_class_init (MyClockClass *klass)
+{
+  /* ... */
+
+  pspec = g_param_spec_string (&amp;quot;text&amp;quot;,
+                               &amp;quot;Text&amp;quot;,
+                               &amp;quot;The text of the date and time&amp;quot;,
+                               NULL,
+                               G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+  props[PROP_TEXT] = pspec;
+  g_object_class_install_property (obj_class, PROP_TEXT, pspec);
+}
+
+static void
+my_clock_init (MyClock *clock_)
+{
+  /* ... */
+  priv-&amp;gt;text = NULL;
+  /* ... */
+}
+
+/* ... */
+
+int
+main (int    argc,
+      char **argv)
+{
+  /* ... */
+
+  /* clock */
+  clock_ = my_clock_new ();
+  g_object_bind_property (clock_, &amp;quot;text&amp;quot;,
+                          text,  &amp;quot;text&amp;quot;,
+                          G_BINDING_SYNC_CREATE);
+
+  /* ... */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 코드에서 변경된 내용은, &lt;code&gt;MyClock&lt;/code&gt;에 문자열 형식의 &lt;code&gt;text&lt;/code&gt; 속성을 추가하고[&lt;code&gt;my_clock_class_init()&lt;/code&gt;], &lt;code&gt;datetime&lt;/code&gt; 속성을 갱신할때 &lt;code&gt;text&lt;/code&gt; 속성도 함께 갱신하도록 한 다음[&lt;code&gt;my_clock_set_date_time()&lt;/code&gt;], 기존 속성 변경(&lt;code&gt;notify::datetime&lt;/code&gt;)에 대한 &lt;code&gt;g_signal_connect()&lt;/code&gt; 함수 호출 대신 &lt;code&gt;g_object_bind_property()&lt;/code&gt; 함수를 이용해 두 객체의 속성을 묶었다는 점입니다. 여기서 핵심은 물론 &lt;code&gt;g_object_bind_property()&lt;/code&gt; 함수인데, 이 함수는 
+&lt;a href=&#34;/2010/10/02/glib-2-26-0-release/&#34;&gt;GLib 2.26 버전에 추가&lt;/a&gt;
+되었으며 
+&lt;a href=&#34;/2008/12/15/exobinding/&#34;&gt;예전에 소개한 ExoBinding&lt;/a&gt;
+과 사용법이 거의 유사합니다. 물론, 옵션을 통해 바인딩하는 시점부터 값을 동기화할 지(&lt;code&gt;G_BINDING_SYNC_CREATE&lt;/code&gt;), 단방향이 아닌 양방향으로 동기화할 지(&lt;code&gt;G_BINDING_BIDIRECTIONAL&lt;/code&gt;) 등을 지정할 수도 있습니다. 이처럼, 위의 코드에서 볼 수 있듯이, 속성 바인딩을 이용하면 매번 콜백함수를 만들지 않고도 간단하게 코드 몇 줄로 원하는 객체 속성간의 동기화(synchronization)를 처리할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;여담이지만, 처음 이 기능을 접했을때 맥, 아이폰 응용 프로그램을 개발하기 위해 XCode에서 마우스 드래그 만으로 객체 속성간 바인딩이 지원되는 것처럼, 코딩이 아닌, Glade 같은 GUI 도구에서 위젯 속성간 바인딩이 지원되면 참 편하지 않을까 하는 생각이 들었던 적도 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;시그널 (Signals)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://developer.gnome.org/gobject/stable/chapter-signal.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GObject 공식 매뉴얼&lt;/a&gt;
+에 의하면 시그널(signals)은 메시지 전달 시스템을 구성하는 두가지 기술 중 하나입니다. 하나는 클로저(closures)이고 다른 하나가 시그널(signals)인데, 클로저가 콜백(callback) 함수를 자료구조로 정의한 거라면, 시그널은 이 콜백함수를 등록하고 호출하는 알고리즘을 정의한 것이라고 이해해도 무방합니다.&lt;/p&gt;
+&lt;p&gt;클로저를 다시 정의하지 않고 함수 포인터를 직접 사용해도 될 것 같은데 이를 객체로 정의한 이유는 여러가지가 있지만, 무엇보다도 콜백함수에 전달되는 인자(parameters) 목록과 인자 형(type)에 대한 처리(marshalling) 때문입니다. C/C++ 언어에서 함수 호출시 스택에 쌓이는 인자를 가공하는 것 뿐 아니라, GObject가 지원하는 여러 언어에 대한 바인딩을 위해 더 일반화된 클로저(closure) 객체가 필요합니다.&lt;/p&gt;
+&lt;p&gt;아무튼, 이론적인 설명은 그만하고 다시 본론으로 돌아와서, 위 예제에서 구현한 &lt;code&gt;MyClock&lt;/code&gt; 객체가 생각보다 잘 설계되고 동작하는 바람에(&amp;hellip;) 프로그램 전체에서 이 객체를 사용하기로 결정했다고 가정해 봅시다. 수많은 모듈과 수많은 객체에서 전역 시계 객체에 속성 알림(notify) 시그널을 연결합니다. 그리고 그때마다 &lt;code&gt;my_clock_get_date_time()&lt;/code&gt;을 호출해 현재 시간을 가져와서 처리합니다. 물론 이 예제에서 전달되는 &lt;code&gt;GDateTime&lt;/code&gt; 구조체는 참조 카운터 방식으로 관리되기 때문에 구조체 전달시  많은 오버헤드가 없지만, 문자열을 복사하거나 많은 데이터가 전달되는 경우라면 무시할 수 없는 상황이 발생합니다. 그래서, 위 첫번째 소스를 다음과 같이 조금 수정합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;/* myclock3.c */
+
+/* ... */
+
+struct _MyClockClass
+{
+  GObjectClass parent_class;
+
+  /* signals */
+  void (*changed) (MyClock   *clock_,
+                   GDateTime *datetime);
+};
+
+enum
+{
+  SIGNAL_CHANGED,
+  SIGNAL_LAST
+};
+
+/* ... */
+
+static guint       signals[SIGNAL_LAST];
+
+/* ... */
+
+static void
+my_clock_set_date_time (MyClock   *clock_,
+                        GDateTime *datetime)
+{
+  /* ... */
+}
+
+static void
+my_clock_real_changed (MyClock   *clock_,
+                       GDateTime *datetime)
+{
+  my_clock_set_date_time (clock_, datetime);
+}
+
+static gboolean
+my_clock_update (gpointer data)
+{
+  /* ... */
+
+  datetime = g_date_time_new_from_timeval_local (&amp;amp;now);
+  g_signal_emit (clock_, signals[SIGNAL_CHANGED], 0, datetime);
+  g_date_time_unref (datetime);
+
+  /* ... */
+}
+
+static void
+my_clock_class_init (MyClockClass *klass)
+{
+  /* ... */
+
+  klass-&amp;gt;changed = my_clock_real_changed;
+
+  signals[SIGNAL_CHANGED] =
+    g_signal_new (&amp;quot;changed&amp;quot;,
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (MyClockClass, changed),
+                  NULL,
+                  NULL,
+                  g_cclosure_marshal_VOID__POINTER,
+                  G_TYPE_NONE,
+                  1,
+                  G_TYPE_POINTER);
+}
+
+/* ... */
+
+static void
+clock_changed (MyClock   *clock_,
+               GDateTime *datetime,
+               gpointer   user_data)
+{
+  ClutterActor *text = user_data;
+  gchar        *str;
+
+  str = g_date_time_format (datetime, &amp;quot;%xn%H:%M:%S&amp;quot;);
+  clutter_text_set_text (CLUTTER_TEXT (text), str);
+  g_free (str);
+}
+
+int
+main (int    argc,
+      char **argv)
+{
+  /* ... */
+
+  /* clock */
+  clock_ = my_clock_new ();
+  g_signal_connect (clock_,
+                    &amp;quot;changed&amp;quot;,
+                    G_CALLBACK (clock_changed),
+                    text);
+
+  /* ... */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;바로 위 코드에 보이는 것처럼 &lt;code&gt;g_signal_connect()&lt;/code&gt; 호출시 연결하는 시그널 이름과 콜백 함수[&lt;code&gt;clock_changed()&lt;/code&gt;]가 더 단순하고 효율적으로 변경된 걸 확인할 수 있습니다. 콜백 함수 호출시 전달되는 인수를 그냥 사용하면 되니까 오버헤드가 매우 많이 줄어들 수 밖에 없습니다. 하지만 시그널을 정의해서 사용하는게 단순히 성능과 효율 때문만은 아닙니다. 위 예제에서는 속성이 변경되었을 때 발생하는 시그널을 정의했지만, 일반적으로 시그널은 속성 만으로 표현할 수 없는 객체의 상태 변화를 알리기 위해서 많이 사용합니다.(예: &lt;code&gt;ClutterActor::enter-event&lt;/code&gt; 시그널) 또한 속성의 변화를 통해 알 수 있더라도 더 쉽고 명확하게 이를 전파하기 위해서도 사용합니다.(예: &lt;code&gt;ClutterActor::hide&lt;/code&gt; 시그널과 &lt;code&gt;ClutterActor:visible&lt;/code&gt; 속성)&lt;/p&gt;
+&lt;p&gt;더 나아가, 시그널은 상태 변화 뿐 아니라 객체의 동작 방식을 외부에서 제어할 수 있도록 유연성을 제공하는데도 사용합니다. 더 자세한 이해를 위해 시그널 함수 포인터부터 설명하자면, 클래스 구조체 안에 선언된 시그널 함수 포인터[&lt;code&gt;MyClockClass::changed()&lt;/code&gt;]는 일종의 가상 함수(virtual function) 역할을 하면서, 시그널이 발생하면(emit) &lt;code&gt;g_signal_connect()&lt;/code&gt;를 이용해 등록된 사용자 콜백함수가 모두 실행된 뒤 맨 나중에 실행되거나 혹은 사용자 콜백 함수보다 먼저 실행됩니다. 따라서 필요 없을 경우 그냥 &lt;code&gt;NULL&lt;/code&gt;로 내버려두어도 상관없지만, 위 예제에서는 클래스 생성시 &lt;code&gt;my_clock_real_changed()&lt;/code&gt; 함수를 등록시켰습니다. &lt;code&gt;my_clock_real_changed()&lt;/code&gt;는 다시  실제로 &lt;code&gt;datetime&lt;/code&gt; 속성을 갱신하는 작업을 처리하는 &lt;code&gt;my_clock_set_date_time()&lt;/code&gt;을 호출합니다. 그리고, 기존 시간 갱신 함수[&lt;code&gt;my_clock_update()&lt;/code&gt;]에서는 직접 &lt;code&gt;my_clock_set_date_time()&lt;/code&gt;을 호출하지 않고, 시그널을 발생시켜[&lt;code&gt;g_signal_emit()&lt;/code&gt;] 작업을 처리합니다.&lt;/p&gt;
+&lt;p&gt;왜 이렇게 복잡하게 일을 나누어 처리할까요? 이렇게 구현하면 몇 가지 장점이 있기 때문입니다. 예를 들어 위 예제에서는 &lt;code&gt;datetime&lt;/code&gt; 속성이 읽기 전용으로 선언되어 있기 때문에 외부에서 그 값을 변경할 수 없습니다. 하지만, 외부에서 직접 &lt;code&gt;g_signal_emit_by_name()&lt;/code&gt; 등을 이용해 시그널을 발생시키면 시그널에 연결된 모든 콜백 함수 뿐 아니라 &lt;code&gt;my_clock_real_changed()&lt;/code&gt; 함수까지도 간접적으로 호출되어 작업을 처리하도록 할 수 있습니다. 게다가 만일 시그널에 연결된 콜백 함수 중 하나가 어떤 이유로 &lt;code&gt;g_signal_stop_emission_by_name()&lt;/code&gt; 등을 호출하면 이후 실행될 콜백 함수나 &lt;code&gt;my_clock_real_changed()&lt;/code&gt; 함수가 호출되지 않게 할 수도 있고, 심지어 객체의 클래스에 등록된 함수 포인터에 직접 자신만의 콜백 함수를 등록해서 원래 작업이 아예 수행되지 않게 할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;참고로, GTK+ / Clutter 등과 같은 GObject 기반 그래픽 툴킷 시스템은 대부분 이 시그널 콜백 함수 메커니즘을 이용해 커스텀 위젯을 만들거나 기존 액터를 상속받아 사용자가 마음껏 기능을 확장할 수 있는 길을 열어 두었습니다.(예: 
+&lt;a href=&#34;http://git.gnome.org/browse/clutter/tree/clutter/clutter-actor.c#n4856&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor.c:clutter_actor_real_paint()&lt;/code&gt;&lt;/a&gt;
+ 소스 참고)&lt;/p&gt;
+&lt;p&gt;시그널 객체는 &lt;code&gt;g_signal_new()&lt;/code&gt; 함수를 이용해 생성한 뒤 전역 &lt;code&gt;signals[]&lt;/code&gt; 배열에 ID를 저장해 둡니다. 이렇게 저장한 시그널 ID는 &lt;code&gt;g_signal_emit()&lt;/code&gt; 함수 호출시 사용합니다. 물론 이렇게 ID를 따로 저장하지 않고 &lt;code&gt;g_signal_emit_by_name()&lt;/code&gt;을 사용해 시그널 이름으로 직접 시그널을 발생시켜도 되지만, 어차피 내부적으로 시그널 이름을 ID로 변환하는 과정을 거치기 때문에 효율을 위해 객체 구현시 관례적으로 이런식으로 작성합니다. 물론 객체 외부에서는 시그널 ID를 모르기 때문에 어쩔 수 없이  &lt;code&gt;g_signal_emit_by_name()&lt;/code&gt;을 사용해야 합니다.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://developer.gnome.org/gobject/stable/gobject-Signals.html#g-signal-new&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_signal_new()&lt;/a&gt;
+ 함수의 인자 중에서 중요한 항목만 설명하면, 첫번째 항목은 시그널 이름을 정의하고, 세번째 항목은 시그널 함수 포인터가 맨 나중에 실행될 지(&lt;code&gt;G_SIGNAL_RUN_LAST&lt;/code&gt;), 또는 가장 먼저 실행될 지(&lt;code&gt;G_SIGNAL_RUN_FIRST&lt;/code&gt;) 등을 지정합니다. 네번째 항목은 클래스 구조체에 정의된 시그널 함수 포인터 위치를 지정하고, 여덟번째는 시그널 콜백 함수의 리턴 형(type), 아홉번째는 콜백 함수에게 전달할 인자의 갯수, 열번째부터는 전달될 인자의 형(types)을 차례대로 정의합니다.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://developer.gnome.org/gobject/stable/gobject-Signals.html#g-signal-new&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_signal_new()&lt;/a&gt;
+ 함수의 일곱번째 인자는 함수 호출시 인자를 처리하는 마샬링(marshalling) 함수를 지정하는데, 함수의 리턴 형(type)과 인자 목록, 인자의 각 형(type)이 정확히 일치되는 함수를 지정해야 합니다. 그런데 원하는 형태의 마샬링 함수를 GLib에서 기본으로 제공하지 않을 경우 &lt;code&gt;glib-genmarshal&lt;/code&gt; 프로그램을 이용해 직접 C 소스 코드를 생성해서 사용해야 했는데, GLib 2.30 버전부터는 그냥 &lt;code&gt;NULL&lt;/code&gt;을 지정하면 
+&lt;a href=&#34;http://sourceware.org/libffi/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libffi&lt;/a&gt;
+ 라이브러리를 이용해 구현한 &lt;code&gt;g_cclosure_marshal_generic()&lt;/code&gt; 함수가 기본으로 호출되어, 알아서 자동으로 마샬링을 처리합니다.&lt;/p&gt;
+&lt;p&gt;정리하자면, GObject 시그널은 모델-뷰(model-view) 구조나 관찰자 패턴(observer pattern)을 구현하는데 사용하기도 하지만, 더 복잡한 객체 지향 시스템을 설계할 때도 유용합니다. 하지만, 여기서는 시그널의 특징과 개념만 설명하느라 전체 기능의 반의 반도 소개되지 않은 셈입니다. 따라서 더 깊은 이해와 활용을 원하시면 반드시 참고 매뉴얼을 한 번 정독하시길 권합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;그리고&amp;hellip;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;다른 프로그래머가 왜 C++, Java, Python 처럼 좋은 언어 놔두고 C 언어 기반에서 복잡한 GObject 같은 걸 가지고 객체 지향 프로그래밍을 할려고 애쓰냐고 물어본다면,  
+&lt;a href=&#34;http://www.tux.org/lkml/#s15-3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 메일링 리스트 FAQ&lt;/a&gt;
+에 있는 유명한 다음 구절을 해석해서 미소지으며 알려주시기 바랍니다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;What&amp;rsquo;s important about object-oriented programming is the techniques, not the languages used.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;뭐, 모든 도구는 필요한 곳이 반드시 있으니까 계속 존재합니다. 다만 내가 아직 그 쓰임새를 알지 못할 뿐이죠&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Vala 언어 소개</title>
+      <link>/2011/06/15/2011-06-15-vala-language-introduction/</link>
+      <pubDate>Wed, 15 Jun 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/06/15/2011-06-15-vala-language-introduction/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;https://live.gnome.org/Vala&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Vala&lt;/a&gt;
+ 언어는 C# 언어와 문법이 비슷한 객체 지향 언어입니다. Vala 언어로 작성한 소스를 이용해 실행 파일을 직접 만들 수도 있지만 C 소스 코드로 변환할 수도 있는데, 더 정확히 말하면, GObject 프레임워크를 이용하는 순수 GLib 기반 C 언어 코드를 생성한 뒤 이를 다시 C 컴파일를 이용해 실행 파일을 생성합니다. 따라서 이렇게 생성된 C 소스 코드는 이론적으로 GLib 라이브러리가 포팅된 어떤 플랫폼에서든 동작할 수 있고, 실행 속도 역시 C 언어로 작성된 코드와 거의 동일한 성능을 보여 줍니다. 생성된 소스 코드나 라이브러리는 GLib 외의 다른 라이브러리 의존성이 없기 때문에(posix 프로파일을 사용하면 GLib 의존성도 없어짐) 당연히 다른 C 언어에서도 이용할 수 있고, 반대로 C 언어로 개발된 라이브러리를 별다른 바인딩 코드 없이 VAPI 기법을 통해 사용할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;요즘 GNOME 프로젝트 개발 흐름을 보면 크게 두 가지 언어, JavaScript와 Vala가 대두되고 있는데, GUI 같은 상위 제어 모듈은 JavaScript로 구현하고, 성능이 중요한 하위 모듈은 C + Vala로 구현한 뒤 이를 하나의 프로그램에서 합쳐서 성능과 개발 효율을 동시에 얻고자 하는 것 같습니다.&lt;/p&gt;
+&lt;p&gt;사실, GObject 프레임워크가 좋긴 하지만, 여러 고수준 언어에서 사용할 때와는 달리 C 언어에서 사용하려면 어려움이 많아서 비판을 많이 받습니다. Vala 언어는, 말하자면, 이러한 반복되는 코드 재작성(boilerplate code)과 자잘한 코딩을 획기적으로 줄여주면서 C 언어로 GObject 객체 지향 프로그램을 할 수 있도록 도와주는 역할을 하는 겁니다. C++의 복잡함은 싫고, 인터프리터 언어의 느림은 견디기 힘들고&amp;hellip; 결국 목마른 사람들이 직접 우물을 판 셈입니다.&lt;/p&gt;
+&lt;p&gt;그렇다고 Vala 언어는 비단 GTK+ / Clutter 기반 GUI 프로그램을 개발하는데만 사용되지 않고, 서버 데몬[
+&lt;a href=&#34;http://www.freedesktop.org/wiki/Software/systemd&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;systemd&lt;/a&gt;
+] 같은 콘솔 프로그램 개발에도 사용합니다. 이미 
+&lt;a href=&#34;http://live.gnome.org/Vala/Documentation#Projects_Developed_in_Vala&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;수많은 프로그램이 Vala를 이용해 개발&lt;/a&gt;
+되었는데, C 언어로 개발되었던 기존 프로그램을 Vala 언어로 다시 작성한 것[
+&lt;a href=&#34;http://live.gnome.org/Cheese&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Cheese&lt;/a&gt;
+]도 눈에 띕니다.&lt;/p&gt;
+&lt;p&gt;그러나, Vala 언어의 단점이라면, C 언어 부류인 C#과 문법이 비슷하긴 하지만, 무엇보다도 새 언어를 익혀야 한다는 점, 그리고 GLib / GObject 개념에 익숙하지 않을 경우 익히는데 조금 더 시간과 노력이 필요하다는 점입니다. 물론, 오픈 소스 리눅스 개발자 커뮤니티에서 개발되어, 아직은, 그 안에서만 사용하는 마이너 언어라는 한계 때문에, 즉 상용 벤더의 지원이나 Visual Studio, XCode 등과 같은 완벽한 통합 개발 환경도 없기 때문에, 많은 개발자를 끌어당길 매력이 부족한 것도 사실입니다. 하지만 한편으로는, 오픈 소스이기 때문에 오히려 미래가 더 투명한게 아닐까 하는 생각도 듭니다.&lt;/p&gt;
+&lt;p&gt;아무튼, Vala 언어에 대해 더 관심이 생기는 분은 
+&lt;a href=&#34;http://live.gnome.org/Vala/Documentation&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;소개, FAQ, 튜토리얼 문서&lt;/a&gt;
+ 등을 한 번 훑어보시길 바랍니다. 샘플 코드도 많고, 튜토리얼도 참 많습니다. 아마 C++ / C# / Java / Python 등과 같은 객체 지향 언어에 익숙한 개발자라면 생각보다 어렵지 않다는 사실을 알게 될 겁니다. 더불어, Vala 컴파일러가 생성한 C 소스 코드를 한 번 확인해 보시면, 객체 지향 개념을 이런 식으로 코딩하고 구현할 수도 있구나 하는, 결국 중요한 건 개발자의 능력이지, 사용하는 언어나 개발도구가 전부가 아니란 것도 느끼게 됩니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GUDev 사용하기</title>
+      <link>/2011/03/07/2011-03-07-using-gudev/</link>
+      <pubDate>Mon, 07 Mar 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/03/07/2011-03-07-using-gudev/</guid>
+      <description>&lt;p&gt;이제는 리눅스 데스크탑 뿐 아니라 임베디드 시스템에서도 당연하게 사용하는 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Udev&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;udev&lt;/a&gt;
+ 시스템은 단순히 장치 파일을 자동으로 생성해 주는 역할 뿐 아니라 여러 핫플러그(hot-plug) 방식 장치를 감지하는데도 유용하게 사용됩니다. 비단 키보드, 마우스 같은 입력 장치 뿐 아니라 USB 플래시, SATA / IDE / SCSI 하드디스크, CD-RW 등과 같은 저장장치가 삽입되었거나 제거되었을 경우 쉽게 감지할 수 있게 도와줍니다.&lt;/p&gt;
+&lt;p&gt;이러한 udev 서브 시스템의 혜택을 개발자가 얻기 위해 많은 방법이 존재하지만, 이 글에서는 GLib 메인루프 기반으로 동작하는 
+&lt;a href=&#34;http://www.kernel.org/pub/linux/utils/kernel/hotplug/gudev/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GUDev&lt;/a&gt;
+ 라이브러리를 이용하는 법을 설명합니다. GLib 라이브러리를 사용하지 않을 경우 직접 
+&lt;a href=&#34;http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libudev&lt;/a&gt;
+ 라이브러리를 사용해도 되지만, 기본 개념만 파악하면 쉽게 어떤 라이브러리를 사용해도 상관없기 때문에 인터페이스가 더 편하고 직관적인 GUDev 라이브러리를 사용합니다. 참고로, 이 글은 &amp;ldquo;
+&lt;a href=&#34;http://www.signal11.us/oss/udev/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libudev and Sysfs Tutorial&lt;/a&gt;
+﻿&amp;rdquo; 글과 &amp;ldquo;
+&lt;a href=&#34;http://www.piware.de/2010/06/gudev-vala-bindings/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gudev Vala bindings&lt;/a&gt;
+&amp;rdquo; 글을 참고했습니다.&lt;/p&gt;
+&lt;p&gt;먼저 라이브러리를 설치하려면 우분투에서는 &lt;code&gt;libgudev-1.0-dev&lt;/code&gt; 패키지, 아치리눅스에서는 &lt;code&gt;udev&lt;/code&gt; 패키지를 설치하면 됩니다. (여담이지만, 아치리눅스는 개발에 필요한 헤더파일과 라이브러리가 별도 패키지로 분리되어 있는 경우가 별로 없는 것 같습니다)&lt;/p&gt;
+&lt;p&gt;다음 소스 코드는 현재 시스템에 장착된 모든 블럭 장치(block)를 보여주고, 이후 USB 플래시가 삽입되거나 제거되었을때 이를 감지하여 표시하도록 한 소스 코드입니다.(&lt;code&gt;gudev.c&lt;/code&gt;)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;gudev/gudev.h&amp;gt;
+
+static void
+print_device (GUdevDevice *device)
+{
+  const gchar * const *symlinks;
+
+  g_print (&amp;quot;  subsystem       : %sn&amp;quot;
+           &amp;quot;  devtype         : %sn&amp;quot;
+           &amp;quot;  name            : %sn&amp;quot;
+           &amp;quot;  number          : %sn&amp;quot;
+           &amp;quot;  sysfs_path      : %sn&amp;quot;
+           &amp;quot;  driver          : %sn&amp;quot;
+           &amp;quot;  action          : %sn&amp;quot;
+           &amp;quot;  seqnum          : %lldn&amp;quot;
+           &amp;quot;  device_type     : %dn&amp;quot;
+           &amp;quot;  device_number   : %dn&amp;quot;
+           &amp;quot;  device_file     : %sn&amp;quot;
+           &amp;quot;n&amp;quot;,
+           g_udev_device_get_subsystem (device),
+           g_udev_device_get_devtype (device),
+           g_udev_device_get_name (device),
+           g_udev_device_get_number (device),
+           g_udev_device_get_sysfs_path (device),
+           g_udev_device_get_driver (device),
+           g_udev_device_get_action (device),
+           g_udev_device_get_seqnum (device),
+           g_udev_device_get_device_type (device),
+           g_udev_device_get_device_number (device),
+           g_udev_device_get_device_file (device));
+}
+
+static void
+uevented (GUdevClient *client,
+          gchar       *action,
+          GUdevDevice *device,
+          gpointer     user_data)
+{
+  g_print (&amp;quot;[action:%s]n&amp;quot;, action);
+  print_device (device);
+}
+
+static void
+print_block_device (gpointer data,
+                    gpointer user_data)
+{
+  GUdevDevice *device = data;
+
+  print_device (device);
+  g_object_unref (device);
+}
+
+static void
+print_block_devices (GUdevClient *client)
+{
+  GList *devices;
+
+  devices = g_udev_client_query_by_subsystem (client, &amp;quot;block&amp;quot;);
+  if (devices)
+  {
+    g_print (&amp;quot;[block devices]n&amp;quot;);
+    g_list_foreach (devices, print_block_device, NULL);
+    g_list_free (devices);
+  }
+}
+
+int
+main (int    argc,
+      char **argv)
+{
+  const gchar *subsystems[4] =
+    { &amp;quot;usb/usb_interface&amp;quot;, &amp;quot;scsi/scsi_device&amp;quot;, &amp;quot;block&amp;quot;, NULL };
+  GUdevClient *client;
+  GMainLoop   *main_loop;
+
+  g_type_init ();
+  main_loop = g_main_loop_new (NULL, FALSE);
+
+  client = g_udev_client_new (subsystems);
+  g_signal_connect (client, &amp;quot;uevent&amp;quot;, G_CALLBACK (uevented), NULL);
+
+  print_block_devices (client);
+
+  g_main_loop_run (main_loop);
+  g_object_unref (client);
+
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;컴파일 하려면 다음과 같이 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ gcc -o gudev gudev.c `pkg-config --cflags --libs gudev-1.0`
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;소스 코드를 간단하게 설명하면, 제일 먼저 &lt;code&gt;g_udev_client_new()&lt;/code&gt; 함수를 이용해 &lt;code&gt;GUdevClient&lt;/code&gt; 객체를 생성합니다. 이때 넘겨주는 인수는 변화를 감지하고 싶은 서브 시스템 목록인데, 여기서는 모든 블럭 장치와 USB, SCSI 서브 시스템을 지정했습니다.(SCSI는 실제로 모든 종류의 하드디스크를 의미하기도 합니다) 만일 &lt;code&gt;NULL&lt;/code&gt;을 지정하면 변화 감지 기능을 사용하지 않고 그냥 질의(query) 계열 API만 사용할 수 있으며, 비어있는 목록을 넘겨주면 시스템의 모든 서브시스템의 장치 변화를 감지해서 시그널로 알려줍니다. 참고로 매뉴얼에는 클라이언트를 생성한 쓰레드의 메인루프를 사용하여 감지 루틴이 실행된다고 하니, 만일 별도 쓰레드에서 이 감지 작업을 수행하려면 쓰레드를 먼저 만들고 그 쓰레드 안에서 생성해야 합니다. 이 예제에서는 테스트를 위해 기본 메인 루프를 사용하고 있습니다.&lt;/p&gt;
+&lt;p&gt;직접 장치 목록을 질의(query)하거나 시그널이 발생했을 경우 넘겨받는 &lt;code&gt;GUdevDevice&lt;/code&gt; 객체와 &lt;code&gt;g_udev_device_get_*()&lt;/code&gt; 계열 API를 이용하면 장치의 세부 정보를 얻을 수 있습니다. 위 예제에서는 udev / sysfs 관련 속성 등은 출력하지 않고 있지만, 필요하다면 더 자세한 정보를 얻을 수 있습니다.&lt;/p&gt;
+&lt;p&gt;실행하면 대략 다음과 같이 출력됩니다. (당연히 실행 환경에 따라 결과가 다릅니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ ./gudev
+[block devices]
+  subsystem       : block
+  devtype         : disk
+  name            : sda
+  number          : (null)
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda
+  driver          : (null)
+  action          : (null)
+  seqnum          : 0
+  device_type     : 98
+  device_number   : 2048
+  device_file     : /dev/sda
+
+  subsystem       : block
+  devtype         : partition
+  name            : sda1
+  number          : 1
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda/sda1
+  driver          : (null)
+  action          : (null)
+  seqnum          : 0
+  device_type     : 98
+  device_number   : 2049
+  device_file     : /dev/sda1
+
+  subsystem       : block
+  devtype         : disk
+  name            : sr0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1f.2/host5/target5:0:0/5:0:0:0/block/sr0
+  driver          : (null)
+  action          : (null)
+  seqnum          : 0
+  device_type     : 98
+  device_number   : 2816
+  device_file     : /dev/sr0
+
+위 출력에서는 일반 디스크 장치(`/dev/sda`)와 디스크 파티션(`/dev/sda1`), DVD-RW 장치(`/dev/sr0`)가 있음을 보여줍니다. 여기서 만일 일반 USB 플래시 메모리를 삽입하면 다음과 같은 결과가 출력됩니다.
+
+[action:add]
+  subsystem       : usb
+  devtype         : usb_interface
+  name            : 2-3:1.0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0
+  driver          : usb-storage
+  action          : add
+  seqnum          : 1934
+  device_type     : 0
+  device_number   : 0
+  device_file     : (null)
+
+[action:add]
+  subsystem       : scsi
+  devtype         : scsi_device
+  name            : 17:0:0:0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host17/target17:0:0/17:0:0:0
+  driver          : sd
+  action          : add
+  seqnum          : 1938
+  device_type     : 0
+  device_number   : 0
+  device_file     : (null)
+
+[action:change]
+  subsystem       : scsi
+  devtype         : scsi_device
+  name            : 17:0:0:0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host17/target17:0:0/17:0:0:0
+  driver          : sd
+  action          : change
+  seqnum          : 1944
+  device_type     : 0
+  device_number   : 0
+  device_file     : (null)
+
+[action:add]
+  subsystem       : block
+  devtype         : disk
+  name            : sdc
+  number          : (null)
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host17/target17:0:0/17:0:0:0/block/sdc
+  driver          : (null)
+  action          : add
+  seqnum          : 1945
+  device_type     : 98
+  device_number   : 2080
+  device_file     : /dev/sdc
+
+[action:add]
+  subsystem       : block
+  devtype         : partition
+  name            : sdc1
+  number          : 1
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host17/target17:0:0/17:0:0:0/block/sdc/sdc1
+  driver          : (null)
+  action          : add
+  seqnum          : 1946
+  device_type     : 98
+  device_number   : 2081
+  device_file     : /dev/sdc1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 예제 소스 코드에서 감시하기 위해 지정한 서브 시스템 모두의 변화를 보여주다보니 복잡해 보이지만, 결국 USB 플래시 메모리가 USB / SCSI / BLOCK 서브시스템에 모두 정상적으로 감지되는 걸 확인할 수 있습니다. 다시 장치를 제거하면 다음과 같이 출력됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;[action:remove]
+  subsystem       : block
+  devtype         : disk
+  name            : sdc
+  number          : (null)
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host16/target16:0:0/16:0:0:0/block/sdc
+  driver          : (null)
+  action          : remove
+  seqnum          : 1926
+  device_type     : 0
+  device_number   : 2080
+  device_file     : /dev/sdc
+
+[action:remove]
+  subsystem       : scsi
+  devtype         : scsi_device
+  name            : 16:0:0:0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host16/target16:0:0/16:0:0:0
+  driver          : (null)
+  action          : remove
+  seqnum          : 1927
+  device_type     : 0
+  device_number   : 0
+  device_file     : (null)
+
+[action:remove]
+  subsystem       : usb
+  devtype         : usb_interface
+  name            : 2-3:1.0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0
+  driver          : (null)
+  action          : remove
+  seqnum          : 1931
+  device_type     : 0
+  device_number   : 0
+  device_file     : (null)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 정보를 실제로 어떻게 활용할지는 이제 어플리케이션에게 달린 몫입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GLib 2.26.0 출시</title>
+      <link>/2010/10/02/2010-10-02-glib-2-26-0-release/</link>
+      <pubDate>Sat, 02 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/10/02/2010-10-02-glib-2-26-0-release/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-list/2010-September/msg00083.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib 2.26.0 안정버전&lt;/a&gt;
+이 출시되었습니다. 한동안 개인적으로 관심있는 업데이트가 없어서 정리를 안 했는데, 이번 업데이트는 흥미로운 기능이 매우 많이 추가되어 있어 관심을 가질 수 밖에 없을 것 같습니다.&lt;/p&gt;
+&lt;p&gt;전반적으로 2011년 4월 예정인 
+&lt;a href=&#34;http://live.gnome.org/ThreePointZero&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 3&lt;/a&gt;
+ 환경을 목표로 계속 개발중인 
+&lt;a href=&#34;http://live.gnome.org/GTK&amp;#43;/3.0&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 3.0&lt;/a&gt;
+에 초점이 맞추어 있는 듯 싶더니, 굵직한 기능들을 이번 GTK+, GLib 안정버전에 미리 많이 포함했다는 느낌을 받습니다. 다른 말로 표현하면, 기존에 여러 라이브러리를 사용해야 했던 데스크탑 어플리케이션 기본(?) 기능들을, 마치 QT 라이브러리처럼, GLib 라이브러리 하나에 통합하고 있는 듯한 느낌입니다. 물론 이로 인해 멀티플랫폼 라이브러리 색깔은 조금 옅어질 것 같지만, 어차피 리눅스 / 유닉스 특화적인 기능은 GIO 모듈로 분리되어 있기 때문에 GIO 라이브러리 사용만 조심한다면, C++ 언어에서 STL, Boost 라이브러리 등과 같이 C 프로그래머를 편하게 해 주는 멀티 플랫폼 &amp;ldquo;기본&amp;rdquo; C 라이브러리 역할을 하는데는 여전히 문제가 없을 것으로 생각됩니다.&lt;/p&gt;
+&lt;p&gt;glib 모듈에서 가장 눈에 띄는 기능은 단연 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-GDateTime.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;GDateTime&lt;/code&gt;&lt;/a&gt;
+ API입니다. 지금까지 GLib 라이브러리를 사용하면서 제일 아쉬웠던 부분 중 하나인데, 날짜와 매우 기초적인 초(seconds) 정보만 다루는 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Date-and-Time-Functions.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;GDate&lt;/code&gt;&lt;/a&gt;
+ API만 있어서 매번 시 / 분 / 초를 표현하는 자료구조와 API를 만들어 사용했던 번거로움이 사라질 것 같습니다.&lt;/p&gt;
+&lt;p&gt;gobject 모듈에는 
+&lt;a href=&#34;/2009/04/20/gobject-property-binding-required/&#34;&gt;제가 무척이나 아쉬워했던&lt;/a&gt;
+ 객체 속성 바인딩 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/GBinding.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;GBinding&lt;/code&gt;&lt;/a&gt;
+ 기능이 추가되었습니다. 사용법은 이전에 제가 소개했던 
+&lt;a href=&#34;/2008/12/15/exobinding/&#34;&gt;&lt;code&gt;ExoBinding&lt;/code&gt;&lt;/a&gt;
+과 거의 비슷하고, 내부 구현도 거의 유사합니다. 더불어 트리모델이나 객체 속성으로 기존 구조체를 사용하기 위해 매번 GBoxed 타입을 구현했는데, 이를 쉽게 해주는 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Type-Information.html#G-DEFINE-BOXED-TYPE:CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;G_DEFINE_BOXED_TYPE()&lt;/code&gt;&lt;/a&gt;
+, 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Type-Information.html#G-DEFINE-POINTER-TYPE:CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;G_DEFINE_POINTER_TYPE()&lt;/code&gt;&lt;/a&gt;
+ 등과 같은 매크로도 추가되었습니다.&lt;/p&gt;
+&lt;p&gt;gio 모듈에는 이번 릴리스의 핵심 기능들이 추가되었습니다. 첫번째는 더 이상 리눅스 기본시스템 버스인 
+&lt;a href=&#34;http://www.freedesktop.org/wiki/Software/dbus&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;DBus&lt;/a&gt;
+에 접근하기 위해 별도의 라이브러리가 필요없도록 
+&lt;a href=&#34;http://library.gnome.org/devel/gio/stable/gdbus-lowlevel.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;GDBus&lt;/code&gt;&lt;/a&gt;
+ API가 추가되었습니다.(간단한 
+&lt;a href=&#34;http://library.gnome.org/devel/gio/stable/ch27.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;튜토리얼 가이드&lt;/a&gt;
+도 있습니다) 두번째 기능은 
+&lt;a href=&#34;http://library.gnome.org/devel/gio/stable/GSettings.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;GSettings&lt;/code&gt;&lt;/a&gt;
+ API인데, GNOME 3부터 현재 
+&lt;a href=&#34;http://projects.gnome.org/gconf/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;GConf&lt;/code&gt;&lt;/a&gt;
+ 설정 기능을 대체할 
+&lt;a href=&#34;http://live.gnome.org/dconf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;dconf&lt;/a&gt;
+ 기능과 연동되어 사용될 것으로 보입니다.(
+&lt;a href=&#34;http://library.gnome.org/devel/gio/stable/ch26.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;ldquo;GConf에서 GSettings로 이전하기&amp;rdquo;&lt;/a&gt;
+ 가이드도 참고하시면 좋을 것 같습니다)&lt;/p&gt;
+&lt;p&gt;이외에도 물론 많은 API가 추가되었으므로, 관련 있으신 분들은 반드시 각 모듈 참고 매뉴얼 마지막의 2.26 버전에서 새로 추가된 API 목록을 확인해 보시기 바랍니다. 참고로, 지금까지 설명한 GLib 변경사항은 
+&lt;a href=&#34;http://library.gnome.org/misc/release-notes/2.32/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 2.32&lt;/a&gt;
+ 버전에 이미 포함되어 있기 때문에 앞으로 출시되는 대부분의 배포판(Ubuntu 10.10 포함)에 기본적으로 탑재됩니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GObject 속성 직렬화(Serialization)하기</title>
+      <link>/2010/04/07/2010-04-07-serialize-gobject-properties/</link>
+      <pubDate>Wed, 07 Apr 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/04/07/2010-04-07-serialize-gobject-properties/</guid>
+      <description>&lt;p&gt;GObject 객체의 속성(properties)을 자동으로 저장하고 다시 자동으로 불러들이는 일련의 작업을 자동화할 수 있다면 편하지 않을까 생각해 본 적이 있을겁니다. 이러한 과정을 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Serialization&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;직렬화(serialization)&lt;/a&gt;
+라고 부른다면, 오브젝티브-C, 자바 등과 같은 많은 언어가 이미 기본적으로 직렬화를 지원하거나 관련 라이브러리를 제공하고 있는만큼, GObject 객체 직렬화 라이브러리가 없을리가 없습니다. 예를 들어, 
+&lt;a href=&#34;http://live.gnome.org/JsonGlib&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;JSON-GLib&lt;/a&gt;
+, 
+&lt;a href=&#34;http://git.dronelabs.com/catalina/about&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Catalina&lt;/a&gt;
+ 등과 같은 라이브러리를 사용하면 됩니다.&lt;/p&gt;
+&lt;p&gt;그런데, 여기서 드는 의문은, 왜 GObject 라이브러리 자체에는 정작 이 기능이 없을까입니다. 그리고, 잠깐 생각해보고 내린 결론은, 특정한 형식을 제한하기보다는, 직렬화를 위한 기본 기능만 지원하고, 어플리케이션 특성에 맞게 직렬화는 프로그래머의 자유에 맡긴게 아닌가 합니다. 위에서 언급한 라이브러리도 기능은 강력하지만, 특정 용도에서 사용하기 위해 만들어지다 보니 불필요하거나 어려운 부분이 조금 있습니다.&lt;/p&gt;
+&lt;p&gt;그래서 이 글에서는 
+&lt;a href=&#34;/2009/08/24/oop-with-gobject-4/&#34;&gt;이전 글&lt;/a&gt;
+에서 잠깐 언급한 객체 속성 정보 얻는 방법을 이용하여 간단한 GObject 속성 직렬화 코드를 구현하는데 필요한 몇 가지 기법을 소개하려고 합니다. 실제 직렬화 기능은 용도와 방식에 맞게 구현하면 되리라 생각합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;직렬화 대상 속성 지정하기&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;직렬화하려는 속성을 매번 지정하는 것보다 객체 설계시 아예 지정해버릴 수 있는 방법이 있으면 자동화에 편합니다. 이때 사용할 수 있는 기법이 &lt;code&gt;G_PARAM_USER_SHIFT&lt;/code&gt; 매크로입니다. 객체 클래스 초기화 함수에서 속성을 추가(install)할때 보통 &lt;code&gt;G_PARAM_READABLE&lt;/code&gt;, &lt;code&gt;G_PARAM_READWRITE&lt;/code&gt; 등과 같은 미리 정의되어 있는 특성을 지정하는데, &lt;code&gt;G_PARAM_USER_SHIFT&lt;/code&gt; 매크로를 이용해 사용자가 임의의 특성을 더 추가할 수 있습니다. 예를 들어 다음과 같이 정의하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define G_PARAM_SERIALIZABLE (1 &amp;lt;&amp;lt; (G_PARAM_USER_SHIFT + 1))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제, 속성 스팩을 만들때(&lt;code&gt;g_param_spec_*()&lt;/code&gt;)  &lt;code&gt;G_PARAM_SERIALIZABLE&lt;/code&gt; 플래그를 함께 지정할 수 있습니다. 예를 들면 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;pspec = g_param_spec_int (&amp;quot;id&amp;quot;,
+                          &amp;quot;ID&amp;quot;,
+                          &amp;quot;unique ID of the device&amp;quot;,
+                          0,
+                          G_MAXINT32,
+                          0,
+                          G_PARAM_READWRITE | G_PARAM_SERIALIZABLE);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;주의할 점은, &lt;code&gt;G_PARAM_USER_SHIFT&lt;/code&gt; 매크로를 응용하는 다른 라이브러리가 있을 수 있으므로 충돌 여부를 확인해야 합니다. 예를 들어 GStreamer 라이브러리의 &lt;code&gt;GST_PARAM_USER_SHIFT&lt;/code&gt; 매크로도 비슷한 역할을 합니다. 따라서 구현하려는 객체가 Gstreamer 객체를 상속받는다면 다른 값을 지정해야 합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;직렬화 대상 속성 목록 얻기&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;g_object_class_list_properties()&lt;/code&gt; 함수를 이용하면 객체 클래스의 모든 속성 목록을 얻을 수 있습니다. 이 함수 프로토타입을 흉내내어 직렬화 대상 속성만 추출하는 함수를 만들면 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;GParamSpec **
+list_serializable_properties (GObject *serializable,
+                              guint   *n_properties)
+{
+  GParamSpec **specs;
+  GParamSpec **new_specs;
+  guint        n_specs;
+  guint        i;
+  guint        total;
+
+  g_return_val_if_fail (G_IS_OBJECT (serializable), NULL);
+
+  specs = g_object_class_list_properties (G_OBJECT_GET_CLASS (serializable), &amp;amp;n_specs);
+  new_specs = g_new0 (GParamSpec *, n_specs + 1);
+  for (i = 0, total = 0; i &amp;lt; n_specs; i++)
+    {
+      GParamSpec *spec = specs[i];
+
+      if (!(spec-&amp;gt;flags &amp;amp; ECC_PARAM_SERIALIZABLE))
+        continue;
+
+      new_specs[total] = spec;
+      total++;
+    }
+  g_free (specs);
+
+  if (n_properties)
+    *n_properties = total;
+
+  return new_specs;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 이 함수가 돌려주는 속성 스펙 목록을 이용해 텍스트 파일이나 데이터베이스, 또는 GConf 등을 이용하여 속성 값을 불러오거나 저장하면 됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;속성값 변환하기&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;하지만 속성은 정수형, 실수형, 문자열 등 여러가지 타입인데 모든 종류의 타입을 하나씩 문자열로 변환해서 저장하는 건 비효율적 과정입니다. 이때 사용할 수 있는 함수가 &lt;code&gt;g_value_transform()&lt;/code&gt;인데, 이 함수는 기본적으로 두 GValue 간 내용을 적절하게(?) 변환해 줍니다. 다음은 이 함수를 이용하여 간단하게 &amp;lsquo;key=value&amp;rdquo; 형식으로 저장한 문자열을 돌려주는 코드입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;gchar *
+serialize_properties (GObject *serializable)
+{
+  GParamSpec **specs;
+  GString     *string;
+  gchar       *str;
+  guint        i;
+
+  g_return_val_if_fail (G_IS_OBJECT (serializable), NULL);
+
+  string = g_string_new (NULL);
+
+  specs = list_properties (serializable, NULL);
+  for (i = 0; specs[i] != NULL; i++)
+    {
+      GParamSpec *spec = specs[i];
+      GValue      value = { 0 };
+      GValue      value_str = { 0 };
+
+      g_value_init (&amp;amp;value, spec-&amp;gt;value_type);
+      g_value_init (&amp;amp;value_str, G_TYPE_STRING);
+      g_object_get_property (G_OBJECT (serializable), spec-&amp;gt;name, &amp;amp;value);
+      if (g_value_transform (&amp;amp;value, &amp;amp;value_str))
+        g_string_append_printf (string,
+                                &amp;quot;%s=%sn&amp;quot;,
+                                spec-&amp;gt;name,
+                                g_value_get_string (&amp;amp;value_str));
+      else
+        g_warning (&amp;quot;failed to transform property &#39;%s&#39; to string&amp;quot;, spec-&amp;gt;name);
+      g_value_unset (&amp;amp;value);
+      g_value_unset (&amp;amp;value_str);
+    }
+  g_free (specs);
+
+  str = string-&amp;gt;str;
+  g_string_free (string, FALSE);
+
+  return str;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그런데 한 가지 문제가 있습니다. &lt;code&gt;g_value_transform()&lt;/code&gt; 함수는 기본적으로 모든 GValue 사이의 변환을 지원하지 않는다는 점입니다. 위에서 예를 든 코드는 C 언어 기본 타입을 문자열로 변환하는데, 다행히도 이 변환은 기본적으로 지원합니다. 하지만, 반대로 문자열에서 다른 타입으로 변환하는 기능은 제한적으로 지원합니다. 그래서 다음과 같이 필요한 변환 함수를 미리 등록해야 합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;static void
+tranform_string_to_int (const GValue *src_value,
+                        GValue       *dest_value)
+{
+  gint64 value;
+
+  value = g_ascii_strtoll (g_value_get_string (src_value), NULL, 10);
+  g_value_set_int (dest_value, value);
+}
+
+static void
+tranform_string_to_boolean (const GValue *src_value,
+                            GValue       *dest_value)
+{
+  gboolean value;
+
+  value = g_ascii_strncasecmp (g_value_get_string (src_value), &amp;quot;TRUE&amp;quot;, 4) == 0 ? TRUE : FALSE;
+  g_value_set_boolean (dest_value, value);
+}
+
+static void
+tranform_string_to_double (const GValue *src_value,
+                           GValue       *dest_value)
+{
+  gdouble value;
+
+  value = g_ascii_strtod (g_value_get_string (src_value), NULL);
+  g_value_set_double (dest_value, value);
+}
+
+static void
+register_transform_funcs (void)
+{
+  struct
+  {
+    GType src_type;
+    GType dest_type;
+    GValueTransform transform_func;
+  } transformers[] =
+  {
+    { G_TYPE_STRING, G_TYPE_INT, tranform_string_to_int },
+    { G_TYPE_STRING, G_TYPE_BOOLEAN, tranform_string_to_boolean },
+    { G_TYPE_STRING, G_TYPE_DOUBLE, tranform_string_to_double }
+  };
+  gint i;
+
+  for (i = 0; i &amp;lt; G_N_ELEMENTS (transformers); i++)
+    if (!g_value_type_transformable (transformers[i].src_type,
+                                     transformers[i].dest_type))
+      g_value_register_transform_func (transformers[i].src_type,
+                                       transformers[i].dest_type,
+                                       transformers[i].transform_func);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;당연히, 속성 타입이 C 언어 기본 타입이 아닐 경우라도 위와 같은 방식으로 변환 함수를 등록해 주면 알아서 동작합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;그외&amp;hellip;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;실제 프로젝트에서는 위와 같은 기능과 몇가지 도우미 API를 지원하는 인터페이스(GInterface) 객체를 정의해서, 각 객체가 그 인터페이스 객체를 구현(implementation)하도록 했습니다. 왜냐하면, 객체의 속성(properties)으로 나타나지 않는 내부 정보도 직렬화할 수 있기 때문입니다. 예를 들어 장치 목록 객체는 여러 장치 객체를 참조합니다. 그래서 장치 목록 객체를 직렬화하는 함수를 호출하면 실제로 장치 목록 객체는 목록에 포함된 장치 객체의 직렬화 함수를 다시 호출해 문자열을 얻어와 조합된 문자열을 돌려줍니다.&lt;/p&gt;
+&lt;p&gt;:)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GLib 테스트 프레임워크 사용하기</title>
+      <link>/2010/02/12/2010-02-12-using-glib-test-framework/</link>
+      <pubDate>Fri, 12 Feb 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/02/12/2010-02-12-using-glib-test-framework/</guid>
+      <description>&lt;p&gt;GLib 라이브러리 2.16 버전부터 지원하는 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;테스트 프레임워크&lt;/a&gt;
+는 C 언어용 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Unit_testing&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;유닛테스트&lt;/a&gt;
+ 도구입니다. 물론 많은 유닛 테스트 도구가 이미 존재하지만, GLib 라이브러리 기반 C 언어 프로그램이라면 굳이 다른 라이브러리를 사용하는 것보다는 이미 지원하는 훌륭한 도구를 사용하는게 더 좋겠지요. 참고로,
+&lt;a href=&#34;http://www.gtk.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+&lt;/a&gt;
+, 
+&lt;a href=&#34;http://clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter&lt;/a&gt;
+ 등 같은 프로젝트도 이미 이 기능을 이용해 테스트 코드를 작성하고 있으므로 알아두면 도움이 됩니다. 모든게 그렇지만, 알고나면 별게 아니므로 기본 개념과 API 사용법만 충실히 이해하면 됩니다.&lt;/p&gt;
+&lt;p&gt;**기본 개념 및 사용법
+**&lt;/p&gt;
+&lt;p&gt;유닛테스트 개념은 스몰토크, 자바, C++처럼 언어적으로 객체지향 개념을 지원하는 언어에서 시작했기 때문에 C 언어에 그대로 적용하기에는 조금 까다로운 점이 많습니다. 그래서 GLib 테스트 프레임워크는 유닛테스트에서 기본 개념과 테스트 실행 방식만 빌려옵니다. 우선 알아야하는 기본 개념은 다음과 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;테스트 케이스 (Test Case) : 가장 기본이 되는 하나의 테스트 단위입니다. GLib에서는 하나의 테스트 함수(function)가 이 역할을 합니다.&lt;/li&gt;
+&lt;li&gt;픽스쳐 (Fixture) : 고정 설치된 물건이라는 뜻처럼, 테스트 케이스 실행 전후에 항상 실행하는 함수를 의미합니다. 실제로는, 테스트 함수를 실행하기 위해 필요한 환경을 미리 구축하거나(setup) 실행 후 리소스를 정리하는(teardown) 함수, 그리고 이와 함께 사용되는 사용자 데이터(data)로 구성됩니다. 참고로, GLib에서는 각 테스트간 의존성을 피하기 위해 모든 테스트 케이스를 실행할때마다 매번 픽스쳐를 새로 구성하는 방식(fresh fixture)을 사용합니다.&lt;/li&gt;
+&lt;li&gt;테스트 슈트 (Test Suite) : 여러 테스트 케이스를 묶은 그룹입니다. 트리 구조처럼 테스트 슈트 여러개를 묶어 더 큰 테스트 슈트를 구성할 수도 있습니다. GLib에서는 테스트 경로(path)라는 개념으로 사용합니다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;개념은 조금 복잡한 것 같지만, 복잡하고 다양한 테스트 케이스를 그룹화하면 나중에 테스트 슈트별로 테스트를 진행할 수도 있는 등 많은 장점이 있습니다. 그리고 GLib이 제공하는 커맨드라인 도구를 이용하면 테스트 결과를 XML로 출력할 수도 있고, HTML 문서로 자동 변환할 수도 있는데 이 경우에도 테스트 슈트를 구성해 두면 많은 도움이 됩니다.&lt;/p&gt;
+&lt;p&gt;물론 GLib은 정교하게 테스트 슈트와 테스트 케이스, 픽스쳐를 구성할 수 있는 많은 API를 제공하지만, 복잡한 과정을 API 호출 하나로 처리할 수 있는 기능도 제공합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;g_test_add_func (&amp;quot;/onvif/nvc-connections&amp;quot;, test_onvif_nvc_connections);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 예제에서 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add-func&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_add_func()&lt;/code&gt;&lt;/a&gt;
+ 함수는 &amp;ldquo;onvif&amp;rdquo; 테스트 슈트 밑에 &amp;ldquo;nvc-connections&amp;rdquo; 이름의 테스트 케이스를 추가합니다. 테스트시 실행할 함수는 사용자가 직접 구현한 &lt;code&gt;test_onvif_nvc_connections()&lt;/code&gt; 함수입니다. &lt;code&gt;g_test_add_func()&lt;/code&gt; 함수가 테스트 슈트를 자동으로 생성해 주기 때문에 별도의 추가 작업이 불필요합니다. 비슷한 기능의 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add-data-func&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_add_data_func()&lt;/code&gt;&lt;/a&gt;
+ 함수는 테스트 함수에 데이터를 전달할 수 있어서, 한 함수로 데이터만 바꿔서 테스트하고자 할때 유용합니다. 하지만, 두 API는 픽스쳐를 지정할 수 없으므로, 픽스쳐를 사용하려면 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_add()&lt;/code&gt;&lt;/a&gt;
+ 함수를 이용해야 합니다.일단, 간단한 예제 코드를 보여드리면 다음과 같습니다. (&amp;quot;
+&lt;a href=&#34;http://blogs.gnome.org/timj/2008/06/24/23062008-writing-unit-tests-with-glib/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Writing Unit Tests with GLib&lt;/a&gt;
+&amp;rdquo; 글에서 발췌했습니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;glib.h&amp;gt;
+
+static void
+simple_test_case (void)
+{
+  /* a suitable test */
+  g_assert (g_bit_storage (1) == 1);
+
+  /* a test with verbose error message */
+  g_assert_cmpint (g_bit_storage (1), ==, 1);
+}
+
+int
+main (int argc, char **argv)
+{
+  /* initialize test program */
+  g_test_init (&amp;amp;argc, &amp;amp;argv, NULL);
+
+  /* hook up your test functions */
+  g_test_add_func (&amp;quot;/Simple Test Case&amp;quot;, simple_test_case);
+
+  /* run tests from the suite */
+  return g_test_run ();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 코드를 &lt;code&gt;g-test-sample1.c&lt;/code&gt; 파일로 저장하고 컴파일 후 실행하면 다음과 같은 결과를 볼 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ gcc -o g-test-sample1 g-test-sample1.c `pkg-config --cflags --libs glib-2.0`
+$ ./g-test-sample1
+/Simple Test Case: OK
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 결과를 재활용하기 위해 XML 형식으로 저장하거나, HTML 문서로 만들고 싶다면 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/gtester.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gtester&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/gtester-report.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gtester-report&lt;/a&gt;
+ 프로그램을 사용하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ gtester -o sample-log.xml g-test-sample1
+TEST: g-test-sample1... (pid=2771)
+PASS: g-test-sample1
+$ gtester-report sample-log.xml &amp;gt; sample-log.html
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위와 같이 실행하여 생성한 HTML 문서 결과는 다음과 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/gtester-report-screenshot.png&#34; alt=&#34;&#34; title=&#34;gtester-report screenshot&#34;&gt;&lt;/p&gt;
+&lt;p&gt;참고로, gtester 프로그램의 인수로 여러 테스트 실행 파일을 한꺼번에 전달하면 모든 테스트 실행 파일의 테스트 슈트가 하나의 결과로 통합됩니다.&lt;/p&gt;
+&lt;p&gt;위 코드에서 사용한 테스트 코드를 보면 제일 먼저 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-init&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_init()&lt;/code&gt;&lt;/a&gt;
+ 함수가 나타납니다. 이 함수는 테스트 기능을 초기화하는데, 리퍼런스 매뉴얼을 보시면 프로그램 실행 인수를 통해 사용자가 여러 테스트 옵션을 지정할 수 있는 걸 알 수 있습니다. 물론 특정 테스트 슈트만 실행하게 하는 옵션도 인수로 지정할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;테스트 함수를 보면 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-assert-cmpint&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_assert_cmpint()&lt;/code&gt;&lt;/a&gt;
+라는 다소 생소한 API가 보이는데, GLib은 테스트 코드를 위해 이와 비슷한 매크로를 더 제공합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define g_assert             (expr)
+#define g_assert_not_reached ()
+#define g_assert_cmpstr      (s1, cmp, s2)
+#define g_assert_cmpint      (n1, cmp, n2)
+#define g_assert_cmpuint     (n1, cmp, n2)
+#define g_assert_cmphex      (n1, cmp, n2)
+#define g_assert_cmpfloat    (n1,cmp,n2)
+#define g_assert_no_error    (err)
+#define g_assert_error       (err, dom, c)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 매크로를 사용하여 테스트 코드를 작성하면 더 친절하고 자세한 에러 메시지를 출력합니다. 예를 들어 다음 코드는,&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;gchar *string = &amp;quot;foo&amp;quot;; g_assert_cmpstr (string, ==, &amp;quot;bar&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이런 메시지를 출력합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;ERROR: assertion failed (string == &amp;quot;bar&amp;quot;): (&amp;quot;foo&amp;quot; ==  &amp;quot;bar&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;물론 기본적으로 실패한 경우에만 메시지를 보여줍니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;그 외 더 많은&amp;hellip;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;지금까지 설명한 기본 기능 외에도 표준출력 / 표준에러 메시지를 표시하지 않도록 한 뒤 이 메시지에서 특정 문자열을 확인한다든가, 항상 동일한 패턴의 난수를 생성하여 이를 테스트에 이용하거나,  테스트에 시간이 얼마나 더 걸리는지 측정할 수도 있습니다. 프로그램을 종료시키는 치명적인 에러가 발생하는 경우도 테스트할 수 있고, 여러가지 테스트 모드(quick / slow / performace 등)를 두어 프로그램 인자를 이용해 원하는 테스트 코드만 실행할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;더 많은 활용 예제가 GLib 자체 테스트 코드에(
+&lt;a href=&#34;http://git.gnome.org/browse/glib/tree/glib/tests/testing.c&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;glib/tests/testing.c&lt;/a&gt;
+) 있으므로, 별로 길지 않으니, 직접 확인해 보시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;프로젝트에 활용하기&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;MVP 개발 모델과 TDD + 유닛테스트 도구를 이용하여 응용 프로그램을 개발하면(
+&lt;a href=&#34;/2008/12/17/presenter-first-development/&#34;&gt;Presenter First 개발&lt;/a&gt;
+) 더 빠르고 쉽게 튼튼한 코드를 만들 수 있으니, 한 번 검토해 보시기 바랍니다. 개발자가 TDD 방법론을 주저하는 이유 중 하나가 테스트 코드까지 만들다 보니 늘어나는 코드량과 늘어나는 개발 시간 때문인데, 테스트 코드를 그대로 실제 코드로 재활용할 수 있다면 얘기가 달라지겠죠.&lt;/p&gt;
+&lt;p&gt;프로젝트 일일빌드시 테스트 루틴도 동작하도록 한뒤 자동으로 테스트 결과를 웹사이트에 게재하는 것도 좋은 개발 습관입니다. 아예 코드 수정 후 저장소에 커밋하면 반드시 모든 테스트 케이스를 통과해야만 커밋되도록 저장소를 설정할 수도 있지만, 엄청난 서버 부하를 야기할 수 있으므로, 테스트 케이스를 통과한 코드만 커밋할 수 있도록 가이드라인을 규정하는 것도 좋습니다.&lt;/p&gt;
+&lt;p&gt;유닛테스트는 특정 객체나 모듈의 모든 API가 항상 정상적으로 동작하는지를 검사하기 위해 사용합니다. 그래서 가장 기본적인 사용법은 공개 함수를 다양한 인수로 호출한 뒤 그 결과값을 확인하는 방식입니다. 하지만 실무에서는 그렇게 단순한(?) 버그만 존재하는게 아니라서, 특정 시나리오나 특정 조건을 만족할 경우에만 버그 현상이 재현되는 경우도 많습니다. 이러한 경우, 버그에 대한 테스트 케이스를 추가하고 이 케이스에 대한 테스트가 통과할때까지 디버깅을 합니다. 이렇게 해두면 동일한 버그가 나중에 재발하는 걸 방지할 수 있습니다. 대부분 회사에서는 버그(이슈)관리시스템을 사용하므로 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-bug&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_bug()&lt;/code&gt;&lt;/a&gt;
+ API를 사용하면 편리합니다.&lt;/p&gt;
+&lt;p&gt;참고로, GTK+ 라이브러리는 GLib 테스트 프레임워크를 기반으로 마우스 버튼 동작이나 키보드 입력을 에뮬레이션하는 기능처럼 
+&lt;a href=&#34;http://library.gnome.org/devel/gtk/stable/gtk-Testing.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GUI 프로그램 테스트용 API&lt;/a&gt;
+를 제공합니다. 더불어 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Xvfb&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Xvfb&lt;/a&gt;
+ 같은 더미 X서버를 이용하면 원격 터미널이나 cron 작업처럼 실제 X서버가 없는 환경에서도 GUI 프로그램 테스트 진행이 가능합니다. 꼭 GTK+ 프로그램이 아니더라도, 폰트 렌더링 루틴이 정확한 그래픽 비트맵을 생성하는지, 특정 항목을 선택하고 특정 행동을 취했을때 정상적으로 문자열이 표시되는지 등도 테스트 케이스로 작성할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;테스트 케이스 실행 방식 및 테스트 코드 위치&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;위 예제처럼 테스트 케이스를 특정 주제별로 나누어 각각의 실행파일로 만들어도 되지만, 테스트 케이스를 초기화하는 부분을 잘 정리하여 테스트 케이스를 여러 모듈로 분리한 뒤,  모든 테스트 케이스를 통째로 하나의 실행파일로 만들어도 됩니다. 이렇게 하면 추가적인 스크립트나 도구의 도움없이도 명령어 한번 실행으로 모든 테스트 케이스를 실행할 수 있기 때문에 더 편리할 수 있습니다. 또는 Clutter 프로젝트처럼 테스트 모듈을 각각 공유라이브러리로 만들어 플러그인처럼 로드해서 실행하는 방법도 있습니다.&lt;/p&gt;
+&lt;p&gt;하지만, 위 방식은 모두 실제 코드와 테스트 코드가 서로 다른 파일에 존재하는 방식입니다. 테스트 코드가 실제 코드와 하나의 파일에 존재한다면 테스트 코드 작성이 더 일상화되고 자연스러워질 수 있습니다. 그러므로, 프로그램 실행 파일 크기가 별로 문제가 되지 않는다면, 또는 릴리스 / 디버그 모드를 분리하여 컴파일하도록 구성된 프로젝트라면,  프로그램에 특정 옵션을 주었을 경우에만 테스트 케이스 실행 모드로 동작하게 하면 됩니다. 물론 특정 테스트 프로그램은 예제로 사용하기 위해 분리할 수도 있겠지만, 모듈이나 객체의 고유 기능만 테스트하는 코드라면 같은 파일에 있는게 더 자연스러울 수 있습니다. 예를 들어 GObject 객체라면, 속성(properties) / 시그널(signal) 이름이 갑자기 변경되었을때 이를 참조하는 모듈이 문제를 일으키지 않도록 하기 위해, &amp;lsquo;validate-properties&amp;rsquo;, &amp;lsquo;validate-signals&amp;rsquo; 등의 테스트 케이스를 추가한뒤 통과하지 못했을 경우 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-message&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_message()&lt;/code&gt;&lt;/a&gt;
+ 등을 이용해 이를 참조하는 모듈을 찾아 수정하라는 강조 메시지를 표시하는 것도 가능합니다. 또한 특정 시그널이 정상적으로 발생하는지, 순서대로 발생하는지 확인할 수 있습니다. 그리고 무엇보다도, 같은 파일에 있으면 내부 자료구조에도 접근할 수 있으므로 내부 로직에 대한 테스트 코드를 작성하는 것도 가능해집니다.&lt;/p&gt;
+&lt;p&gt;따라서 무조건 한 가지 방식만 고집하기보다, 적절하게 필요에 따라 알맞는 방식을 선택하는 것이 중요합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;결론&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;뭐 다른 결론이 있을리 없을만큼 유닛 테스트와 리그레션 테스트(regression test) 등은 이미 소프트웨어 개발 분야 전반에 광범위하게 사용하고 있습니다. 다만, C 언어를 이용해 개발하는 경우 리거시(legacy) 코드가 너무 많거나, 마땅한 테스트 도구를 찾지 못했거나, 여러가지 이유로 도입하지 못하는 경우가 많은데, 함께 잘 극복하고 익숙해져서 더 좋은 방향으로 나아가야 하지 않을까&amp;hellip; 생각해 봅니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>싱글턴(Singleton) GObject 객체 만들기</title>
+      <link>/2010/02/11/2010-02-11-how-to-make-a-gobject-singleton/</link>
+      <pubDate>Thu, 11 Feb 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/02/11/2010-02-11-how-to-make-a-gobject-singleton/</guid>
+      <description>&lt;p&gt;좋은 
+&lt;a href=&#34;http://blogs.gnome.org/xclaesse/2010/02/11/how-to-make-a-gobject-singleton/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;블로그 포스트&lt;/a&gt;
+가 올라왔길래, 우리말로 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;GObject 기반 객체 지향 프로그래밍에서 싱글턴 패턴을 사용하려면 대개 다음과 같은 함수를 추가합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;FooBar*
+foo_bar_get_default (void)
+{
+  static FooBar *self = NULL;
+
+  if (self == NULL)
+    self = foo_bar_new ();
+
+  return self;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;하지만 이렇게 구현할 경우 몇가지 단점이 있는데, 돌려받은 객체를 실수로 해제할 경우 문제를 일으킬 수 있고, 프로그램이 종료할때까지 객체가 소멸되지 않아 메모리 누수가 발생할 수 있습니다. 또한 사용자가 &lt;code&gt;g_object_new(FOO_TYPE_BAR, NULL)&lt;/code&gt; 방식으로 객체를 생성하면 결국 새 객체가 만들어지기 때문에 싱글턴 객체로 동작하지 않습니다.&lt;/p&gt;
+&lt;p&gt;그래서, 
+&lt;a href=&#34;http://live.gnome.org/Empathy&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Empathy&lt;/a&gt;
+ 프로젝트에서는 다음과 같이 싱글턴 객체를 구현하고 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;static GObject*
+constructor (GType type,
+             guint n_construct_params,
+             GObjectConstructParam *construct_params)
+{
+  static GObject *self = NULL;
+
+  if (self == NULL)
+    {
+      self = G_OBJECT_CLASS (foo_bar_parent_class)-&amp;gt;constructor (
+        type, n_construct_params, construct_params);
+      g_object_add_weak_pointer (self, (gpointer) &amp;amp;self);
+      return self;
+    }
+
+  return g_object_ref (self);
+}
+
+static void
+foo_bar_class_init (FooBarClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class-&amp;gt;constructor = constructor;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 방식을 이용하면 &lt;code&gt;g_object_new()&lt;/code&gt;를 이용해 객체를 만들어도 항상 동일한 객체를 돌려줍니다. 더불어 객체의 참조카운터를 증가해서 돌려주기 때문에, 일반 객체처럼, 사용이 끝나면 &lt;code&gt;g_object_unref()&lt;/code&gt;를 호출해 객체를 해제하면 됩니다. 물론 마지막 사용이 끝나는 시점에서는 자동으로 객체가 소멸되고 객체 포인터도 NULL값으로 초기화됩니다.(
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-add-weak-pointer&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_object_add_weak_pointer()&lt;/a&gt;
+ 함수가 이 역할을 합니다)&lt;/p&gt;
+&lt;p&gt;물론 빈번한 객체 생성 / 소멸 호출을 막기 위해 프로그램 전반적으로 객체를 유지하든, 필요한 때만 생성해서 사용하도록 할 지 여부는 이 객체를 사용하는 프로그램이 선택할 수 있습니다. 따라서 라이브러리 코드를 작성할 경우 반드시 이 방식으로 싱글턴 객체를 제공하는게 좋습니다.&lt;/p&gt;
+&lt;p&gt;참고로, 위 구현은 멀티쓰레드가 동시에 접근하는 경우 안전하지 않습니다. 그러므로, 필요하다면, 뮤텍스나 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Threads.html#g-once&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_once()&lt;/a&gt;
+ 등을 이용해 객체 포인터를 보호해야 합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GLib 2.22.0 출시</title>
+      <link>/2009/09/24/2009-09-24-glib-2-22-0-release/</link>
+      <pubDate>Thu, 24 Sep 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/09/24/2009-09-24-glib-2-22-0-release/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-September/msg00053.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib 2.22.0 안정버전 출시 소식&lt;/a&gt;
+이 도착했습니다. 물론 
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-September/msg00054.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 2.18.0 버전도 함께 출시&lt;/a&gt;
+되었지만 이 포스트에서는 일단 GLib에 대한 내용만 다루고, GTK+ 변경사항은 다른 포스트에서 정리할 예정입니다. 물론 그대로 우리말로 옮기는 건 지루하고 재미없는 작업이라, 한두가지 눈에 띄는 것만 정리합니다.&lt;/p&gt;
+&lt;p&gt;제일 먼저 눈에 띄는 추가 사항은, 
+&lt;a href=&#34;/2009/09/21/using-glib-mainloop/&#34;&gt;이전 포스트&lt;/a&gt;
+에서 언급했던 GMainContext 객체를 쓰레드별로 자동 관리해주는 API가 추가되었다는 점입니다. 새로 추가된 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#g-main-context-get-thread-default&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_main_context_get_thread_default ()&lt;/a&gt;
+ 함수는 쓰레드별 GMainContext 객체를 돌려주는데, 이 객체는 자동으로 생성되는 건 아니고, 쓰레드가 생성되자마자 바로 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#g-main-context-push-thread-default&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_main_context_push_thread_default ()&lt;/a&gt;
+ 함수를 이용해 등록해야 합니다. 그럼 별로 달라지는 게 없는 게 아니냐고 생각할 수도 있지만, 일단 이 API를 사용하면 쓰레드별 컨텍스트 객체나 메인루프 객체를 프로그래머가 관리해야하는 수고를 조금 덜어줍니다. 하지만 그보다 더 좋은 예는, 어떤 작업을 처리하는 비동기 호출 함수가 여러 쓰레드에서 호출될 수 있을때,  하지만 비동기 작업 자체는 호출한 쓰레드의 메인 루프에서 실행되기를 원한다면, 그 함수에서는 그저 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#g-main-context-get-thread-default&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_main_context_get_thread_default ()&lt;/a&gt;
+ 함수가 돌려주는 컨텍스트에 원하는 소스를 추가하기만 하면 되므로 코드가 상당히 간결하고 명료해집니다. 동일한 작업의 효율을 위해 비동기 방식으로 복수 쓰레드에 분산시키는 구조로 설계된 코드라면 특히 더 편해질 수 있습니다. (참고로 이번 버전의 GIO 모듈을 구현하는데 많이 사용하고 있습니다. 아마도 그쪽을 구현하다 보니 필요해져서 새로 추가된 API가 아닐까 추측해봅니다)&lt;/p&gt;
+&lt;p&gt;그리고 위 내용을 포함한 몇몇 객체에 대한 참조 카운터 지원과 소소한 변경사항을 제외하면, 이번 릴리스는 대부분 GIO 모듈에 대한 기능 추가가 대부분인 것 같습니다. 특히 엄청나게 많은 네트워크 관련 API가 새로 추가되었는데, IP 주소와 유닉스 도메인 소켓 주소 관리,  비동기 방식으로 도메인 이름에 대한 주소를 얻어오거나 혹은 반대로 주소에 대한 도메인 이름을 얻어오기, 일반적인 소켓 / 유닉스 도메인 소켓 API 지원 등은 놀라울 따름입니다. 만일 리눅스 뿐 아니라 GLib 라이브러리가 동작하는 모든 플랫폼에서 문제없이 동작한다면, 향후 개발하는 네트워크 관련 프로젝트에서 이 API를 적극 이용할 용의가 있음도 물론입니다. 다만, GLib 라이브러리 기본 모듈이 아닌 GIO 모듈에 추가되었다는 점이 큰 아쉬움이긴 하지만&amp;hellip; ( GLib 라이브러리에는 고작 문자열이 IPv4 또는 IPv6 주소 형식인지 검사해주는 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Hostname-Utilities.html#g-hostname-is-ip-address&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_hostname_is_ip_address ()&lt;/a&gt;
+ 등과 같은 함수들만 몇 개 추가되었을 뿐이니&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;아무튼, 별로 내용이 길지 않은 릴리스 원문과 더불어 각 모듈별 매뉴얼 목차 마지막에 있는 `Index of new symbols in 2.22&amp;rsquo; 페이지도 꼭 확인하시기 바랍니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GLib 메인루프 이용하기</title>
+      <link>/2009/09/21/2009-09-21-using-glib-mainloop/</link>
+      <pubDate>Mon, 21 Sep 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/09/21/2009-09-21-using-glib-mainloop/</guid>
+      <description>&lt;p&gt;GLib API를 이용한 멀티쓰레드 프로그래밍에서 비동기 메시지 큐를 이용하는 방법은 지난 
+&lt;a href=&#34;/2008/08/06/glib-thread-programming/&#34;&gt;포스트&lt;/a&gt;
+에서 설명한 적이 있는데, 이번에는 
+&lt;a href=&#34;/2009/09/17/glib-mainloop-vs-libdispatch-of-apple-gcd/&#34;&gt;애플 GCD의 libdispatch와 비교되는 GLib의 메인루프&lt;/a&gt;
+를 이용하는 방법을 정리해 보았습니다. 이 방법은 어떤 관점에서 보면 더 쉽고, 이미 많은 기능이 기본적으로 지원되기 때문에 몇몇 경우를 제외하면 더 좋은 방법입니다. 다만 API 사용법을 이해하기가 처음에 조금 까다롭다는 점이 걸림돌입니다.&lt;/p&gt;
+&lt;p&gt;일반적으로 GLib / GTK 어플리케이션은 메인 쓰레드에서 실행되는 메인 이벤트 루프 기반에서 동작합니다. 키보드 / 마우스 이벤트 처리, 화면 표시, 사용자가 등록한 Idle / Timeout 함수 처리 등이 모두 이 메인 이벤트 루프에서 처리됩니다. 그런데 이 메인 이벤트 루프라는 건 마냥 개념적인게 아니라, 실제로 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#GMainLoop&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GMainLoop&lt;/a&gt;
+ 객체를 기반으로 동작합니다. 그런데 &lt;code&gt;g_main_loop_*()&lt;/code&gt; 계열 함수를 살펴보면 몇 개 안됩니다. 루프 객체를 생성하고, 참조하고, 해제하고, 돌리고[&lt;code&gt;g_main_loop_run()]&lt;/code&gt;, 종료하고[&lt;code&gt;g_main_loop_quit()]&lt;/code&gt;, 돌아가는 중인지 확인하기 등의 함수만 있습니다. 아, 하나 더 있군요. 객체를 생성할때 전달하는 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#GMainContext&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GMainContext&lt;/a&gt;
+ 객체를 얻어오는 함수[&lt;code&gt;g_main_loop_get_context()]&lt;/code&gt;가 있군요.&lt;/p&gt;
+&lt;p&gt;모든 GMainLoop는 하나의 GMainContext와 함께 사용됩니다. GMainContext 객체는 실행할 소스[
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#GSource&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GSource&lt;/a&gt;
+] 목록을 관리합니다. 소스는 파일, 파이프, 소켓 등의 디스크립터를 기반으로 한 이벤트 소스일 수도 있고, Idle / Timeout 등과 같은 시간 소스일 수도 있습니다. 컨텍스트는 실행 소스 각각을 검사해서 원하는 이벤트가 발생했는지, 아니면 실행할 시간이 되었는지를 판단해 등록한 콜백함수를 호출합니다. 참고로, 메인 쓰레드에서 동작하기 위한 컨텍스트[&lt;code&gt;g_main_context_default()&lt;/code&gt;]는 기본적으로 제공합니다. 이 기본 컨텍스트는 &lt;code&gt;gtk_main()&lt;/code&gt; 함수가 사용하는 것은 물론, &lt;code&gt;g_idle_add()&lt;/code&gt;, &lt;code&gt;g_timeout_add()&lt;/code&gt; 등과 같은 함수도 이 기본 컨텍스트를 사용합니다.&lt;/p&gt;
+&lt;p&gt;아무튼 조금 더 구체적이고 자세한 내용은 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;공식 문서&lt;/a&gt;
+를 참고하시고, 이제 이를 이용한 멀티쓰레드 프로그래밍을 해보겠습니다. 말이 길었으니 코드를 먼저 보여드리겠습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;glib.h&amp;gt;
+
+static GThread *my_thread;
+static GMainLoop *my_loop;
+
+static void
+add_idle_to_my_thread (GSourceFunc    func,
+                       gpointer       data)
+{
+  GSource *src;
+
+  src = g_idle_source_new ();
+  g_source_set_callback (src, func, data, NULL);
+  g_source_attach (src,
+                   g_main_loop_get_context (my_loop));
+  g_source_unref (src);
+}
+
+static void
+add_timeout_to_my_thread (guint          interval,
+                          GSourceFunc    func,
+                          gpointer       data)
+{
+  GSource *src;
+
+  src = g_timeout_source_new (interval);
+  g_source_set_callback (src, func, data, NULL);
+  g_source_attach (src,
+                   g_main_loop_get_context (my_loop));
+  g_source_unref (src);
+}
+
+static gpointer
+loop_func (gpointer data)
+{
+  GMainLoop *loop = data;
+
+  g_main_loop_run (loop);
+
+  return NULL;
+}
+
+static void
+start_my_thread (void)
+{
+  GMainContext *context;
+
+  context = g_main_context_new ();
+  my_loop = g_main_loop_new (context, FALSE);
+  g_main_context_unref (context);
+
+  my_thread = g_thread_create (loop_func, my_loop, TRUE, NULL);
+}
+
+static void
+stop_my_thread (void)
+{
+  g_main_loop_quit (my_loop);
+  g_thread_join (my_thread);
+  g_main_loop_unref (my_loop);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;함수 먼저 설명하면, &lt;code&gt;start_my_thread()&lt;/code&gt; 함수는 쓰레드를 시작하고, &lt;code&gt;stop_my_thread()&lt;/code&gt; 함수는 쓰레드를 중지합니다. &lt;code&gt;add_idle_to_my_thread()&lt;/code&gt; 함수는 바로 실행되는 Idle 콜백 함수를 추가하고, &lt;code&gt;add_timeout_to_my_thread()&lt;/code&gt; 함수는 주기적으로 실행되는 Timeout 콜백 함수를 추가합니다. 마지막 두 함수의 인수는 &lt;code&gt;g_idle_add()&lt;/code&gt;, &lt;code&gt;g_timeout_add()&lt;/code&gt; 함수와 각각 동일합니다. 따라서, 콜백 함수가 &lt;code&gt;TRUE&lt;/code&gt;를 리턴하면 자동으로 반복해서 계속 실행되고, &lt;code&gt;FALSE&lt;/code&gt;를 리턴하면 한번만 실행되고 종료합니다.&lt;/p&gt;
+&lt;p&gt;위 코드의 핵심은 GMainContext 객체를 만들고 이를 기반으로 GMainLoop 객체를 만든 뒤 별도 쓰레드에서 실행하도록 하는 부분입니다. 그리고, 필요한 모든 작업은 Idle / Timeout 소스 객체를 만들어 컨텍스트에 추가(attach)해서 동작하도록 하는 겁니다. 참고로, 관련 API는 모두 쓰레드에 안전합니다.&lt;/p&gt;
+&lt;p&gt;물론 위 함수를 조금 더 확장하면 콜백함수가 종료될때 자동으로 호출되는 notify 함수도 등록할 수 있고, 우선순위도 조절할 수 있습니다. 또한 여러 쓰레드를 종류별로 만들어 필요한 쓰레드에게 해당 작업만 전달해도 됩니다. 하지만 그 정도는 응용하는데 별로 어려움이 없을 거라 생각하고 한가지만 더 설명하겠습니다.&lt;/p&gt;
+&lt;p&gt;예를 들어 네트워크 소켓(socket)을 하나 만들고 이 소켓에 읽을 데이터가 도착했을 경우에만 호출되는 함수를 등록하고 싶은 경우, 다음과 같은 코드를 사용하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;static gboolean
+socket_read (GIOChannel  *source,
+             GIOCondition condition,
+             gpointer data)
+{
+  /* Use g_io_channel_read_chars() to read data... */
+
+  return TRUE;
+}
+
+static void
+add_socket_to_my_thread (gint sock_fd)
+{
+  GIOChannel *channel;
+  GSource *src;
+
+  channel = g_io_channel_unix_new (sock_fd);
+  src = g_io_create_watch (channel, G_IO_IN);
+  g_source_set_callback (src,
+                         (GSourceFunc) read_socket,
+                         NULL,
+                         NULL);
+  g_source_attach (src,
+                   g_main_loop_get_context (my_loop));
+  g_source_unref (src);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;자세한 내용은 위 코드와 비슷하지만 기본 메인 이벤트 루프에서 동작하도록 하는 &lt;code&gt;g_io_add_watch()&lt;/code&gt; API 설명 부분을 참고하시기 바랍니다. 어쨌든, 기본적으로 GMainContext 객체는 유닉스 시스템의 폴링(polling) 메카니즘을 사용하기 때문에 이론적으로는 거의 모든 파일 디스크립터를 사용할 수 있습니다. 물론 비슷한 방식으로 윈도우 운영체제에서 이벤트 핸들이나 소켓 핸들도 사용할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;글머리에서 적은 것처럼 비동기 메시지 큐를 이용하는 방식보다 아주 약간의 오버헤드는 있겠지만, 훨씬 더 많은 기능을 제공하는 것 같지 않나요?&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GLib 메인루프와 애플 GCD의 libdispatch</title>
+      <link>/2009/09/17/2009-09-17-glib-mainloop-vs-libdispatch-of-apple-gcd/</link>
+      <pubDate>Thu, 17 Sep 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/09/17/2009-09-17-glib-mainloop-vs-libdispatch-of-apple-gcd/</guid>
+      <description>&lt;p&gt;GTK 메일링 리스트에 
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-September/msg00036.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;흥미있는 포스트&lt;/a&gt;
+가 있어서 정리해 봅니다.&lt;/p&gt;
+&lt;p&gt;스노우 레오파드 출시와 더불어 오픈 소스로 공개되면서 요즘 한창 이슈가 되고 있는 애플의 
+&lt;a href=&#34;http://arstechnica.com/open-source/news/2009/09/apple-opens-gcd-challenges-impede-adoption-on-linux.ars&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GCD(Grand Central Dispatch)&lt;/a&gt;
+의 일부인 
+&lt;a href=&#34;http://libdispatch.macosforge.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libdispatch&lt;/a&gt;
+ 라이브러리와 GLib 메인루프를 비교한 내용인데, 정리해 보면 다음과 같습니다.&lt;/p&gt;
+&lt;p&gt;libdispatch는 세 종류의 실행 큐를 제공하는데 다음과 같습니다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;메인 큐(main queue) : GLib의 메인 이벤트 루프와 동일&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;전역 큐(global queue) : 쓰레드풀(thread pool) 방식으로 동작하며 모든 작업(job)은 이 큐로 보내진 다음 임의의 쓰레드에서 비동기(asynchronously) 실행됩니다&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;개인 큐(private queue) : 이 큐의 작업은 순서대로 실행됩니다.&lt;/span&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;개인 큐와 메인 큐는 전역 큐의 쓰레드로 동작하는데, 이 방식은 GLib에서 GSource(g_idle / g_timeout / etc) 콜백함수를  다른 쓰레드에서 처리하게 위해 GMainLoop + GThreadPool 조합을 사용하는 것보다 사용자에게 더 편한 것 같습니다. 물론 libdispatch는 GCC를 확장한 블럭(blocks)이라는 문법을 이용하므로 사용하려면 GCC 패치가 필요합니다. 참고로, 블럭(blocks)은 함수형 언어나 스크립트 언어에서 지원되는 일종의 익명(anonymous) 함수인데, GLib의 GClosure와 비슷한 역할을 합니다. 예를 들어 C 언어에서는 특정 이벤트나 시그널이 발생할때 처리를 하려면 함수를 정의하고 이 함수를 콜백함수로 등록해야 하는데, 블럭(blocks)을 사용하면 함수를 따로 정의하지 않고 코드 블럭을 직접 시그널에 연결할 수 있는 셈입니다.&lt;/p&gt;
+&lt;p&gt;그런데 이 포스트에 달린 댓글을 보면 GLib을 이용해 GCD와 비슷한 역할을 하는 라이브러리인 
+&lt;a href=&#34;http://git.dronelabs.com/iris&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;iris&lt;/a&gt;
+와 
+&lt;a href=&#34;http://git.dronelabs.com/catalina&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;catalina&lt;/a&gt;
+ 라이브러리도 소개하고 있군요. 어쩌면  얼마 안있어 GCD를 참고한 라이브러리나 혹은 새로운 GLib API가 추가될 지도 모른다고 예측해 봅니다. 워낙 오픈소스 쪽은 부지런한 사람이 많아서 말이죠&amp;hellip; :)&lt;/p&gt;
+&lt;p&gt;얼마전에는, 작은 웹서버를 띄우고 웹페이지에서 실행중인 GTK 어플리케이션의 모든 GObject 객체를 보여주는 것은 물론 바로 객체 속성도 수정할 수 있는 
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-list/2009-September/msg00044.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gtkwebd 유틸리티가 소개&lt;/a&gt;
+되었고, 구글 어스나 나사의 월드윈드처럼 3차원으로 지구 지도를 보여주도록 도와주는 
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-list/2009-September/msg00050.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;AWether 라이브러리도 공개&lt;/a&gt;
+되었습니다. 물론 
+&lt;a href=&#34;/2009/02/03/location-aware-softwares-in-linux/&#34;&gt;이전 포스트&lt;/a&gt;
+에서 다룬 
+&lt;a href=&#34;http://projects.gnome.org/libchamplain/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libchamplain&lt;/a&gt;
+ 라이브러리에 더 관심이 많아 그다지 흥미롭지는 않았는데, 모르고 있던 
+&lt;a href=&#34;http://earthobservatory.nasa.gov/Features/BlueMarble/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Blue Marble NG&lt;/a&gt;
+, 
+&lt;a href=&#34;http://topex.ucsd.edu/WWW_html/srtm30_plus.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SRTM 30 Plus&lt;/a&gt;
+ 등과 같은 무료 지도 데이터 정보를 알 수 있게 되어 고마울 따름입니다.&lt;/p&gt;
+&lt;p&gt;아무튼 이쪽 세상은 끊임없이 상용 코드를 벤치마킹하고 모방하면서 조금씩 계속 진화하고 있습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GObject 객체 지향 프로그래밍 (4)</title>
+      <link>/2009/08/24/2009-08-24-oop-with-gobject-4/</link>
+      <pubDate>Mon, 24 Aug 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/08/24/2009-08-24-oop-with-gobject-4/</guid>
+      <description>&lt;p&gt;이전 글에 계속 이어집니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;객체 속성 정보 얻기&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;EdcHost 객체의 속성 정보를 실행 중에 얻어볼까 합니다.&lt;/p&gt;
+&lt;p&gt;왜 또 갑자기 불필요한 예제를 꺼내냐고 물어보실 분이 있을 것 같아 말하자면, 가끔 요긴한 경우가 있기 때문입니다. 예를 들어 EdcHost 객체를 상속받은 EdcHostDoosan, EdcHostKia, EdcHostLitte 객체가 여러 개 존재할 경우, 이 객체들은 EdcHost의 공통 속성 뿐 아니라 본인의 속성도 따로 가집니다. 이러한 여러 객체를 관리할때, 특정 속성이 있는지 여부를 검사해서 관련 UI를 활성 / 비활성하거나, 편집 UI 자체를 속성 스펙과 목록을 이용해 100% 자동화하는 게 가능합니다. (Glade 처럼 말이죠) 물론 옵션 같은 플래그(flags) 변수를 정의하는 방법 등 여러가지 대안이 가능하겠지만, 최초 객체 설계시 고려하지 못했던 기능이나 속성을 나중에 계속 추가해 나가야 하는 경우 기존에 만든 객체를 매번 다시 수정하고 업그레이드하는 것보다 더 안전하고 깔끔한 방법이 될 수 있습니다. 그리고 당연히 더많은 응용이 있겠지만, 일단 알아두면 나중에 어떤 식으로든 도움이 되리라 생각합니다.&lt;/p&gt;
+&lt;p&gt;일단, 다음 코드는 객체가 가지고 있는 속성 이름과 각 속성의 현재 값을 출력합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;static void
+print_properties (GObject *object)
+{
+  GObjectClass *oclass;
+  GParamSpec **specs;
+  guint n;
+  guint i;
+
+  oclass = G_OBJECT_GET_CLASS (object);
+  specs = g_object_class_list_properties (oclass, &amp;amp;n);
+  for (i = 0; i &amp;lt; n; i++)
+    {
+      GParamSpec *spec;
+      GValue value = { 0 };
+      gchar *str;
+
+      spec = specs[i];
+
+      g_value_init (&amp;amp;value, spec-&amp;gt;value_type);
+      g_object_get_property (G_OBJECT (object),
+                             spec-&amp;gt;name,
+                             &amp;amp;value);
+      str = g_strdup_value_contents (&amp;amp;value);
+
+      g_print (&amp;quot;property &#39;%s&#39; is &#39;%s&#39;n&amp;quot;,
+               spec-&amp;gt;name,
+               str);
+
+      g_value_unset (&amp;amp;value);
+      g_free (str);
+    }
+  g_free (specs);
+}
+
+{
+  EdcHost *host;
+
+  /* ... */ 
+
+  host = g_object_new (
+           EDC_TYPE_HOST,
+           &amp;quot;address&amp;quot;, &amp;quot;demo.emstone.com&amp;quot;,
+           &amp;quot;port&amp;quot;, 8081,
+           NULL);
+  print_properties (G_OBJECT (host));
+  g_object_unref (host);
+
+  /* ... */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 코드에서 분명하게 이해해야 하는 점은, 객체 인스턴스가 아닌 객체 클래스에게 속성 정보를 질의한다는 점입니다. 모든 속성의 스펙을 얻기 위해 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-list-properties&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_class_list_properties()&lt;/code&gt;&lt;/a&gt;
+ 함수를 사용하고, GValue 객체에 속성 값을 가져온 다음, 문자열로 출력하기 위해 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Generic-values.html#g-strdup-value-contents&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_strdup_value_contents()&lt;/code&gt;&lt;/a&gt;
+ 함수를 이용해 변환하고 있습니다.&lt;/p&gt;
+&lt;p&gt;객체에 어떤 속성이 있는지 알아보려면 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-find-property&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_class_find_property()&lt;/code&gt;&lt;/a&gt;
+ 함수를 이용하면 됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;속성 변경 알림 시그널 이용하기&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;객체의 속성 값을 변경할 때 &lt;code&gt;g_object_set()&lt;/code&gt; 함수를 이용하면 좋은 점은, 값을 변경하면 자동으로 시그널(signal)이 발생한다는 점입니다. GObject 시스템에서 시그널은 특정 사건(event)이 일어나면 발생(emit)합니다. 대부분의 경우 시그널은 객체 클래스 초기화시에 정의해야 하지만, 다행히도 속성 값이 변경될때 발생하는 시그널은 특별한 작업을 해주지 않아도 기본적으로 동작합니다. 따라서 &amp;ldquo;&lt;code&gt;notify::property-name&lt;/code&gt;&amp;rdquo; 형식의 이름을 가지는 시그널에 콜백 함수를 연결하면 객체 값이 변경될때 자동으로 호출되는 함수를 등록할 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;static void
+property_notified (GObject    *object,
+                   GParamSpec *pspec,
+                   gpointer    data)
+{
+  GValue value = { 0 };
+  gchar *str;
+
+  g_value_init (&amp;amp;value, pspec-&amp;gt;value_type);
+  g_object_get_property (object, pspec-&amp;gt;name, &amp;amp;value);
+  str = g_strdup_value_contents (&amp;amp;value);
+
+  g_print (&amp;quot;property &#39;%s&#39; is set to &#39;%s&#39;n&amp;quot;,
+             pspec-&amp;gt;name, str);
+
+  g_value_unset (&amp;amp;value);
+  g_free (str);
+}
+
+{
+  EdcHost *host;
+
+  host = g_object_new (EDC_TYPE_HOST, NULL);
+
+  g_signal_connect (host,
+                    &amp;quot;notify::address&amp;quot;,
+                    G_CALLBACK (property_notified),
+                    NULL);
+  g_signal_connect (host,
+                    &amp;quot;notify::port&amp;quot;,
+                    G_CALLBACK (property_notified),
+                    NULL);
+
+  g_object_set (host,
+                &amp;quot;address&amp;quot;, &amp;quot;192.168.0.1&amp;quot;,
+                &amp;quot;port&amp;quot;, 8087,
+                NULL);
+
+  edc_host_set_address (host, &amp;quot;192.168.0.22&amp;quot;);
+
+  g_object_unref (host);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고로 이 기능은, 디자인 패턴에서 말하는 관찰자(observer) 패턴일 수도 있고, GObject 매뉴얼에서 사용하는 것처럼 일종의 메시징 시스템 역할도 합니다. 예를 들어 모델(model)의 값이 변경되면 자동으로 뷰(view) 역할을 하는 GUI에 반영하는 코드를 작성할 경우 기존 객체 구현 코드를 수정하지 않고, 다시 말해 의존성을 추가하지 않고 기능을 구현할 수 있게 도와주어 객체간 결합도를 없애 줍니다.&lt;/p&gt;
+&lt;p&gt;자 그런데, 위 예제에서 &lt;code&gt;edc_host_set_address()&lt;/code&gt; 를 사용할 때는 콜백함수가 호출이 안되는 문제점이 있습니다. 왜냐하면 이 함수는 내부 address 변수를 직접 수정하기 때문에 값이 변경되었는지 여부를 GObject 시스템이 알 방법이 없기 때문입니다. 따라서 기존 코드를 수정해야 하는데, 첫번째 방법은 접근자를 이용하더라도 내부적으로 &lt;code&gt;g_object_set()&lt;/code&gt; 을 호출하도록 하는 겁니다. (여기서는 &amp;lsquo;address&amp;rsquo; 관련 API만 보여드립니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void
+edc_host_set_address (EdcHost     *host,
+                      const gchar *address)
+{
+  g_return_if_fail (EDC_IS_HOST (host));
+  g_return_if_fail (address != NULL);
+
+  g_object_set (host,
+                &amp;quot;address&amp;quot;,  address,
+                NULL);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;하지만 이 방법은 약간의 오버헤드가 있을 수 있습니다. 두번째 방법은, 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-notify&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_notify()&lt;/code&gt;&lt;/a&gt;
+ 함수를 이용해 직접 알려주는 겁니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void
+edc_host_set_address (EdcHost     *host,
+                      const gchar *address)
+{
+  EdcHostPrivate *priv;
+
+  g_return_if_fail (EDC_IS_HOST (host));
+  g_return_if_fail (address != NULL);
+
+  priv = EDC_HOST_GET_PRIVATE (host);
+
+  g_free (priv-&amp;gt;address);
+  priv-&amp;gt;address = g_strdup (address);
+
+  g_object_notify (G_OBJECT (host), &amp;quot;address&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;edc_host_set_property()&lt;/code&gt; 함수 안에서 중복되는 코드도 정리해 봅시다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;static void
+edc_host_set_property (GObject      *object,
+                       guint         property_id,
+                       const GValue *value,
+                       GParamSpec   *pspec)
+{
+  EdcHost *host = EDC_HOST (object);
+  EdcHostPrivate *priv;
+
+  priv = EDC_HOST_GET_PRIVATE (host);
+
+  switch (property_id)
+    {
+    case EDC_HOST_PROP_NAME:
+      edc_host_set_name (host, g_value_get_string (value));
+      break;
+    case EDC_HOST_PROP_ADDRESS:
+      edc_host_set_address (host, g_value_get_string (value));
+      break;
+    case EDC_HOST_PROP_PORT:
+      edc_host_set_port (host, g_value_get_int (value));
+      break;
+    case EDC_HOST_PROP_USER:
+      edc_host_set_user (host, g_value_get_string (value));
+      break;
+    case EDC_HOST_PROP_PASSWORD:
+      edc_host_set_password (host, g_value_get_string (value));
+      break;
+    default:
+      /* We don&#39;t have any other property... */
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object,
+                                         property_id,
+                                         pspec);
+      break;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;시그널이 중복 발생할 경우를 염려할 필요는 없습니다. 시그널은 GObject 내부적으로 알아서 잘 정리되어 한 번 변경하면 한 번만 시그널이 발생합니다.&lt;/p&gt;
+&lt;p&gt;오늘은 여기까지입니다&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GObject 객체 지향 프로그래밍 (3)</title>
+      <link>/2009/08/18/2009-08-18-oop-with-gobject-3/</link>
+      <pubDate>Tue, 18 Aug 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/08/18/2009-08-18-oop-with-gobject-3/</guid>
+      <description>&lt;p&gt;이 글은 회사 개발팀 내부 세미나를 위해 작성중인 글입니다. 하지만, 블로그란 매체의 특성상 외부에도 공개되고 있는데, 댓글은 달지 않아도 접속하는 사람들 대부분이 제가 아는 분일 거라 생각하고 한마디 하자면, 세상에 공짜가 어디 있는가, 주저하지 말고 내게 연락해서 술 한 잔 사게! (언젠가부터 술 강요 청탁 협박 블로그가 되어 가고 있군&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;속성 (Properties) 추가하기&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;이제, GObject 속성(properties) 기능을 추가하려고 하는데, 왜 쓸데없이 일을 만들어서 하냐고 물으면 할 말이 있어야할 것 같아서, GObject 속성의 특징을 요약해 봤습니다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;단일 API로 모든 속성 값을 얻어오거나 변경하기&lt;/li&gt;
+&lt;li&gt;속성 변경시 자동으로 호출되는 함수 등록하기 (시그널 이용)&lt;/li&gt;
+&lt;li&gt;실행 중에 속성에 대한 정보 얻어내기&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;물론 이미 많은 언어와 라이브러리가 그 이상의 기능을 지원하기도 하고, 일정 능력 이상의 개발자라면 직접 구현하는게 아주 어려운 것도 아닙니다. 하지만 이미 잘 구현되어 검증받은 라이브러리가 있는데 굳이 새로운 바퀴를 만들 필요는 없겠지요? 아무튼, 정확한 내용은 글을 적으면서 하나씩 설명해 나가겠습니다.&lt;/p&gt;
+&lt;p&gt;GObject 객체에 속성을 추가하려면 속성의 값(value)이 어떤 형(type)인지, 이름이 무엇인지, 값의 범위는 어떻게 되는지, 기본값은 무엇인지 등을 정의해서 알려주어야 합니다. (C++이나 Java에서 클래스 멤버 변수를 정의하는 것과 비슷합니다) 이러한 정보를 줄임말로 스펙(spec.)이라고 한다면, 속성을 추가한다는 건 다른 말로, 스펙으로 명시한 속성 정보를 클래스에 설치(install)하는 것을 의미합니다. 객체 인스턴스마다 속성의 실제 값(value)은 모두 다르겠지만, 어떤 속성이 있는지 그 속성은 어떻게 구성되어는지는 모두 동일하겠지요. (참고로 GObject 관련 API를 훑어보시면 정확히 모르더라도 지금 언급한 개념의 단어로 이루어진 API가 꽤 많은 걸 아시게 될 겁니다) 그렇기 때문에, 속성을 추가하는 작업은 클래스 초기화 함수에서 이루어집니다.&lt;/p&gt;
+&lt;p&gt;다음은 기존 예제에서 속성을 추가한 코드입니다. (변경된 부분만 보여드립니다)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;edc-host.c&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/* ...[snip]... */
+
+enum
+{
+  EDC_HOST_PROP_0, /* ignore */
+  EDC_HOST_PROP_NAME,
+  EDC_HOST_PROP_ADDRESS,
+  EDC_HOST_PROP_PORT,
+  EDC_HOST_PROP_USER,
+  EDC_HOST_PROP_PASSWORD
+};
+
+/* ...[snip]... */
+
+static void
+edc_host_get_property (GObject    *object,
+                       guint       property_id,
+                       GValue     *value,
+                       GParamSpec *pspec)
+{
+  EdcHost *host = EDC_HOST (object);
+  EdcHostPrivate *priv;
+
+  priv = EDC_HOST_GET_PRIVATE (host);
+
+  switch (property_id)
+    {
+    case EDC_HOST_PROP_NAME:
+      g_value_set_string (value, priv-&amp;gt;name);
+      break;
+    case EDC_HOST_PROP_ADDRESS:
+      g_value_set_string (value, priv-&amp;gt;address);
+      break;
+    case EDC_HOST_PROP_PORT:
+      g_value_set_int (value, priv-&amp;gt;port);
+      break;
+    case EDC_HOST_PROP_USER:
+      g_value_set_string (value, priv-&amp;gt;user);
+      break;
+    case EDC_HOST_PROP_PASSWORD:
+      g_value_set_string (value, priv-&amp;gt;password);
+      break;
+    default:
+      /* We don&#39;t have any other property... */
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object,
+                                         property_id,
+                                         pspec);
+      break;
+    }
+}
+
+static void
+edc_host_set_property (GObject      *object,
+                       guint         property_id,
+                       const GValue *value,
+                       GParamSpec   *pspec)
+{
+  EdcHost *host = EDC_HOST (object);
+  EdcHostPrivate *priv;
+
+  priv = EDC_HOST_GET_PRIVATE (host);
+
+  switch (property_id)
+    {
+    case EDC_HOST_PROP_NAME:
+      g_free (priv-&amp;gt;name);
+      priv-&amp;gt;name = g_value_dup_string (value);
+      break;
+    case EDC_HOST_PROP_ADDRESS:
+      g_free (priv-&amp;gt;address);
+      priv-&amp;gt;address = g_value_dup_string (value);
+      break;
+    case EDC_HOST_PROP_PORT:
+      priv-&amp;gt;port = g_value_get_int (value);
+      break;
+    case EDC_HOST_PROP_USER:
+      g_free (priv-&amp;gt;user);
+      priv-&amp;gt;user = g_value_dup_string (value);
+      break;
+    case EDC_HOST_PROP_PASSWORD:
+      g_free (priv-&amp;gt;password);
+      priv-&amp;gt;password = g_value_dup_string (value);
+      break;
+    default:
+      /* We don&#39;t have any other property... */
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object,
+                                         property_id,
+                                         pspec);
+      break;
+    }
+}
+
+/* ...[snip]... */
+
+/* class initializer */
+static void
+edc_host_class_init (EdcHostClass *klass)
+{
+  GObjectClass *gobj_class;
+  GParamSpec *pspec;
+
+  gobj_class = G_OBJECT_CLASS (klass);
+  gobj_class-&amp;gt;finalize = edc_host_finalize;
+  gobj_class-&amp;gt;set_property = edc_host_set_property;
+  gobj_class-&amp;gt;get_property = edc_host_get_property;
+
+  g_type_class_add_private (gobj_class,
+                            sizeof (EdcHostPrivate));
+
+  pspec =
+    g_param_spec_string (&amp;quot;name&amp;quot;,               /* name */
+                         &amp;quot;Name&amp;quot;,               /* nick */
+                         &amp;quot;the name of a host&amp;quot;, /* blurb */
+                         &amp;quot;&amp;quot;,                   /* default */
+                         G_PARAM_READWRITE);
+  g_object_class_install_property (gobj_class,
+                                   EDC_HOST_PROP_NAME,
+                                   pspec);
+
+  pspec = g_param_spec_string (&amp;quot;address&amp;quot;,
+                               &amp;quot;Address&amp;quot;,
+                               &amp;quot;the address of a host&amp;quot;,
+                               &amp;quot;&amp;quot;,
+                               G_PARAM_READWRITE);
+  g_object_class_install_property (gobj_class,
+                                   EDC_HOST_PROP_ADDRESS,
+                                   pspec);
+
+  pspec = g_param_spec_int (&amp;quot;port&amp;quot;,
+                            &amp;quot;Port&amp;quot;,
+                            &amp;quot;the port number of a host&amp;quot;,
+                            0,     /* minimum */
+                            65535, /* maximum */
+                            0,     /* default */
+                            G_PARAM_READWRITE);
+  g_object_class_install_property (gobj_class,
+                                   EDC_HOST_PROP_PORT,
+                                   pspec);
+
+  pspec = g_param_spec_string (&amp;quot;user&amp;quot;,
+                               &amp;quot;User&amp;quot;,
+                               &amp;quot;password for authetication&amp;quot;,
+                               &amp;quot;&amp;quot;,
+                               G_PARAM_READWRITE);
+  g_object_class_install_property (gobj_class,
+                                   EDC_HOST_PROP_USER,
+                                   pspec);
+
+  pspec = g_param_spec_string (&amp;quot;password&amp;quot;,
+                               &amp;quot;Password&amp;quot;,
+                               &amp;quot;password for authetication&amp;quot;,
+                               &amp;quot;&amp;quot;,
+                               G_PARAM_READWRITE);
+  g_object_class_install_property (gobj_class,
+                                   EDC_HOST_PROP_PASSWORD,
+                                   pspec);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;제일 먼저 정의된 열거형 타입에 대해 설명하자면, 클래스 내부에서 속성은 정수형 숫자로 관리됩니다. 예를 들어 1번 속성, 3번 속성처럼 직접 정수형을 사용해도 되지만, 관례적으로 가독성을 위해 열거형으로 정의합니다. 이렇게 정의한 번호를 클래스에 속성을 설치할때 지정하면 [
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-install-property&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_class_install_property()&lt;/code&gt;&lt;/a&gt;
+],  &lt;code&gt;edc_host_{get/set}_property() &lt;/code&gt;속성 읽기 / 쓰기 함수의 인자로 `&lt;code&gt;property_id&lt;/code&gt;&#39;가 전달되는데, 이 ID가 바로 속성 번호입니다. 물론 속성 번호는 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-override-property&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_class_override_property()&lt;/code&gt;&lt;/a&gt;
+ 같은 다른 API에서도 사용합니다.[](&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-override-property&#34;&gt;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-override-property&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;edc_host_class_init()&lt;/code&gt; 클래스  초기화 함수를 보면, 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Standard-Parameter-and-Value-Types.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_param_spec_*()&lt;/code&gt;&lt;/a&gt;
+ 함수를 이용하여 각 속성의 스펙을 정의해서 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-install-property&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_class_install_property()&lt;/code&gt;&lt;/a&gt;
+함수를 이용해 클래스 객체에 설치합니다. 그리고,속성 읽기 /쓰기 메쏘드를 재정의합니다. 참고로 API 문서를 확인하시면, 다양한 형(type)을 위한 스펙 정의 함수가 있는 걸 알 수 있습니다. 속성 스펙을 정의할때 마지막에 넣어주는 플래그(flags)는 속성의 특성을 정의하는데, 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-GParamSpec.html#GParamFlags&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GParamFlags&lt;/a&gt;
+ 설명을 한 번 읽어보시면 어렵지 않게 이해할 수 있습니다. 여기서는 모든 속성을 읽고 쓰기 가능하게 했습니다.&lt;/p&gt;
+&lt;p&gt;재정의된 &lt;code&gt;edc_host_{get/set}_property() &lt;/code&gt;속성 읽기 / 쓰기 메쏘드 함수를 보면, 접근자(accessor) 함수와 동일한 작업을 합니다. 다른 점이라면 속성 ID에 따라 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Generic-values.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GValue&lt;/a&gt;
+ 객체에서 값을 읽거나, 값을 할당한다는 점입니다. GValue 객체는 쉽게 말해 어떤 형(type)의 값이라도 담을 수 있는 일반적인 값(generic values)입니다. 참고로 이 역시 다양한 형(type)을 위한 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Standard-Parameter-and-Value-Types.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_value_{set,get}_*()&lt;/code&gt;&lt;/a&gt;
+ 형태의 함수가 존재하므로 이를 그대로 이용하면 됩니다. (물론 더 능숙하게 사용하려면 API 문서를 한 번 훑어보는게 좋겠지요)&lt;/p&gt;
+&lt;p&gt;여기까지 이해하셨다면 아시겠지만, GObject 시스템은 속성에 전반적인 틀과 관리 체계만 제공할 뿐 실제 속성을 다루는 작업은 대부분 직접 구현해야 합니다. 이는 프로그래머의 자유도를 높여 주기도 하지만, 불필요한 반복 작업을 유발하기도 합니다. 그리고 이 때문에 
+&lt;a href=&#34;http://live.gnome.org/Vala&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Vala&lt;/a&gt;
+ 같은 GObject 기반 언어가 새로 만들어지기도 했습니다.&lt;/p&gt;
+&lt;p&gt;**속성 (Properties) 사용하기
+**&lt;/p&gt;
+&lt;p&gt;이렇게 정의한 속성을 객체 외부에서 사용하기 위해 몇 가지 방법이 있지만, 가장 쉽고 많이 사용하는 방법은 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-get&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_get()&lt;/code&gt;&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-set&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_set()&lt;/code&gt;&lt;/a&gt;
+ 함수를 이용하는 겁니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{
+  EdcHost *host;
+  gchar *address;
+  gint port;
+
+  g_type_init ();
+
+  host = edc_host_new ();
+
+  g_object_set (host,
+                &amp;quot;address&amp;quot;, &amp;quot;192.168.0.100&amp;quot;,
+                &amp;quot;port&amp;quot;, 8080,
+                NULL);
+
+  address = edc_host_get_address (host);
+  g_assert_cmpstr (address, ==, &amp;quot;192.168.0.100&amp;quot;);
+  g_free (address);
+
+  g_object_get (host,
+                &amp;quot;address&amp;quot;, &amp;amp;address,
+                &amp;quot;port&amp;quot;, &amp;amp;port,
+                NULL);
+
+  g_assert_cmpstr (address, ==, &amp;quot;192.168.0.100&amp;quot;);
+  g_assert_cmpint (port, ==, 8080);
+  g_free (address);
+  
+  g_object_unref (host);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-new&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_new()&lt;/code&gt;&lt;/a&gt;
+ 함수를 이용하여 객체를 생성할때 아예 속성을 함께 지정할 수도 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{
+  EdcHost *host;
+  gchar *address;
+  gint port;
+
+  g_type_init ();
+
+  host = g_object_new (EDC_TYPE_HOST,
+                       &amp;quot;address&amp;quot;, &amp;quot;demo.emstone.com&amp;quot;,
+                       &amp;quot;port&amp;quot;, 8081,
+                       NULL);
+  g_object_get (host,
+                &amp;quot;address&amp;quot;, &amp;amp;address,
+                &amp;quot;port&amp;quot;, &amp;amp;port,
+                NULL);
+  g_assert_cmpstr (address, ==, &amp;quot;demo.emstone.com&amp;quot;);
+  g_assert_cmpint (port, ==, 8081);
+  g_free (address);
+
+  g_object_unref (host);  
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;눈여겨 보신 분은 아시겠지만, &lt;code&gt;edc_host_new()&lt;/code&gt; 함수는 &lt;code&gt;g_object_new (EDC_TYPE_HOST, NULL)&lt;/code&gt; 호출로 만들어진 객체를 돌려주는 역할만 합니다.&lt;/p&gt;
+&lt;p&gt;이렇게 대략 GObject 속성 기본 사용법을 설명한 것 같습니다. 물론 이 예제 코드에는 몇 가지 오류가 남아있는데, 이는 위에서 언급한 것처럼 객체 속성을 다루는 다른 부분을 설명하면서 보완해 나갈 예정입니다.&lt;/p&gt;
+&lt;p&gt;오늘은 여기까지입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GObject 객체 지향 프로그래밍 (2)</title>
+      <link>/2009/08/14/2009-08-14-oop-with-gobject-2/</link>
+      <pubDate>Fri, 14 Aug 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/08/14/2009-08-14-oop-with-gobject-2/</guid>
+      <description>&lt;p&gt;첫번째 글이 당연한 내용을 너무 길게 설명했다는 의견이 있어서, 이번 글부터는 더 짧고 간결하게 정리해 보려고 노력하고 있습니다. 그리고, 이 글의 대상은 한 번이라도 GTK+ / GLib 라이브러리를 사용한 경험이 있는 개발자입니다. 그래서 정말로 기초적인 내용은 피하고 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;접근자 (Accessors)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;소프트웨어 공학에서 모듈이나 객체 설계시 기본적으로 강조하는 정보은닉(information hiding), 캡슐화(encapsulation), 결합도(coupling) 등과 같은 개념에 의하면, C 언어처럼 구조체의 필드 변수를 외부로 직접 공개하는 건 좋지 않다고 합니다. 그리고 대부분의 경우 직접 접근 방식보다 읽고 쓰는 접근자(accessors)를 제공하는 게 여러모로 좋다고 하지요. 물론 성능 문제로 직접 접근 방식을 고려해야 하는 경우도 있지만, 지금까지 경험에 비춰보면, 병목을 일으키는 부분은 프로파일러를 돌려서 정확하게 파악한 다음에 해결하는 게 대부분 좋기 때문에 처음부터 그럴 필요는 없을 것 같습니다.&lt;/p&gt;
+&lt;p&gt;참고로 현재 개발 중인 
+&lt;a href=&#34;http://live.gnome.org/GTK%2B/3.0/Roadmap&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 3.0&lt;/a&gt;
+에서도 기존에 공개되었던 변수들을 모조리 안으로 숨기고, GTK+ 2.x 어플리케이션의 이전(migration)을 위해 
+&lt;a href=&#34;http://live.gnome.org/GnomeGoals/UseGseal&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GSEAL() 매크로&lt;/a&gt;
+를 2.14 버전부터 제공하고 있습니다.&lt;/p&gt;
+&lt;p&gt;아무튼 그래서, 일단 지난 글에서 예제로 사용한 호스트 객체의 필드를 숨기고 접근 API를 구현해 보았습니다. (변경되거나 수정한 부분만 보여드립니다)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;edc-host.h&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct _EdcHostClass EdcHostClass;
+typedef struct _EdcHost      EdcHost;
+
+struct _EdcHost
+{
+  GObject parent;
+};
+
+struct _EdcHostClass
+{
+  GObjectClass parent_class;
+};
+
+GType        edc_host_get_type     (void) G_GNUC_CONST;
+EdcHost     *edc_host_new          (void);
+const gchar *edc_host_get_name     (EdcHost     *host);
+void         edc_host_set_name     (EdcHost     *host,
+                                    const gchar *name);
+const gchar *edc_host_get_address  (EdcHost     *host);
+void         edc_host_set_address  (EdcHost     *host,
+                                    const gchar *address);
+gint         edc_host_get_port     (EdcHost     *host);
+void         edc_host_set_port     (EdcHost     *host,
+                                    gint         port);
+const gchar *edc_host_get_user     (EdcHost     *host);
+void         edc_host_set_user     (EdcHost     *host,
+                                    const gchar *user);
+const gchar *edc_host_get_password (EdcHost     *host);
+void         edc_host_set_password (EdcHost     *host,
+                                    const gchar *password);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;edc-host.c&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;quot;edc-host.h&amp;quot;
+
+typedef struct _EdcHostPrivate EdcHostPrivate;
+struct _EdcHostPrivate
+{
+  gchar *name;
+  gchar *address;
+  gint   port;
+  gchar *user;
+  gchar *password;
+};
+
+#define EDC_HOST_GET_PRIVATE(host) 
+ G_TYPE_INSTANCE_GET_PRIVATE (host, EDC_TYPE_HOST, EdcHostPrivate)
+
+G_DEFINE_TYPE (EdcHost, edc_host, G_TYPE_OBJECT);
+
+EdcHost *
+edc_host_new (void)
+{
+  return EDC_HOST (g_object_new (EDC_TYPE_HOST, NULL));
+}
+
+/* object initializer */
+static void
+edc_host_init (EdcHost *host)
+{
+  EdcHostPrivate *priv;
+
+  priv = EDC_HOST_GET_PRIVATE (host);
+
+  priv-&amp;gt;name = g_strdup (&amp;quot;&amp;quot;);
+  priv-&amp;gt;address = g_strdup (&amp;quot;&amp;quot;);
+  priv-&amp;gt;port = 0;
+  priv-&amp;gt;user = g_strdup (&amp;quot;&amp;quot;);
+  priv-&amp;gt;password = g_strdup (&amp;quot;&amp;quot;);
+}
+
+/* object finalizer */
+static void
+edc_host_finalize (GObject *self)
+{
+  EdcHost *host = EDC_HOST (self);
+  EdcHostPrivate *priv;
+
+  priv = EDC_HOST_GET_PRIVATE (host);
+
+  g_free (priv-&amp;gt;name);
+  g_free (priv-&amp;gt;address);
+  g_free (priv-&amp;gt;user);
+  g_free (priv-&amp;gt;password);
+
+  /* call our parent method (always do this!) */
+  G_OBJECT_CLASS (edc_host_parent_class)-&amp;gt;finalize (self);
+}
+
+/* class initializer */
+static void
+edc_host_class_init (EdcHostClass *klass)
+{
+  GObjectClass *gobj_class;
+
+  gobj_class = G_OBJECT_CLASS (klass);
+  gobj_class-&amp;gt;finalize = edc_host_finalize;
+
+  g_type_class_add_private (gobj_class, sizeof (EdcHostPrivate));
+}
+
+const gchar *
+edc_host_get_name (EdcHost *host)
+{
+  EdcHostPrivate *priv;
+
+  g_return_val_if_fail (EDC_IS_HOST (host), NULL);
+
+  priv = EDC_HOST_GET_PRIVATE (host);
+
+  return priv-&amp;gt;name;
+}
+
+void
+edc_host_set_name (EdcHost     *host,
+                   const gchar *name)
+{
+  EdcHostPrivate *priv;
+
+  g_return_if_fail (EDC_IS_HOST (host));
+  g_return_if_fail (name != NULL);
+
+  priv = EDC_HOST_GET_PRIVATE (host);
+
+  g_free (priv-&amp;gt;name);
+  priv-&amp;gt;name = g_strdup (name);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;먼저 헤더 파일을 보면, &lt;code&gt;EdcHost&lt;/code&gt; 구조체에서 공개되었던 객체 변수가 모두 사라지고, 대신 &lt;code&gt;edc_host_{get,set}_*()&lt;/code&gt; 형태의 API 선언이 추가되었습니다. 소스 파일에는 새로 &lt;code&gt;EdcHostPrivate&lt;/code&gt; 구조체를 정의하고 모든 비공개 변수를 집어 넣은 뒤, 클래스 초기화 함수[&lt;code&gt;edc_host_class_init ()&lt;/code&gt;] 마지막 부분에서 이 크기만큼의 공간을 확보하도록 합니다.[
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Type-Information.html#g-type-class-add-private&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_type_class_add_private()&lt;/code&gt;&lt;/a&gt;
+] 그리고 모든 함수에서 이 구조체를 쉽게 얻어오기 위해 정의한 &lt;code&gt;EDC_HOST_GET_PRIVATE()&lt;/code&gt; 매크로를 사용해 필요한 작업을 수행합니다.&lt;/p&gt;
+&lt;p&gt;부가적으로 조금만 더 설명하면, 모든 문자열을 넘겨주는 API는 문자열을 복사해서 넘겨주어 원본 문자열을 보호합니다. 따라서 API 문서에 넘겨받은 문자열을 반드시 해제하라고 명시되어 있어야 하겠죠. 또한 지난 글에서 잠시 언급한 것처럼, 공개된 함수 진입 시점에서 인수 적합성 검사를 할때 &lt;code&gt;EDC_IS_HOST()&lt;/code&gt; 매크로를 사용해 NULL 여부 뿐 아니라 정확하게 해당 객체인지 검사하도록 합니다.&lt;/p&gt;
+&lt;p&gt;참고로 위 예제에서 비공개(private) 객체에 접근하는 방법은 설명을 위해 오버헤드가 존재하는 단순한 방식입니다. 따라서 실제로 사용하려면 반드시 이 
+&lt;a href=&#34;/2008/12/23/reduce-accesing-overhead-for-gobject-private-data/&#34;&gt;포스트&lt;/a&gt;
+를 참고하시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;이렇게 해서 기본적인 객체 속성에 대한 접근자를 구현했습니다. 물론 이게 다는 아니고, 다음에 설명할 GObject 속성(properties) 기능을 이용하면 사실 접근자를 구현할 필요도 없습니다. 하지만, GTK+와 같은 대부분의 GObject 기반 객체는 함수 API 기반의 접근자를 동시에 제공하고 있으므로 관례를 따르는 게 나쁘지는 않겠지요.&lt;/p&gt;
+&lt;p&gt;글머리에서 언급했듯이, 계속 적다 보면 내용도 길어지고 포스팅 주기도 길어질 것 같아 오늘은 일단 여기까지만 적습니다. 다음에는 본격적으로 GObject 속성(properties)을 추가할 예정인데, 설명할 게 많아서&amp;hellip; ;)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GObject 객체 지향 프로그래밍 (1)</title>
+      <link>/2009/08/10/2009-08-10-oop-with-gobject-1/</link>
+      <pubDate>Mon, 10 Aug 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/08/10/2009-08-10-oop-with-gobject-1/</guid>
+      <description>&lt;p&gt;GTK+, Clutter 등과 같은 라이브러리는 C 언어로 구현되었지만 객체 지향 개념을 충실히 따르고 있는데, 그 중심에는 GLib 라이브러리의 GObject가 있습니다. 따라서 이러한 라이브러리를 제대로 이해하고 사용하려면 필수적으로 GObject 개념을 잘 이해하고 있어야 합니다. 그런데, 생각보다 GObject 개념은 이해하기 어렵습니다. 이해하더라도 이를 응용하려면 그만큼 시간이 또 필요합니다.&lt;/p&gt;
+&lt;p&gt;그래서 이번 글을 시작으로 GObject 라이브러리를 이용한 C 언어에서 객체 지향 프로그래밍이라는 거창한 주제를 예제 형식을 이용해 다루어 보려고 합니다. 바로 새 GTK+ 위젯을 구현하거나 클러터 객체를 분석하는 방식이 아니라 왜 GObject가 이런 방식으로 설계되었는지 그 철학을 따라가 보려고 합니다. 그리고, 가능한 기존 GObject 튜토리얼의 어려운 설명이 아니라 실제 사용하는 코드를 중심으로 설명할 예정이니, 그래도 무슨 말인지 모르겠거나 더 풀어서 설명을 하는 게 좋을 것 같을 경우 의견 주시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;여기서 예제로 사용할 개념은 네트워크 카메라 호스트와 호스트 목록입니다. (하는 일이 이쪽 분야라서&amp;hellip; :)&lt;/p&gt;
+&lt;p&gt;네트워크 카메라 호스트는 이름(name), 주소(address), 포트번호(port), 사용자(user), 비밀번호(password) 등과 같은 항목을 포함합니다. 필요한 함수로는 새 객체를 만들거나 해제, 그리고 각 필드값을 얻어오거나 변경하는 정도입니다. (아마도 나중에는 값이 변경되면 자동으로 호출되는 콜백 함수도 추가할 겁니다)&lt;/p&gt;
+&lt;p&gt;모든 코드는 GLib API를 이용하여 작성합니다.&lt;/p&gt;
+&lt;p&gt;**객체 (Objects) + 참조 카운터 (Reference Counter)
+**&lt;/p&gt;
+&lt;p&gt;소프트웨어 공학자들이 객체라고 부르기 전부터 C 언어에는 구조체(struct)가 있었습니다. GObject 시스템 역시 기본 바탕은 구조체입니다. 그러면 GObject 프로그래밍을 하기 전에, 일반 C 언어 구조체를 이용해 네트워크 카메라 호스트를 정의하면, 다음과 같은 코드가 나오지 않을까요?&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct _EdcHost EdcHost;
+struct _EdcHost
+{
+  gchar *name;
+  gchar *address;
+  gint   port;
+  gchar *user;
+  gchar *password;
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;만일 상속이나 함수 오버로딩(overloading)을 전혀 사용하지 않는다면, 굳이 새로운 함수를 추가할 필요를 못 느끼는 분들이 많을 겁니다. 왜냐하면, 직접 구조체 크기만큼 메모리를 할당한 뒤 해제하고, 직접 모든 필드를 접근하면 되니까요. 하지만, 할당하고 해제하는 코드가 여러 곳에 분산되어 있다면 디버깅도 힘들고 유지 보수도 힘드니까 최소한 객체를 생성하고 해제하는 함수만이라도 만들어 봅시다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;EdcHost *
+edc_host_new (void)
+{
+  EdcHost *host;
+
+  host = g_new0 (EdcHost, 1);
+
+  return host;
+}
+
+void
+edc_host_destroy (EdcHost *host)
+{
+  g_return_if_fail (host != NULL);
+
+  g_free (host-&amp;gt;name);
+  g_free (host-&amp;gt;address);
+  g_free (host-&amp;gt;user);
+  g_free (host-&amp;gt;password);
+  g_free (host);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;간단한 코드라서 설명할 필요는 없을 것 같습니다. 참고로 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Memory-Allocation.html#g-free&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_free()&lt;/code&gt;&lt;/a&gt;
+ 함수는 인수가 NULL일 경우 무시하므로 NULL 검사 코드는 필요없습니다.&lt;/p&gt;
+&lt;p&gt;그런데, 이 객체는 단순히 목록 관리 뿐 아니라 여러 다른 모듈에서도 사용할 예정입니다. 여기서 갑자기, 모든 모듈이 하나의 객체를 공유하고 싶은 욕망이 꿈틀대기 시작합니다. 모듈 간에 객체를 전달할때 복사할 필요도 없고, 모듈 별로 객체를 따로 만들어 정보를 보관하는 것보다 메모리를 절약할 수 있으며, 필드 하나가 변경되었을 경우 그 정보를 모든 관련 객체에 반영할 수고도 덜 수 있기 때문입니다. 그렇다고 무턱대고 모든 모듈에서 객체 주소(pointer)만 참조하게 하면 객체를 어느 시점에 할당하고 해제해야 하는지 매우 까다로워집니다. 특히 동적으로 임시 객체를 생성해 다른 모듈에게 넘겨주는 경우라면, 객체를 어느 시점에서 해제해야 하는지도 실수하기 딱 좋습니다. 더 나아가 멀티 쓰레드 환경까지 고려한다면, 단순히 포인터만 가리키는 방식은, 아마추어나 사용하는 옛날 UML 클래스 빌더가 자동으로 생성해주는 코드만으로는, 힘들 수 밖에 없습니다.&lt;/p&gt;
+&lt;p&gt;이런 경우 자주 사용하는 방식이 참조 카운터(reference counter) 기법입니다. 짧게 설명하자면, 모든 모듈에서 몇 가지 원칙만 지키면 됩니다. 첫번째 원칙은, 객체(메모리)를 할당한 모듈에서 반드시 해제하기입니다. 두번째는, 모듈 관점에서 내가 필요한 시점부터 객체의 참조 카운터를 증가하고, 더이상 사용하지 않으면 객체의 참조 카운터를 감소합니다. 새로 생성된 객체는 참조 카운터 값이 1이고, 참조 카운터가 감소되어 0이 되면 객체는 자동으로 해제됩니다. 참고로, 참조 카운터 기법은 멀티미디어 프레임 버퍼, 네트워크 패킷 등과 같은 버퍼 관리에도 널리 사용하는 것은 물론, 오브젝티브-C 언어(Objective-C)의 NSObject 객체가 기본적으로 제공하는 기능이기도 합니다.&lt;/p&gt;
+&lt;p&gt;자 이제, 호스트 객체를 참조 카운터 기법을 적용해 수정해 보면 다음과 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;edc-host.h&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#ifndef __EDC_HOST_H__
+#define __EDC_HOST_H__
+
+#include &amp;lt;glib.h&amp;gt;
+
+#ifdef __cplusplus
+extern &amp;quot;C&amp;quot; {
+#endif
+
+typedef struct _EdcHost EdcHost;
+struct _EdcHost
+{
+  gchar *name;
+  gchar *address;
+  gint   port;
+  gchar *user;
+  gchar *password;
+
+  gint   ref_count;
+};
+
+EdcHost *edc_host_new   (void);
+EdcHost *edc_host_ref   (EdcHost *host);
+void     edc_host_unref (EdcHost *host);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __EDC_HOST_H__ */
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;edc-host.c&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;quot;edc-host.h&amp;quot;
+
+EdcHost *
+edc_host_new (void)
+{
+  EdcHost *host;
+
+  host = g_new0 (EdcHost, 1);
+  if (!host)
+    return NULL;
+
+  host-&amp;gt;ref_count = 1;
+
+  return host;
+}
+
+static void
+edc_host_destroy (EdcHost *host)
+{
+  g_return_if_fail (host != NULL);
+
+  g_free (host-&amp;gt;name);
+  g_free (host-&amp;gt;address);
+  g_free (host-&amp;gt;user);
+  g_free (host-&amp;gt;password);
+  g_free (host);
+}
+
+EdcHost *
+edc_host_ref (EdcHost *host)
+{
+  g_return_val_if_fail (host != NULL, NULL);
+
+  g_atomic_int_inc (&amp;amp;host-&amp;gt;ref_count);
+
+  return host;
+}
+
+void
+edc_host_unref (EdcHost *host)
+{
+  g_return_if_fail (host != NULL);
+
+  if (g_atomic_int_dec_and_test (&amp;amp;host-&amp;gt;ref_count))
+    edc_host_destroy (host);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;제일 먼저 설명할 부분은 역시 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Atomic-Operations.html#g-atomic-int-inc&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_atomic_int_inc()&lt;/code&gt;&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Atomic-Operations.html#g-atomic-int-dec-and-test&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_atomic_int_dec_and_test()&lt;/code&gt;&lt;/a&gt;
+ 함수입니다. 멀티 쓰레드에서 안전하게 카운터 변수를 증가하고 감소할 수 있게 도와주는 GLib API입니다. 이를 이용해 위에서 설명한 참조 카운터 개념을 구현하고 있습니다. 공개했던 &lt;code&gt;edc_host_destroy()&lt;/code&gt; 함수는 모듈 내부에서만 접근할 수 있도록 &lt;code&gt;static&lt;/code&gt; 키워드를 붙였습니다. 또한 C++ 소스에서 포함(include)할때 문제를 일으키지 않도록 헤더파일에 &amp;lsquo;&lt;code&gt;extern &amp;quot;c&amp;quot; {}&lt;/code&gt;&amp;rsquo; 키워드도 추가했습니다.&lt;/p&gt;
+&lt;p&gt;그런데 참조 카운터가 필요한 객체마다 이렇게 구현하면 비슷한 작업을 하는 코드가 중복될 수 밖에 없습니다. 이를 일반적인 API로 분리해 다시 구현하면 재활용이 가능할테니, 다음과 같이 수정해 보겠습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;edc-object.h&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#ifndef __EDC_OBJECT_H__
+#define __EDC_OBJECT_H__
+
+#include &amp;lt;glib.h&amp;gt;
+
+#ifdef __cplusplus
+extern &amp;quot;C&amp;quot; {
+#endif
+
+typedef struct _EdcObject EdcObject;
+struct _EdcObject
+{
+  gint           ref_count;
+  GDestroyNotify finalize;
+};
+
+static inline gpointer
+edc_object_alloc (GDestroyNotify finalize,
+                  gint           obj_size)
+{
+  EdcObject *obj;
+
+  obj = g_malloc (obj_size);
+  if (!obj)
+    return NULL;
+
+  obj-&amp;gt;ref_count = 1;
+  obj-&amp;gt;finalize = finalize;
+
+  return obj;
+}
+
+static inline gpointer
+edc_object_ref (gpointer obj)
+{
+  EdcObject *object = obj;
+
+  if (object)
+    g_atomic_int_inc (&amp;amp;object-&amp;gt;ref_count);
+
+  return object;
+}
+
+static inline void
+edc_object_unref (gpointer obj)
+{
+  EdcObject *object = obj;
+
+  if (!obj)
+    return;
+
+  if (g_atomic_int_dec_and_test (&amp;amp;object-&amp;gt;ref_count))
+    {
+      if (object-&amp;gt;finalize)
+        object-&amp;gt;finalize (object);
+      g_free (object);
+    }
+}
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __EDC_OBJECT_H__ */
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;edc-host.h&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#ifndef __EDC_HOST_H__
+#define __EDC_HOST_H__
+
+#include &amp;quot;edc-object.h&amp;quot;
+
+#ifdef __cplusplus
+extern &amp;quot;C&amp;quot; {
+#endif
+
+typedef struct _EdcHost EdcHost;
+struct _EdcHost
+{
+  EdcObject parent;
+
+  gchar *name;
+  gchar *address;
+  gint   port;
+  gchar *user;
+  gchar *password;
+};
+
+EdcHost *edc_host_new (void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __EDC_HOST_H__ */
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;edc-host.c&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;quot;edc-host.h&amp;quot;
+
+static void
+edc_host_finalize (gpointer obj)
+{
+  EdcHost *host = obj;
+
+  g_free (host-&amp;gt;name);
+  g_free (host-&amp;gt;address);
+  g_free (host-&amp;gt;user);
+  g_free (host-&amp;gt;password);
+}
+
+EdcHost *
+edc_host_new (void)
+{
+  EdcHost *host;
+
+  host = edc_object_alloc (edc_host_finalize,
+                           sizeof (EdcHost));
+  if (!host)
+    return NULL;
+
+  host-&amp;gt;name = NULL;
+  host-&amp;gt;address = NULL;
+  host-&amp;gt;user = NULL;
+  host-&amp;gt;password = NULL;
+
+  return host;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;객체 지향 상속(또는 파생 객체)을 C 언어로 구현하는 가장 쉬운 방법은 위 코드에서 보는 것처럼 부모(또는 원본 객체)를 구조체 맨 앞에 두는 겁니다. 그러면 부모와 자식 API 모두 사용할 수 있게 되죠. 위 코드의 경우 개념상으로 보면 EdcObject 객체를 상속 받아 EdcHost 객체를 구현한 셈이 되죠. 따라서 다음과 같이 사용할 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;void
+func_a (EdcHost *host)
+{
+  edc_object_ref (host);
+  // do some stuff for long time...
+  edc_object_unref (host);
+}
+
+{
+  EdcHost *host;
+
+  host = edc_host_new ();
+  ...
+  func_a (host);
+  ...
+  edc_object_unref (host); /* destroy */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고로 C 언어에서 `&lt;code&gt;void *&lt;/code&gt;&amp;rsquo; 형은 어떤 포인터와도 양방향 대입(assignment)을 할 수 있으므로 컴파일 경고를 피하기 위해 불필요한 형변환을 할 필요가 없습니다. (
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Basic-Types.html#gpointer&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;gpointer&lt;/code&gt;&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Datasets.html#GDestroyNotify&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;GDestroyNotify&lt;/code&gt;&lt;/a&gt;
+ API도 설명도 확인해 보시기 바랍니다)&lt;/p&gt;
+&lt;p&gt;이제 지금까지 구현한 부분을 GObject 객체 기반으로 옮겨 봅니다. 자세히 보시면, 지금까지 프로그래밍한 내용과 거의 비슷한 점을 알아챌 수 있을 겁니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;edc-host.h&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#ifndef __EDC_HOST_H__
+#define __EDC_HOST_H__
+
+#include &amp;lt;glib-object.h&amp;gt;
+
+G_BEGIN_DECLS
+
+#define EDC_TYPE_HOST 
+ (edc_host_get_type ())
+#define EDC_HOST(obj) 
+ (G_TYPE_CHECK_INSTANCE_CAST ((obj), EDC_TYPE_HOST, EdcHost))
+#define EDC_HOST_CLASS(obj) 
+ (G_TYPE_CHECK_CLASS_CAST ((obj), EDC_TYPE_HOST, EdcHostClass))
+#define EDC_IS_HOST(obj) 
+ (G_TYPE_CHECK_INSTANCE_TYPE ((obj), EDC_TYPE_HOST))
+#define EDC_IS_HOST_CLASS(obj) 
+ (G_TYPE_CHECK_CLASS_TYPE ((obj), EDC_TYPE_HOST))
+#define EDC_GET_HOST_CLASS(obj) 
+ (G_TYPE_INSTANCE_GET_CLASS ((obj), EDC_TYPE_HOST, EdcHostClass))
+
+typedef struct _EdcHostClass EdcHostClass;
+typedef struct _EdcHost      EdcHost;
+
+struct _EdcHost
+{
+ GObject parent;
+
+ gchar  *name;
+ gchar  *address;
+ gint    port;
+ gchar  *user;
+ gchar  *password;
+};
+
+struct _EdcHostClass
+{
+ GObjectClass parent_class;
+};
+
+GType    edc_host_get_type (void) G_GNUC_CONST;
+EdcHost *edc_host_new      (void);
+
+G_END_DECLS
+
+#endif /* __EDC_HOST_H__ */
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;edc-host.c&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;quot;edc-host.h&amp;quot;
+
+G_DEFINE_TYPE (EdcHost, edc_host, G_TYPE_OBJECT);
+
+EdcHost *
+edc_host_new (void)
+{
+ return EDC_HOST (g_object_new (EDC_TYPE_HOST, NULL));
+}
+
+/* object initializer */
+static void
+edc_host_init (EdcHost *host)
+{
+ host-&amp;gt;name = NULL;
+ host-&amp;gt;address = NULL;
+ host-&amp;gt;port = 0;
+ host-&amp;gt;user = NULL;
+ host-&amp;gt;password = NULL;
+}
+
+/* object finalizer */
+static void
+edc_host_finalize (GObject *self)
+{
+ EdcHost *host = EDC_HOST (self);
+
+ g_free (host-&amp;gt;name);
+ g_free (host-&amp;gt;address);
+ g_free (host-&amp;gt;user);
+ g_free (host-&amp;gt;password);
+
+ /* call our parent method (always do this!) */
+ G_OBJECT_CLASS (edc_host_parent_class)-&amp;gt;finalize (self);
+}
+
+/* class initializer */
+static void
+edc_host_class_init (EdcHostClass *klass)
+{
+ GObjectClass *gobject_class;
+
+ gobject_class = G_OBJECT_CLASS (klass);
+ gobject_class-&amp;gt;finalize = edc_host_finalize;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;갑자기 코드량이 증가했다고 놀랄 필요는 없습니다. 뭐든지 다 그렇지만, 알고 보면 별 거 아닙니다.&lt;/p&gt;
+&lt;p&gt;먼저 헤더 파일을 설명하면,  GObject 객체를 사용하기 위해 glib-object.h 파일을 포함했습니다. 이는 EdcHost 객체가 GObject 객체만 사용하기 때문에, 더 정확히는 GObject의 파생 객체(derived objects), 다른 말로는 GObject 객체만 상속(inheritance)하기 때문에 그렇습니다. 만일 다른 객체에서 파생한다면 그 객체를 정의하는 헤더 파일을 포함해야 합니다. &amp;lsquo;&lt;code&gt;extern &amp;quot;c&amp;quot; {}&lt;/code&gt;&amp;rsquo; 키워드는 GLib의 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Miscellaneous-Macros.html#G-BEGIN-DECLS--CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;G_BEGIN_DECLS&lt;/code&gt;&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Miscellaneous-Macros.html#G-END-DECLS--CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;G_END_DECLS&lt;/code&gt;&lt;/a&gt;
+ API로 대체했습니다.&lt;/p&gt;
+&lt;p&gt;EdcHost 인스턴스와 EdcHostClass 클래스를 정의하고 있는 부분을 설명하면, 클래스 객체는 전역으로 하나만 존재하고 그냥 객체는 인스턴스(instance) 역할을 합니다. 또한 여기서는 인스턴스 객체의 모든 필드가 공개되어 있지만, 물론 외부에 공개하지 않는(private) 필드를 정의할 수도 있습니다. (이는 다른 글에서 따로 설명하겠습니다)&lt;/p&gt;
+&lt;p&gt;복잡해 보이는 몇몇 매크로는 자주 사용하는 긴 API를 간편화한 것입니다. 런타임 중에 인스턴스가 유효하고 EdcHost 객체로 형변환까지 해주거나[&lt;code&gt;EDC_HOST(obj)&lt;/code&gt;], 인스턴스가 EdcHost 객체인지 확인하거나[&lt;code&gt;EDC_IS_HOST(obj)&lt;/code&gt;], 인스턴스의 클래스 객체를 얻어오거나[&lt;code&gt;EDC_GET_HOST_CLASS(obj)&lt;/code&gt;] 하는 등 일종의 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Run-time_type_information&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;RTTI&lt;/a&gt;
+ 관련 매크로입니다. 아마 제일 많이 사용하는 매크로는 `&lt;code&gt;EDC_HOST(obj)&lt;/code&gt;&#39;일 겁니다.&lt;/p&gt;
+&lt;p&gt;소스를 살펴 보면, 제일 먼저 나오는게 `
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Type-Information.html#G-DEFINE-TYPE--CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;G_DEFINE_TYPE(TN, t_n, T_P)&lt;/code&gt;&lt;/a&gt;
+&amp;rsquo; 입니다. 여담이지만, 이 매크로가 추가되기 전에 작성한 GObject 기반 코드는 귀찮은 작업을 많이 해야 했는데, 이 매크로가 자동으로 해주는 기능이 많아서 불필요하게 중복되는 코드가 많이 줄어들었습니다. 그래서 GTK+ 소스 코드 중에도 가끔 그렇게 작성한 코드도 있고, GObject 관련 초기 문서를 보면 이 매크로를 사용하지 않고 구현되어 있는 경우도 있습니다.&lt;/p&gt;
+&lt;p&gt;이 매크로가 하는 일은 다음과 같습니다. 지정한 `&lt;code&gt;t_n&lt;/code&gt;` 이름으로 시작하는 클래스 초기화 함수[&lt;code&gt;*_class_init()&lt;/code&gt;] / 인스턴스 초기화 함수[&lt;code&gt;*_init()&lt;/code&gt;] 모두 구현되어 있다고 가정하고 `&lt;code&gt;*_get_type()&lt;/code&gt;&amp;rsquo; 함수를 자동으로 삽입해 줍니다. 더불어 부모 클래스 객체를 가리키는 `&lt;code&gt;*_parent_class&lt;/code&gt;&amp;rsquo; 전역 변수도 만들어 줍니다. 따라서 프로그래머는 최소한 함수 두 개만 구현해 주면 되는 셈입니다. [&lt;code&gt;edc_host_init()&lt;/code&gt; / &lt;code&gt;edc_host_class_init()&lt;/code&gt;]&lt;/p&gt;
+&lt;p&gt;하지만 위 예제에서는 클래스 초기화 함수에서 인스턴스 객체가 해제될때 호출되는 finalize 함수를 교체하고 있습니다. 이를 통해 객체가 해제될때 사용하던 리소스를 해제해 줍니다. 그리고, 반드시 상위 클래스의 finalize 함수를 호출해 주어야 정상적으로 부모 객체의 해제 함수가 차례대로 호출될 수 있습니다.&lt;/p&gt;
+&lt;p&gt;자 이제 GObject의 핵심 기능 중 하나인 객체 참조 카운터(object reference counter) 기능을 쉽게 이용할 수 있습니다. 이렇게 작성한 객체는 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-ref&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_ref()&lt;/code&gt;&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-unref&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_unref()&lt;/code&gt;&lt;/a&gt;
+ 함수 등을 이용해 참조 카운터를 제어할 수 있습니다. GObject 소스 코드를 확인해 보시면 알겠지만, 실제 객체 참조 카운터 기능은 거의 비슷하게 구현되어 있습니다. 더 많은 경우의 수를 고려하고 더 많은 기능을 제공하다보니 코드가 더 복잡한 것 뿐입니다.&lt;/p&gt;
+&lt;p&gt;더 중요한 점은 모든 GObject 기반 객체, 예를 들어 GTK+ 위젯이나 클러터 객체 모두 GObject 기반이기 때문에 객체간 연결(부모-자식, 컨테이너-아이템 등)시 객체에 대한 포인터를 유지하면서 동시에 참조 카운터를 유지하여 메모리를 관리한다는 점입니다. 이 부분에 대한 더 자세한 설명은 
+&lt;a href=&#34;/2008/12/28/gtk-memory-management/&#34;&gt;GTK+ 메모리 관리&lt;/a&gt;
+ 글에서 확인하시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;오늘은 일단 여기까지만&amp;hellip; ;)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GNOME 3.0 셸(GNOME Shell) 소개</title>
+      <link>/2009/06/02/2009-06-02-gnome-3-shell/</link>
+      <pubDate>Tue, 02 Jun 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/06/02/2009-06-02-gnome-3-shell/</guid>
+      <description>&lt;p&gt;GNOME 3.0의 기본 프로그램 역할을 하게 될 
+&lt;a href=&#34;http://live.gnome.org/GnomeShell&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그놈 셸(GNOME Shell)&lt;/a&gt;
+에 대한 소식이 요즘 많이 보이는군요. 하지만 역시 엔지니어라서 그런지, 사용자 관점의 변화보다 기술적인 면에 더 관심이 갈 수 밖에 없는터라 그 부분을 조금 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;새로운 셸은 기존에 컴피즈(Compiz)가 했던 3D 컴포지트 기능을 내장하면서 메타시티(Metacity)가 담당했던 윈도우 관리자 역할과 그놈 패널(GNOME Panel) 역할을 동시에 담당합니다. 그런데, 지금보다 더 직관적이고 화려한(?) 인터페이스를 구현하는 것은 물론 많은 개발자가 쉽게 패널 애플릿을 작성할 수 있도록 과감하게도 
+&lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터(Clutter)&lt;/a&gt;
+ 라이브러리와 자바스크립트(JavaScript) 언어를 이용해 구현하고 있습니다.&lt;/p&gt;
+&lt;p&gt;물론 그렇다고 모든 그놈 플랫폼에서 GTK+ 라이브러리를 클러터 라이브러리로 대체하는 것은 아니고 그놈 셸을 작성하는데만 사용하는 것으로 일단 제한하고 있습니다. 클러터보다는 아무래도 GTK+ 자체가 더 복잡한 인터페이스를 요구하는 많은 어플리케이션에 적합하기 때문입니다. 그러나 그놈 셸처럼 화려하고 직관적인 인터페이스를 구현하기 위해서는 클러터 라이브러리가 더 적합하다는 판단인 것 같습니다.&lt;/p&gt;
+&lt;p&gt;하지만 자바스크립트 언어의 도입은 약간 충격적입니다. 그동안 파이썬, 루비, 펄, 심지어 Vala  등과 같은 언어까지 새로 만들어가면서도 무언지 모를 아쉬움에 선택을 못하더니, (그래도 결국 C++은 사용하지 않고 :-) C 언어를 대체할 언어를 찾아가던 그놈 개발자들이 결국 전 세계에서 가장 많은 (웹 프로그래머) 사용자를 가진 언어를 선택하게 된 셈입니다. 물론 여기에는 점점 성능이 좋아지는 자바스크립트 인터프리터 엔진의 역할도 큰 것 같습니다.&lt;/p&gt;
+&lt;p&gt;자바스크립트 인터프리터 엔진은 현재 모질라 트레이스몽키(TraceMonkey) 기반의 
+&lt;a href=&#34;http://live.gnome.org/Gjs&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Gjs&lt;/a&gt;
+와 웹킷(WebKit) 자바스크립트 엔진 기반의 
+&lt;a href=&#34;http://live.gnome.org/Seed&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Seed&lt;/a&gt;
+를 동시에 고려하고 있는듯 합니다. 둘 모두 활발하게 개발되고 있고 각각의 장단점이 있기 때문에 지금 현 시점에서 굳이 하나를 선택하지는 않는 것 같습니다.(
+&lt;a href=&#34;http://lwn.net/Articles/333930/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN 기사&lt;/a&gt;
+ 참조)&lt;/p&gt;
+&lt;p&gt;또한 쉽게 자바스크립트 언어를 선택하게 된 배경에는 최근에 멋지게 데뷔한 
+&lt;a href=&#34;http://live.gnome.org/GObjectIntrospection&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GObject Introspection&lt;/a&gt;
+ 라이브러리의 역할도 큰 것 같습니다. 참고로 이 라이브러리는 GObject 기반 라이브러리를 어떤 언어에도 쉽게 바인딩할 수 있도록 도와줍니다.&lt;/p&gt;
+&lt;p&gt;언제나 그렇듯이, 직접적인 그놈 개발자는 아니지만, KDE처럼 성급하게 새로운 기술을 실험하지 않고 점진적으로 이미 잘 개발된 라이브러리를 바탕으로 조금씩 혁신을 이루어가는 그놈 쪽 개발 과정을 보고 있노라면 흐뭇하기만 합니다. 특히나 저처럼 이쪽으로 먹고 사는 사람들한테는 더욱&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GObject Property Binding 기능이 필요함</title>
+      <link>/2009/04/20/2009-04-20-gobject-property-binding-required/</link>
+      <pubDate>Mon, 20 Apr 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/04/20/2009-04-20-gobject-property-binding-required/</guid>
+      <description>&lt;p&gt;맥 코코아 프레임웍을 공부하면서 GTK+ / GObject 라이브러리에도 있으면 참 좋겠다고 생각한 것 중 하나가 특정 속성(property)을 다른 객체의 속성과 결합하는(binding) 개념입니다. 이를 이용해 자동으로 모델과 뷰를 클릭 몇 번으로 연결하고, 더 나아가 객체 배열은 물론 선택한 항목까지 자동으로 동기화되는 걸 보면서 정말 잘 만들어진 프레임웍이라는 걸 새삼 느낍니다. 또한 사용자가 직접 설계한 클래스를 인터페이스 빌더의 객체로 등록해서 마우스 클릭만으로 자연스럽게 연결이 되는 걸 보면 정말 부럽습니다.&lt;/p&gt;
+&lt;p&gt;물론 GObject  객체의 속성 묶기(property binding)를 지원하기 위해 
+&lt;a href=&#34;/2008/12/15/exobinding/&#34;&gt;ExoBinding&lt;/a&gt;
+과 같은 라이브러리도 존재하지만, 이 역시 개발자가 직접 코드를 추가해주어야 하는 방식일 뿐 Glade와 같은 인터페이스 빌더에서 직접 사용할 수는 없습니다. 아쉽게도 
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-April/msg00048.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 3.0 로드맵&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-February/msg00039.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib 2.22 예정&lt;/a&gt;
+에도 없는 걸 보면 GTK+ 개발자들은 아무래도 직접 코딩하는 걸 더 선호하거나 혹은 필요성을 못 느끼거나, 또는 아직 괜찮다고 생각하는 구현이 없는 거라고 생각하고 싶을 뿐입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GTK&#43; 메모리 관리</title>
+      <link>/2008/12/28/2008-12-28-gtk-memory-management/</link>
+      <pubDate>Sun, 28 Dec 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/12/28/2008-12-28-gtk-memory-management/</guid>
+      <description>&lt;p&gt;GTK+ 포럼에 
+&lt;a href=&#34;http://www.gtkforums.com/viewtopic.php?t=2412&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 메모리 관리하기&lt;/a&gt;
+라는 글이 올라왔는데 내용이 간결해서 이를 참고로 다시 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;참조 카운터 (Reference Counting)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;모든 GTK 객체는 GObject를 상속하고 있는데, GObject는 메모리 관리를 위해 참조 카운터 기능을 기본적으로 지원합니다. GObject가 새로 생성되면 참조 카운터는 1입니다. 이 참조 카운터는 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-ref&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_object_ref()&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-unref&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_object_unref()&lt;/a&gt;
+ 함수를 이용해 증가시키거나 감소시킬 수 있습니다. 말 그대로 객체를 사용중이라면(참조하고 있다면) 참조 카운터를 증가시키면 되고, 더 이상 사용하지 않는다면(참조를 안한다면) 참조 카운터를 감소시키면 됩니다. 참조 카운터가 0이 되면 당연히 객체의 모든 리소스는 자동으로 해제됩니다. 하지만 언제나 그렇듯이 예외가 존재하는데 이런 경우 조심하지 않으면 그대로 메모리 누수가 발생하기 쉽상입니다.&lt;/p&gt;
+&lt;p&gt;첫번째 경우는 객체간에 결합할 때입니다. 가장 흔한 경우가 GtkTreeModel 인터페이스를 구현한 GtkTreeStore / GtkListStore 객체와 GtkTreeView / GtkComboBox 객체를 연결할 때입니다. 예를 들어 gtk_list_store_new() 함수로 만들어진 GtkListStore 객체의 참조 카운터는 1입니다. 
+&lt;a href=&#34;http://library.gnome.org/devel/gtk/stable/GtkTreeView.html#gtk-tree-view-set-model&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gtk_tree_view_set_model()&lt;/a&gt;
+ 함수로 트리뷰 객체에 리스트 스토어 객체를 연결하면 참조 카운터는 2가 됩니다. 왜냐하면 트리뷰 객체가 리스트 스토어 객체를 참조하기 때문입니다. 많은 예제 프로그램에서 이 함수를 호출한 뒤 g_object_unref() 함수를 이용해 리스트 스토어 객체의 참조 카운터를 감소하는 이유는, 이후 리스트 스토어 객체에 대한 메모리 관리를 더 이상 프로그래머가 할 필요 없이, 트리뷰 객체가 없어질때 리스트 스트어 객체의 참조 카운터를 감소하면서 자동으로 리소스가 정리되도록 하기 위해서입니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;객체 복사 (Object Copying)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;두번째 경우는 객체 데이터를 저장하거나 가져올 때입니다. GtkTreeStore / GtkListStore 객체에서 
+&lt;a href=&#34;http://library.gnome.org/devel/gtk/stable/GtkTreeModel.html#gtk-tree-model-get&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gtk_tree_model_get()&lt;/a&gt;
+ 함수로 데이터를 가져오거나 gtk_list_store_set() / gtk_tree_store_set() 등으로 저장할때, 즉 데이터가 복사될때는 데이터 타입이 GObject 기반이라면 참조 카운터가 증가됩니다. 이미지 데이터를 관리하는데 많이 사용하는 GdkPixbuf 객체도 그 중 하나입니다. 따라서 이러한 객체를 가져온 뒤 사용이 다 끝났다면 g_object_unref() 함수를 이용해 반드시 참조 카운터를 해제해야 합니다.  객체 속성(property)를 설정하거나 가져올때도 마찬가지로 객체 복사 규칙이 적용됩니다. 따라서 g_object_set() / g_object_get() 함수를 사용했을 때도 사용이 끝난 객체에 대한 참조 카운터를 감소해 주어야 합니다. 마찬가지로, GtkCellRenderer 객체의 속성도 동일한 규칙이 적용되므로 유의해야 합니다.&lt;/p&gt;
+&lt;p&gt;참고로, 객체 복사시 정수 / 실수 타입 등은 무관하지만 문자열은 항상 새로 할당된 메모리에 복사된 문자열이 전달되기 때문에 사용이 끝나면 g_free() 함수로 해제해야 합니다. 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Boxed-Types.html#g-boxed-copy&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GBoxed&lt;/a&gt;
+ 타입은 참조 카운터가 없기 때문에 항상 새로 할당된 메모리에 복사된 자료 구조가 전달되므로 마지막에 해당 객체의 해제 함수로 리소스를 정리해야 합니다. (
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Boxed-Types.html#G-TYPE-DATE--CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;G_TYPE_DATE&lt;/a&gt;
+, 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Boxed-Types.html#G-TYPE-STRV--CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;G_TYPE_STRV&lt;/a&gt;
+, 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Boxed-Types.html#G-TYPE-GSTRING--CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;G_TYPE_GSTRING&lt;/a&gt;
+, &amp;hellip;)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;GInitiallyUnowned 상속 객체 (Descendants of GInitiallyUnowned)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;GTK 객체 중에서 GObject를 직접 상속하지 않고, GtkObject 객체를 상속받는 객체들이 있습니다. GtkWidget / GtkAdjustment / GtkCellRenderer 등이 대표적이므로, GtkWidget을 상속하는 대부분의 위젯이 이러한 객체입니다. 
+&lt;a href=&#34;http://library.gnome.org/devel/gtk/stable/GtkObject.html#GtkObject.object-hierarchy&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GtkObject 상속도&lt;/a&gt;
+를 보면 특이하게 GInitiallyUnowned 객체를 상속받는데 이 객체의 참조 카운터 동작 방식은 위에서 설명한 것과 조금 다르기 때문에 더 깊은 이해가 필요합니다.&lt;/p&gt;
+&lt;p&gt;GInitiallyUnowned 객체는 생성되면 초기에 참조 카운터가 0입니다. 대신 부동 참조(floating reference) 상태에 있게 됩니다. 누군가가 
+&lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-ref-sink&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_object_ref_sink()&lt;/a&gt;
+ 함수를 호출하면 떠있는(floating) 참조가 참조 카운터로 변환되며 닻을 내리게(sink) 됩니다. 이후에는 일반적인 GObject 참조 카운터와 동일하게 동작합니다. 여기서 누군가는 대부분 객체를 자식(child)으로 갖는 부모(parent) 객체입니다. 즉, gtk_container_add() / gtk_box_pack_start() 등과 같은 함수를 이용하여 위젯을 결합하면 상위 위젯이 g_object_ref_sink() 함수를 호출합니다.&lt;/p&gt;
+&lt;p&gt;GTK+ 프로그래밍시 위젯을 만들고 상위 위젯에 넣는 작업은 매우 빈번한데 만일 이 과정에 생성하는 모든 위젯 객체 리소스를 프로그래머가 관리해야 한다면 끔찍해질 겁니다. 부동 참조(floating reference) 개념은 이러한 수고를 덜어주는데 유용합니다. 모든 위젯은 생성 후 상위 위젯에 추가되어도 참조 카운터는 1밖에 안되고, gtk_widget_destroy() 등을 이용하여 최상위 위젯을 없애면 모든 하위 위젯 객체는 자동으로 참조 카운터가 0이 되어 메모리가 해제됩니다.&lt;/p&gt;
+&lt;p&gt;참고로, 어떤  위젯을 부모 위젯에서 떼어낸 뒤 다른 부모 위젯에 넣기 위해서는 제일 먼저 해당 위젯의 참조 카운터를 증가시켜야 합니다. 왜냐하면 부모 위젯에서 떼어낼 때도 참조 카운터가 자동으로 감소하기 때문에, 떼어내는 순간 객체가 사라지기 때문입니다. 부모 위젯이 더 이상 자식 위젯을 참조 하지 않기 때문에 떼어내는 순간 자식 위젯의 참조 카운터가 감소됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;문자열 / 문자열 배열 / 리스트 (Strings, String Arrays and Lists)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;GLib 라이브러리는 매우 많은 문자열 관련 API를 제공합니다. 또한 특정 객체에서 어떤 결과나 내부 자료를 얻어올때는 문자열 배열이나 리스트(GList) 등도 많이 사용합니다. 이 경우 프로그래머는 반드시 자신이 사용하는 API 문서를 꼼꼼하게 잘 읽어야 합니다. 대부분의 API 문서는 결과로 넘겨지는 데이터 사용이 끝난 뒤 어떻게 해야 하는지를 분명히 명시하고 있기 때문에 이에 따라 리소스를 처리 해야합니다.&lt;/p&gt;
+&lt;p&gt;따라서 예전부터 GLib / GTK+ 프로그래밍시에는 편집기의 자동 완성 (auto-complete) 기능을 잊어버리고, 번거롭더라도 DevHelp프로그램이나 웹브라우저를 이용해 API 리퍼런스를 분명히 열람한 뒤 정확하게 API를 사용할 것을 권장하고 있습니다.&lt;/p&gt;
+&lt;p&gt;만일, API 문서에 명확하게 메모리 관리 / 객체 참조 카운터 방식이 명시되지 않았거나 무언가 개운치 않다면, 해당 API 소스 코드를 참고하는 것이 가장 확실한 방법입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GObject Private 데이터 접근 오버헤드 줄이기</title>
+      <link>/2008/12/23/2008-12-23-reduce-accesing-overhead-for-gobject-private-data/</link>
+      <pubDate>Tue, 23 Dec 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/12/23/2008-12-23-reduce-accesing-overhead-for-gobject-private-data/</guid>
+      <description>&lt;p&gt;GTK+ 개발자 메일링 리스트에서 
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2008-December/thread.html#00061&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 속도 관련 질의 응답&lt;/a&gt;
+이 오가는 걸 지켜보는 도중 g_type_class_add_private() + g_type_instance_get_private() 조합을 사용하면 편하지만, 오버헤드가 크고 느리기 때문에 이를 
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2008-December/msg00072.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;줄일 수 있는 다른 방법을 소개한 내용&lt;/a&gt;
+이 있어 결론만 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;그 방법은, 
+&lt;a href=&#34;http://developer.gnome.org/doc/guides/programming-guidelines/binary.html#PRIVATE&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그놈 프로그래밍 가이드라인&lt;/a&gt;
+에서도 명시했듯이,  객체 데이터 선언시 &amp;lsquo;priv&amp;rsquo; 등과 같은 필드를 선언하고, g_type_instance_get_private() 함수로 내부 데이터 주소를 얻어 &amp;lsquo;priv&amp;rsquo; 필드에 저장해 둡니다. 그리고 다음부터는 그 필드를  이용하여 내부 데이터(Private Data)에 직접 접근하는 방식입니다.&lt;/p&gt;
+&lt;p&gt;예를 들어 기존의 코드가 다음과 같다면,&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/* foo-object.h */
+typedef struct _FooObject FooObject;
+struct _FooObject
+{
+  GObject parent;
+};
+
+gint foo_object_do_something (FooObject *foo);
+
+/* foo-object.c */
+typedef struct _FooObjectPrivate FooObjectPrivate;
+struct _FooObjectPrivate
+{
+  gboolean eating;
+  gint size;
+};
+
+#define FOO_OBJECT_GET_PRIVATE(obj) 
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), 
+   FOO_TYPE_OBJECT, 
+   FooObjectPrivate))
+
+static void
+foo_object_class_init (FooObjectClass *klass)
+{
+  /* ... */
+  g_type_class_add_private (G_OBJECT_CLASS (klass), 
+                            sizeof (FooBarPrivate));
+} 
+
+gint
+foo_object_do_something (FooObject *foo)
+{
+  FooObjectPrivate *priv;
+
+  priv = FOO_OBJECT_GET_PRIVATE (foo);
+  priv-&amp;gt;eating = TRUE;
+  /* ... */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다음과 같이 변경하면, 매번 g_type_instance_get_private() 함수를 호출하는 오버헤드를 줄일 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/* foo-object.h */
+typedef struct _FooObjectPrivate FooObjectPrivate;
+typedef struct _FooObject FooObject;
+struct _FooObject
+{
+  GObject parent;
+  FooObjectPrivate *priv;
+};
+
+gint foo_object_do_something (FooObject *foo);
+
+/* foo-object.c */
+struct _FooObjectPrivate
+{
+  gboolean eating;
+  gint size;
+};
+
+#define FOO_OBJECT_GET_PRIVATE(obj) 
+  (((FooObject *) (obj))-&amp;gt;priv)
+
+static void
+foo_object_class_init (FooObjectClass *klass)
+{
+  /* ... */
+  g_type_class_add_private (G_OBJECT_CLASS (klass), 
+                            sizeof (FooBarPrivate));
+} 
+
+static void
+foo_object_init (FooObject *obj)
+{
+  /* ... */
+  obj-&amp;gt;priv = 
+    G_TYPE_INSTANCE_GET_PRIVATE (obj, 
+                                 FOO_TYPE_OBJECT, 
+                                 FooObjectPrivate);
+}
+
+gint
+foo_object_do_something (FooObject *foo)
+{
+  FooObjectPrivate *priv;
+
+  priv = FOO_OBJECT_GET_PRIVATE (foo);
+  priv-&amp;gt;eating = TRUE;
+  /* ... */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;물론 위에서 설명한 방식 대신 객체 초기화시 내부 데이터(private)를 아예 따로 할당해서 관리하는  방식도 비슷하지만, g_type_class_add_private() 함수를 통해 추가한 메모리는 GLib 라이브러리가 알아서 관리해주기 때문에 더 편합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GTK&#43; / GLib 경고 메시지 추적하기</title>
+      <link>/2008/11/14/2008-11-14-tracing-gtk-glib-warning-messages/</link>
+      <pubDate>Fri, 14 Nov 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/11/14/2008-11-14-tracing-gtk-glib-warning-messages/</guid>
+      <description>&lt;p&gt;GTK+ 또는 GLib 기반 프로그래밍을 할때 g_warning() / g_return_if_fail() 등과 같은 API를 사용한 경고 메시지가 어디서 발생했는지 찾기 어려운 경우가 있습니다. 더 나아가 해당 함수를 호출하는 부분을 알아야 하는데, 사실 메시지만으로는 찾기가 매우 어려운 경우가 많습니다.&lt;/p&gt;
+&lt;p&gt;예를 들어 수만라인짜리 프로그램이 실행 도중 다음과 같은 메시지를 출력합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Gtk-CRITICAL **: gtk_widget_set_sensitive: 
+assertion `GTK_IS_WIDGET (widget)&#39; failed
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아, gtk_widget_set_sensitive() 함수를 호출할때 첫번째 인수를 잘못 넘겨준 건 알겠는데, 문제는 gtk_widget_set_sensitve() 함수를 호출하는 부분이 수십군데입니다. 마땅히 실행 도중이라 어떤 모듈에서 호출하는지도 애매합니다. 다음에 설명할 방법을 모른다면, 리누스 토발즈의 말 그대로, 모든 소스 코드를 직접 검토할 수 밖에 없죠&amp;hellip;&lt;/p&gt;
+&lt;p&gt;만일 이 메시지가 발생하는 시점에서 gdb의 backtrace 명령으로 함수 호출 스택을 알아낼 수 있다면 인생은 편해집니다. 그리고 이를 위해 GLib에는 당연하다는듯이 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Message-Logging.html#g-log-set-always-fatal&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_log_set_always_fatal()&lt;/a&gt;
+ 이라는 API가 존재합니다. 이 API는 설정하는 레벨의 로그 메시지가 발생하면 강제로 코어 덤프를 발생하고 프로그램 실행을 중지합니다. gdb에서 동작할 경우 해당 지점에서 정확하게 멈춥니다.&lt;/p&gt;
+&lt;p&gt;위 예에서 우리가 원하는 레벨은 CRITICAL 레벨인 경우이므로 다음 코드를 프로그램 시작 부분에 넣어주면 위 메시지가 출력되는 시점에서 정확하게 프로그램이 멈추게 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;g_log_set_always_fatal (G_LOG_LEVEL_ERROR |
+                        G_LOG_LEVEL_CRITICAL);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 gdb에서 backtrace 명령을 실행하면, 정확하게 문제를 일으키는 코드를 찾아낼 수 있겠죠?&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GLib 쓰레드 프로그래밍</title>
+      <link>/2008/08/06/2008-08-06-glib-thread-programming/</link>
+      <pubDate>Wed, 06 Aug 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/08/06/2008-08-06-glib-thread-programming/</guid>
+      <description>&lt;p&gt;소프트웨어를 개발하면서 멀티 쓰레드 방식을 사용하는 경우는 많습니다. 하지만 그만큼 복잡도가 증가해서 세심하게 고려하여 설계하지 않으면 디버깅 재앙을 얻는 경우가 많습니다. 이 글은 &amp;lsquo;
+&lt;a href=&#34;/2008/12/28/gtk-memory-management/&#34;&gt;멀티쓰레드 프로그래밍 규칙&lt;/a&gt;
+&amp;lsquo;에서 이어지는 내용입니다. 
+&lt;a href=&#34;/2006/01/20/multi-thread-gtk-programming/&#34;&gt;GTK+ 쓰레드 관련 잡설&lt;/a&gt;
+은 이미 언급한 적이 있으니까, 오늘은 별도의 쓰레드로 동작하는 간단한 예제 모듈을 만들면서 몇가지 유용한 GLib 쓰레드 API를 설명하겠습니다.&lt;/p&gt;
+&lt;h3 id=&#34;리소스-resources&#34;&gt;리소스 (Resources)&lt;/h3&gt;
+&lt;p&gt;한 개 이상의 쓰레드가 동작하는 방식의 소프트웨어를 설계할 경우 가장 염두에 두어야 하는 점은 **자원(resources)**입니다. 자원, 즉 리소스는 쉽게 말해 소프트웨어가 사용하는 데이터를 의미합니다. 전역 변수, 디스크 파일, 네트웍 소켓, 외부 장치 심지어 비디오 카드 같은 그래픽 장치 등이 모두 리소스입니다. 물론 넓은 의미에서 보면 리소스는 하나의 기능이나 세부 작업을 나타낼 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;멀티쓰레드 프로그래밍에서 가능한 지켜야 하는 가장 중요한 원칙은 &amp;lsquo;&lt;strong&gt;하나의 쓰레드만 하나의 리소스에 접근할 수 있어야 한다&lt;/strong&gt;&amp;lsquo;입니다. 아무 생각없이 하나의 리소스에 여러 쓰레드가 동시에 접근하도록 설계할 경우, 어쩔 수 없이 뮤텍스(mutex) 계열 API를 이용해 접근할 때마다 임계 구역을 보호해야 합니다. 그리고 이러한 기법은 소스 코드가 복잡해지고 커질수록 버그가 많아지고, 디버깅도 점점 어려워집니다. 물론, 쓰레드-풀(thread-pool) 기법처럼 성능 최적화나 확장성을 위해 멀티쓰레드를 사용하는 경우처럼 예외도 사실 많지만, 일단 이 글에서는 무시합니다.&lt;/p&gt;
+&lt;p&gt;앞서 예를 들었던 GTK+ 쓰레드 프로그래밍도 리소스 관점에서 보면, 무조건 모든 쓰레드에서 GTK+ / GDK API 호출 전후에 gdk_threads_*() 계열 API를 남용해서 지독한 데드락과 이중락에 고생하던가, 아니면 GTK+ / GDK API 호출을 메인 쓰레드에서만 호출하도록 g_idle_add() / g_timeout_add() API만 이용하는 방법이 있습니다. 두번째 방법을 모델-뷰(Model-View) 개념으로 생각하면 마지막 GTK+ / GDK API 호출을 뷰(view) 갱신으로 볼 수 있고, g_idle_add() 계열 API는 일종의 메시지 전달로 생각할 수도 있습니다. (참고로 Sentry24DVR 2.x 버전은 첫번째 방식을, Sentry24CMS 2.x 버전은 두번째 방식을 사용합니다)&lt;/p&gt;
+&lt;h3 id=&#34;쓰레드-시작--정지--실행&#34;&gt;쓰레드 시작 / 정지 / 실행&lt;/h3&gt;
+&lt;p&gt;가장 먼저 쓰레드를 만들고 종료하는 루틴을 만들어 봅시다. 편의상 모듈 이름은 &amp;lsquo;drink&#39;라고 합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;glib.h&amp;gt;
+
+typedef struct _Drink Drink;
+struct _Drink
+{
+  GThread *thread;
+  gint running;
+  GAsyncQueue *queue;
+  gchar *host;
+  gint port;
+};
+
+static gpointer
+drink_process (gpointer data)
+{
+  Drink *drink = data;
+
+  while (g_atomic_int_get (&amp;amp;drink-&amp;gt;running))
+    {
+      // do something...
+    }
+
+  return NULL;
+}
+
+Drink *
+drink_new (const gchar *host, gint port)
+{
+  Drink *drink;
+
+  g_return_val_if_fail (host != NULL, NULL);
+  g_return_val_if_fail (port &amp;gt; 0, NULL);
+
+  drink = g_new (Drink, 1);
+  drink-&amp;gt;host = g_strdup (host);
+  drink-&amp;gt;port = port;
+  drink-&amp;gt;queue = g_async_queue_new ();
+
+  g_atomic_int_set (&amp;amp;drink-&amp;gt;running, 1);
+  drink-&amp;gt;thread = g_thread_new (drink_process, drink, TRUE, NULL);
+
+  return drink;
+}
+
+void
+drink_destroy (Drink *drink)
+{
+  g_return_if_fail (drink != NULL);
+
+  g_atomic_int_set (&amp;amp;drink-&amp;gt;running, 0);
+  g_thread_join (drink-&amp;gt;thread);
+
+  g_async_queue_unref (disk-&amp;gt;queue);
+  g_free (drink-&amp;gt;host);
+  g_free (drink);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;drink_new() 함수는 지정한 호스트 / 포트 번호를 이용하여 새로운 Drink 객체를 만듭니다. 그리고 앞으로 나올 모든 데이터는 각각 자신이 속한 Drink 객체만 접근합니다. 즉, Drink 객체를 하나의 리소스로 여기면 됩니다. drink_destroy() 함수는 쓰레드가 종료할때까지 기다렸다가 Drink 객체를 해제하고 마무리합니다.&lt;/p&gt;
+&lt;p&gt;쓰레드 함수 무한 루프는 간단하게 정수형 변수를 플래그처럼 사용합니다. 제대로 하려면 플래그 변수 역시 뮤텍스 API로 보호해주어야 하지만 대부분의 경우 간단한 원자연산자(atomic operator)로 처리가 가능합니다. 일단 이렇게 만들어 둡시다.&lt;/p&gt;
+&lt;p&gt;마지막으로 설명할 API가 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Asynchronous-Queues.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GAsyncQueue&lt;/a&gt;
+ 객체인데, 가장 중요한 역할을 담당하는 물건입니다. 설명 그대로 이 API는 쓰레드간 비동기 통신(asynchronous communication between threads)을 하는데 사용합니다. 이 객체를 생성하는데는 g_async_queue_new(), 없애기 위해서는 g_async_queue_unref() 함수를 이용하는데, 일단 지금은 만들어만 놓습니다.&lt;/p&gt;
+&lt;h3 id=&#34;api-추가--메시지-전달&#34;&gt;API 추가 + 메시지 전달&lt;/h3&gt;
+&lt;p&gt;제일 먼저 하고 싶은 일은 미리 지정한 서버에 TCP 연결을 하거나, 끊고 싶습니다. 이를 비동기큐를 이용해서 간단하게 구현해 봅시다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;enum
+{
+  DRINK_MSG_CONNECT = 1,
+  DRINK_MSG_SHUTDOWN = 2,
+};
+
+void
+drink_connect (Drink *drink)
+{
+  g_return_if_fail (drink != NULL);
+
+  g_async_queue_push (drink-&amp;gt;queue,
+                      GINT_TO_POINTER (DRINK_MSG_CONNECT));
+}
+
+void
+drink_shutdown (Drink *drink)
+{
+  g_return_if_fail (drink != NULL);
+
+  g_async_queue_push (drink-&amp;gt;queue,
+                      GINT_TO_POINTER (DRINK_MSG_SHUTDOWN));
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이렇게 하면 drink_connect() / drink_shutdown() 함수를 호출하면 g_async_queue_push() 함수를 이용해 메시지를 큐에 넣기만 하고 아무 일도 안합니다. (참고 : 모듈 외부에서 볼때는 내부 구현에 쓰레드를 사용하는지, 메시지 큐를 이용하는지 등은 공개되지도 않고, 공개할 필요도 없습니다) 이제 drink_process() 함수를 다음과 같이 수정합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;static gpointer
+drink_process (gpointer data)
+{
+  Drink *drink = data;
+
+  while (g_atomic_int_get (&amp;amp;drink-&amp;gt;running))
+    {
+      do {
+        GTimeVal tval;
+        gpointer msg;
+
+        /* wait for messages */
+        g_get_current_time (&amp;amp;tval);
+        g_timeval_add (&amp;amp;tval, 10000); /* 10msec */
+        msg = g_async_queue_timed_pop (drink-&amp;gt;queue, &amp;amp;tval);
+        if (!msg)
+          break;
+
+        switch (GPOINTER_TO_INT (msg))
+          {
+          case DRINK_MSG_CONNECT:
+            // do connect work...
+            break;
+          case DRINK_MSG_SHUTDOWN:
+            // do shutdown work...
+            break;
+          default:
+            g_warning (&amp;quot;unknown drink msg&amp;quot;);
+            break;
+          }
+      } while (1);
+
+      // do something else ...
+    }
+
+  return NULL;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;보는 바와 같이 메시지 큐에서 메시지를 꺼내어 메시지에 해당하는 작업을 처리합니다. 만일 메시지 큐를 사용하지 않고 drink_connect() 함수에서 직접 연결 작업을 수행하면 쓰레드 부분과 공유하는 부분을 모두 뮤텍스로 보호해야 하지만 이처럼 모든 작업을 담당 쓰레드가 처리하도록 메시지만 전송하면 실행 순서도 맞고 쓰레드가 자료 공유를 걱정할 필요도 없게 됩니다.&lt;/p&gt;
+&lt;p&gt;여기서 사용한 g_async_queue_timed_pop() 함수는 지정한 시간 동안 아무 메시지도 없으면 NULL을 돌려줍니다. 비슷한 함수로 g_async_queue_pop() 함수는 메시지가 올때까지 무한정 기다랍니다. g_async_queue_try_pop() 함수는 메시지가 없을 경우 바로 NULL을 돌려줍니다. 만일 쓰레드 함수 자체적인 작업은 없고 100% 외부에서 메시지가 올때만 작업이 수행된다면 g_async_queue_pop() 함수를 사용하는 것이 더 좋습니다. 프로세스 동기화나 수면 상태(sleep) 등을 다른 작업을 하면서 자체적으로 하는 경우라면 g_async_queue_try_pop() 함수가 유용합니다.&lt;/p&gt;
+&lt;p&gt;이 예제에서는 단순하게 10 밀리초 여유를 두고 메시지를 확인하고, 그외 다른 작업을 처리하도록 했습니다.&lt;/p&gt;
+&lt;h3 id=&#34;쓰레드-종료-다듬기&#34;&gt;쓰레드 종료 다듬기&lt;/h3&gt;
+&lt;p&gt;예제 처음에 있던 쓰레드 종료 코드가 너무 단순해서 조금 불안할 지도 모르겠네요. 메시지 큐에 데이터가 있을때 종료되면 메모리 누수도 있을 것 같고&amp;hellip; 그래서 쓰레드 종료도 하나의 메시지로 처리하도록 하려고 합니다. 수정하는 부분은 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;enum
+{
+  DRINK_MSG_STOP_THREAD = -1,
+  DRINK_MSG_CONNECT = 1,
+  DRINK_MSG_SHUTDOWN = 2,
+};
+
+static gpointer
+drink_process (gpointer data)
+{
+  Drink *drink = data;
+
+  while (TRUE)
+    {
+      GTimeVal tval;
+      gpointer msg;
+
+      /* wait for messages */
+      g_get_current_time (&amp;amp;tval);
+      g_timeval_add (&amp;amp;tval, 10000); /* 10msec */
+      msg = g_async_queue_timed_pop (drink-&amp;gt;queue, &amp;amp;tval);
+      if (msg)
+        {
+          if (msg == GINT_TO_POINTER (DRINK_MSG_STOP_THREAD)) break;
+
+          switch (GPOINTER_TO_INT (msg))
+            {
+            case DRINK_MSG_CONNECT:
+              // do connect work...
+              break;
+            case DRINK_MSG_SHUTDOWN:
+              // do shutdown work...
+              break;
+            default:
+              g_warning (&amp;quot;unknown drink msg&amp;quot;);
+              break;
+            }
+        }
+
+      // do something else ...
+    }
+
+void
+drink_destroy (Drink *drink)
+{
+  g_return_if_fail (drink != NULL);
+
+  g_async_queue_push (drink-&amp;gt;queue, GINT_TO_POINTER (DRINK_MSG_STOP_THREAD));
+  g_thread_join (drink-&amp;gt;thread);
+
+  g_async_queue_unref (disk-&amp;gt;queue);
+  g_free (drink-&amp;gt;host);
+  g_free (drink);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;쓰레드 함수 무한루프 조건문이 조금 변경되었을 뿐 기본적인 원리는 동일합니다.&lt;/p&gt;
+&lt;h3 id=&#34;마지막-조금-더-개선&#34;&gt;마지막, 조금 더 개선&amp;hellip;&lt;/h3&gt;
+&lt;p&gt;이놈의 메시지 방식을 사용하면 대부분 프로그래머는 쉽게 switch() 문의 유혹을 떨쳐버리지 못합니다. 근데, 만일 당신이 매우 성능 좋은 메시징 서비스를 만들고 있다면 이런 방식의 코드는 유지보수도 힘들고 성능도 나쁠 수 있습니다. 메시지-함수 테이블을 유지해도 되고, 여러가지 방법이 있겠지만 여기서는 약간 가독성(readability)과 유지보수에 중점을 둔 방식을 설명하려 합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;typedef struct _DrinkMsg DrinkMsg;
+struct _DrinkMsg
+{
+  void (*func) (Drink *drink, gpointer data1, gpointer data2);
+  gpointer data1;
+  gpointer data2;
+};
+
+static gpointer
+drink_process (gpointer data)
+{
+  ...
+  DrinkMsg *msg;
+
+  msg = g_async_queue_try_pop (drink-&amp;gt;queue);
+  if (msg)
+    {
+      if (msg == GINT_TO_POINTER (-1))
+        break;
+      msg-&amp;gt;func (drink, msg-&amp;gt;data1, msg-&amp;gt;data2);
+      g_slice_free1 (msg);
+    }
+  ...
+}
+
+void
+drink_destroy (Drink *drink)
+{
+  ...
+  g_async_queue_push (drink-&amp;gt;queue, GINT_TO_POINTER (-1));
+  g_thread_join (drink-&amp;gt;thread);
+  ...
+}
+
+static void
+drink_connect_real (Drink *drink, gpointer data1, gpointer data2)
+{
+  gchar *host = data1;
+  gint port = GPOINTER_TO_INT (data2);
+
+  // do connect work...
+
+  g_free (host);
+}
+
+void
+drink_connect (Drink *drink, const gchar *host, gint port)
+{
+  DrinkMsg *msg;
+
+  msg = g_slice_new (DrinkMsg);
+  msg-&amp;gt;func = drink_connect_real;
+  msg-&amp;gt;data1 = g_strdup (host);
+  msg-&amp;gt;data2 = GINT_TO_POINRTER (port);
+  g_async_queue_push (drink-&amp;gt;queue, msg);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;뭐&amp;hellip; 더 이상의 설명은 피곤해서&amp;hellip;&lt;/p&gt;
+&lt;p&gt;궁금한 API는 직접 매뉴얼을 한 번 뒤져보시길&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GObject - Glib object system</title>
+      <link>/2007/02/05/2007-02-05-gobject-glib-object-system/</link>
+      <pubDate>Mon, 05 Feb 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/02/05/2007-02-05-gobject-glib-object-system/</guid>
+      <description>&lt;p&gt;오랜만에 Glib 객체 시스템인 GObject에 대한 글들을 다시 정독해 보았다. 아무 것도 모르고 처음 읽었을때와 몇년동안 GTK+와 친숙해진뒤 다시 읽어볼때는 역시 차이가 있는 법, 이제 GObject 객체를 프로젝트에 하나씩 적용해볼 생각이다.&lt;/p&gt;
+&lt;p&gt;참고 사이트:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://developer.gnome.org/doc/API/2.0/gobject/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GObject 공식 리퍼런스와 튜토리얼&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://developer.gnome.org/doc/tutorials/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 개발자 설명서 모음&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Gobject&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;위키피디아에 있는 간략한 GObject 소개&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://docs.programmers.ch/index.php/HOWTO_gobject&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GObject Tutorial Copyright Ryan McDougall (2004)&lt;/a&gt;
+ - C 언어로 객체지향을 구현하기 위해 GObject를 어떤 이유와 근거로 설계했는지를 단계별로 하나씩 설명해주는 튜토리얼&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://le-hacker.org/papers/gobject/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The Glib Object system&lt;/a&gt;
+ - 공식(?) GObject 튜토리얼&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.jirka.org/gob.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GOB(GObject Builder)&lt;/a&gt;
+ - 쉽게 GObject C 코드를 생성해주는 전처리기&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://hellocity.net/%7Eiolo/files/gnome/BeginningGTK2Programming/BeginningGTK2Programming.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Beginning GTK+ Programming&lt;/a&gt;
+ - 훌륭한 GTK+, GObject 프로그래밍 관련 컨퍼런스 자료&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>APR(Apache Portable Runtime)</title>
+      <link>/2006/01/20/2006-01-20-aprapache-portable-runtime/</link>
+      <pubDate>Fri, 20 Jan 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/01/20/2006-01-20-aprapache-portable-runtime/</guid>
+      <description>&lt;p&gt;크로스 플랫폼 어플리케이션 개발을 위해 지금까지 많은 라이브러리를 검토했지만 대부분 아쉬운 점이 많았다. 덩치가 너무 크거나, 의존하는 라이브러리가 너무 많거나, 반대로 너무 기능이 제한적이고 부족하거나 하는 이유로 진행하는 프로젝트에서는 직접 만들어 사용하고 있는 실정이다.&lt;/p&gt;
+&lt;p&gt;오늘 문득 
+&lt;a href=&#34;http://httpd.apache.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Apache2&lt;/a&gt;
+ 웹서버와 
+&lt;a href=&#34;http://subversion.tigris.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Subversion&lt;/a&gt;
+ 버전 관리 소프트웨어가 사용하는 
+&lt;a href=&#34;http://apr.apache.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;APR&lt;/a&gt;
+(Apache Portable Runtime) 라이브러리를 살펴보게 되었다. 그 존재는 Subversion을 사용하기 시작하면서부터 알고 있었으나 사이트를 들어가서 검토까지 해본 건 이번이 처음이다. 튼튼한 네트워크 서버를 만들면서 구축한 라이브러리의 특성을 한눈에 확인할 수 있다. 프로세스, 쓰레드, 시그널, MMAP, 메모리 관리, 공유 메모리 등과 같은 부분의 API가 정교하게 다듬어져 있다.&lt;/p&gt;
+&lt;p&gt;하지만 아직까지는 
+&lt;a href=&#34;http://www.gtk.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib&lt;/a&gt;
+에게 더 높은 점수를 주고 싶다. GObject까지는 필요 없더라도 GLib 자체는 충분히 안정화되어 가고 있다. 초기 버전에 비해 Win32 지원이 날이 갈수록 좋아지는 걸 확인하고 있다. GLib에서 가장 좋아하는 부분은 메인 이벤트 루프를 지원한다는 점이다.(물론 가장 까다로운 부분이라 고생하는 부분이기도 하다)&lt;/p&gt;
+&lt;p&gt;GLib과 APR을 대충 비교하면, GLib과 겹치는 부분도 있지만 없는 부분도 많다. 물론 GLib에만 있는 부분이 더 많다. 그리고 APR은 아직도 너무 치열하게 개발중이다. 즉, GLib은 이미 API가 안정화 단계에 있는데 APR은 아직도 활발하게 API가 변경되고 있다.&lt;/p&gt;
+&lt;p&gt;지금 당장 프로젝트에 도입할 수는 없지만, 몇 개월 뒤에는 또 어떻게 발전해 있을까 궁금해진다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>멀티쓰레드 GTK&#43; 프로그래밍</title>
+      <link>/2006/01/20/2006-01-20-multi-thread-gtk-programming/</link>
+      <pubDate>Fri, 20 Jan 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/01/20/2006-01-20-multi-thread-gtk-programming/</guid>
+      <description>&lt;p&gt;대부분의 프로젝트를 GTK+를 이용하지만, 잊어버릴만 하면 부딪히는 문제 중 하나가 바로 멀티쓰레드 프로그램에서 GTK+ 위젯을 다룰때 발생하는 여러가지 현상들이다.&lt;/p&gt;
+&lt;p&gt;우선 가장 쉽게 만나는 패턴은 XLib에서 Sync 에러를 내면서 프로그램 종료, 아니면 반대로 GUI가 블럭킹되어 아무 것도 동작안하는 현상이다. 그 다음으로는 해제된 위젯에 접근하거나, 아직 초기화가 덜된 위젯에 접근할 경우 발생하는 무수한 오동작 현상이 있지만, 이는 어플리케이션 설계의 문제이기도 하다.&lt;/p&gt;
+&lt;p&gt;첫번째 패턴은 GTK+를 멀티쓰레드에서 이용할 경우 처음 사용하는 사람은 누구나 만나게 된다. X 윈도우는 프로세스별로 접근은 제어해주지만, 쓰레드별 접근은 제어를 해주지 않기 때문에 이는 상위 라이브러리나 프로그래머가 처리해야 한다는 점을 모를 경우 말이다.&lt;/p&gt;
+&lt;p&gt;물론 
+&lt;a href=&#34;http://library.gnome.org/devel/gdk/stable/gdk-Threads.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 매뉴얼에는 친절하게 설명&lt;/a&gt;
+이 되어 있다. 시그널 핸들러를 통해 호출되는 콜백 함수는 항상 GDK 쓰레드가 잠겨서 호출되지만, g_idle_add(), g_timeout_add() 등을 통해 호출되는 콜백 함수는 프로그래머가 해주어야 한다. 또한 메인 GTK+ 쓰레드가 아닌 쓰레드에서 GTK+ 위젯을 접근하려면 g_idle_add() 또는 다른 메시징 방식을 이용해 메인 쓰레드에서 처리하도록 하거나, 매번 GDK 쓰레드 잠금/해제를 프로그래머가 해주어야 한다. gtk_main_iteration() 등의 도움을 받기도 한다.&lt;/p&gt;
+&lt;p&gt;하지만, 내가 말하고 싶은 건, 그럼에도 불구하고 너무 복잡하다. GTK+의 많은 부분을 좋아하지만 이 부분만큼은 정말 GTK+가 알아서 해주면 얼마나 좋을까라는 생각을 몇 년째 하고 있다. 수십 개의 쓰레드가 존재하고, 외부 명령을 호출하여 그 결과를 GUI에 반영하면서 다른 GUI 부분들도 정상적으로 동작해야 하는데, 기능 외적인 부분에 항상 너무 많은 시간이 소모된다. 모든 경우를 위와 같은 방식으로 해결할 수도 없다. 4년 넘게 GTK+ 어플리케이션을 만들어 프로젝트를 진행하고 있지만, 기능이 추가될때마다 똑같은 홍역을 겪고 있다.&lt;/p&gt;
+&lt;p&gt;이제, 다른 대안을 찾아야 할 시기일까&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>멀티쓰레드 프로그래밍 규칙</title>
+      <link>/2005/11/20/2005-11-20-multi-thread-programming-rules/</link>
+      <pubDate>Sun, 20 Nov 2005 00:00:00 +0000</pubDate>
+      <guid>/2005/11/20/2005-11-20-multi-thread-programming-rules/</guid>
+      <description>&lt;p&gt;멀티 쓰레드 방식 프로그래밍은 강력한 효율을 제공하지만 그만큼 프로그래머를 힘들게 하기도 한다. 그렇다면, 멀티 쓰레드 방식을 대체할 수 있는 방법은 무엇이 있을까? 물론 많은 사람들이 이 주제에 대하여 책도 쓰고 글도 남겼지만 여기는 내 블로그니까, 가능한 내 경험에 비추어 생각해본다.&lt;/p&gt;
+&lt;h3 id=&#34;뮤텍스mutex를-사용해야-하는-구조로-설계하지-말기&#34;&gt;뮤텍스(mutex)를 사용해야 하는 구조로 설계하지 말기&lt;/h3&gt;
+&lt;p&gt;뮤텍스를 이용하는 근본적인 이유는 하나의 리소스에 대해 동시에 접근할 경우 문제가 발생할 수 있을 경우 이에 대한 상호 배제(Mutual Exclusion)를 하기 위함이다. 하지만 하나의 리소스 또는 기능에 대한 처리를 전담하는 쓰레드를 만들고, 원하는 작업을 이 쓰레드(또는 프로세스)에게 메시지로 전달하여 처리하는 방식을 이용하면 뮤텍스를 사용해야 하는 경우는 사라지게 된다. 즉, 메시지 처리 방식(message-driven)을 이용하는 것이다. 물론 이 방식은 비동기적인 메시지일 경우 별로 문제가 없지만, 동기화가 필요한 경우 복잡해진다는 단점이 있다. 또한 성능 문제도 무시할 수 없다.&lt;/p&gt;
+&lt;h3 id=&#34;폴링polling-방식을-적극적으로-이용하고-쓰레드로-분리하지-않기&#34;&gt;폴링(polling) 방식을 적극적으로 이용하고 쓰레드로 분리하지 않기&lt;/h3&gt;
+&lt;p&gt;멀 티쓰레드 프로그래밍시 발생하는 대부분의 문제는 한번 쓰레드 방식을 이용하게 되면 이후 추가되는 모든 구현에 적극적으로 쓰레드를 도입하게 되는 습관에서 시작한다. 특히 IO(비디오,디스크,네트워크) 관련 처리에 대한 비동기 처리를 폴링 방식으로 프로그래밍하면 느려지고 복잡하기 때문에 쓰레드로 분리해서 쉽게 해결하지만, 바로 이때부터가 재앙의 시작이다. 경험상으로 보면 가장 큰 기능별로 쓰레드를 분리하는 것이 가장 바람직하며, 정말로 성능에 별로 지장을 주지 않는다면 조금 수고가 들더라도 비동기 방식으로 제작하여 한 쓰레드에서 수행되도록 하는 것이 데드락(deadlock)과 같은 저주를 피하면서 뇌세포에게 더 많은 휴식을 줄 수 있는 방법일 것이다.&lt;/p&gt;
+&lt;h3 id=&#34;이미-잘설계된-라이브러리를-이용하기&#34;&gt;이미 잘설계된 라이브러리를 이용하기&lt;/h3&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://www.gtk.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib&lt;/a&gt;
+ 같은 라이브러리를 살펴보면 위의 원칙대로 프로그래밍하기 위한 API가 너무나 잘 지원되고 있다. 욕심이 나지 않을 수가 없다. 다만, 임베디드 시스템에도 이용할 수 있도록 다른 라이브러리에 대한 의존성이 적고, WinCE 등과 같은 플랫폼도 문제없이 지원한다면 현재 진행중인 모든 프로젝트의 기본 라이브러리로 채택하지 않을 이유가 없을텐데 말이다.&lt;/p&gt;
+&lt;p&gt;물론 다른 규칙도 많겠지만, 오늘은 일단 여기까지만&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

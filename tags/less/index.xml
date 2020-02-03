@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Less | 대체로 무해함</title>
+    <link>/tags/less/</link>
+      <atom:link href="/tags/less/index.xml" rel="self" type="application/rss+xml" />
+    <description>Less</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Mon, 07 Mar 2016 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Less</title>
+      <link>/tags/less/</link>
+    </image>
+    
+    <item>
+      <title>less 명령어가 끝나도 내용을 지우지 않게 하기</title>
+      <link>/2016/03/07/2016-03-07-exit-less-without-clearing-the-screen/</link>
+      <pubDate>Mon, 07 Mar 2016 00:00:00 +0000</pubDate>
+      <guid>/2016/03/07/2016-03-07-exit-less-without-clearing-the-screen/</guid>
+      <description>&lt;p&gt;&lt;code&gt;git diff&lt;/code&gt;, &lt;code&gt;git log&lt;/code&gt; 같은 명령어는 내부적으로 다시 &lt;code&gt;less&lt;/code&gt; 프로그램을
+사용합니다. 그런데 언젠가부터 갑자기 명령어가 끝나면 내용이 지워지면서 원래
+화면이 표시되어 여간 불편했는데, 그 이유를 조사해 보니 Zsh 셸을 사용하면서
+설치한 
+&lt;a href=&#34;https://github.com/robbyrussell/oh-my-zsh&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Oh My Zsh&lt;/a&gt;
+ 때문이었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;~/.oh-my-zsh/lib/misc.zsh&lt;/code&gt; 파일에 다음과 같이 되어 있는데,&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;export PAGER=&amp;quot;less&amp;quot;
+export LESS=&amp;quot;-R&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아래와 같이 수정하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;export PAGER=&amp;quot;less&amp;quot;
+export LESS=&amp;quot;-R -F -X&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;구글링으로 참조한 링크는 아래와 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://superuser.com/questions/106637/less-command-clearing-screen-upon-exit-how-to-switch-it-off&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;lsquo;less&amp;rsquo; command clearing screen upon exit - how to switch it off?&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://unix.stackexchange.com/questions/38634/is-there-any-way-to-exit-less-without-clearing-the-screen&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Is there any way to exit “less” without clearing the screen?&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;:)&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

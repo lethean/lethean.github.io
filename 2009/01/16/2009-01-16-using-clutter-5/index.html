@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="클러터 튜토리얼 계속 이어집니다. **효과(Effects) - 자연스러운 애니메이션 ** 클러터는 애니메이션을 쉽게 구현하기 위해 효과(effect) 기능">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2009/01/16/2009-01-16-using-clutter-5/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2009/01/16/2009-01-16-using-clutter-5/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2009/01/16/2009-01-16-using-clutter-5/">
+  <meta property="og:title" content="클러터(Clutter) 사용하기 (5) | 대체로 무해함">
+  <meta property="og:description" content="클러터 튜토리얼 계속 이어집니다. **효과(Effects) - 자연스러운 애니메이션 ** 클러터는 애니메이션을 쉽게 구현하기 위해 효과(effect) 기능"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2009-01-16T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T19:56:33&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2009/01/16/2009-01-16-using-clutter-5/"
+  },
+  "headline": "클러터(Clutter) 사용하기 (5)",
+  
+  "datePublished": "2009-01-16T00:00:00Z",
+  "dateModified": "2020-02-03T19:56:33+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "클러터 튜토리얼 계속 이어집니다. **효과(Effects) - 자연스러운 애니메이션 ** 클러터는 애니메이션을 쉽게 구현하기 위해 효과(effect) 기능"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>클러터(Clutter) 사용하기 (5) | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>클러터(Clutter) 사용하기 (5)</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>
+<a href="http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html" target="_blank" rel="noopener">클러터 튜토리얼</a>
+ 계속 이어집니다.</p>
+<p>**효과(Effects) - 자연스러운 애니메이션
+**</p>
+<p>클러터는 애니메이션을 쉽게 구현하기 위해 효과(effect) 기능을 제공합니다. 시간에 따라 하나의 액터 속성을 변경하기 위해 타임라인과 간단한 숫자 계산을 이용한 
+<a href="http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html" target="_blank" rel="noopener">여러가지 효과(effect) 함수</a>
+를 이용할 수 있습니다. 예를 들어 
+<a href="http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html#clutter-effect-fade" target="_blank" rel="noopener"><code>clutter_effect_fade()</code></a>
+는 액터의 불투명도(opacity)를 단계적으로 변화시키고, 
+<a href="http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html#clutter-effect-rotate" target="_blank" rel="noopener"><code>clutter_effect_rotate()</code></a>
+는 단계적으로 액터를 회전시키는데(rotate), 이때 불투명도와 회전도는 프로그래머가 등록하는 <code>alpha_func</code> 콜백을 호출해서 계산합니다.</p>
+<p>효과 기능을 사용하려면 제일 먼저 
+<a href="http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html#clutter-effect-template-new" target="_blank" rel="noopener"><code>clutter_effect_template_new()</code></a>
+를 이용하여 ClutterEffectTemplate 객체를 하나 만들어야 합니다. 이때 타임라인 객체와 ClutterAlphaFunc 형태의 콜백을 함께 지정해야 합니다. 이 콜백은 
+<a href="http://clutter-project.org/docs/clutter/0.8/ClutterAlpha.html#clutter-alpha-get-timeline" target="_blank" rel="noopener"><code>clutter_alpha_get_timeline()</code></a>
+을 호출해서 타임라인 객체를 얻은 뒤, 현재 프레임 번호(
+<a href="http://clutter-project.org/docs/clutter/0.8/ClutterTimeline.html#clutter-timeline-get-current-frame" target="_blank" rel="noopener"><code>clutter_timeline_get_current_frame()</code></a>
+)와 총 프레임 수(
+<a href="http://clutter-project.org/docs/clutter/0.8/ClutterTimeline.html#clutter-timeline-get-n-frames" target="_blank" rel="noopener"><code>clutter_timeline_get_n_frames()</code></a>
+)를 기반으로 알파값을 계산하여 반환하면 됩니다. 반환하는 값은 0과 
+<a href="CLUTTER_ALPHA_MAX_ALPHA"><code>CLUTTER_ALPHA_MAX</code>_ALPHA</a>
+ 사이의 값이어야 하며, 이 값의 의미는 사용하는 효과에 따라 다릅니다. 예를 들어 
+<a href="http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html#clutter-effect-fade" target="_blank" rel="noopener"><code>clutter_effect_fade()</code></a>
+를 사용할때 
+<a href="CLUTTER_ALPHA_MAX_ALPHA"><code>CLUTTER_ALPHA_MAX_ALPHA</code></a>
+ 값은 불투명도 100%를 의미합니다. 물론 모든 계산을 직접 할 수도 있지만 
+<a href="http://clutter-project.org/docs/clutter/0.8/ClutterAlpha.html#CLUTTER-ALPHA-SINE:CAPS" target="_blank" rel="noopener"><code>CLUTTER_ALPHA_SINE</code></a>
+처럼 미리 정의된 콜백 함수를 이용하면 쉽게 자연스러운 움직임을 얻을 수 있습니다. 다음 그림은 미리 정의된 몇가지 알파 콜백 함수가 반환하는 값을 그래프로 표현한 것입니다.</p>
+<p><img src="/figures/clutter-alpha-func.png" alt=""></p>
+<p>이렇게 만들어진 ClutterEffectTemplate 객체를 사용하려는 
+<a href="http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html" target="_blank" rel="noopener"><code>clutter_effect_*()</code></a>
+ 함수를 호출하면서 전달하면 됩니다.</p>
+<p>여러가지 타임라인을 여러가지 효과와 사용할때는 
+<a href="http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html#clutter-effect-template-set-timeline-clone" target="_blank" rel="noopener"><code>clutter_effect_template_set_timeline_clone()</code></a>
+을 이용하여 타임라인을 복제하도록 하면, 원본 타임라인을 변경해서 다른 효과에 사용할 수 있으므로, 다른 효과에 영향을 주지 않고 쉽게 재활용이 가능합니다. ClutterTimeline 객체와 마찬가지로 ClutterEffectTemplate 객체도 사용이 끝난후 <code>g_object_unref()</code>를 이용하여 리소스를 해제해야 합니다. 참고로, 효과 함수를 호출한 이후 템플릿을 더 이상 사용하지 않는다면 바로 해제해도 됩니다.</p>
+<p>효과 함수는 실제로 
+<a href="http://clutter-project.org/docs/clutter/stable/ClutterBehaviour.html" target="_blank" rel="noopener">ClutterBehaviour</a>
+ 객체를 감싼 단순화된 API라고 말할 수 있습니다. 하지만 효과 함수는 한 번에 하나의 액터만 제어할 수 있고 타임라인이 실행중인 동안에는 효과를 변경할 수 없습니다. 이러한 단점을 피하고 더 복잡한 효과를 원한다면 움직임(Behaviours) 객체를 직접 사용해야 합니다.</p>
+<p><strong>움직임(Behaviours) - 더 자연스럽고 강력한 애니메이션</strong></p>
+<p>효과 기능은 간단하지만, 더 복잡하고 다양한 애니메이션을 제어하기에는 부족하기 때문에 가끔은 움직임(Behaviours) 객체를 직접 사용해야 하는 경우가 있습니다. 효과 함수와 달리 움직임 객체를 사용하면 여러 액터를 동시에 제어할 수 있고 타임라인이 실행중이라도 움직임 파라메터를 변경할 수 있습니다. 예를 들어 
+<a href="http://clutter-project.org/docs/clutter/stable/ClutterBehaviourPath.html" target="_blank" rel="noopener">ClutterBehaviourPath</a>
+는 액터를 지정한 경로(path)를 따라 움직이는데, 매 프레임마다 <code>alpha_func</code> 콜백을 호출해서 경로상의 위치를 계산합니다. 다음 그림은 경로 상에서 알파 함수의 효과를 그래프로 표현한 것입니다.</p>
+<p><img src="/figures/clutter-path-alpha-func.png" alt=""></p>
+<p>콜백 함수 동작 방식은 효과(effect) 함수에서 사용하는 것과 동일합니다.</p>
+<p>타임라인이 무한루프 방식으로 동작하지 않을 경우, 움직임(behaviour)의 타임라인이 시작되면 움직임은 항상 마지막 점에 도달한 뒤 거기서 끝납니다. 예를 들자면, 액터는 타임라인에서 지정한 총 프레임 수와 초당 프레임 수에서 지정한 만큼 변경되면서 마지막 지점에 도달할때까지 경로를 따라 움직입니다.</p>
+<p>액터와 마찬가지로 
+<a href="http://clutter-project.org/docs/clutter/stable/ClutterAlpha.html" target="_blank" rel="noopener">ClutterAlpha</a>
+ 객체도 부동 참조(floating reference)를 가지고 있으므로 움직임 객체에 더한 다음에 따로 리소스를 해제할 필요가 없습니다. 하지만 움직임 객체는 아니므로 사용이 끝난 뒤에 <code>g_object_unref()</code>를 이용하여 리소스를 해제해야 합니다.</p>
+<p>클러터에서 제공하는 기본 움직임은 다음과 같습니다.</p>
+<ul>
+<li>
+<a href="http://clutter-project.org/docs/clutter/stable/ClutterBehaviourBspline.html" target="_blank" rel="noopener">ClutterBehaviourBspline</a>
+: 스플라인을 따라 액터가 이동</li>
+<li>
+<a href="http://clutter-project.org/docs/clutter/stable/ClutterBehaviourDepth.html" target="_blank" rel="noopener">ClutterBehaviourDepth</a>
+: Z축을 따라 액터가 이동</li>
+<li>
+<a href="http://clutter-project.org/docs/clutter/stable/ClutterBehaviourEllipse.html" target="_blank" rel="noopener">ClutterBehaviourEllipse</a>
+: 타원을 따라 액터가 이동</li>
+<li>
+<a href="http://clutter-project.org/docs/clutter/0.8/ClutterBehaviourOpacity.html" target="_blank" rel="noopener">ClutterBehaviourOpacity</a>
+: 액터의 불투명도 변화</li>
+<li>
+<a href="http://clutter-project.org/docs/clutter/0.8/ClutterBehaviourPath.html" target="_blank" rel="noopener">ClutterBehaviourPath</a>
+: 일련의 점으로 정의된 경로를 따라 액터가 이동</li>
+<li>
+<a href="http://clutter-project.org/docs/clutter/0.8/ClutterBehaviourRotate.html" target="_blank" rel="noopener">ClutterBehaviourRotate</a>
+: 액터가 회전</li>
+<li>
+<a href="http://clutter-project.org/docs/clutter/0.8/ClutterBehaviourScale.html" target="_blank" rel="noopener">ClutterBehaviourScale</a>
+: 액터가 확대 또는 축소</li>
+</ul>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/clutter/">Clutter</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2009/01/16/2009-01-16-using-clutter-5/&amp;text=%ed%81%b4%eb%9f%ac%ed%84%b0%28Clutter%29%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0%20%285%29" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2009/01/16/2009-01-16-using-clutter-5/&amp;t=%ed%81%b4%eb%9f%ac%ed%84%b0%28Clutter%29%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0%20%285%29" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=%ed%81%b4%eb%9f%ac%ed%84%b0%28Clutter%29%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0%20%285%29&amp;body=/2009/01/16/2009-01-16-using-clutter-5/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2009/01/16/2009-01-16-using-clutter-5/&amp;title=%ed%81%b4%eb%9f%ac%ed%84%b0%28Clutter%29%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0%20%285%29" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=%ed%81%b4%eb%9f%ac%ed%84%b0%28Clutter%29%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0%20%285%29%20/2009/01/16/2009-01-16-using-clutter-5/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2009/01/16/2009-01-16-using-clutter-5/&amp;title=%ed%81%b4%eb%9f%ac%ed%84%b0%28Clutter%29%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0%20%285%29" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2009/01/16/2009-01-16-implementing-clutter-actors/">Clutter 액터 구현하기 (Implementing Actors)</a></li>
+      
+      <li><a href="/2009/01/16/2009-01-16-using-clutter-6/">클러터(Clutter) 사용하기 (6)</a></li>
+      
+      <li><a href="/2009/01/15/2009-01-15-using-clutter-2/">클러터(Clutter) 사용하기 (2)</a></li>
+      
+      <li><a href="/2009/01/15/2009-01-15-using-clutter-3/">클러터(Clutter) 사용하기 (3)</a></li>
+      
+      <li><a href="/2009/01/15/2009-01-15-using-clutter-4/">클러터(Clutter) 사용하기 (4)</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

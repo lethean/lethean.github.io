@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kernel | 대체로 무해함</title>
+    <link>/tags/kernel/</link>
+      <atom:link href="/tags/kernel/index.xml" rel="self" type="application/rss+xml" />
+    <description>Kernel</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Sun, 16 Jan 2011 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Kernel</title>
+      <link>/tags/kernel/</link>
+    </image>
+    
+    <item>
+      <title>perf top 사용하기</title>
+      <link>/2011/01/16/2011-01-16-using-perf-top/</link>
+      <pubDate>Sun, 16 Jan 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/01/16/2011-01-16-using-perf-top/</guid>
+      <description>&lt;p&gt;리눅스에서 병목 현상 디버깅이나 현재 실행중인 프로세스 중에서 가장 CPU 리소스를 많이 소모하는 녀석을 찾아야 할 경우가 있습니다. 이런 경우 가장 전통적이고 간단한 방법은 &lt;code&gt;top&lt;/code&gt; 명령어를 실행해서 키보드 단축키 &amp;lsquo;1&amp;rsquo; / &amp;lsquo;H&#39;를 눌러 CPU / 쓰레드별 사용량을 확인하는 것입니다. 또한 이와 관련된 전통적인 유닉스 명령어도 많지만, 리눅스에서 실행 루틴 수준에서 더 정밀하게 분석하고 싶다면 
+&lt;a href=&#34;http://www.google.co.kr/search?q=OProfile&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;OProfile&lt;/a&gt;
+, 
+&lt;a href=&#34;http://www.google.co.kr/search?q=Valgrind&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Valgrind&lt;/a&gt;
+, 
+&lt;a href=&#34;/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/&#34;&gt;Google Performance Tools&lt;/a&gt;
+ 등과 같은 도구를 사용해도 됩니다.&lt;/p&gt;
+&lt;p&gt;그런데, 최근 리눅스 커널과 배포판에는 
+&lt;a href=&#34;https://perf.wiki.kernel.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;perf&lt;/a&gt;
+ 추적(trace) 도구가 포함되어 있습니다. 그리고 이를 기반으로 한 여러 명령어 중에서, 이 글에서 소개하는 &lt;code&gt;perf top&lt;/code&gt; 명령어를 사용하면 쉽게 현재 실행중인 커널 / 사용자 프로세스의 CPU 사용 내역을 확인할 수 있습니다. 이 명령어는 기본적으로 &lt;code&gt;top&lt;/code&gt; 명령어와 비슷하게 동작하지만, OProfile 같은 도구처럼 별도의 복잡한 설정 과정이 필요없다는 장점이 있습니다. 게다가 그 원리를 조금만 이해하면 다양한 응용이 가능하고, 최근 리눅스 커널에 추가된 많은 추적 도구 중에서 가장 활발하게 개발되고 있는 프레임워크이기 때문에 익숙해지는 것도 나쁘지 않을 것 같습니다.&lt;/p&gt;
+&lt;p&gt;우분투 리눅스에서 perf 도구를 사용하려면 제일 먼저 다음과 같이 해당 패키지를 설치해야 합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo apt-get install linux-tools
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;실행하기 위해서 반드시 perf 이벤트 접근 권한이 있어야 하므로 루트 계정 또는 &lt;code&gt;sudo&lt;/code&gt; 명령을 이용해 다음과 같이 무작정 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo perf top
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/perf-top-screenshot.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;위 출력 화면을 간단하게 설명하면, 마지막 갱신 주기 동안 &lt;code&gt;AES_encrypt&lt;/code&gt; 함수가 가장 많이 실행되었습니다. 목록은 위에서 아래로 더 많이 실행된 순서로 정렬되어 있는데, 각 열(column)을 설명하면, 맨 앞의 샘플(samples)과 퍼센트(pcnt)는 총 성능 카운터 샘플링 중에서 차지한 회수와 비율을 나타내고 함수(function)과 동적 공유 객체(DSO)는 샘플링된 위치를 보여줍니다. 따라서 가장 많이 샘플링된 함수가 갱신 주기 동안 가장 많이 실행된 부분이라고 해석하면 됩니다.&lt;/p&gt;
+&lt;p&gt;예를 들어 위 실행 결과는, &lt;code&gt;git pull&lt;/code&gt; 명령으로 ssh 방식 네트웍 서버로부터 데이터를 받아오는 작업을 처리하는 과정을 분석한 것입니다. ssh 연결이므로 암호화 관련 라이브러리 호출이 가장 많이 보이고, 커널에서 사용자 공간으로 복사하는 함수, e1000 이더넷 드라이버 인터럽트 핸들러 등이 눈에 띕니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;man perf top&lt;/code&gt; 또는 &lt;code&gt;perf top help&lt;/code&gt; 명령으로 더 자세한 사용법을 얻을 수 있습니다. 많은 옵션이 있지만 그 중에서 자주 사용하는 옵션 몇 가지만 설명하면, &lt;code&gt;-v&lt;/code&gt; 옵션은 함수 내에서 더 장확한 샘플링 위치를 보여주면서 상세한 메시지를 출력합니다. 그리고, &lt;code&gt;-s&lt;/code&gt; 옵션은 지정한 함수만 어셈블리 단계에서 샘플링한 결과를 자세히 보여줍니다.&lt;/p&gt;
+&lt;p&gt;참고로, 데비안 / 우부툰에서 개발하는 분이라면 패키지로 설치한 라이브러리의 디버깅 심볼 포함 패키지를 함께 설치해 두면, 예를 들어 libc6 라이브러리는 libc6-dbg 패키지(끝에 &amp;lsquo;-dbg&#39;가 더 붙음), 많은 개발 / 분석 도구에서 더 자세한 정보를 얻을 수 있습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 데스크탑 반응속도 향상 패치 테스트</title>
+      <link>/2010/11/20/2010-11-20-test-a-patch-to-improve-responsiveness-in-linux-desktop/</link>
+      <pubDate>Sat, 20 Nov 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/11/20/2010-11-20-test-a-patch-to-improve-responsiveness-in-linux-desktop/</guid>
+      <description>&lt;p&gt;며칠전부터 리눅스 커뮤니티와 관련 뉴스 사이트에서 리눅스 데스크탑 반응속도(reponsiveness)를 획기적으로 향상시킨다는 
+&lt;a href=&#34;http://marc.info/?l=linux-kernel&amp;amp;m=128978361700898&amp;amp;w=2&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;233라인짜리 패치&lt;/a&gt;
+에 대한 
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=article&amp;amp;item=linux_2637_video&amp;amp;num=1&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;소식&lt;/a&gt;
+이 끊임없이 흘러다니고 있습니다. 리누스 토발즈가 극찬을 해서 더 유명해진 것 같기도 한데, 아마도 원래 아이디어를 본인이 제안해서 그런게 아닌가 싶기도 하고, 커널 컴파일과 동시에 웹브라우징, 동영상 재생을 하는 것처럼 극단적인 환경과 멀티코어 시스템에만 적용될 뿐이라고 
+&lt;a href=&#34;http://psankar.blogspot.com/2010/11/cpu-or-io-what-matters-most.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그리 대단하게 않게 보는 사람&lt;/a&gt;
+들도 있는 것 같습니다. 게다가 한 터미널(tty)에서 파생한 프로세스를 모두 하나의 태스크 그룹으로 묶어 다른 태스크 그룹과 공평한 스케줄링이 되도록 한다는 아이디어가 근본적으로 cgroup 파일시스템을 이용하기 때문에 특별한 커널 패치 없이 
+&lt;a href=&#34;http://blog.glock.co.za/cgroup-user-space-speed-patch&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;cgroup 데몬과 스크립트를 이용해 동일한 효과를 얻는 기법&lt;/a&gt;
+도 등장했습니다.&lt;/p&gt;
+&lt;p&gt;직접 느껴보려고 일단 회사 개발 장비에 적용해 보았는데, 사양이 너무 좋아서인지 별로 차이점을 느끼지 못했습니다. 그래서 오래된 노트북 PC와 상대적으로 낮은 사양의 데스크탑 장비에도 적용해봤습니다. 하지만, 아이디어 자체가 터미널 작업과 다른 작업을 다른 그룹으로 나누는 것 뿐이라서 그런지, 터미널을 열어 다른 작업을 안했더니 별로 반응속도가 달라지는 건 느끼지 못하고 있습니다.&lt;/p&gt;
+&lt;p&gt;그럼에도 불구하고, 스케줄링 정책만으로 데스크탑 반응성을 향상할 수 있다는 아이디어를 조금만 더 확장하면 더 좋은 아이디어만 알고리즘이 나오지 않을까 기대해 봅니다. 아니나 다를까, 
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=news_item&amp;amp;px=ODc5OQ&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;페도라 15에서 시작 데몬으로 탑재할 SystemD 데몬에서 이미 사용자 세션, 서비스별로 각각의 태스크 그룹을 분리하도록 적용&lt;/a&gt;
+하는 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[업데이트-2010.11.22]&lt;/strong&gt; 예를 들어 제 경우, 구형 노트북에서 조금이라도 그래픽 성능 향상을 얻을 수 있을까 해서 ﻿&lt;code&gt;/etc/gdm/Init/Default&lt;/code&gt; 파일 마지막 라인 &amp;lsquo;&lt;code&gt;exit 0&lt;/code&gt;&amp;rsquo; 전에 다음과 같은 항목을 추가해서 체감 속도 변화를 느껴보려고 노력 중입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#chrt -rr -p 10 $(pidof X)
+mkdir -m 0700 -p /mnt/cgroups/cpu/Xorg
+echo $(pidof X) &amp;gt; /mnt/cgroups/cpu/Xorg/tasks
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>안드로이드 운영체제에서 실시간 시스템</title>
+      <link>/2010/11/19/2010-11-19-real-time-on-android-os/</link>
+      <pubDate>Fri, 19 Nov 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/11/19/2010-11-19-real-time-on-android-os/</guid>
+      <description>&lt;p&gt;실시간 시스템의 핵심 요구사항 중 하나는 빠른 대기시간(latency)이 아니라 가장 느린 대기시간을 미리 가늠할 수 있어야(predictability) 한다는 점입니다. 즉, 아무리 짧은 응답시간을 제공하더라도 시스템 부하(load)나 입출력(I/O), 태스크 동기화(synchronization) 등에 의해 느려지거나 최대 응답시간을 예측할 수 없다면 실시간 운영체제가 아닙니다. 물론 응답시간이 가능한 짧으면서 편차가 크지 않으면 더 바랄게 없겠지만, 그렇지 못할 경우라도 운영체제가 대기시간을 어느 정도까지 보장할 수 있느냐가 더 중요합니다. 참고로 여기서 언급하는 대기시간(latency)은 인터럽트, 태스크 스케줄링, I/O 스케줄링 등 여러 문맥에서 다른 의미를 가집니다.&lt;/p&gt;
+&lt;p&gt;실시간 시스템의 또 하나의 중요한 특징은 실시간 태스크의 스케줄링을 보장하는 일입니다. 즉, 시스템에 어떤 상황이 발생하더라도 미리 지정한 실시간 태스크가 마감시간(deadline)을 지킬 수 있어야 합니다. 이를 위해 전통적인 실시간 운영체제들은 마감시간 스케줄러(deadline scheduler), 스포래딕 서버(sporadic server) 등을 이용해 이를 보장합니다.&lt;/p&gt;
+&lt;p&gt;최근 리눅스 커널과 관련된 이슈를 살펴보면 위에서 설명한 두 가지 조건을 만족하기 위한 작업이 한창이지만, 이 글에서는 안드로이드(Android) 운영체제가 스마트폰 뿐 아니라 여러 내장 시스템(embedded system)에 도입되기 위한 필수조건을 일단 정리했습니다.&lt;/p&gt;
+&lt;p&gt;일반적으로 기능적 오류가 아닌 시간적 오류, 즉 안드로이드가 실시간 시스템 설계 명세에서 제한한 마감시간(deadline)을 얼마나 잘 지원하는지를 실험한 결과를 보면[1], 측정을 크게 둘로 나뉘어, 첫번째는 하드웨어 인터럽트 이벤트가 커널 내부의 이벤트 처리 모듈에게 전달되는데까지 소요되는 대기시간(latency)을 측정한 것이고, 두번째는 커널 이벤트 처리 모듈이 이벤트를 안드로이드 달빅(Dalvik) 가상머신 위에서 동작하는 어플리케이션에게 전달하기까지 걸리는 시간을 측정합니다. 더불어 대기시간의 변동량(variation)을 관찰해 실시간 시스템에 적합한 지 여부도 확인해 봅니다. 안드로이드 하부는 리눅스 커널이므로, 이 실험은 결국 안드로이드 플랫폼에 사용되는 리눅스 커널에 대한 실험이기도 합니다.&lt;/p&gt;
+&lt;p&gt;실험 결과는 흥미로운데, 정상적인 부하가 걸릴때보다(under normal load) 아무 부하도 없을때(under no load) 대기시간이 더 들쑥날쑥 합니다. 그 원인은 아무 작업도 없을 경우 저전력모드(low power mode)로 있다가 인터럽트가 발생하면 그때서야 정상적인 상태로 돌아와 이벤트를 처리하기 때문입니다. 하지만 타이머 인터럽트 주기를 100밀리초에서 1밀리초로 변경하면, 거의 제 시간에 처리하지 못하는 결과가 발생하는 모습을 보여줍니다.&lt;/p&gt;
+&lt;p&gt;안드로이드 자바 어플리케이션의 각 쓰레드는 리눅스 pthread에 일대일로 대응합니다. 안드로이드에서 자바 쓰레드 우선순위는 10단계로 조정할 수 있는데, 이 값은 리눅스 쓰레드의 nice값으로 변환됩니다. 즉, 리눅스 커널 스케줄링 클래스 중에서 SCHED_OTHER 클래스만 사용하고 실시간 우선순위를 사용하는 SCHED_FIFO, SCHED_RR 클래스는 사용하지 않습니다.[2] 달빅(Dalvik) 가상머신은 고전적인 자바 가상머신이 실시간 시스템에서 고생하는 원인 중 하나로 지목되는 가비지 컬렉션(garbage collection)으로 인한 예측불가능한 프로세스 멈춤(freeze) 현상을 여전히 가지고 있습니다. 자체적으로 구현한 C 라이브러리(bionic)는 SystemV IPC 등과 같은 기존 프로세스간 동기화 메카니즘을 없애고 Binder라는 고유 IPC 메카니즘을 제공하는데,  태스크간 우선순위 역전(priority inversion)을 막기 위한 우선순위 상속(priority inheritance),  우선순위 한계(priority ceiling) 같은 프로토콜을 아직 제공하지 않습니다.&lt;/p&gt;
+&lt;p&gt;안드로이드는 인터럽트 핸들러가 우선순위가 더 높은 실시간 태스크를 선점하거나 지연하지 않기 위해 반드시 해결되어야 하는 리눅스 커널 인터럽트 처리 방식의 구조적 한계도 그대로 가지고 있습니다. 이를 해결하려면, 사용하는 모든 드라이버의 인터럽트 핸들러를 리눅스 2.6.30 버전부터 추가된 쓰레드 방식으로 바꾸거나 PREEMPT_RT 패치를 적용해야 합니다.&lt;/p&gt;
+&lt;p&gt;그래서 결론은, 역시 아직 안드로이드 운영체제는 실시간 시스템에 적합하지 않지만, 이를 보완하기 위한 많은 작업과 연구가 더 필요합니다.&lt;/p&gt;
+&lt;p&gt;[1]﻿ 
+&lt;a href=&#34;http://www.ece.gatech.edu/~vkm/Android_Real_Time.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Bhupinder S. Mongia, Vijay K. Madisetti, ﻿Reliable Real-Time Applications on Android OS&lt;/a&gt;
+
+[2] 
+&lt;a href=&#34;http://www.cister.isep.ipp.pt/docs/evaluating&amp;#43;android&amp;#43;os&amp;#43;for&amp;#43;embedded&amp;#43;real-time&amp;#43;systems/569/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Claudio Mia, Luis Nogueira, Evaluating Android OS for Embedded Real-Time Systems&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 스케줄링 영역과 클래스</title>
+      <link>/2010/10/06/2010-10-06-linux-kernel-scheduling-domains-and-classes/</link>
+      <pubDate>Wed, 06 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/10/06/2010-10-06-linux-kernel-scheduling-domains-and-classes/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;스케줄링 영역 (Scheduling Domain)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;멀티 프로세서 시스템에서 스케줄러의 중요한 역할 중 하나는 모든 CPU의 부하를 균등하게 맞추는 일입니다. 이를 위해 스케줄러는 한 CPU에서 동작하던 태스크를 다른 CPU로 이동해야 하는 경우, 각 아키텍쳐의 특성을 고려해야 합니다.  왜냐하면, 한 CPU에서 동작하던 태스크를 다른 CPU로 옮기면(migration) 캐시 불일치 등으로 인한 오버헤드가 발생하는 것은 물론 아키텍쳐에 따라 심각한 성능 저하를 일으킬 수도 있기 때문입니다.[1]&lt;/p&gt;
+&lt;p&gt;예를 들어, 하이퍼 쓰레드 프로세서는 하나의 프로세서 안에 논리적인 CPU가 여러 개 포함된 구조이기 때문에 여러 논리 CPU는 모두 캐시와 메모리를 모두 공유합니다. 따라서 이 논리 CPU간에는 태스크를 이동하는데 오버헤드가 없습니다. SMP(Symmectric Multi Processor) 시스템이나 멀티 코어(Multi Core) 프로세서에는 하나의 물리 CPU 안에 한 개 이상의 CPU 코어가 장착되어 있습니다. 이 CPU 코어는 각각 캐시(cache)를 가지고 있지만, 메모리는 모두 공유합니다. 따라서 프로세서간 태스크 이동(migration)이 가능한 적을수록 좋은 성능을 얻을 수 있습니다. NUMA 아키텍쳐는 여러 노드로 구성되는데, 한 노드는 하나의 CPU와 메모리, 캐시로 구성됩니다. 그리고 한 CPU가 같은 노드의 메모리를 접근할 때는 속도가 다른 노드의 메모리를 접근할 때보다 훨씬 빠릅니다. 그러므로 CPU간 태스크 이동은 정책적으로 반드시 필요한 경우에만 일어나야 합니다. 최근 출시되는 프로세서는 대부분 멀티 코어이면서 각 프로세서 코어가 다시 하이퍼 쓰레드를 통해 논리 CPU를 지원하고, NUMA 아키텍쳐에서 한 노드의 프로세서가 하이퍼 쓰레드를 지원하기도 합니다.&lt;/p&gt;
+&lt;p&gt;이처럼 다양한 구조의 시스템을 효율적으로 지원하기 위해 리눅스 커널 2.6 버전부터 스케줄링 영역(scheduling domains) 기능이 추가되었습니다. 스케줄링 영역은 스케줄링 그룹 자료구조와 함께 구성되며 계층적인 방식으로 전체 시스템의 영역을 구성합니다. 스케줄링 영역(&lt;code&gt;struct sched_domain&lt;/code&gt;)은 속성(properties)과 정책(policies)을 공유하는 CPU 집합이기 때문에, 해당 CPU 간에 부하가 균등하게 조절됩니다. 스케줄링 그룹(&lt;code&gt;struct sched_group&lt;/code&gt;)은 CPU별로 할당되면서 동시에 영역의 여러 CPU를 묶어서 구성되기도 합니다. 스케줄링 영역은 스케줄링 그룹을 한 개 이상 포함하기 때문에 스케줄러가 한 영역 내에서 균형을 유지하려할 때 그룹 안에서 발생하는 상황을 걱정하지 않고 그룹의 부하(load)를 다른 그룹으로 이동합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;스케줄링 클래스 (Scheduling Class)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;리눅스 커널 2.6.23 버전에서 기존 O(1) 스케줄러를 대체한 CFS(Completely Fair Scheduler) 스케줄러를 구현하면서 함께 도입된 스케줄링 클래스(Scheduling Class)는 리눅스 커널의 다양한 스케줄링 정책을 캡슐화해서 기본 스케줄러를 확장하기 쉽도록 도와줍니다. 하지만 스케줄러 메인 코드가 모듈 방식으로 구현된 건 아니기 때문에 새 스케줄러를 일반 커널 모듈처럼 쉽게 넣거나 뺄 수 있는 건 아닙니다. 다만 POSIX 표준에서 요구하는 &lt;code&gt;SCHED_RR&lt;/code&gt;, &lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_NORMAL&lt;/code&gt;, &lt;code&gt;SCHED_BATCH&lt;/code&gt;, &lt;code&gt;SCHED_IDLE&lt;/code&gt; 등과 같은 정책을 분리해서 구현하기 위해 도입된 구조입니다.[2] 하지만, 새 스케줄러 모듈을 추가하는 작업이 예전에 비해 쉬어진 것은 사실입니다.&lt;/p&gt;
+&lt;p&gt;스케줄링 클래스는 코어 스케줄러를 돕는 여러 모듈을 연결해 놓은 고리처럼 볼 수 있습니다. 가장 앞에 있는 스케줄러 모듈이 먼저 실행되고, 실행할 태스크가 없으면 다음 스케줄러 모듈을 실행하는 방식으로 동작합니다. 실제로, 스케줄링 클래스에는 실시간 스케줄러(&lt;code&gt;sched_rt.c&lt;/code&gt;), CFS 스케줄러(&lt;code&gt;sched_fair.c&lt;/code&gt;), 유휴 스케줄러(&lt;code&gt;sched_idletask.c&lt;/code&gt;) 순으로 단일 연결 목록에 등록되어 있어 순서대로 스케줄러 모듈을 실행합니다.&lt;/p&gt;
+&lt;p&gt;각 스케줄러 모듈은 스케줄링 클래스 구조체(&lt;code&gt;struct sched_class&lt;/code&gt;)가 제안하는 기능을 콜백 함수처럼 구현합니다. 다음은 리눅스 커널 2.6.23 버전에서 정의된 스케줄링 클래스 구조입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;struct sched_class { /* Defined in 2.6.23:/usr/include/linux/sched.h */
+  struct sched_class *next;
+  void (*enqueue_task) (struct rq *rq, struct task_struct *p, int wakeup);
+  void (*dequeue_task) (struct rq *rq, struct task_struct *p, int sleep);
+  void (*yield_task) (struct rq *rq, struct task_struct *p);
+  void (*check_preempt_curr) (struct rq *rq, struct task_struct *p);
+  struct task_struct * (*pick_next_task) (struct rq *rq);
+  void (*put_prev_task) (struct rq *rq, struct task_struct *p);
+  unsigned long (*load_balance) (struct rq *this_rq, int this_cpu,
+                 struct rq *busiest,
+                 unsigned long max_nr_move, unsigned long max_load_move,
+                 struct sched_domain *sd, enum cpu_idle_type idle,
+                 int *all_pinned, int *this_best_prio);
+  void (*set_curr_task) (struct rq *rq);
+  void (*task_tick) (struct rq *rq, struct task_struct *p);
+  void (*task_new) (struct rq *rq, struct task_struct *p);
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 구조체에서 중요한 함수를 살펴보면 다음과 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;enqueue_task()&lt;/code&gt; : 태스크가 실행 가능한 상태로 진입할 때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dequeue_task()&lt;/code&gt; : 태스크가 더 이상 실행 가능한 상태가 아닐때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;yield_task()&lt;/code&gt; : 태스크가 스스로 &lt;code&gt;yield()&lt;/code&gt; 시스템콜을 실행했을 때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;check_preempt_curr()&lt;/code&gt; : 현재 실행 중인 태스크를 선점(preempt)할 수 있는지 검사합니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;pick_next_task()&lt;/code&gt; : 실행할 다음 태스크를 선택합니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;put_prev_task()&lt;/code&gt; : 실행중인 태스크를 다시 내부 자료구조에 넣을때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;load_balance()&lt;/code&gt; : 코어 스케줄러가 태스크 부하를 분산하고자 할때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;set_curr_task()&lt;/code&gt; : 태스크의 스케줄링 클래스나 태스크 그룹을 바꿀때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;task_tick()&lt;/code&gt; : 타이머 틱 함수가 호출합니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;task_new()&lt;/code&gt; : 새 태스크가 생성되었을때 그룹 스케줄링을 위해 호출됩니다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;스케줄링 클래스 구조는 기본 CFS 스케줄러에서 사용하는 내부 자료구조와 밀접하게 연관되어 있습니다. 예를 들어 각 CPU별로 유지하면서 콜백 함수의 인수로 넘겨지는 실행 큐(&lt;code&gt;struct rq&lt;/code&gt;)는 CFS 스케줄러를 위해 채택한 레드-블랙 트리(red-black tree) 자료구조를 사용하기  때문에 새 스케줄러 모듈을 구현하려면 반드시 기존 CFS 스케줄러 동작 방식과 구조를 어느정도 자세히 알고 있어야 합니다.[3]&lt;/p&gt;
+&lt;p&gt;[1] 
+&lt;a href=&#34;http://lwn.net/Articles/80911/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Jonathan Corbet, &amp;ldquo;Scheduling domains&amp;rdquo;, LWN.net, 2004
+&lt;/a&gt;
+[2] 
+&lt;a href=&#34;http://www.ibm.com/developerworks/linux/library/l-cfs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Avinesh Kumar, Multiprocessing with the Completely Fair Scheduler, IBM developerWorks, 2008
+&lt;/a&gt;
+[3] 
+&lt;a href=&#34;http://www.ibm.com/developerworks/linux/library/l-completely-fair-scheduler/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;M. Tim Jones, Inside the Linux 2.6 Completely Fair Scheduler, IBM developerWorks, 2009&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 I/O 스케줄링 우선순위</title>
+      <link>/2010/10/05/2010-10-05-linux-kernel-io-scheduler-priority/</link>
+      <pubDate>Tue, 05 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/10/05/2010-10-05-linux-kernel-io-scheduler-priority/</guid>
+      <description>&lt;p&gt;리눅스 커널 CPU 스케줄링과 마찬가지로 I/O 스케줄링에 적용되는 스케줄링 클래스와 우선순위도 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/ioprio_set.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ioprio_set()&lt;/code&gt;&lt;/a&gt;
+ 시스템콜을 이용해 사용자가 제어할 수 있습니다. 하지만 리눅스 커널이 제공하는 여러가지 I/O 스케줄러 중에서 CFQ(Completely Fair Queuing) 스케줄러에서만 사용할 수 있습니다. 물론 리눅스 커널은 블럭 장치마다 다른 I/O 스케줄러를 사용할 수 있도록 허용하므로 필요한 경우 적절하게 시스템을 구성하는 것도 가능합니다.[1]&lt;/p&gt;
+&lt;p&gt;I/O 스케줄링 클래스는 CPU 스케줄링과 비슷하게 나누어집니다. 첫번재 &lt;code&gt;IOPRIO_CLASS_RT(1)&lt;/code&gt; 클래스는 실시간(real-time) I/O 클래스로서, 이 클래스에 속한 태스크는 다른 클래스에 속한 태스크보다 항상 디스크에 먼저 접근합니다. 클래스 내부 우선순위는 가장 높은 0부터 가장 낮은 7까지 지정할 수 있습니다. 두번째 &lt;code&gt;IOPRIO_CLASS_BE(2)&lt;/code&gt; 클래스는 최선노력(best-effort) I/O 클래스로서, 특별히 I/O 우선순위를 지정하지 않은 대부분의 태스크가 이 클래스에 속합니다. 첫번째 클래스와 마찬가지로 0부터 7까지 내부 우선순위를 지정할 수 있으며, 이 우선순위에 따라 얼마나 많은 I/O 대역폭을 할당할지 결정합니다. 마지막 &lt;code&gt;IOPRIO_CLASS_IDLE(3)&lt;/code&gt; 클래스에 속한 태스크는 위의 두 클래스에 속한 어떤 태스크도 해야할 I/O 작업이 없을때만 I/O 작업을 수행하고, 내부 우선순위는 무시됩니다.&lt;/p&gt;
+&lt;p&gt;I/O 스케줄링 클래스와 우선순위는 읽기 작업과 동기화 쓰기 작업(&lt;code&gt;O_DIRECT&lt;/code&gt;, &lt;code&gt;O_SYNC&lt;/code&gt;)에만 반영됩니다. 즉, 일반적인 비동기 쓰기 작업에는 적용되지 않습니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ioprio_set()&lt;/code&gt;, &lt;code&gt;ioprio_get()&lt;/code&gt; 시스템콜은 리눅스 표준 C 라이브러리에 대응하는 함수가 없기 때문에 다음과 같이 직접 &lt;code&gt;syscall()&lt;/code&gt; 함수를 이용해 호출해야 합니다.[2]&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define _GNU_SOURCE      /* or _BSD_SOURCE or _SVID_SOURCE */
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/syscall.h&amp;gt; /* For SYS_xxx definitions */
+
+static inline int ioprio_set (int which, int who, int ioprio)
+{
+  return syscall (__NR_ioprio_set, which, who, ioprio);
+}
+
+static inline int ioprio_get (int which, int who)
+{
+  return syscall (__NR_ioprio_get, which, who);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위와 같이 프로그램 소스 코드를 수정하지 않아도 
+&lt;a href=&#34;http://linux.die.net/man/1/ionice&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ionice&lt;/code&gt;&lt;/a&gt;
+ 프로그램을 이용하면 셸(shell)이나 스크립트에서 직접 다른 태스크의 I/O 스케줄링 클래스와 우선순위를  변경할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;이와 더불어 리눅스 커널 cgroups 시스템의 blkio 서브시스템을 이용하면 태스크 / 디스크별 대역폭(bandwidth)을 할당하거나 그룹별로 더 다양한 I/O 정책을 세밀하게 적용할 수 있습니다.[3]&lt;/p&gt;
+&lt;p&gt;[1] 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/ioprio_set.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ioprio_set(), Linux Programmer&amp;rsquo;s Manual&lt;/a&gt;
+
+[2] 
+&lt;a href=&#34;http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=Documentation/block/ioprio.txt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Block IO Priorities, Linux Kernel Source Documentation&lt;/a&gt;
+
+[3] 
+&lt;a href=&#34;http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=Documentation/cgroups/blkio-controller.txt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Block IO Controller, Linux Kernel Source Documentation&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 실시간 스케줄링 우선순위</title>
+      <link>/2010/09/30/2010-09-30-linux-kernel-realtime-scheduling-priority/</link>
+      <pubDate>Thu, 30 Sep 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/09/30/2010-09-30-linux-kernel-realtime-scheduling-priority/</guid>
+      <description>&lt;p&gt;&lt;code&gt;SCHED_OTHER&lt;/code&gt;, &lt;code&gt;SCHED_IDLE&lt;/code&gt;, &lt;code&gt;SCHED_BATCH&lt;/code&gt; 스케줄링 정책(policy)에 속하는 일반 태스크는 스케줄링 우선순위(priority)는 항상 0입니다. 하지만 &lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_RR&lt;/code&gt; 등과 같은 실시간 스케줄링 정책에 속하는 태스크는 가장 낮은 1부터 가장 높은 99까지의 우선순위가 부여됩니다.&lt;/p&gt;
+&lt;p&gt;리눅스 커널 스케줄러는 태스크 우선순위별로 실행 가능한 태스크 목록을 유지하고,  가장 높은 우선순위부터 차례대로 각 우선순위별 태스크 목록이 비어있는지 검사해서 태스크가 있을 경우 목록의 첫번째 태스크를 다음에 실행할 태스크로 선택합니다. 따라서, 항상 가장 높은 우선순위가 부여된 실시간 태스크가 실행되고, 결과적으로 일반 태스크는 항상 실시간 태스크보다 나중에 스케줄링됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_RR&lt;/code&gt; 정책은 우선순위가 같을 경우 태스크를 목록 어디에 삽입할 지를 결정하는데 사용합니다. &lt;code&gt;SCHED_FIFO&lt;/code&gt; 정책에 속하는 태스크는 실행 가능 상태가 되면 우선순위 태스크 목록의 마지막에 삽입됩니다. 이 태스크는 I/O 요청을 기다리거나, 우선순위가 더 높은 태스크에 의해 선점(preempted)되는 경우, 직접 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/sched_yield.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;sched_yield(2)&lt;/code&gt;&lt;/a&gt;
+ 시스템콜을 호출하는 경우가 아니면 계속 실행됩니다. 반면에 &lt;code&gt;SCHED_RR&lt;/code&gt; 정책은 &lt;code&gt;SCHED_FIFO&lt;/code&gt; 정책과 비슷하지만 각 태스크에게 할당된 최대 실행 시간(maximum time quantum)이 지나면 자동으로 우선순위 태스크 목록 마지막으로 이동됩니다.[1]&lt;/p&gt;
+&lt;p&gt;만일 프로세스(process)가 아닌 쓰레드(thread)의 스케줄링 속성을 변경하려면, &lt;code&gt;gettid()&lt;/code&gt; 시스템콜을 호출해서 얻은 tid 값을 프로세스 pid 대신 넘겨주면 됩니다. 하지만 &lt;code&gt;gettid()&lt;/code&gt; 시스템콜은 C 라이브러리에 대응하는 함수가 없기 때문에 다음과 같이 직접 &lt;code&gt;syscall()&lt;/code&gt; 함수를 이용해 호출해야 합니다.[2]&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define _GNU_SOURCE      /* or _BSD_SOURCE or _SVID_SOURCE */
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/syscall.h&amp;gt; /* For SYS_xxx definitions */
+#include &amp;lt;sys/types.h&amp;gt;   /* For pid_t */
+
+static inline pid_t gettid (void)
+{
+  return (pid_t) syscall (SYS_gettid); /* or __NR_gettid */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위와 같이 직접 프로그래밍하지 않아도 
+&lt;a href=&#34;http://linux.die.net/man/1/chrt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;chrt&lt;/code&gt;&lt;/a&gt;
+ 유틸리티를 사용하면 셸(shell)이나 스크립트에서 직접 다른 태스크의 실시간 스케줄링 속성을 변경할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;하지만 리눅스 커널은 실시간 태스크 스케줄링에 필수적인 스케쥴링 지연시간(scheduling latency), 인터럽트 지연시간(interrupt latency)을 보장하지(guarantee) 않기 때문에 이를 개선하기 위해서는 별도의 패치를 적용한 커널을 사용해야 합니다.[3][4]&lt;/p&gt;
+&lt;p&gt;[1] 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/sched_setscheduler.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;sched_setscheduler(), Linux Programmer&amp;rsquo;s Manual&lt;/a&gt;
+
+[2] 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/gettid.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gettid(), Linux man-pages&lt;/a&gt;
+
+[3] 
+&lt;a href=&#34;https://rt.wiki.kernel.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Real-time Linux Wiki&lt;/a&gt;
+
+[4] 
+&lt;a href=&#34;https://www.osadl.org/Realtime-Linux.projects-realtime-linux.0.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;OSADL Project: Real-time Linux&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 로그 버퍼 읽기</title>
+      <link>/2010/07/28/2010-07-28-reading-linux-kernel-log-buffer/</link>
+      <pubDate>Wed, 28 Jul 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/07/28/2010-07-28-reading-linux-kernel-log-buffer/</guid>
+      <description>&lt;p&gt;우분투 최신 버전을 설치하면 
+&lt;a href=&#34;http://packages.ubuntu.com/lucid/kerneloops-daemon&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;kerneloops-daemon&lt;/a&gt;
+ 패키지가 자동으로 설치됩니다. 이 프로그램은 커널 로그 메시지를 주기적으로(10초 간격으로) 가져와서 파싱(parsing)한 뒤 커널 패닉(OOPS) 메시지를 추출해 이를 
+&lt;a href=&#34;http://www.freedesktop.org/wiki/Software/dbus&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;D-Bus&lt;/a&gt;
+를 통해 전달하는 역할을 하는데. 
+&lt;a href=&#34;http://packages.ubuntu.com/lucid/kerneloops-applet&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;kerneloops-applet&lt;/a&gt;
+ 패키지를 설치하면 로그인시 자동으로 애플릿 하나가 실행되면서 D-Bus에서 메시지를 받아 사용자 확인을 거쳐 
+&lt;a href=&#34;http://kerneloops.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;kerneloops.org&lt;/a&gt;
+ 사이트 등으로 보고서를 자동으로 전송합니다. 참고로, 우분투에서 데몬을 동작하게 하려면 &lt;code&gt;/etc/default/kerneloops&lt;/code&gt; 파일 안에서 &lt;code&gt;enabled&lt;/code&gt; 항목을 1로 변경해야 하고, 세부 동작 옵션은 &lt;code&gt;/etc/kerneloops.conf&lt;/code&gt; 설정 파일을 수정하면 됩니다.&lt;/p&gt;
+&lt;p&gt;그런데 이 kernelooops 소스를 검토하던 중 커널 로그 버퍼(보통 dmesg 명령 결과)를 가져오기 위해 다음과 같은 시스템콜을 직접 호출하는 것을 발견했습니다. (kerneloops 패키지 소스 안에 &lt;code&gt;dmesg.c:423&lt;/code&gt;)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;syscall(__NR_syslog, 3, buffer, getpagesize());
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 시스템 콜 사용법이 궁금해서 dmesg 소스를 확인해 보니 여기서는 다음과 같은 C 라이브러리 함수를 사용합니다. (util-linux 패키지 소스 안에 &lt;code&gt;sys-utils/dmesg.c:120&lt;/code&gt;)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;n = klogctl(3, buf, sz); /* read only */
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그래서 매뉴얼을 찾아보니(&lt;code&gt;man klogctl&lt;/code&gt;) 둘 모두 같은 동작을 하는 것은 물론, 지금껏 모르고 있었던 몇가지 기능도 알 수 있었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/man-klogctl.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;예를 들어, 매뉴얼에도 나와 있듯이, 지금까지는 syslogd 데몬과 통신하는 syslog(3) 함수만 알고 있었는데,  이 함수는 커널 syslog 시스템콜과 아무 관계가 없다는 점 등입니다. 참고로, 리눅스 커널 소스는 &lt;code&gt;kernel/printk.c&lt;/code&gt; 파일에 있는 &lt;code&gt;do_syslog()&lt;/code&gt; 함수가 실제로 syslog 시스템콜을 처리하고 있습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투 10.10 기본 파일시스템 - Btrfs</title>
+      <link>/2010/05/16/2010-05-16-btrfs-as-the-default-filesystem-in-ubuntu-10-10/</link>
+      <pubDate>Sun, 16 May 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/05/16/2010-05-16-btrfs-as-the-default-filesystem-in-ubuntu-10-10/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;/2010/01/25/btrfs-for-a-while/&#34;&gt;Btrfs 사용기&lt;/a&gt;
+를 포스팅한 지 얼마 되지도 않았는데, 우분투 배포판 10.10 버전 기본 파일시스템으로 
+&lt;a href=&#34;http://www.netsplit.com/2010/05/14/btrfs-by-default-in-maverick/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Btrfs를 사용할지도 모른다는 소식&lt;/a&gt;
+이 들려옵니다. 인텔(Intel) 모블린(Moblin)과 노키아(Nokia) 마에모(Maemo) 플랫폼이 통합된 
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=news_item&amp;amp;px=ODIzOA&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;미고(MeeGo) 플랫폼에서도 Btrfs 파일시스템을 채택&lt;/a&gt;
+하더니 바로 우분투 다음 버전도 채택할 지 모른다는 얘기입니다.&lt;/p&gt;
+&lt;p&gt;세부 일정은, Btrfs 파일시스템 안정성과 성능은 일단 2010년 10월 릴리스에 사용하는 리눅스 커널 2.6.35 버전에서 어느 정도 완성된다는 가정하에, GRUB2 부트로더를 지원하고 알파(alpha) 릴리스부터 사용자 피드백을 받아 파일시스템 개발자와 충분한 피드백을 주고 받아 안정화 하는 방식으로 진행할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;아무튼, 이렇게 되면 Btrfs 파일시스템을 설치 옵션으로 제공함으로써 패키지 업데이트 전후 스냅샷 복구 기능을 Btrfs를 이용해 지원하는 페도라(Fedora) 배포판처럼, 사용자가 직접 느낄 수 있는 기능이 우분투에도 추가되면 재미있고 유용해 질 수 있을 것 같습니다. 게다가, SSD 디스크에 최적화되어 있다는 마운트 옵션도 궁금하고, 요즘 관심을 가지고 있는 Ceph 분산 파일 시스템도 테스트해 볼 수 있을테고&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.33 릴리스</title>
+      <link>/2010/03/14/2010-03-14-linux-kernel-2-6-33-release/</link>
+      <pubDate>Sun, 14 Mar 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/03/14/2010-03-14-linux-kernel-2-6-33-release/</guid>
+      <description>&lt;p&gt;리눅스 커널 2.6.33 버전이 릴리스(2010-02-24)된지도 한참 지났는데, 이제서야 변경사항을 정리하게 되었습니다. 그 사이에 제 개인적으로는 다시 학생이면서 직장인 신분이 되었고, 그로 인해 사는게 두 배는 바빠졌습니다. 다행인지 불행인지, 릴리스 이후 조금 시간이 지나니 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_33&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널 뉴비&lt;/a&gt;
+ 뿐 아니라 제가 관심 있는 부분만 따로 정리한 기사도 나타나길래, 이 포스트는 아예 그 기사들을 참고했습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;LZO 압축 알고리즘 추가&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;커널 이미지와 initramfs 파일시스템 압축에 LZO 알고리즘을 사용할 수 있게 되었습니다. 기존 LZMA, BZIP2 알고리즘과의 차이라면 압축 해제 속도입니다. 비록 압축된 크기는 10~15% 정도 크지만, 압축 해제 속도가 더 빠르기 때문에 임베디드 시스템 뿐 아니라 일반 데스크탑에서도 부팅 속도 향상을 꾀할 수 있게 되었습니다. 참고로, ARM 플랫폼에서는 기본 옵션이 될 것이라고 합니다. (한동안은 줄이는 게 유행이더니, 이제는 부팅 속도 개선을 위한 기능이 유행이군요)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Compcache 지원&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://code.google.com/p/compcache/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Compcache&lt;/a&gt;
+는 메모리를 디스크에 스왑핑(swapping)할때 압축을 해서 넣고 빼는 기능입니다. 메모리 사용이 제한된  임베디드 시스템, 서버 가상화 환경 뿐 아니라 CPU 성능은 좋지만 상대적으로 메모리가 부족할 수 있는 넷북 플랫폼에서도 유용한 기능입니다. 이미 Edubuntu 배포판에서는 채용하고 있을 정도로 유용성이 증명되고 있는 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;perftool 기능 개선&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;커널 2.6.31 버전부터 추가된 perftool 시리즈에 &amp;lsquo;perf probe&#39;라는 기능이 새로 추가되었는데, 솔라리스의 DTrace를 모방한 SystemTap과 비슷한 기능을 합니다. 하지만 SystemTap은 사용하기에 조금 불편한데, 매번 새로운 probe를 추가하거나 수정할때마다 커널 모듈을 만들어 넣어야 하고, 이를 위해 커널 빌드 환경이 구축되어 있어야 합니다. 그래서 정작 임베디드 시스템에서는 사용하기 어려웠습니다. 그런데 &amp;lsquo;perf probe&amp;rsquo; 기능은 sysfs 인터페이스를 이용하기 때문에 커맨드라인에서 직접 실행 중에 probe를 추가 / 편집할 수 있습니다.  더 자세한 내용은 ftrace와 kprobe를 설명한 
+&lt;a href=&#34;http://lwn.net/Articles/343766/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN 기사&lt;/a&gt;
+를 참고하시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;그외 펄(perl) 스크립트를 이용해 perf 도구를 프로그래밍할 수 있는 기능도 추가되는 등, 처음에는 성능 카운터(performance counter)로 출발한 이 도구가 향후 리눅스 커널 디버깅 도구의 주연으로 등장할 것 같은 예감이 들기도 합니다.&lt;/p&gt;
+&lt;p&gt;**블럭 디바이스 기능 개선
+**&lt;/p&gt;
+&lt;p&gt;오랫동안 서버용 시스템에서 좋은 성능을 보여왔다고 평가되어 왔던 Anticipatory I/O 스케쥴러가 제거되었습니다.  이제는 CFQ I/O 스케쥴러가 모든 응용에 적합할만큼 충분히 성숙했다고 판단한 모양입니다. 이제 남은 것은 CFQ(Completely Fair Queue) I/O 스케쥴러와 Deadline, Noop 등인데 향후 이들도 하나의 스케쥴러만 남기거나 통합할 예정이라고 합니다.&lt;/p&gt;
+&lt;p&gt;이와 더불어 CFQ I/O 스케쥴러에 블럭 I/O 컨트롤러 기능이 추가되었는데, 이를 이용하면 네트워크 대역폭을 QOS를 이용해 제어하듯이 특정 프로세스나 프로세스 그룹에서 디스크 I/O 대역폭을 할당하거나 제한할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;기타&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;이제는 커널 컴파일 옵션에서 ext4 파일시스템 하나만 설정해도 이를 이용해 ext2 / ext3 파일시스템도 마운트할 수 있게 되었고, 안드로이드 커널이 공식 커널 트리에서 빠지게 되었으며(
+&lt;a href=&#34;http://www.kroah.com/log/linux/android-kernel-problems.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;참고&lt;/a&gt;
+), NVidia 그래픽카드 오픈소스 드라이버인 Nouveau 드라이버가 대폭 성능과 기능이 개선되어 공식적으로 포함되었습니다. 언제나 그렇듯이 많은 디바이스 드라이버가 추가, 변경되었고 API도 몇 개 바뀐게 보이고&amp;hellip; 대략 한 번 커널 뉴비 내용을 훑어보는 것도 나쁘지는 않을 것 같습니다.&lt;/p&gt;
+&lt;p&gt;참고한 기사는 다음과 같습니다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Kernel Newbies - Linux 2.6.33 : &lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_33&#34;&gt;http://kernelnewbies.org/Linux_2_6_33&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Linux 2.6.33 features for embedded systems : &lt;a href=&#34;http://free-electrons.com/blog/linux-2-6-33/&#34;&gt;http://free-electrons.com/blog/linux-2-6-33/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2.6.33 is Out! Say Good Bye to the Anticipatory Scheduler : &lt;a href=&#34;http://www.linux-mag.com/id/7724&#34;&gt;http://www.linux-mag.com/id/7724&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>아주 잠시 Btrfs 파일시스템을 사용해보고</title>
+      <link>/2010/01/25/2010-01-25-btrfs-for-a-while/</link>
+      <pubDate>Mon, 25 Jan 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/01/25/2010-01-25-btrfs-for-a-while/</guid>
+      <description>&lt;p&gt;요즘 여기
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=article&amp;amp;item=ext4_btrfs_2633&amp;amp;num=1&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;저기&lt;/a&gt;
+서 Btrfs 파일시스템 얘기가 많아서, 한번 써봐야겠다 싶어 우분투 개발버전(lucid, linux kernel 2.6.32) 저장소를 확인해보니 패키지 하나만(btrfs-tools) 설치하면 되길래 홈디렉토리를 btrfs 파일시스템으로 교체해 보았습니다. 그리고 스트레스 테스트를 위해 회사에서 유지하는 모든 프로젝트의 Git 저장소를 내려받고(clone) 동시에 컴파일을 해봤습니다.&lt;/p&gt;
+&lt;p&gt;그리고 지금, 다시 Ext4 파일시스템으로 되돌린 상태에서 동일하게 Git 저장소를 내려받으며 이 글을 적고 있습니다. 체감 속도가 느린 것은 물론, 오랜만에 마우스 움직임이 끊기는 현상까지 경험했습니다. CPU 리소스 점유율은 또 얼마나 높은지&amp;hellip;(압축 옵션을 사용하지 않았음에도 불구하고) 적어도 읽기 성능은 좋다고 하던데, 여러 프로세스가 동시에 접근할 때는 형편없이 저하되는 걸 목격했습니다.&lt;/p&gt;
+&lt;p&gt;뭐, 물론 아직도 활발하게 개발중이고, 좋은 기능도 많이  있는 것 같지만(그래서 그만큼의 리소스가 더 필요한 걸지도&amp;hellip;), 경험적 결론은, 아직 서버나 제품에 사용하기에는 시기상조라는 겁니다.&lt;/p&gt;
+&lt;p&gt;기회가 되면  SSD 디스크에서도 테스트해보고 싶은데, 가난한 개발자라서&amp;hellip; (술값만 줄여도 되려나&amp;hellip;?)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.32 릴리스</title>
+      <link>/2009/12/18/2009-12-18-linux-kernel-2-6-32-release/</link>
+      <pubDate>Fri, 18 Dec 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/12/18/2009-12-18-linux-kernel-2-6-32-release/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://lwn.net/Articles/364927/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.32 릴리스 소식&lt;/a&gt;
+을 들은지 한참 지난 지금에서야 정리해 봅니다. 모든 일이 그렇지만, 언제 이 버전의 커널을 프로젝트에 사용할지 모르는 일이므로 게으름부리지 말아야겠다는 생각이 다시 들고 있는 요즘입니다.&lt;/p&gt;
+&lt;p&gt;언제나 그렇듯이 제가 관심있는 내용만 정리합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CFQ IO 스케쥴러 새 기능&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;리눅스 커널의 기본 IO 스케쥴러인 CFQ 스케쥴러에 새 기능이 추가되었습니다. 백그라운드 IO 작업이 다른 작업에 영향을 덜 끼치도록 하여 데스크탑 관련 프로세스나 미디어 재생 프로그램의 상호작용성(interactiveness)을 향상시키는 기능인데, 반대로 IO 처리율(throughput) 성능을 떨어뜨릴 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;따라서 IO 성능이 더 중요한 시스템, 예를 들어 서버나 GUI 기능이 필요없는 시스템이라면 다음처럼 이 기능을 꺼야 합니다. (/dev/sda 장치의 경우)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ echo 0 &amp;gt; /sys/class/block/sda/queue/iosched/low_latency
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아마도 배포판의 경우 서버 / 데스크탑별로 자체 튜닝을 하지 않을까 싶습니다. 더 자세한 내용은 
+&lt;a href=&#34;http://lwn.net/Articles/355904/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN.net 페이지&lt;/a&gt;
+를 참고하시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;KVM 성능 향상&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;가상화 관련되어서는 KSM(kernel shared memory) 기술이 도입되어 KVM과 같은 가상환경의 메모리 사용량을 더 줄였습니다. 예를 들어 여러 가상머신을 실행하고 있을때 이들이 동일한 소프트웨어 라이브러리나 프로그램을 사용할 경우 이를 하나의 메모리에 공유해서 사용하도록 하여 실제 메모리 사용량을 줄이는 기술입니다. 사용하려면 명시적으로 다음과 같이 실행해야 합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ echo 1 &amp;gt; /sys/kernel/mm/ksm/run
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Devtmpfs 파일시스템&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;/dev 디렉토리를 메모리파일시스템(tmpfs)을 이용해 처리할 수 있도록 devtmpfs 파일시스템이 추가되었습니다. &amp;lsquo;devfs 2.0&#39;이라고도 불릴수 있는데, 커널 자신이 부팅하면서 램디스크를 만들어 마운트하고 장치 파일을 만들기 때문에 부팅시간을 줄일 수 있을 뿐 아니라 udev 등을 사용하지 않아도 되고, 이를 위한 initrd 파일시스템 없이 부팅할 수 있도록 도와줍니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;X86 플랫폼 지원 향상&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;인텔 무어스타운(Moorestown) 플랫폼을 공식적으로 추가되고 아톰(Atom)이 하나의 프로세서로 분리되면서 더 최적화된 지원을 하게 되었습니다. 더불어 인텔의 
+&lt;a href=&#34;http://simplefirmware.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SFI(Simple Firmware Interface)&lt;/a&gt;
+를 지원한다고 하는데, ACPI를 대체하기 위해 인텔이 만든 것이라고 합니다. 무어스타운 플랫폼 자체가 스마트폰, MID(Mobile Internet Device) 등과 같은 임베디드 환경을 목표로 하므로 향후 이 플랫폼을 활용하려면 어쩔 수 없이 이 버전 이후 커널을 사용해야 할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;ACPI 4.0 지원이 추가된 것은 물론 최신 메인 보드의 I/O 장치가 제공하는 실행중 전원 절약 기능을 충분히 사용하도록 개선되면서 전원 관리 기능도 대폭 향상되었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;성능 분석 도구 추가&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;성능 카운터(Performance Counters)가 성능 이벤트(Performance Events)로 이름이 바뀌면서 매우 많은 기능이 추가되었습니다. 프로세스 스케쥴러를 분석하는 작업을 쉽게 해주는 &amp;ldquo;
+&lt;a href=&#34;http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff;h=0a02ad9331dd4db56c29c60db2e99c4daaad8a48&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;perf sched&lt;/a&gt;
+&amp;rdquo; 도구라든지, &amp;ldquo;perf record&amp;quot;를 이용해 기록한 내용을 SVG 그래픽파일로 변환해주는 &amp;ldquo;
+&lt;a href=&#34;http://blog.fenrus.org/?p=5&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Timechart&lt;/a&gt;
+&amp;rdquo; 도구 등이 그것입니다. Timechart는 bootchart와도 비슷하지만, 커널 레벨에서 수집하는 정보를 사용하기 때문에 부팅 시간 단축을 위한 측정에도 유용할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CFS 스케쥴러 성능 개선&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;안드로이드(Android)를 비롯한 리눅스 커널을 사용하는 몇몇 프로젝트에서는 이미 반영하고 있어 요즘 이슈가 되고 있는 
+&lt;a href=&#34;http://ck.kolivas.org/patches/bfs/sched-BFS.txt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;BFS&lt;/a&gt;
+ 스케쥴러와 관련된 패치도 있군요. 오픈소스 H.264 인코더 라이브러리 X264 개발자가 
+&lt;a href=&#34;http://x264dev.multimedia.cx/?p=185&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;블로그&lt;/a&gt;
+에서 밝힌 것처럼, 멀티코어 시스템에서 x264 인코딩을 실행하면 BFS 스케쥴러를 사용하는 경우가 리눅스 기본 CFS 스케쥴러보다 80% 정도 성능 향상이 있다는 내용을 리눅스 커널 메일링 리스트에 올리자마자 커널 개발자들이 이를 흔쾌히 받아들여 기존 CFS 스케쥴러의 버그를 수정했다고 하는데, 이번 커널 릴리스에 반영되었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&amp;lsquo;localmodconfig&amp;rsquo; 설정 옵션 추가&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;커널 빌드를 위해 설정할때 &amp;lsquo;make localmodconfig&amp;rsquo; 명령을 실행하면, 현재 실행중인 커널과 실제로 로드된 커널 모듈 목록만을 가지로 자동으로 최적화된 커널 설정 파일을 만들어주는 기능입니다. 자주 커널을 테스트하는 사람에게 매우 유용한 옵션일 것 같습니다. 비슷하지만 모든 모듈을 컴파일하여 커널에 내장시키도록 해주는 &amp;lsquo;make localyesconfig&amp;rsquo; 명령도 추가되었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;그외&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;btrfs 파일시스템을 많이 개선했고, 블럭 레이어 확장성(scalability)을 위한 개선 작업이 이루어졌습니다. 하지만 아직 사용하고 있지 않아 별로 감흥은&amp;hellip;&lt;/p&gt;
+&lt;p&gt;AMD/ATI 2000,300,4000 라데온 그래픽카드에 대한 커널모드스위치(KMS)와 3D그래픽 지원이 추가되었습니다. 인텔 칩셋은 항상 가장 먼저 지원되므로, 이제 메이저 칩셋 중에서는 NVIDIA 쪽만 남은 것 같기도 하고&amp;hellip; 인텔 드라이버는 프레임버퍼 압축 기능을 지원하여 Idle 상태에서 전원을 0.5W 정도 절약한다고 합니다.&lt;/p&gt;
+&lt;p&gt;VMware 설치시에 빌드하던 vmxnet3 기상 이더넷 드라이버가 커널에 공식적으로 포함되었습니다. 하지만 요즘은 VirtualBox를 사용하고 있어서 그다지&amp;hellip;&lt;/p&gt;
+&lt;p&gt;아무튼 ALSA 오디오 드라이버 / 비디오 / 이더넷 / 스토리지 등 많은 드라이버가 업데이트되었다고 하니, 더 자세한 내용이 궁금하신 분은 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_32&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널뉴비 페이지&lt;/a&gt;
+를 참고하시기 바랍니다. 커널뉴비 페이지가 너무 길다면 &amp;lsquo;
+&lt;a href=&#34;http://www.h-online.com/open/features/What-s-new-in-Linux-2-6-32-872271.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;What&amp;rsquo;s new in Linux 2.6.32&lt;/a&gt;
+&amp;rsquo; 기사를 보셔도 될 것 같습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.31 릴리스</title>
+      <link>/2009/09/14/2009-09-14-linux-kernel-2-6-31-release/</link>
+      <pubDate>Mon, 14 Sep 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/09/14/2009-09-14-linux-kernel-2-6-31-release/</guid>
+      <description>&lt;p&gt;어김없이 
+&lt;a href=&#34;http://lwn.net/Articles/351782/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.31 버전이 릴리스&lt;/a&gt;
+되었습니다. 그리고, 갈수록 내용이 부실해지고 있지만, 역시 제가 관심있는 변경 사항만 간추려 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;사용자 공간 문자 장치 (CUSE, Character Devices in User Space)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;FUSE가 사용자 공간에서 구현할 수 있는 파일시스템 드라이버를 제공한다면, 사용자 공간 문자 장치(?)는 문자 장치를 사용자 공간에서 구현할 수 있도록 도와줍니다. 특히 이를 이용해 ALSA가 대체한 OSS 장치에 대한 프록시 디바이스를 구현하고 있는데, 예를 들어 OSS 장치인 것처럼 보이지만 사용자 공간 드라이버이기 때문에 ALSA 라이브러리를 직접 호출해 구현할 수도 있고, 다른 네트워크 장치로 전달할 수도 있습니다. 더 나아가 PulseAudio 라이브러리를 이용할 수도 있고 다채널 믹싱 기능도 구현할 수도 있습니다. 이를 통해 커널의 ALSA OSS 에뮬레이션 모듈을 대체하면서 OSS 오디오 장치를 사용하는 많은 유닉스 어플리케이션이 리눅스에서 더 쉽게 동작할 수 있도록 도와줍니다.&lt;/p&gt;
+&lt;p&gt;아무튼 처음 시작은 OSS 프록시 장치를 구현하려고 포함된 기능이지만, 활용 방도는 FUSE처럼 무궁무진할 것으로 보입니다. 위와 같은 예가 오디오 장치에만 국한되는 건 아니니까요. 예를 들어 비디오 캡쳐 라이브러리가 바이너리 형태로만 제공되는 하드웨어를 사용하고 싶은데, 기존 어플리케이션이 V4L2 인터페이스 기반으로 만들어져 있다면, 캡쳐 카드용 V4L2 장치 파일을 CUSE 기반으로 만든 다음 V4L2 API 호출을 라이브러리 호출로 변환해도 되겠지요.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;성능 카운터 (Performance Counters)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;성능 카운터는 일종의 프로파일 도구입니다. 최근 CPU들이 기본적으로 지원하는 하드웨어 카운터 레지스터를 이용하기 때문에 커널이나 어플리케이션의 성능 저하를 야기하지 않습니다. 사용한 CPU 싸이클 수, 캐시 참조 회수, 캐시 미스 회수, 페이지 폴트 등과 같은 정보를 확인할 수 있는데, 현재  X86, PPC 플랫폼을 완전히 지원하고 S390, FRV 등은 부분적으로 지원하는 것 같습니다.&lt;/p&gt;
+&lt;p&gt;성능 정보를 추출하거나 확인하려면 커널 소스에 포함된 perf 라는 커맨드라인 도구를 이용합니다. 커널 뉴비의 예제를 보면 특정 프로그램과 라이브러리를 지정하면서 디버깅 정보를 전달하면 함수 단위로 실행 정보를 보여주는 기능도 있습니다. top 명령어처럼 실시간으로 상태를 보는 기능도 있는 것 같고&amp;hellip; 어플리케이션 성능 디버깅을 위해 OProfile을 사용하기가 부담될때 사용하면 좋을 것 같은 기능입니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Btrfs 파일 시스템 개선&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Ext4 파일시스템을 대체할 차세대 파일시스템으로 각광받고 있는 Btrfs는 리누스 토발즈가 자신의 노트북 루트 파일 시스템으로 사용하고 있다고 해서 더 유명하죠. 솔라리스 ZFS 파일시스템과 비교도 많이 되고&amp;hellip; 아무튼 이번 버전에서 많이 안정화가 되었다고 하는데, 다음이나 다다음 릴리스 즈음엔 (1~2년 뒤?) 일반 배포판에서도 공식적으로 지원할 수 있을 정도의 상태인 것 같습니다. 더 자세한 기술적인 내용이 
+&lt;a href=&#34;http://lwn.net/Articles/342892/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN에 포스팅&lt;/a&gt;
+되어 있는데,  언제 여유가 되면 따로 정리해봐야 할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;기타&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;OProfile 기능이 인텔 아톰과 코어 i7 칩셋도 지원하게 되었군요. (지금까지 아톰칩에서 안되고 있었단 말인가&amp;hellip;) 아직 시장에 제품도 안나온 USB 3.0 지원이 포함되고, 커널 메모리 디버깅 관련 몇 가지 기능(Kmemcheck / Kmemleak)이 추가되었습니다. 데스크탑 반응성을 향상시키는 미리읽기(readahead)와  메모리 관리 관련 변경이 있었으며,  inotify / dnotify 등이 FSNotify 기반으로 다시 구현되었다고 합니다. 인텔 칩셋에 이어 ATI 라데온 칩셋의 커널 모드 셋팅 지원도 추가되었고, GCC 커버리지 기능(gcov)도 포함되었습니다. 물론 그외 많은 드라이버가 새로 추가되었고 버그도 많이 고쳐졌다고 합니다.&lt;/p&gt;
+&lt;p&gt;더 자세한 내용에 관심있는 분은 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_31&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널뉴비&lt;/a&gt;
+를 방문하시기 바랍니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>X 윈도우 비디오 가속(VA) API</title>
+      <link>/2009/07/13/2009-07-13-x-window-video-acceleration-api-overview/</link>
+      <pubDate>Mon, 13 Jul 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/07/13/2009-07-13-x-window-video-acceleration-api-overview/</guid>
+      <description>&lt;p&gt;기존 X 윈도우 프로그래밍에서 하드웨어 가속 기능을 이용하여  YUV 형식의 비디오를 재생하거나 MPEG2 코덱을 디코딩하려면  
+&lt;a href=&#34;http://en.wikipedia.org/wiki/X_video_extension&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Xv (X Video)&lt;/a&gt;
+와 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/X-Video_Motion_Compensation&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;XvMC (X Video Motion Compensation)&lt;/a&gt;
+ 확장(extension) API를 사용해야 합니다. 하지만 몇년 전부터 이러한 X 윈도우 확장 API의 한계를 벗어나기 위해 업체별로 각각 별도의 API 라이브러리를 제공하고 있는데, 인텔의 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Video_Acceleration_API&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;VA (Video Acceleration) API&lt;/a&gt;
+, NVIDIA의  
+&lt;a href=&#34;http://en.wikipedia.org/wiki/VDPAU&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;VDPAU (Video Decode and Presentation API for Unix)&lt;/a&gt;
+, ATI의 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/X-Video_Bitstream_Acceleration&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;XvBA (X-Video Bitstream Acceleration)&lt;/a&gt;
+ API 등이 그 예입니다. (물론 이를 지원하는 최신 그래픽카드 칩셋이 장착되어 있어야 하는데, 인텔의 경우 G45 칩셋부터 가능하다고 합니다) 참고로 CPU 점유율 66.3 ~ 98.4% 정도를 사용하는 고해상도 H.264 / VC1 비디오 재생이 하드웨어 가속 기능을 이용하면 0.6% 이하로 낮아진다는 
+&lt;a href=&#34;http://gwenole.beauchesne.info/en/blog/2009/06/22/video_decode_acceleration_benchmarks&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;벤치마킹 결과&lt;/a&gt;
+도 있습니다.&lt;/p&gt;
+&lt;p&gt;이러한 여러 업체의 독자적인 API가, 
+&lt;a href=&#34;http://lwn.net/Articles/339349/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN 기사&lt;/a&gt;
+에서 정리한 것처럼, 이제는 인텔 API로 통합되어 가고 있습니다.  VDPAU / XvBA 기능이 VA API의 백엔드(backend)로 구현하는 작업이 진행되고 있어 VA API만 지원해도 응용 프로그램은 쉽게 다른 업체의 하드웨어 가속 기능을 사용할 수 있게 되는 것입니다. 물론 MPlayer, FFmpeg, VLC 같은 대표적인 비디오 관련 응용 프로그램은 VA API를 이미 지원하거나 지원하기 위해 준비하고 있습니다.&lt;/p&gt;
+&lt;p&gt;VA API는 비디오 디코딩 뿐 아니라 기존 Xv 확장 API에서 처리하던 색상 공간 변환 (color space conversion), 감마 교정 (gamma correction), 확대 (scaling) 외에 기타 비디오 작업을 처리합니다. 게다가 앞으로는 인텔에서 제공하는 하드웨어 가속 인코딩 기능까지 지원할 예정인 것 같습니다. (2009년 하반기에 발표할 예정인 인텔 Moorestown 모바일 플랫폼에서 지원하는 것 같습니다) 더 나아가 클러터(Clutter) 같은 툴킷 라이브러리에서 직접 사용할 수 있도록 OpenGL 텍스쳐(texture)에 직접 렌더링하는 기능도 지원할 예정이라는군요.&lt;/p&gt;
+&lt;p&gt;그래픽 하드웨어 칩셋의 인코더 / 디코더 기능을 이용하는 기능은 얼핏 리눅스 커널 V4L2 기반의 하드웨어 인코더 / 디코더 API와 중복된다는 느낌도 있지만, VA API는 디코딩한 데이터가 바로 그래픽 카드 프레임 버퍼에 저장되어 표시되기 때문에 별도의 디스플레이 과정이 불필요하다는 점이 다릅니다. 또한 인코더 / 디코더 보드는 대부분 다채널 동시 인코딩 / 디코딩을 지원하지만, VA API는 한 번에 하나의 비디오만 처리할 수 있다는 점도 다릅니다.&lt;/p&gt;
+&lt;p&gt;아직은 모두 오픈소스가 아닌 업체가 제공하는 바이너리 X 윈도우 드라이버에서만 동작하는 것 같지만, 나중에 분명 필요하게 될 때가 있을 것 같으니, VA API 사용법도 한 번 둘러봐야 할 것 같습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.30 릴리스</title>
+      <link>/2009/06/12/2009-06-12-linux-kernel-2-6-30-release/</link>
+      <pubDate>Fri, 12 Jun 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/06/12/2009-06-12-linux-kernel-2-6-30-release/</guid>
+      <description>&lt;p&gt;어김없이 
+&lt;a href=&#34;http://lwn.net/Articles/336506/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.30 버전&lt;/a&gt;
+이 나왔습니다. 에휴&amp;hellip;&lt;/p&gt;
+&lt;p&gt;20대에는 릴리스마다 변경된 커널 코드를 읽어 보기도 했는데, 30대 초반 들어서는 기술 분석 문서를 읽는 것도 벅차더니, 30대 중반을 달리고 있는 요즘은 어디 잘 요약해 놓은데 없나 찾아 다니기만 하는 것 같습니다. 물론 갈수록 게을러지는 게 가장 큰 원인이겠지만, 매 릴리스마다 변경되는 기술의 폭이 커지는 것도 하나의 변명이 될 수 있지 않을까 생각합니다. 게다가 요즘은 초창기와 다르게 릴리스 전에 많은 전문가들이 먼저 시험해 보고 잘 정리해 놓으니까, 직접 API를 사용해 보거나 코드를 확인하는 건 정말 업무에 사용하게될 때 뿐인 것 같습니다. 어찌되었든, 중요한 변경 사항은 놓치지 않고 확인해놔야 먹고 사는데 지장이 없을 것 같아 제가 관심 있는 부분만 정리해 봅니다. 물론 더 자세한 내용은 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_30&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널 뉴비 사이트&lt;/a&gt;
+를 보시면 지나치게 잘 정리되어 있으니 놓치지 마시길!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;파일시스템 잔치 : NILFS2, POHMELFS, DST, EXOFS, EXT4, EXT3, &amp;hellip;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;일본 NTT Lab에서 개발한 NILFS2 파일시스템이 정식으로 커널에 포함되었습니다. 아직 개선이 조금 더 필요하지만 SSD 저장장치에서 엄청난 성능을 뿜어낸다고 하는군요. 아주 오래전부터 공식 커널 밖에서 개발되던 로그-구조(Log-structured) 방식 파일시스템이 드디어 실생활에 사용될 수 있을지 조금 기대가 됩니다. 참고로 로그-구조란, 로그 파일에 로그 메시지가 계속 추가되듯이, 기존 내용을 덮어쓰지 않고 추가 / 수정된 부분만 계속 새로운 공간에 배치하기 때문에 공간이 허락하는 한 무한대 롤백 / 스냅샷이 가능합니다. 그리고 이러한 특성 때문에 쓰기 제한이 있는 SSD 매체에 적합한 파일시스템이라는 얘기도 가능합니다.&lt;/p&gt;
+&lt;p&gt;오랫동안 
+&lt;a href=&#34;http://planet.kernel.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널 플래닛&lt;/a&gt;
+에서 개발 과정을 지켜봤던 POHMELFS 파일시스템도 포함되었습니다. 지금까지 존재하는 어떤 네트웍 파일시스템보다 성능이 더 좋다고 하는데, 써 볼 기회가 없는게 아쉽네요. 또한 NFS / AFS 등의 성능 개선을 이끌어낸 FS-Cache 캐싱 파일시스템도 추가되었다고 합니다. DST, EXOS 파일시스템은 잘 모르는 거라서&amp;hellip;&lt;/p&gt;
+&lt;p&gt;EXT3 / EXT4 파일시스템에서 fsync() 호출에 대한 반응속도(latency)도 많은 논의 끝에(?) 개선되었고, EXT3 파일시스템에서 relatime 옵션이 기본으로 켜지게 되었습니다. 더불어 EXT4 파일시스템도 많이 안정화된 것처럼 보입니다.&lt;/p&gt;
+&lt;p&gt;아무튼, 요즘 리눅스 커널은 BTRFS, EXT4, UnionFS 등을 포함한 차세대 파일시스템들이 EXT3 다음 자리를 놓고 치열하게 경쟁하는 덕분에, 개발자들 공부 많이 하게 해 주는군요&amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;쓰레드 방식 인터럽트 핸들러 지원&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;솔라리스나 실시간 커널에서는 이미 몇십년 전부터 사용하고 있는 방식이지만, 여러 정치적인 이유로 실시간 커널 브랜치에만 있던 
+&lt;a href=&#34;http://lwn.net/Articles/302043/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;쓰레드 방식 인터럽트 핸들러 기능&lt;/a&gt;
+이 이제서야 메인 커널에 추가되었습니다. 물론 인터럽트 핸들러가 실행이 길어질수록 시스템의 다른 부분이 아무 일도 할 수 없기 때문에 리눅스 커널은 아주 오래전부터 상단/하단 부분(top/bottom half)이나 태스크릿(tasklet)을 비롯해 많은 메카니즘을 제공함으로써 커널 레이턴시(latency)를 훌륭하게 보장하고 있지만, 아무래도 실시간 시스템 하는 사람들에겐 부족했던 모양입니다.&lt;/p&gt;
+&lt;p&gt;기존 방식으로 동작하려면 지금과 동일하게 request_irq() 함수를 사용하면 되고, 각각의 핸들러가 별도 커널 쓰레드로 동작하게 하려면 request_threaded_irq() 함수를 이용해 등록하면 됩니다. 두번째 방식은 핸들러 함수(quick_check_handler)가 하나 더 있는데, 인터럽트가 발생하면 이 핸들러가 먼저 실행된 후 인터럽트가 자신의 것이 맞는지 여부와, 그렇다면 그에 따라 인터럽트 핸들러 쓰레드를 깨울지, 직접 인터럽트 문맥에서 실행할 지 등을 결정하는 리턴값을 돌려주면 그에 따라 인터럽트 핸들러 쓰레드가 동작하는 방식입니다. 따라서 이로 인해 기존 태스크릿(tasklet)은 사라질 수도 있다고 합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;기타&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;커널 부팅 속도를 빠르게 하기 위해 한번에 하나씩 장치를 스캔하지 않고, 한꺼번에 장치 스캔 요청을 보낸 뒤 나중에 
+&lt;a href=&#34;http://lwn.net/Articles/314808/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;비동기(async)로 응답을 받아 처리할 수 있는 API&lt;/a&gt;
+도 추가되었습니다.&lt;/p&gt;
+&lt;p&gt;메모리 관리자는 또 개선되어, 커널 메모리 추적자(kmemtrace)라는 녀석도 추가되어 kmalloc(), kfree(), kmem_cache_alloc() 등과 같은 메모리 관련 API 추적 정보를 사용자 영역 프로세스에게 전달해 분석에 사용할 수 있게 되었습니다. 더불어 
+&lt;a href=&#34;http://lwn.net/Articles/308237/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;DMA API 디버깅을 위한 기능&lt;/a&gt;
+도 추가되었습니다.&lt;/p&gt;
+&lt;p&gt;X86_32 아키텍쳐에서 커널 스택 보호 기능도 추가되고, 이제 더 이상 zImage 형식은 지원하지 않게 되었고, /sys 밑에 새로운 항목들이 추가되고, 수많은 디바이스 드라이버가 업데이트되고 추가되었고&amp;hellip;&lt;/p&gt;
+&lt;p&gt;아무튼, 오늘은 여기까지!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.29 릴리스</title>
+      <link>/2009/03/26/2009-03-26-linux-kernel-2629-release/</link>
+      <pubDate>Thu, 26 Mar 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/03/26/2009-03-26-linux-kernel-2629-release/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://lwn.net/Articles/325047/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.29 버전이 릴리스&lt;/a&gt;
+되었군요. 이번에도 역시 제가 관심있는 부분만 우리말로 다시 요약해 보았습니다. 물론, 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_29&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널뉴비&lt;/a&gt;
+에서 더 자세한 내용을 확인할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;커널 모드 셋팅 (Kernel Modesetting)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;커널이 그래픽 모드 설정을 직접 제어하는 이 기능은 오랫동안 기다렸지만, 아직은 인텔 그래픽 카드만 지원하기 때문에 다른 비디오 카드 사용자는 더 기다려야 합니다. 하지만, 윈도우, 맥 같은 다른 데스크탑 운영체제처럼 드디어 리눅스도 그래픽컬한 운영체제로 변신하기 시작했다는 이정표는 분명히 될 것 같습니다. 개발자와 사용자 모두에게 많은 장점이 있지만, 이미 많은 사이트에서 이미 잘 설명하고 있으므로 자세한 내용은 생략합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Btrfs / Squashfs / Ext4 파일시스템&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;썬과 애플의 ZFS에 견줄만한 유일한 파일시스템이 드디어 메인 커널에 추가되었습니다. 오라클의 지원하에 EXT4를 대체할 파일시스템 자리를 노리며 활발하게 개발되고 있지만, 아직은 테스트용으로만 추천하고 있습니다. 하물며 안정화되었다는 EXT4 파일시스템도 우분투 9.04에 포함되기 위해 일반 사용자 테스트를 받는 도중 데이터 손실이라는 심각한 버그로 인해 고생하고 있는 상황에서&amp;hellip; :)&lt;/p&gt;
+&lt;p&gt;임베디드 시스템이나 라이브CD 환경에서 사용하기 적합한 읽기 전용 파일시스템 Squashfs도 드디어 메인 커널에 들어왔습니다. 높은 압축률 때문에 기존 읽기 전용 파일시스템을 대체하기에 적합합니다.&lt;/p&gt;
+&lt;p&gt;Ext4 파일시스템에는 저널링 없이 사용하는 기능이 추가되었는데 Ext2 파일시스템과 견줄만큼은 아니지만 (당연한 얘기지만) 조금 더 성능이 좋다고 합니다. 어떤 용도에 사용될 지 아직 이해할 수는 없지만.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;파일시스템 얼리기 (Filesystem freeze)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;파일시스템을 백업해야 하는데 백업 시점에서 모든 파일 쓰기 작업을 잠시 멈추게 해야할 필요가 있는데 이 경우에 유용하게 사용할 수 있습니다. 예를 들어, 이벤트 로그를 특정 시점까지만 백업하려고 해도 동작을 멈추면 안되는 서버가 이벤트 로그를 계속 발생하고 있다면 파일시스템을 갱신하는 모든 작업을 잠시 지연시키고(얼려버리고) 백업이 끝난다음 자연스럽게 다시 처리되도록 하면 됩니다. 물론 이 기능은 대기모드(suspend)로 들어갔다가 나오는 경우에도 활용됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;빨리 부팅하기&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;한때 큰 이슈가 된 
+&lt;a href=&#34;http://lwn.net/Articles/299483/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;5초 안에 리눅스 부팅하기&lt;/a&gt;
+ 프로젝트에서 구현한 기능 중 일부(scsi / libata 검사 비동기 실행하기)가 포함되었습니다. 하지만 기본값은 사용하지 않도록 되어 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;속도 향상?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=article&amp;amp;item=linux_2629_benchmarks&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;2.6.24 ~ 2.6.29 버전별 성능을 벤치마킹&lt;/a&gt;
+한 걸 보면, 2.6.29 버전에서는 멀티 쓰레드 관련 성능이 개선되어 OpenMP를 이용하는 어플리케이션은 물론 멀티쓰레드를 활용한 많은 어플리케이션의 성능이 좋아졌다고 합니다.&lt;/p&gt;
+&lt;p&gt;또한 2.6.26 ~ 2.6.28 버전에 있었던 SQLite 성능 저하 문제가 고쳐져서 이를 이용하는 파이어폭스 등과 같은 데스크탑 어플리케이션의 체감 속도도 나아질 것 같습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 병합 마운트(union mount)</title>
+      <link>/2009/01/09/2009-01-09-linux-union-mount/</link>
+      <pubDate>Fri, 09 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/09/2009-01-09-linux-union-mount/</guid>
+      <description>&lt;p&gt;리눅스 커널에서 파일 시스템 병합(union) 기능은 이미 존재하는 
+&lt;a href=&#34;http://lwn.net/Articles/217084/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Unionfs&lt;/a&gt;
+ 파일시스템을 이용하면 사용할 수 있습니다. 그런데 이를 별도 파일 시스템이 아닌 리눅스 VFS 레이어에서 직접 지원하기 위한 작업이 진행중입니다. 
+&lt;a href=&#34;http://lwn.net/Articles/308920/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;병합 마운트(union mount)&lt;/a&gt;
+ 기능인데,  예를 들어 마운트할때 &amp;lsquo;&amp;ndash;union&amp;rsquo; 옵션을 주면 파일 시스템을 병합해서 마운트합니다.&lt;/p&gt;
+&lt;p&gt;파일 시스템 병합에 대해 간략하게 설명하면, 일반적으로 리눅스에서는 디렉토리 하나에 하나의 파일 시스템만 마운트하는게 대부분입니다. 만일 동일한 디렉토리에 둘 이상의 파일 시스템을 마운트하면 항상 마지막에 마운트한 파일 시스템 내용만 보이고 이전에 마운트한 파일 시스템의 내용은 접근이 불가능합니다. 병합 마운트란 하나의 디렉토리에 여러 파일 시스템을 마운트하면 여러 파일 시스템 내용이 합쳐지는 것을 의미합니다. 먼저 마운트한 파일 시스템의 디렉토리 구조는 나중에 마운트한 파일 시스템의 디렉토리 구조와 합쳐집니다. 동일한 파일 이름을 가지고 있다면 나중에 마운트한 파일 시스템 내용을 우선적으로 보여주고, 나중에 마운트한 파일 시스템이 읽기 쓰기가 가능할 경우 파일을 지웠다면 그 정보도 유지되는 방식입니다.&lt;/p&gt;
+&lt;p&gt;이러한 개념을 적용한 Unionfs를 가장 많이 사용하는 경우는 라이브 CD/DVD 배포판입니다. 기본 루트 파일 시스템은 읽기 전용으로 CD에서 마운트하고, 사용자가 업데이트한 패키지나 작성한 문서 등을 저장하기 위해 읽기-쓰기 가능한 파일시스템을 그 위해 다시 마운트합니다. 물론 읽기-쓰기 파일시스템은 방식에 따라 사용자가 사용하는 주 운영체제 안의 파일 하나일 수도 있고, USB 플래시일 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;병합 마운트 기능은 아직 읽기 전용에 최상위 디렉토리 병합 기능만 제공하지만, 한창 개발 중이고 Unionfs 파일 시스템과 서로 장단점이 있기 때문에, 실무에 적용하려면 조금은 더 기다려야 할 것 같습니다. 예제를 포함한 더 자세한 내용은 
+&lt;a href=&#34;http://lwn.net/Articles/312641/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN.net 페이지&lt;/a&gt;
+를 참고하면 됩니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.28 릴리스</title>
+      <link>/2008/12/26/2008-12-26-linux-kernel-2628-release/</link>
+      <pubDate>Fri, 26 Dec 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/12/26/2008-12-26-linux-kernel-2628-release/</guid>
+      <description>&lt;p&gt;리누스 토발즈가 크리스마스 선물로 2.6.28 버전 커널을 내놓았군요. 늘 그랬듯이 변동사항 중에서 관심있는 사항에 대해서만 정리해 보았습니다. 자세한 내용은 물론 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_28&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널 뉴비&lt;/a&gt;
+에서 확인이 가능합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Ext4 파일시스템 공식 지원&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Ext3 파일시스템과 하위 호환성을 유지하면서 대안을 각광받고 있는 
+&lt;a href=&#34;http://kernelnewbies.org/Ext4&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Ext4&lt;/a&gt;
+ 파일시스템이 드디어 실험(experimental) 딱지를 떼고 안정 버전으로 바뀌었습니다. 더 큰 용량 지원, 더 좋아진 성능과 안정성을 기반으로 리눅스의 주 파일 시스템으로 사용될 것 같습니다.&lt;/p&gt;
+&lt;p&gt;조금 더 자세히 살펴보면, Ext3는 최대 16TB, 파일 크기는 2TB까지 지원했지만, Ext4는 1EB, 파일 크기는 16TB까지 지원합니다.(1EB = 1024PB, 1PB = 1024TB, 1TB=1024GB) Ext3는 한 디렉토리에 32000개 항목만 지원하지만, Ext4는 무한대의 항목이 가능합니다. 또한 Ext4는 전통적인 Unix 파일시스템의 간적 블럭 맵핑 방식 대신 최신 파일시스템에서 사용하는 익스텐트(extents) 기법을 적용하여 큰 파일을 처리하는데 성능을 개선했습니다. 블럭 할당 알고리즘도 개선하고, 악명놓은 
+&lt;a href=&#34;http://kerneltrap.org/Linux/Improving_fsck_Speeds_in_Ext4&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;fsck 실행 시간도 개선&lt;/a&gt;
+했고, 그외 많은 부분에서 분명 Ext3 파일시스템의 한계를 극복했습니다.&lt;/p&gt;
+&lt;p&gt;하지만 아직 대부분의 배포판에서 사용하는 GRUB 부트매니저가 지원하지 않고(우분투나 데비안에서는 grub-pc 패키지를 설치하면 됨) 있지만 대부분 배포판의 다음 배포판에서는 다음 릴리스부터 공식적으로 지원할 것 같습니다.(다른 편법은 /boot 디렉토리만 ext3 파일시스템을 사용하면 됩니다) 물론 기본 Ext3 파일 시스템을 Ext4 파일시스템으로 마운트해서 사용할 수도 있고, Ext3 -&amp;gt; Ext4 변환도 가능합니다.&lt;/p&gt;
+&lt;p&gt;차세대 리눅스 파일시스템으로 각광받고 있는 
+&lt;a href=&#34;http://btrfs.wiki.kernel.org/index.php/Main_Page&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Btrfs&lt;/a&gt;
+ 파일시스템이 안정화될 때까지 사용하기 위한 임시 방편이라는 말도 있지만, 향후 2~3년 정도는 Ext3의 자리를 물려받아 대세가 될 파일시스템임은 분명할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;GPU 메모리 관리자 GEM 추가&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;리눅스 커널이 윈도우 커널과 비교될때 가장 취약적으로 지적받던 그래픽 카드 관련 기능은 많은 이슈와 논란을 거쳤지만 결국 리눅스 커널은 프레임버퍼(FB)나 3D 가속을 위한 인터페이스 정도(DRI)만 지원했습니다. 그러던 것이 이제서야 드디어 본격적으로 커널에서 X 서버와 유기적으로 동작하기 위한 기능이 추가되기 시작했는데, 기존 X서버에서 처리하던 GPU 메모리 관리 기능이 리눅스 커널이 처리하게 된 것입니다. (비디오 모드 설정기능은 2.6.29에서 공식 지원할 듯)&lt;/p&gt;
+&lt;p&gt;아직 i915 드라이버 기반 최신 인텔 그래픽 칩셋만 지원하지만, 페도라 10 배포판은 이미 이 기능을 이용하여 부팅부터 GDM 로그인까지 화면 깜박임없는 부팅을 지원하고 있습니다. (물론 이를 위해 사용하는 최신 X서버가 NVidia 같은 바이너리 드라이버가 제대로 동작하지 않아 말도 많았지만) 시간은 걸리겠지만 다른 그래픽 드라이버도 모두 이 방식을 지원하게 될 것이고, 리눅스 기반 그래픽 환경도 성능과 안정성에서 다른 운영체제와 차이점이 더 줄어들 것으로 생각됩니다. 물론 드라이버 개발자는 더 골치 아파지겠지만&amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;디스크 충격 방지 기능&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;노트북에서 많이 사용하는 충격 방지 기능은 디스크를 사용하지 않을때 헤드를 언로드해서 충격이 발생해도 디스크 표면에 영향을 안끼치는 방식입니다. 이번 릴리스부터 리눅스 커널은 /sys/block/*/device/unload_heads 파일에 밀리초 단위의 정수형을 쓰면 그 시간동안 헤드를 언로드하고, 시간이 지나면 다시 원래대로 되돌리는 기능을 지원합니다. 하지만 모든 디스크를 지원하는 것도 아니고, 어떤 디스크는 오동작을 일으킬 수도 있기 때문에 정확히 지원하는 모델인지 확인하고 사용해야 합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;기타&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;그외에도 VM 메모리 관리자를 다시 작성해 많은 메모리 장착시 성능 개선, 커널 부팅 최적화를 도와주는 CONFIG_BOOT_TRACER 옵션 추가,  Atheros L2(atl2) 드라이버 공식 지원, Ultra Wide Band / Wireless USB 지원, SSD(solid-state drive) 디스크 지원 강화, ALSA 드라이버 1.0.18 탑재 등 역시나 이번에도 많은 변화가 있었으니 더 관심있는 분은 
+&lt;a href=&#34;http://www.heise-online.co.uk/open/Kernel-Log-Higher-and-Further-The-innovations-of-Linux-2-6-28--/features/112299/0&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이 기사&lt;/a&gt;
+도 읽어보시길&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 메모리 검사 기능</title>
+      <link>/2008/07/16/2008-07-16-linux-2626-memory-test-function/</link>
+      <pubDate>Wed, 16 Jul 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/07/16/2008-07-16-linux-2626-memory-test-function/</guid>
+      <description>&lt;p&gt;리눅스 커널 2.6.26 릴리스에는 메모리 검사 기능이 추가되었습니다. 기존에 많이 사용하는, 우분투 리눅스의 경우 grub 부트 메뉴에서 선택해서 실행할 수 있는 
+&lt;a href=&#34;http://www.memtest.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Memtest86+&lt;/a&gt;
+ 프로그램처럼 많은 기능이 있는 건 아니지만, 가끔 간단한 메모리 검사가 필요한 경우 요긴하게 사용할 수 있을 것 같습니다.&lt;/p&gt;
+&lt;p&gt;아직 X86 플랫폼만 지원하며, 사용하려면 커널 컴파일시 CONFIG_MEMTEST_BOOTPARAM 설정을 선택해야 하고, 부팅시 &amp;lsquo;memtest&amp;rsquo; 인수를 넘겨주면 동작합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Linux Kernel 2.6.21 Release</title>
+      <link>/2007/04/26/2007-04-26-linux-kernel-2621-release/</link>
+      <pubDate>Thu, 26 Apr 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/04/26/2007-04-26-linux-kernel-2621-release/</guid>
+      <description>&lt;p&gt;어김없이 또 
+&lt;a href=&#34;http://lkml.org/lkml/2007/4/25/561&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.21 버전이 릴리스&lt;/a&gt;
+되었다.&lt;/p&gt;
+&lt;p&gt;개인적으로 관심있는 부분만 정리하면 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;font-size:100%;&#34;&gt;Dynticks과 클럭이벤트&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;리누스 말로는 타이머 부분이 가장 많이 바뀌었다고 하는데, 멀티태스킹 시분할 시스템(time-sharing system)의 기본 원리라고 할 수 있는 타이머 인터럽트의 오버헤드를 최소화하기 위해, 필요한 경우에만 사용하겠다는(tickless) 아이디어 자체가 신선하다. 전원 관리에도 효과가 있고, 시스템 성능에도 미미하지만 영향을 끼칠 수 있을 뿐 아니라 고해상도 타이머 구현도 더 효율적으로 구현되었다고 한다. 이번 릴리스에서는 X86-32만 지원하지만 다른 아키텍쳐도 곧 지원된다고 한다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;ASoC (ALSA 시스템온칩) 레이어&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;ASoc는 오디오 시스템을 다음과 같이 세가지로 구성한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;코덱 드라이버 : 플랫폼 독립, 오디오 제어, 코덱 IO 등&lt;/li&gt;
+&lt;li&gt;플랫폼 드라이버 : DMA, 인터페이스 드라이버(I2S, AC97, PCM)&lt;/li&gt;
+&lt;li&gt;머신 드라이버 : 장치 관련 제어나 오디오 이벤트 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이를 통해 임베디드 시스템처럼 직접 연결된 오디오칩에 대한 드라이버 개발을 더 쉽게 해준다. 더불어 동적 전원 관리 시스템이 더 적은 전원을 사용하도록 도와준다. 예를 들어 실제로 캡쳐나 재생 작업이 있을 경우에만 알아서 전원 스위치를 제어한다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;GPIO API&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;임베디드 시스템 CPU에서 거의 대부분 사용하는 GPIO 관련 API가 공식적으로 추가되었다. 이렇게 단순한 것도 API가 될 수 있구나 하면서도, 왜 이제야 정리되었을까 하는 생각도 든다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;utrace&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;ptrace() 시스템콜의 기능을 넘어 dtrace 기능을 준비하기 위한 기본 API로 보인다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;ARM11 oprofile 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;가끔 유용하게 사용하는 oprofile이 ARM11 플랫폼도 지원한다.&lt;/p&gt;
+&lt;p&gt;그외 가상화 관련 VMI, KVM 도 많이 개선되었다고 하는데, 사실 아직은 별로 관심이 없다. 더 자세한 변경사항은 
+&lt;a href=&#34;http://kernelnewbies.org/LinuxChanges&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널뉴비 페이지&lt;/a&gt;
+에서 확인할 수 있다. API 변경 사항은 
+&lt;a href=&#34;http://lwn.net/Articles/2.6-kernel-api/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN 페이지&lt;/a&gt;
+에서 확인이 가능하다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Linux Kernel 2.6.20 Release</title>
+      <link>/2007/02/05/2007-02-05-linux-kernel-2620-release/</link>
+      <pubDate>Mon, 05 Feb 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/02/05/2007-02-05-linux-kernel-2620-release/</guid>
+      <description>&lt;p&gt;리눅스 커널 2.6.20 버전이 릴리스되었다. 관심있는 사항만 요약하면 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;소니 플레이스테이션3(PS3) 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;아직 그래픽 장치처럼 모든 주변장치를 지원하는 것은 아니고 일반적인 PS3에서 부팅이 가능한 것도 아니지만, 소니 엔지니어에 의해 공식적으로 PS3가 지원되기 시작했다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;KVM을 이용한 가상화(Virtualization) 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;나처럼 구식(?) PC를 사용하는 사람들한테는 그림의 떡이지만, 최신 인텔과 AMD CPU에서 지원하는 가상화 기능(Intel VT / AMD-V)을 이용해 VMWare처럼 가상의 머신을 실행시킬 수 있도록 도와주는 KVM이 공식적으로 지원된다. 물론 
+&lt;a href=&#34;http://fan4326.blogspot.com/2007/01/qemu.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;QEMU&lt;/a&gt;
+와 함께 동작하며 아직 윈도우 운영체제는 APIC 문제로 잘 동작하지 않는 문제이지만, 조만간 모두 해결될 것으로 보인다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;i386에서 병렬가상화(Paravirtualization) 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;KVM이 하드웨어의 도움을 받는 가상화솔루션이라면 이 기능은 이미 존재하는 가상화 솔루션에서 이용할 수 있는 공통 모듈이다. 게스트 운영체제에 대한 제어 기능이 커널에서 공식적으로 지원하게 됨에 따라 VMWare, Xen 등의 커널 모듈도 이 기능을 이용하도록 변경될 것으로 생각된다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;X86에서 재배치가능(relocatable)한 커널 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;런타임 오버헤드없이 컴파일시 커널 주소 공간을 지정할 수 있도록 한다. 일반 사용자에게는 별로 중요하지 않지만 kexec 등을 이용해 커널 크래쉬 상태를 덤프하고 다시 로드할때 커널 주소 공간을 다르게 함으로서 유용하게 사용할 수 있다고 한다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;결함 주입 (Fault Injection)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;실시간 시스템의 결함 허용 중 하나인 결함 주입 기능은 일부러 에러를 일으키는 값이나 환경을 만들어 커널이 이를 얼마나 잘 견디고 처리하는지를 확인하는 것으로 쉽게 찾을 수 없는 에러를 디버깅하는데 유용하다. 구체적으로 이 기능은 메모리 할당 오류와 디스크 I/O 실패를 고의로 발생시키는데, 파일시스템 개발자들은 이에 대한 예외처리를 얼마나 잘 하는지 테스트 가능하다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;상대적 atime 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;마운트시 &amp;lsquo;noatime&amp;rsquo; 옵션을 주면 파일을 읽을때마다 접근 시간(access time)을 갱신하지 않게 되어 실제적으로 매우 많은 디스크 성능 향상을 체험하게 된다. 실제로 kernel.org 사이트도 이 옵션 하나만으로 평균 부하량이 반으로 줄었다고 하며, 현재 우리 회사에서 개발한 DVR 시스템에도 이 옵션이 적용되어 있다. 그런데 이 기능은 무조건 갱신하는 것이 아니라 생성시간(ctime)이나 수정시간(mtime)보다 접근시간(atime)이 더 오래되었을 경우에만 갱신하도록 한다. 이를 통해 정확하면서도 &amp;lsquo;noatime&amp;rsquo; 옵션과 비슷한 성능향상을 얻을 수 있다고 한다. 아직은 OCFS2 파일시스템에서만 지원된다고 하며 mount(8) 에도 &amp;lsquo;reltime&amp;rsquo; 옵션으로 적용되어 있다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;X86-32에서 &amp;lsquo;regparm&amp;rsquo; 사용&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;GCC 확장 기능을 이용하여 함수 인수 전달시 인수 갯수가 3개 이하일 경우 레지스터를 이용하여 전달하도록 하는 방식(&#39;-mregparm=3&amp;rsquo; )을 사용한다. 그런데 내가 알기로는 레드햇 커널에서는 이미 예전부터 기본적으로 사용하고 있는데&amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;워크큐(Workqueue) 구조 변경&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;워크큐(struct work_struct) 구조가 변경되어 이를 사용하고 있는 외부 드라이버나 모듈이 있다면 
+&lt;a href=&#34;http://lwn.net/Articles/211279/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이 페이지&lt;/a&gt;
+를 참고하여 수정하는 것이 좋다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;GCC 버전 변경&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;이제 커널 2.6.20 버전 이상을 컴파일하려면 최소 gcc 3.2 버전 이상이 필요하다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;i386에서 300Hz 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;25FPS를 사용하는 PAL 방식과 달리 29.99FPS를 사용하는 NTSC 방식 비디오 프레임 처리에 유용하도록 300Hz 클럭을 지원한다. 이 클럭을 사용하면 25 / 30 FPS 모두를 처리하는데 유용하며 성능은 250Hz와 비슷하다고 한다.&lt;/p&gt;
+&lt;p&gt;물론 더 자세한 내용은 이미 잘 정리된 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_20&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;KernelNewbies 2.6.20 변경사항&lt;/a&gt;
+ 페이지를 참고하면 된다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 멀티쓰레드(futex) 호출 디버깅</title>
+      <link>/2006/12/21/2006-12-21-linux-multithread-futex-call-debugging/</link>
+      <pubDate>Thu, 21 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/21/2006-12-21-linux-multithread-futex-call-debugging/</guid>
+      <description>&lt;p&gt;리눅스 커널 2.6 이후, 즉 최신 리눅스 환경에서 어플리케이션을 개발할때 멀티쓰레드인 경우 데드락이나 블럭킹 현상을 디버깅하려면 매우 골치가 아프다. strace나 gdb 백트레이스를 추적하다보면 결국 &lt;code&gt;futex()&lt;/code&gt; 시스템콜을 호출하고, 여기서 멈춰있는 경우가 대부분이다. 이 경우 대부분 이 시스템콜은 pthread 라이브러리가 호출하는 것이다. 이 경우 정확히 어떤 공유 라이브러리와 연관이 있는지 확인하기 힘든데 
+&lt;a href=&#34;http://galathilion.livejournal.com/91051.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;여기&lt;/a&gt;
+ 블로그에 달린 댓글을 보면 다음 2가지 방법을 권하고 있다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;export LD_ASSUME_KERNEL=2.4.1&lt;/code&gt;식으로 커널 버전을 명시하여 glibc가 NPTL 대신 futex() 를 사용하지 않는 이전 LinuxThread 방식을 사용하도록 하여 디버깅하기&lt;/li&gt;
+&lt;li&gt;ltrace 프로그램을 이용하여 라이브러리 호출 감시하기&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;하지만, 뭐 그런다고 쉽게 풀리지는 않는게 멀티쓰레드 프로그래밍인지라&amp;hellip;&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://galathilion.livejournal.com/91051.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Jeremy Kolb: futex headaches&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 사용자공간 커널 드라이버 - UIO</title>
+      <link>/2006/12/19/2006-12-19-uio-linux-userspace-kernel-driver/</link>
+      <pubDate>Tue, 19 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/19/2006-12-19-uio-linux-userspace-kernel-driver/</guid>
+      <description>&lt;p&gt;리눅스에서 디바이스 드라이버는 대개 동적으로 로딩 가능한 커널 모듈 방식이나 커널 자체에 포함시키는 방식으로 구성된다. 사용자공간(userspace)에서 일반 어플리케이션처럼 동작하는 디바이스 드라이버 구조는 X서버, Cupsys 프린터 드라이버 등에서 이미 사용되고 있듯이 새로운 개념은 아니다. 하지만 그 용도가 제한되어 있고, 인터럽트 처리와 성능에 대한 한계로 인해 아직도 대부분의 리눅스용 디바이스 드라이버는 커널 모듈로 작성되는 것이 일반적이다.&lt;/p&gt;
+&lt;p&gt;예전에 리눅스용 사용자공간 드라이버 개발 프레임워크가 제안된 적이 있다가 많은 관심과 비판을 함께 받고 사라진 듯 싶더니 이번에 다시 -mm 커널 트리에 UIO 코어라는 이름으로 다시 포함이 된 것 같다. 정식 커널에 포함될지는 아직 잘 모르지만 그 구조가 흥미로울 것 같아 한번 들여다 보았다.&lt;/p&gt;
+&lt;p&gt;UIO 코어는 하드웨어가 발생하는 인터럽트를 처리하기 위한 최소한의 커널 드라이버만 작성하고, 나머지 모든 작업은 사용자공간 프로그램으로 작성하도록 한다. 이를 통해 다양한 라이브러리와 개발도구를 사용할 수 있기 때문에 유지보수와 디버깅이 훨씬 쉬워진다. 드라이버 개발자가 느끼는 리눅스 커널의 가장 큰 장점이자 단점인 커널이 변경되어도 드라이버는 거의 변경할 필요도 없어진다. 또한 라이센스 문제도 피해갈 수 있다.&lt;/p&gt;
+&lt;p&gt;UIO가 동작하는 방식은 다음과 같다.&lt;/p&gt;
+&lt;p&gt;각각의 UIO 장치는 하나의 디바이스 파일과 sysfs 속성 파일을 통해 접근한다. 디바이스 파일 이름은 &lt;code&gt;/dev/uio0&lt;/code&gt;, &lt;code&gt;/dev/uio1&lt;/code&gt; 식이다. 이 디바이스 파일은 mmap()을 이용해 장치의 특정한 레지스터나 램 영역을 주소 공간처럼 접근하는데 이용한다. 인터럽트는 디바이스 파일을 읽는 작업을 통해 이루어진다. read() 시스템콜을 호출하면 블럭킹 상태에 있다가 인터럽트가 발생하면 깨어나 총 인터럽트 발생 횟수를 돌려준다. 이렇게 돌려받은 총 인터럽트 발생 횟수를 이용해 놓친 인터럽트에 대한 처리도 가능하다.&lt;/p&gt;
+&lt;p&gt;인터럽트를 제대로 처리하기 위해 드라이버만의 고유한 커널 모듈 인터럽트 핸들러를 구현할 경우라도 내부 핸들러가 자동으로 호출해 준다. 인터럽트를 발생하지 않고 폴링 방식으로 동작하는 장치일 경우 타이머를 이용해 주기적으로 강제로 인터럽트 핸들러를 호출하게 할 수도 있다.&lt;/p&gt;
+&lt;p&gt;드라이버는 sysfs를 통해 추가적인 접근 가능한 속성을 제공할 수도 있는데 다음은 UIO가 제공하는 기본 속성으로, &lt;code&gt;/sys/class/uio/uioX&lt;/code&gt; 디렉토리에서 볼 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;name : 장치 이름&lt;/li&gt;
+&lt;li&gt;addr : 맵핑 가능 영역 시작 주소&lt;/li&gt;
+&lt;li&gt;size : 맵핑 가능 영역 크기&lt;/li&gt;
+&lt;li&gt;version : 드라이버 버전 정보&lt;/li&gt;
+&lt;li&gt;event: 마지막으로 장치를 읽은 이후 드라이버가 처리한 인터럽트 총 갯수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;커널 모듈에서 동작하는 인터럽트 핸들러를 작성하려면 &lt;code&gt;struct uio_info&lt;/code&gt; 구조체에 정보를 채워 &lt;code&gt;uio_register_device()&lt;/code&gt;를 이용해 등록하면 된다. 이 정보에는 인터럽트 핸들러 방식, 메모리 맵핑 정보 등을 담고 있다.&lt;/p&gt;
+&lt;p&gt;많 은 하드웨어들이 인터럽트 발생후 드라이버 ACK 작업을 해주어야하는데, 사용자공간 프로그램은 동작하지 않을 수도 있고, 어떠한 원인으로 종료할 수도 있으므로 이런 작업은 직접 작성한 인터럽트 핸들러에서 처리하도록 하고 있다. 또한 인터럽트 발생할때마다 데이터를 하드웨어에서 읽어 커널 내부 버퍼에 저장하고 사용자공간 프로그램에게 전달할 수도 있다.&lt;/p&gt;
+&lt;p&gt;모노리식 커널의 한계일지도 모르지만 약간 조잡하다는 느낌을 지울 수 없다. 조금 더 편하게 커널 API를 통해 인터럽트 이벤트를 처리할 수 있으면 좋을 것 같다. 또한 커널 내부의 PCI, USB 등의 서브시스템과의 연동은 어떻게 할 것인가? 물론 PCI나 USB 정보 사용자공간에서 접근이 가능하긴 하지만, 아직은 이론적으로 이상적인 프레임웍으로만 보인다. 그렇다면 마이크로커널 기반에서 디바이스 드라이버는 어떤 식으로 인터럽트를 처리할까? 음&amp;hellip;&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.kroah.com/log/2006/12/13#uio&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Userspace I/O kernel drivers for Linux&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.kernel.org/pub/linux/kernel/people/gregkh/gregkh-2.6/gregkh-01-driver/uio-documentation.patch&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;UIO Documentation&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Linux Kernel 2.6.19 Release</title>
+      <link>/2006/11/30/2006-11-30-linux-kernel-2619-release/</link>
+      <pubDate>Thu, 30 Nov 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/11/30/2006-11-30-linux-kernel-2619-release/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://kerneltrap.org/node/7440&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.19 릴리스 소식&lt;/a&gt;
+을 접하게 되었다. 역시나 또 많은 새로운 기능이 추가되고, 변경되고 사라졌다. 이 중에서 관심있는 것만 간추려보면 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;GFS / ECRYPTFS / EXT4 파일 시스템 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;GFS 는 레드햇이 주도해서 만드는 클러스터링 파일 시스템, ECRYTPFS는 파일단위별로 암호화가 가능한 파일 시스템이다. EXT4는 EXT3의 다음 버전으로 16테라바이트 이상 크기 지원(64비트), 32000 개 하위디렉토리 제한 없애기, 나노초 단위 파일 시간 정보 저장, mke2fs/e2fsck 속도 향상 등이 주요 이슈이다. 아직 안정화되려면 시간이 더 걸린다고 한다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;Libata PATA (Parallel ATA) 추가&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;병 렬 ATA(Parallel ATA) 장치는 직렬 ATA(Serial ATA) 장치가 이전에 존재하던, 다시 말해 현재 대부분의 데스크탑에서 사용하는 저장 장치 인터페이스이다. 현재 잘 동작하고 있으나 구조적인 문제로 해결이 어려운 몇몇 문제를 안고 있는 드라이버를 SATA 드라이버의 기반이 되는 libata를 기반으로 다시 작성한 PATA 드라이버가 추가되었다. 아직 모든 IDE를 지원하는 것은 아니며 기존 IDE 드라이버와 공존해서 존재한다. 하지만 PATA 드라이버가 안정화되면 점차 기존 IDE 드라이버는 모두 지워질 것이라고 한다. 또한 장치 이름도 더 이상 &lt;code&gt;/dev/hda&lt;/code&gt; 식이 아닌 &lt;code&gt;/dev/sda&lt;/code&gt;, &lt;code&gt;/dev/sr0&lt;/code&gt; 식으로 바뀐다. 즉, 다른 모든 저장장치와 동일한 방식으로 관리된다. 앨런 콕스(Alan Cox)가 주도하는 이 작업은 오랫동안 리눅스 커널에 있던 IDE 드라이버가 이제서야 구조적으로 업그레이드 되는 셈이다. (또 얼마나 많은 리눅스 커널 관련 서적이 Obsolete로 변하게 될지&amp;hellip; 하긴 그래야 새로운 개정판을 구입하겠지만&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;ALSA가 지원하는 OSS 드라이버 제거&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;ALSA가 리눅스 커널 2.6의 공식 오디오 드라이버로 지정된 이후로 이제서야 OSS 드라이버가 없어지기 시작했다. 물론 ALSA는 OSS 호환 레이어를 제공하기 때문에 기존 OSS 기반 어플리케이션은 아무 문제가 없다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;IRQ 핸들러 구조 변경&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;모든 인터럽트 핸들러는 CPU 레지스터 상태를 나타내는 &lt;code&gt;&amp;quot;struct pt_regs *&amp;quot;&lt;/code&gt;를 인수로 받았는데, CPU별 전역 변수를 두는 대신 인터럽트 핸들러 인수에서 사라졌다. 아키텍쳐에 따라서는 오버헤드 감소로 인한 성능 향상을 기대할 수도 있다. 공식 커널에 포함된 약 1800개의 인터럽트 핸들러가 모두 수정되었다고 한다. (물론 디바이스 드라이버를 별도로 개발하는 사람들에겐 별로 기쁜 소식이 아닐지도&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;FAT 파일 시스템에 &amp;lsquo;flush&amp;rsquo; 옵션 추가&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;USB 플래시와 같이 제거 가능한 미디어 장치를 FAT로 마운트할때 &lt;code&gt;&amp;quot;-o flush&amp;quot;&lt;/code&gt; 옵션을 주면 가능한 빨리 디스크에 내용을 반영한다. &lt;code&gt;&amp;quot;-o sync&amp;quot;&lt;/code&gt;와 비슷하지만 훨씬 더 빠르다고 한다.&lt;/p&gt;
+&lt;p&gt;더 자세한 변경사항은 이미 잘 정리된 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_19&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;lsquo;Kernel Newbies - 리눅스 2.6.19&amp;rsquo;&lt;/a&gt;
+를 참고하면 된다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널에서 devfs 제거</title>
+      <link>/2006/07/03/2006-07-03-devfs-removed-from-linux-kernel/</link>
+      <pubDate>Mon, 03 Jul 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/07/03/2006-07-03-devfs-removed-from-linux-kernel/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://kerneltrap.org/node/6744&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Linux: The Case For Removing devfs&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;그렇게 많은 논란이 있어왔던 devfs 파일시스템이 드디어 공식적으로 리눅스 커널 소스에서 제거되었다. 정확히는 위 기사에 언급된 패치가 리누스 토발즈의 커널 트리에 6월 29일 날짜로 
+&lt;a href=&#34;http://www.kernel.org/git/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=602cada851b28c5792339786efe872fbdc1f5d41&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;반영&lt;/a&gt;
+되었다. 따라서 2.6.18 릴리스부터는 공식적으로 적용될 것 같다. 물론 그 전부터 몇몇 드라이버는 이미 devfs 지원을 제거해오기 시작하고, 위 패치가 적용된 이후에도 몇몇 누락된 드라이버들도 계속해서 관련 코드를 제거하는 것 같다.&lt;/p&gt;
+&lt;p&gt;우분투를 사용하게 되면서 직접 커널을 컴파일해서 사용하는 경우가 거의 사라진 지금의 내게 있어 사실 devfs 지원이 사라지는 것은 별로 의미가 없다. 왜냐하면 현재 회사 제품에 사용하는 대부분의 임베디드 리눅스 시스템에서는 devfs / udev 모두 사용하지 않고 /dev 디렉토리를 직접 만들어 사용하는 방식을 이용하고 있기 때문이다. 다만 커널 바이너리 크기가 조금 더 작아진다니 그런 혜택이라도 받을 수 있으려나 모르겠다.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

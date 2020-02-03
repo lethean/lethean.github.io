@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="업무상 실제 패킷 사용량을 측정할 필요때문에 여러가지 도구를 찾던 중 마땅한 걸 찾지 못해 직접 측정한 방식을 정리해 봅니다. 물론 이보다 더 좋은 방법들이 당연히 있을테">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/">
+  <meta property="og:title" content="tcpdump를 이용한 네트워크 사용량 측정하기 | 대체로 무해함">
+  <meta property="og:description" content="업무상 실제 패킷 사용량을 측정할 필요때문에 여러가지 도구를 찾던 중 마땅한 걸 찾지 못해 직접 측정한 방식을 정리해 봅니다. 물론 이보다 더 좋은 방법들이 당연히 있을테"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2009-12-15T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T19:56:33&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/"
+  },
+  "headline": "tcpdump를 이용한 네트워크 사용량 측정하기",
+  
+  "datePublished": "2009-12-15T00:00:00Z",
+  "dateModified": "2020-02-03T19:56:33+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "업무상 실제 패킷 사용량을 측정할 필요때문에 여러가지 도구를 찾던 중 마땅한 걸 찾지 못해 직접 측정한 방식을 정리해 봅니다. 물론 이보다 더 좋은 방법들이 당연히 있을테"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>tcpdump를 이용한 네트워크 사용량 측정하기 | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>tcpdump를 이용한 네트워크 사용량 측정하기</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>업무상 실제 패킷 사용량을 측정할 필요때문에 여러가지 도구를 찾던 중 마땅한 걸 찾지 못해 직접 측정한 방식을 정리해 봅니다. 물론 이보다 더 좋은 방법들이 당연히 있을테지만, tcpdump 프로그램만 겨우 사용할 수 있는 환경에서 측정하는 법을 정리한 문서를 찾지 못해 남겨둡니다.</p>
+<p>우선 어떤 방식으로든 해당 장비에 tcpdump 프로그램을 설치합니다.</p>
+<p>그리고 측정하려는 과정이나 단계가 시작하는 동시에 다음과 같이 tcpdump 프로그램을 실행합니다.</p>
+<pre><code>$ tcpdump -qvtttt dst xxx.xxx.xxx.xxx &gt; packet-dump.txt
+</code></pre>
+<p>여기서 <code>xxx.xxx.xxx.xxx</code>는 측정에 사용할 대상 장비입니다. 즉, 위 예제는 특정 IP로 전송하는 패킷량만 캡쳐하여 <code>packet-dump.txt</code> 파일에 저장합니다. 중요한 점은 앞의 옵션인데, 이 옵셥을 사용해야 아래에서 사용하는 스크립트가 분석할 수 있는 형태의 결과물로 저장됩니다. 그리고, 필요하다면, 저장한 파일을 리눅스 또는 맥 장비로 복사합니다.</p>
+<p>저장한 파일을 <code>conv2csv.sh</code> 스크립트를 이용해 엑셀이나 오픈오피스에서 읽어들일 수 있는 CSV 파일 형태로 변환합니다.</p>
+<pre><code>$ ./conv2csv.sh packet-dump.txt
+</code></pre>
+<p>변환된 <code>packet-dump.csv</code> 파일은 한 행에 &lsquo;<strong>TIMESTAMP BYTES Kbps</strong>&rsquo; 형태로 각 초당 데이터가 저장되어 있습니다. 따라서 이 파일을 액셀이나 오픈오피스에서 공백(space)을 구분자로 해서 읽어들인 후 3번째 컬럼을 사용하면 됩니다. 참고로 여기서 측정한 크기는 IP/TCP/UDP 헤더까지 포함한 크기입니다.</p>
+<p>다음은 이렇게 변환한 데이터를 구글 스프레드시트를 이용해 만든 차트입니다.</p>
+<p><img src="/figures/packet-traffic-analysis.png" alt=""></p>
+<p>위에서 언급한 <code>conv2csv.sh</code> 스크립트는 다음과 같습니다.</p>
+<pre><code>#!/bin/sh
+
+CSVFILE=&quot;$(dirname $1)/$(basename $1 .txt).csv&quot;
+
+awk '{ print $2, $18 }' $1 | 
+  tr '.)' '  ' | 
+  awk 'BEGIN { last = &quot;&quot;; sum = 0; } 
+       { if (last == $1) 
+           { sum += $3 } 
+         else 
+           { print last, sum, sum * 8 / 1000; 
+             last = $1; 
+             sum = $3; } 
+       }' &gt; $CSVFILE
+</code></pre>
+<p>;)</p>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/linux/">Linux</a>
+  
+  <a class="badge badge-light" href="/tags/macosx/">MacOSX</a>
+  
+  <a class="badge badge-light" href="/tags/network/">Network</a>
+  
+  <a class="badge badge-light" href="/tags/shell/">Shell</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/&amp;text=tcpdump%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%84%a4%ed%8a%b8%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%eb%9f%89%20%ec%b8%a1%ec%a0%95%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/&amp;t=tcpdump%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%84%a4%ed%8a%b8%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%eb%9f%89%20%ec%b8%a1%ec%a0%95%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=tcpdump%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%84%a4%ed%8a%b8%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%eb%9f%89%20%ec%b8%a1%ec%a0%95%ed%95%98%ea%b8%b0&amp;body=/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/&amp;title=tcpdump%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%84%a4%ed%8a%b8%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%eb%9f%89%20%ec%b8%a1%ec%a0%95%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=tcpdump%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%84%a4%ed%8a%b8%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%eb%9f%89%20%ec%b8%a1%ec%a0%95%ed%95%98%ea%b8%b0%20/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/&amp;title=tcpdump%eb%a5%bc%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%84%a4%ed%8a%b8%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%eb%9f%89%20%ec%b8%a1%ec%a0%95%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2009/10/06/2009-10-06-fix-broken-hangul-filename-from-mac-os-x-in-linux/">MacOS X의 한글 이름 파일을 리눅스에 복사하면 깨지는 현상 고치기</a></li>
+      
+      <li><a href="/2009/08/14/2009-08-14-init-eth-dev-number-when-lan-card-changes-in-ubuntu/">우분투에서 이더넷 장치 변경시 장치번호 초기화</a></li>
+      
+      <li><a href="/2009/07/17/2009-07-17-debugging-crontab-job-not-running/">실행 안되는 crontab 작업 디버깅하기</a></li>
+      
+      <li><a href="/2006/09/14/2006-09-14-ssh-port-forwarding-to-access-intranet-servers/">SSH 포트 포워딩(port forwarding) &#43; 내부 네트웍 서버 접근하기</a></li>
+      
+      <li><a href="/2009/09/17/2009-09-17-glib-mainloop-vs-libdispatch-of-apple-gcd/">GLib 메인루프와 애플 GCD의 libdispatch</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

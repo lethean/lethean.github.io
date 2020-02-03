@@ -1,0 +1,3169 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Clutter | 대체로 무해함</title>
+    <link>/tags/clutter/</link>
+      <atom:link href="/tags/clutter/index.xml" rel="self" type="application/rss+xml" />
+    <description>Clutter</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Fri, 06 Mar 2015 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Clutter</title>
+      <link>/tags/clutter/</link>
+    </image>
+    
+    <item>
+      <title>Cairo 라이브러리를 이용해 Font Awesome 아이콘 그리기</title>
+      <link>/2015/03/06/2015-03-06-draw-font-awesome-icons-with-cairo/</link>
+      <pubDate>Fri, 06 Mar 2015 00:00:00 +0000</pubDate>
+      <guid>/2015/03/06/2015-03-06-draw-font-awesome-icons-with-cairo/</guid>
+      <description>&lt;p&gt;요즘 웹에는 글꼴 아이콘(font icon)을 많이 사용합니다. 벡터 그래픽 방식이라
+확대해도 좋은 품질을 보여주고, 자주 사용되는 다양한 모양도 많이 제공됩니다.
+덕분에 작은 규모의 팀에서 간단한 웹 사이트나 웹앱을 개발할 때, 디자이너의
+도움(?)이 없어도 되기 때문에, 시간과 노력을 많이 절약하게 됩니다. 특히
+라이센스도 자유로우면서 다양한 아이콘을 제공하는 글꼴 아이콘도 많은데,
+대표적으로 
+&lt;a href=&#34;http://fortawesome.github.io/Font-Awesome/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Font Awesome&lt;/a&gt;
+, 
+&lt;a href=&#34;http://www.webhostinghub.com/glyphs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;WebHostingHub Glyphs&lt;/a&gt;
+ 등이 있습니다.
+물론 
+&lt;a href=&#34;https://www.google.co.kr/search?q=font&amp;#43;icon&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;구글 검색을 해보면&lt;/a&gt;
+ 유료제품도 있고, 직접 만들어주는 도구까지 있습니다.&lt;/p&gt;
+&lt;p&gt;그런데 글꼴 아이콘은 HTML과 CSS를 이용하는 웹 페이지에서는 쉽게 이용할 수
+있지만, 데스크톱 / 임베디드 프로그램에서 사용하려면 약간 다른 방법을 사용해야
+합니다. 이 글은 여러 방법 중에서 GTK+, Clutter 라이브러리에서 이용하는
+
+&lt;a href=&#34;http://cairographics.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Cairo&lt;/a&gt;
+ 라이브러리를 이용해 Font Awesome 아이콘을 그리는 방법을 설명합니다.&lt;/p&gt;
+&lt;p&gt;생각해 보면 간단할 것 같은데, 막상 Cairo API를 뒤져보면 글꼴 파일을 직접
+지정하는 방법이 없습니다. 막강한 기능을 제공하는 
+&lt;a href=&#34;http://www.pango.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Pango&lt;/a&gt;
+ 라이브러리 역시 글꼴
+파일을 지정하는 함수는 없습니다. 모두 
+&lt;a href=&#34;http://www.freedesktop.org/wiki/Software/fontconfig/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Fontconfig&lt;/a&gt;
+를 이용해 아이콘 글꼴 파일을
+지정해야 합니다. 하지만 프로그램과 함께 배포해야 하는 아이콘 글꼴 파일을 시스템
+글꼴 디렉터리나 사용자 글꼴 디렉터리에 복사하는 방식은 번거롭기도 하고 불가능한
+경우도 있어서 가능하다면 글꼴 파일을 직접 사용하는 방법을 찾아보았습니다.&lt;/p&gt;
+&lt;p&gt;(&lt;em&gt;2015-05-06 업데이트&lt;/em&gt;: Pango 개발자가 더 자세히 설명한
+
+&lt;a href=&#34;http://mces.blogspot.kr/2015/05/how-to-use-custom-application-fonts.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Pango를 이용한 사용자 폰트 사용하기&lt;/a&gt;
+ 문서를 참고해도 됩니다)&lt;/p&gt;
+&lt;p&gt;그래서 찾은 방법은 다음과 같습니다.&lt;/p&gt;
+&lt;p&gt;먼저 
+&lt;a href=&#34;http://freetype.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;FreeType&lt;/a&gt;
+ 라이브러리를 이용해 글꼴 파일을 읽은 후
+
+&lt;a href=&#34;http://cairographics.org/manual/cairo-FreeType-Fonts.html#cairo-ft-font-face-create-for-ft-face&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;cairo_ft_font_face_create_for_ft_face()&lt;/code&gt;&lt;/a&gt;
+
+함수를 이용해 Cairo 글꼴을 만듭니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;static cairo_font_face_t *
+get_font_face (void)
+{
+  static cairo_font_face_t *font_face = NULL;
+
+  if (!font_face)
+    {
+      FT_Library ft_library;
+      FT_Face ft_face;
+      FT_Error ft_error;
+
+      ft_error = FT_Init_FreeType (&amp;amp;ft_library);
+      if (ft_error)
+        {
+          g_warning (&amp;quot;FT_Init_FreeType() failure: %d&amp;quot;, ft_error);
+          return NULL;
+        }
+      ft_error = FT_New_Face (ft_library, &amp;quot;FontAwesome.otf&amp;quot;, 0, &amp;amp;ft_face);
+      if (ft_error)
+        {
+          g_warning (&amp;quot;FT_New_Face() failure: %d&amp;quot;, ft_error);
+          FT_Done_FreeType (ft_library);
+          return NULL;
+        }
+
+      font_face = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
+    }
+
+  return font_face;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 Cairo 글꼴 함수를 이용해 아이콘을 그리면 됩니다. 참고로, 아래 코드에서는
+
+&lt;a href=&#34;https://developer.gnome.org/clutter/stable/clutter-Colors.html#ClutterColor&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ClutterColor&lt;/code&gt;&lt;/a&gt;
+ 구조체를 이용해 아이콘 색상과 그림자 색상을
+지정합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;static void
+draw_font_icon (cairo_t            *cr,
+                double              x,
+                double              y,
+                int                 centering,
+                const char         *code,
+                double              size,
+                const ClutterColor *color,
+                const ClutterColor *shadow_color,
+                double              shadow_offset)
+{
+  cairo_font_options_t *options;
+
+  cairo_save (cr);
+
+  options = cairo_font_options_create ();
+  cairo_font_options_set_antialias (options, CAIRO_ANTIALIAS_GRAY);
+  cairo_font_options_set_hint_style (options, CAIRO_HINT_STYLE_FULL);
+  cairo_set_font_options (cr, options);
+  cairo_font_options_destroy (options);
+
+  cairo_set_font_face (cr, get_font_face ());
+  cairo_set_font_size (cr, size);
+
+  {
+    cairo_text_extents_t extents;
+
+    cairo_text_extents (cr, code, &amp;amp;extents);
+    if (!centering)
+      {
+        x -= extents.x_bearing;
+        y -= extents.y_bearing;
+      }
+    else
+      {
+        x += (extents.x_bearing -extents.width * 0.5);
+        y += (-extents.y_bearing -extents.height * 0.5);
+      }
+  }
+
+  if (shadow_color &amp;amp;&amp;amp; shadow_color-&amp;gt;alpha &amp;gt; 0 &amp;amp;&amp;amp; shadow_offset != 0.0)
+    {
+      cairo_save (cr);
+      cairo_move_to (cr, x + shadow_offset, y + shadow_offset);
+      clutter_cairo_set_source_color (cr, shadow_color);
+      cairo_show_text (cr, code);
+      cairo_restore (cr);
+    }
+
+  clutter_cairo_set_source_color (cr, color);
+  cairo_move_to (cr, x, y);
+  cairo_show_text (cr, code);
+
+  cairo_restore (cr);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아이콘을 회전하려면 다음과 같이 미리 캔버스를 돌린 후에 아이콘을 그리면 됩니다.
+예를 들어, 
+&lt;a href=&#34;https://developer.gnome.org/clutter/stable/ClutterCanvas.html#ClutterCanvas-draw&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ClutterCanvas::draw&lt;/code&gt;&lt;/a&gt;
+ 시그널 핸들러는 다음과
+같이 작성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;static gboolean
+draw_icon_content (ClutterCanvas *canvas,
+                   cairo_t       *cr,
+                   gint           width,
+                   gint           height,
+                   gpointer       user_data)
+{
+  const double rotate_degree = 180.0;
+
+  /* Clear the contents of the canvas. */
+  cairo_save (cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_paint (cr);
+  cairo_restore (cr);
+
+  if (rotate_degree &amp;gt; 0.0)
+    {
+      cairo_translate (cr, width / 2, height / 2);
+      cairo_rotate (cr, rotate_degree * (G_PI / 180.0));
+      cairo_translate (cr, - width / 2, - height / 2);
+    }
+  draw_font_icon (cr, ...);
+
+  return TRUE;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그런데
+
+&lt;a href=&#34;http://fortawesome.github.io/Font-Awesome/icons/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Font Awesome 아이콘 목록&lt;/a&gt;
+에서 원하는 아이콘은 찾았는데, 아이콘 이름에 해당하는
+실제 글꼴의 문자 코드(code)는 어떻게 알 수 있을까요? 웹 페이지를 무식하게
+파싱해서 C 언어 헤더 파일을 자동으로 생성하는 
+&lt;a href=&#34;https://gist.github.com/lethean/bdd5a657f103b6cb0c23&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Node.js 스크립트&lt;/a&gt;
+를 이용하면
+다음과 같은 결과를 얻을 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define FA_ICON_ADJUST &amp;quot;\xef\x81\x82&amp;quot; /* &amp;amp;#xf042; */
+#define FA_ICON_ADN &amp;quot;\xef\x85\xb0&amp;quot; /* &amp;amp;#xf170; */
+#define FA_ICON_ALIGN_CENTER &amp;quot;\xef\x80\xb7&amp;quot; /* &amp;amp;#xf037; */
+#define FA_ICON_ALIGN_JUSTIFY &amp;quot;\xef\x80\xb9&amp;quot; /* &amp;amp;#xf039; */
+#define FA_ICON_ALIGN_LEFT &amp;quot;\xef\x80\xb6&amp;quot; /* &amp;amp;#xf036; */
+#define FA_ICON_ALIGN_RIGHT &amp;quot;\xef\x80\xb8&amp;quot; /* &amp;amp;#xf038; */
+#define FA_ICON_AMBULANCE &amp;quot;\xef\x83\xb9&amp;quot; /* &amp;amp;#xf0f9; */
+#define FA_ICON_ANCHOR &amp;quot;\xef\x84\xbd&amp;quot; /* &amp;amp;#xf13d; */
+#define FA_ICON_ANDROID &amp;quot;\xef\x85\xbb&amp;quot; /* &amp;amp;#xf17b; */
+#define FA_ICON_ANGELLIST &amp;quot;\xef\x88\x89&amp;quot; /* &amp;amp;#xf209; */
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;:)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Raspberry Pi &#43; X11 &#43; Clutter(&#43; Cogl)</title>
+      <link>/2015/02/16/2015-02-16-try-cogl-with-x11-on-raspberry-pi/</link>
+      <pubDate>Mon, 16 Feb 2015 00:00:00 +0000</pubDate>
+      <guid>/2015/02/16/2015-02-16-try-cogl-with-x11-on-raspberry-pi/</guid>
+      <description>&lt;p&gt;결론부터 말하자면 실패한 해킹에 대한 기록입니다.&lt;/p&gt;
+&lt;p&gt;Raspberry Pi 2 장비를 하나 얻게 되어, 이삼일 정도 클러터(Clutter) 라이브러리가 제대로 동작하도록 삽질을 했습니다.&lt;/p&gt;
+&lt;p&gt;구글에는 X 서버, 즉 X 윈도 없이 리눅스 프레임 버퍼 위에서 EGL + GLES2 API를 이용하는 방법은 많이 나와 있는데, X11 + EGL + GLES2 조합은 없어서 여기저기 구글링을 통해 얻은 정보를 이용해 Cogl 예제 디렉터리에 있는 프로그램들이, 비록 전체화면 방식이기는 하지만, 문제없이 실행되게 하는 데까지는 성공했습니다. (
+&lt;a href=&#34;https://gist.github.com/lethean/ac21450495dddc597f79#file-cogl-1-8-raspberrypi-patch&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;패치 파일&lt;/a&gt;
+과 
+&lt;a href=&#34;https://gist.github.com/lethean/ac21450495dddc597f79#file-cogl-build-sh&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;빌드 스크립트&lt;/a&gt;
+)&lt;/p&gt;
+&lt;p&gt;하지만 Clutter 예제 프로그램을 돌리면 여러 가지 경고를 내고 멈추거나 아무 메시지도 출력하지 않고 CPU 점유율만 차지하는 경우가 발생합니다. EGL + Raspberry Pi API가 전혀 생소한 것은 물론 Cogl + Clutter 연결 고리도 잘 모르지만, 다른 할 일도 많고, 내일모레부터는 설 연휴이기도 하고, 당장 급한 일도 아니라 일단 이 상태에서 작업을 멈추었습니다.&lt;/p&gt;
+&lt;p&gt;혹시 Clutter / Cogl 라이브러리를 Raspberry Pi 상에서 깔끔하게 돌아가게 하는 패치나 소스를 알고 계신 분 있나요? 아마도 회사에서 업무로 Raspberry Pi를 건드리는 분 중에는 분명 이미 작업한 분이 있을 것 같은데&amp;hellip;&lt;/p&gt;
+&lt;p&gt;시간이 지날수록 구글링 실력도 점점 줄어드는 것 같고&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GObject 객체 지향 프로그래밍 (5)</title>
+      <link>/2012/02/24/2012-02-24-oop-with-gobject-5/</link>
+      <pubDate>Fri, 24 Feb 2012 00:00:00 +0000</pubDate>
+      <guid>/2012/02/24/2012-02-24-oop-with-gobject-5/</guid>
+      <description>&lt;p&gt;거의 2년만에 GObject 객체 지향 프로그래밍 연재 글을 포스팅합니다. 사실 이 글의 일부는 예전에 작성해 둔 것인데, 이번 
+&lt;a href=&#34;http://gnome-kr.blogspot.com/2012/02/2-gnome-tech-talks.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME Tech Talks&lt;/a&gt;
+에서 발표 하나를 맡게 되면서, 슬라이드 자료를 따로 만들 시간은 없고 그렇다고 오래된 자료를 재탕하는 건 실례인 것 같아 조금 보완해서 작성했습니다. 참고로, GObject 개념을 잘 모르는 분이라면 이전 연재 글을 먼저 읽어 보시면 도움이 될 수 있습니다. :)&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2009/08/10/oop-with-gobject-1/&#34; title=&#34;GObject 객체 지향 프로그래밍 (1)&#34;&gt;GObject 객체 지향 프로그래밍 (1)&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2009/08/14/oop-with-gobject-2/&#34; title=&#34;GObject 객체 지향 프로그래밍 (2)&#34;&gt;GObject 객체 지향 프로그래밍 (2)&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2009/08/18/oop-with-gobject-3/&#34; title=&#34;GObject 객체 지향 프로그래밍 (3)&#34;&gt;GObject 객체 지향 프로그래밍 (3)&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2009/08/24/oop-with-gobject-4/&#34; title=&#34;GObject 객체 지향 프로그래밍 (4)&#34;&gt;GObject 객체 지향 프로그래밍 (4)&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2010/02/11/how-to-make-a-gobject-singleton/&#34; title=&#34;싱글턴(Singleton) GObject 객체 만들기&#34;&gt;싱글턴(Singleton) GObject 객체 만들기&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;/2010/04/07/serialize-gobject-properties/&#34; title=&#34;GObject 속성 직렬화(Serialization)하기&#34;&gt;GObject 속성 직렬화(Serialization)하기&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;GObject 객체 지향 시스템을 구성하는 여러가지 개념 중 상속(inheritance), 참고 카운터(reference counting), 속성(properties) 등에 대해서는 지난 글에서 이미 소개했습니다. 아직 GObject 라이브러리에서 소개하지 않은 개념이 아직 많이 남아 있지만, 그 중에서 가장 중요한 것 중 하나는 바로 시그널(signals)이 아닐까 생각합니다. 속성이 변경되었을때 자동으로 호출되는 콜백 함수를 등록해서 사용하는 방법을 설명할 때 약간 소개했지만, 아무래도 그걸로는 부족하기 때문에 이번 글은 시그널의 개념과 사용 방법, 그리고 속성 바인딩을 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;간단한 클러터 기반 시계&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/myclock-screenshot.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;언제나 그렇듯이 재미없는 예제 소스를 먼저 보여드립니다. 이 소스를 컴파일해서 실행하면 위 그림과 같은 시계가 동작합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;/* myclock1.c */
+
+/*****************************************************************************/
+
+#include &amp;lt;glib-object.h&amp;gt;
+
+#define MY_TYPE_CLOCK (my_clock_get_type ())
+#define MY_CLOCK(obj) 
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), MY_TYPE_CLOCK, MyClock))
+#define MY_CLOCK_CLASS(klass) 
+  (G_TYPE_CHECK_CLASS_CAST ((klass), MY_TYPE_CLOCK, MyClockClass))
+#define MY_IS_CLOCK(obj) 
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MY_TYPE_CLOCK))
+#define MY_IS_CLOCK_CLASS(klass) 
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), MY_TYPE_CLOCK))
+#define MY_CLOCK_GET_CLASS(obj) 
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), MY_TYPE_CLOCK, MyClockClass))
+
+typedef struct _MyClock        MyClock;
+typedef struct _MyClockClass   MyClockClass;
+typedef struct _MyClockPrivate MyClockPrivate;
+
+struct _MyClock
+{
+  GObject         parent;
+  MyClockPrivate *priv;
+};
+
+struct _MyClockClass
+{
+  GObjectClass parent_class;
+};
+
+enum
+{
+  PROP_0,
+  PROP_DATE_TIME,
+  PROP_LAST
+};
+
+struct _MyClockPrivate
+{
+  GDateTime *datetime;
+  guint      timeout;
+};
+
+G_DEFINE_TYPE (MyClock, my_clock, G_TYPE_OBJECT);
+
+static GParamSpec *props[PROP_LAST];
+
+GDateTime *
+my_clock_get_date_time (MyClock *clock_)
+{
+  g_return_val_if_fail (MY_IS_CLOCK (clock_), NULL);
+
+  return g_date_time_ref (clock_-&amp;gt;priv-&amp;gt;datetime);
+}
+
+static void
+my_clock_set_date_time (MyClock   *clock_,
+                        GDateTime *datetime)
+{
+  g_date_time_unref (clock_-&amp;gt;priv-&amp;gt;datetime);
+  clock_-&amp;gt;priv-&amp;gt;datetime = g_date_time_ref (datetime);
+  g_object_notify_by_pspec (G_OBJECT (clock_), props[PROP_DATE_TIME]);
+}
+
+static gboolean
+my_clock_update (gpointer data)
+{
+  MyClock   *clock_ = data;
+  GTimeVal   now;
+  GDateTime *datetime;
+  guint      interval;
+
+  g_get_current_time (&amp;amp;now);
+
+  datetime = g_date_time_new_from_timeval_local (&amp;amp;now);
+  my_clock_set_date_time (clock_, datetime);
+  g_date_time_unref (datetime);
+
+  interval = (1000000L - now.tv_usec) / 1000L;
+  clock_-&amp;gt;priv-&amp;gt;timeout =
+    g_timeout_add_full (G_PRIORITY_HIGH_IDLE,
+                        interval,
+                        my_clock_update,
+                        g_object_ref (clock_),
+                        g_object_unref);
+
+  return FALSE;
+}
+
+static void
+my_clock_set_property (GObject      *object,
+                       guint         param_id,
+                       const GValue *value,
+                       GParamSpec   *pspec)
+{
+  switch (param_id)
+    {
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, param_id, pspec);
+      break;
+    }
+}
+
+static void
+my_clock_get_property (GObject   *object,
+                       guint      param_id,
+                       GValue     *value,
+                       GParamSpec *pspec)
+{
+  MyClock *clock_ = MY_CLOCK (object);
+
+  switch (param_id)
+    {
+    case PROP_DATE_TIME:
+      g_value_set_boxed (value, clock_-&amp;gt;priv-&amp;gt;datetime);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, param_id, pspec);
+      break;
+    }
+}
+
+static void
+my_clock_finalize (GObject *gobject)
+{
+  MyClockPrivate *priv = MY_CLOCK (gobject)-&amp;gt;priv;
+
+  g_date_time_unref (priv-&amp;gt;datetime);
+  g_source_remove (priv-&amp;gt;timeout);
+
+  G_OBJECT_CLASS (my_clock_parent_class)-&amp;gt;finalize (gobject);
+}
+
+static void
+my_clock_class_init (MyClockClass *klass)
+{
+  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
+  GParamSpec   *pspec;
+
+  obj_class-&amp;gt;set_property = my_clock_set_property;
+  obj_class-&amp;gt;get_property = my_clock_get_property;
+  obj_class-&amp;gt;finalize     = my_clock_finalize;
+
+  g_type_class_add_private (klass, sizeof (MyClockPrivate));
+
+  pspec = g_param_spec_boxed (&amp;quot;datetime&amp;quot;,
+                              &amp;quot;Date and Time&amp;quot;,
+                              &amp;quot;The date and time to show in the clock&amp;quot;,
+                              G_TYPE_DATE_TIME,
+                              G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+  props[PROP_DATE_TIME] = pspec;
+  g_object_class_install_property (obj_class, PROP_DATE_TIME, pspec);
+}
+
+static void
+my_clock_init (MyClock *clock_)
+{
+  MyClockPrivate *priv;
+
+  priv = clock_-&amp;gt;priv =
+    G_TYPE_INSTANCE_GET_PRIVATE (clock_,
+                                 MY_TYPE_CLOCK,
+                                 MyClockPrivate);
+
+  priv-&amp;gt;datetime = g_date_time_new_now_local ();
+  priv-&amp;gt;timeout = 0;
+
+  my_clock_update (clock_);
+}
+
+MyClock *
+my_clock_new (void)
+{
+  return g_object_new (MY_TYPE_CLOCK, NULL);
+}
+
+/*****************************************************************************/
+
+#include &amp;lt;clutter/clutter.h&amp;gt;
+
+static void
+clock_datetime_changed (GObject    *object,
+                        GParamSpec *pspec,
+                        gpointer    data)
+{
+  MyClock      *clock_ = MY_CLOCK (object);
+  ClutterActor *text   = data;
+  GDateTime    *datetime;
+  gchar        *str;
+
+  datetime = my_clock_get_date_time (clock_);
+  str = g_date_time_format (datetime, &amp;quot;%xn%H:%M:%S&amp;quot;);
+
+  clutter_text_set_text (CLUTTER_TEXT (text), str);
+
+  g_free (str);
+  g_date_time_unref (datetime);
+}
+
+int
+main (int    argc,
+      char **argv)
+{
+  ClutterActor      *stage;
+  ClutterActor      *text;
+  ClutterConstraint *constraint;
+  MyClock           *clock_;
+
+  if (clutter_init (&amp;amp;argc, &amp;amp;argv) != CLUTTER_INIT_SUCCESS)
+    return -1;
+
+  /* stage */
+  stage = clutter_stage_get_default ();
+  clutter_actor_set_size (stage, 320, 240);
+  clutter_stage_set_color (CLUTTER_STAGE (stage), CLUTTER_COLOR_Black);
+  clutter_stage_set_user_resizable (CLUTTER_STAGE (stage), TRUE);
+
+  /* text */
+  text = clutter_text_new_full (&amp;quot;Sans Bold 20&amp;quot;,
+                                &amp;quot;NOW&amp;quot;,
+                                CLUTTER_COLOR_LightButter);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), text);
+  clutter_text_set_line_alignment (CLUTTER_TEXT (text), PANGO_ALIGN_CENTER);
+
+  /* align text in center of stage */
+  constraint =
+    clutter_align_constraint_new (stage, CLUTTER_ALIGN_X_AXIS, 0.5);
+  clutter_actor_add_constraint (text, constraint);
+
+  constraint =
+    clutter_align_constraint_new (stage, CLUTTER_ALIGN_Y_AXIS, 0.5);
+  clutter_actor_add_constraint (text, constraint);
+
+  /* clock */
+  clock_ = my_clock_new ();
+  g_signal_connect (clock_,
+                    &amp;quot;notify::datetime&amp;quot;,
+                    G_CALLBACK (clock_datetime_changed),
+                    text);
+
+  clutter_actor_show (stage);
+
+  clutter_main ();
+
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;소스 코드를 간단하게 설명하면, &lt;code&gt;MyClock&lt;/code&gt; 객체가 1초 간격으로 현재 시간을 얻어와 자신의 &lt;code&gt;datetime&lt;/code&gt; 속성을 갱신하면[&lt;code&gt;my_clock_update()&lt;/code&gt;], 속성이 변경되었을때(&lt;code&gt;notify::datetime&lt;/code&gt;) 자동으로 호출되는 콜백 함수를[&lt;code&gt;clock_datetime_changed()&lt;/code&gt;] 등록해 자동으로 클러터 텍스트(&lt;code&gt;ClutterText&lt;/code&gt;)를 이용해 화면에 표시합니다.&lt;/p&gt;
+&lt;p&gt;이제 이 소스 코드를 두 가지 방법으로 확장하려고 합니다. 첫번째 방법은 속성 바인딩(property binding)을 이용해 시그널을 사용하지 않는 방법이고, 두번째 방법은 시간이 변경되었을때 호출되는 진짜(!) 시그널을 추가하는 것입니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;속성 바인딩 (Property Binding)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;속성 바인딩(property binding)이란 두 GObject 객체간의 두 속성을 묶는 걸 말합니다. 여기서 묶는다는 의미는, 한 객체의 속성 값이 변하면 다른 객체의 속성 값도 자동으로 변한다는 의미입니다. 물론 묶으려는 두 속성은 같은 형(type)이어야 합니다. 그런데, 위 예제의 경우 &lt;code&gt;MyClock:``datetime&lt;/code&gt; 속성과 
+&lt;a href=&#34;http://developer.gnome.org/clutter/stable/ClutterText.html#ClutterText--text&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ClutterText:``text&lt;/code&gt;&lt;/a&gt;
+ 속성은 형(type)이 다릅니다. 그래서, 위 소스를 다음과 같이 수정합니다. (변경된 부분만 보여 드립니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;/* myclock2.c */
+
+/* ... */
+
+enum
+{
+  PROP_0,
+  PROP_DATE_TIME,
+  PROP_TEXT,
+  PROP_LAST
+};
+
+struct _MyClockPrivate
+{
+  GDateTime *datetime;
+  guint      timeout;
+  gchar     *text;
+};
+
+/* ... */
+
+const gchar *
+my_clock_get_text (MyClock *clock_)
+{
+  g_return_val_if_fail (MY_IS_CLOCK (clock_), NULL);
+
+  return clock_-&amp;gt;priv-&amp;gt;text;
+}
+
+static void
+my_clock_set_date_time (MyClock   *clock_,
+                        GDateTime *datetime)
+{
+  g_date_time_unref (clock_-&amp;gt;priv-&amp;gt;datetime);
+  clock_-&amp;gt;priv-&amp;gt;datetime = g_date_time_ref (datetime);
+  g_object_notify_by_pspec (G_OBJECT (clock_), props[PROP_DATE_TIME]);
+
+  g_free (clock_-&amp;gt;priv-&amp;gt;text);
+  clock_-&amp;gt;priv-&amp;gt;text = g_date_time_format (datetime, &amp;quot;%xn%H:%M:%S&amp;quot;);
+  g_object_notify_by_pspec (G_OBJECT (clock_), props[PROP_TEXT]);
+}
+
+/* ... */
+
+static void
+my_clock_finalize (GObject *gobject)
+{
+  /* ... */
+  g_free (priv-&amp;gt;text);
+  /* ... */
+}
+
+static void
+my_clock_class_init (MyClockClass *klass)
+{
+  /* ... */
+
+  pspec = g_param_spec_string (&amp;quot;text&amp;quot;,
+                               &amp;quot;Text&amp;quot;,
+                               &amp;quot;The text of the date and time&amp;quot;,
+                               NULL,
+                               G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+  props[PROP_TEXT] = pspec;
+  g_object_class_install_property (obj_class, PROP_TEXT, pspec);
+}
+
+static void
+my_clock_init (MyClock *clock_)
+{
+  /* ... */
+  priv-&amp;gt;text = NULL;
+  /* ... */
+}
+
+/* ... */
+
+int
+main (int    argc,
+      char **argv)
+{
+  /* ... */
+
+  /* clock */
+  clock_ = my_clock_new ();
+  g_object_bind_property (clock_, &amp;quot;text&amp;quot;,
+                          text,  &amp;quot;text&amp;quot;,
+                          G_BINDING_SYNC_CREATE);
+
+  /* ... */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 코드에서 변경된 내용은, &lt;code&gt;MyClock&lt;/code&gt;에 문자열 형식의 &lt;code&gt;text&lt;/code&gt; 속성을 추가하고[&lt;code&gt;my_clock_class_init()&lt;/code&gt;], &lt;code&gt;datetime&lt;/code&gt; 속성을 갱신할때 &lt;code&gt;text&lt;/code&gt; 속성도 함께 갱신하도록 한 다음[&lt;code&gt;my_clock_set_date_time()&lt;/code&gt;], 기존 속성 변경(&lt;code&gt;notify::datetime&lt;/code&gt;)에 대한 &lt;code&gt;g_signal_connect()&lt;/code&gt; 함수 호출 대신 &lt;code&gt;g_object_bind_property()&lt;/code&gt; 함수를 이용해 두 객체의 속성을 묶었다는 점입니다. 여기서 핵심은 물론 &lt;code&gt;g_object_bind_property()&lt;/code&gt; 함수인데, 이 함수는 
+&lt;a href=&#34;/2010/10/02/glib-2-26-0-release/&#34;&gt;GLib 2.26 버전에 추가&lt;/a&gt;
+되었으며 
+&lt;a href=&#34;/2008/12/15/exobinding/&#34;&gt;예전에 소개한 ExoBinding&lt;/a&gt;
+과 사용법이 거의 유사합니다. 물론, 옵션을 통해 바인딩하는 시점부터 값을 동기화할 지(&lt;code&gt;G_BINDING_SYNC_CREATE&lt;/code&gt;), 단방향이 아닌 양방향으로 동기화할 지(&lt;code&gt;G_BINDING_BIDIRECTIONAL&lt;/code&gt;) 등을 지정할 수도 있습니다. 이처럼, 위의 코드에서 볼 수 있듯이, 속성 바인딩을 이용하면 매번 콜백함수를 만들지 않고도 간단하게 코드 몇 줄로 원하는 객체 속성간의 동기화(synchronization)를 처리할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;여담이지만, 처음 이 기능을 접했을때 맥, 아이폰 응용 프로그램을 개발하기 위해 XCode에서 마우스 드래그 만으로 객체 속성간 바인딩이 지원되는 것처럼, 코딩이 아닌, Glade 같은 GUI 도구에서 위젯 속성간 바인딩이 지원되면 참 편하지 않을까 하는 생각이 들었던 적도 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;시그널 (Signals)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://developer.gnome.org/gobject/stable/chapter-signal.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GObject 공식 매뉴얼&lt;/a&gt;
+에 의하면 시그널(signals)은 메시지 전달 시스템을 구성하는 두가지 기술 중 하나입니다. 하나는 클로저(closures)이고 다른 하나가 시그널(signals)인데, 클로저가 콜백(callback) 함수를 자료구조로 정의한 거라면, 시그널은 이 콜백함수를 등록하고 호출하는 알고리즘을 정의한 것이라고 이해해도 무방합니다.&lt;/p&gt;
+&lt;p&gt;클로저를 다시 정의하지 않고 함수 포인터를 직접 사용해도 될 것 같은데 이를 객체로 정의한 이유는 여러가지가 있지만, 무엇보다도 콜백함수에 전달되는 인자(parameters) 목록과 인자 형(type)에 대한 처리(marshalling) 때문입니다. C/C++ 언어에서 함수 호출시 스택에 쌓이는 인자를 가공하는 것 뿐 아니라, GObject가 지원하는 여러 언어에 대한 바인딩을 위해 더 일반화된 클로저(closure) 객체가 필요합니다.&lt;/p&gt;
+&lt;p&gt;아무튼, 이론적인 설명은 그만하고 다시 본론으로 돌아와서, 위 예제에서 구현한 &lt;code&gt;MyClock&lt;/code&gt; 객체가 생각보다 잘 설계되고 동작하는 바람에(&amp;hellip;) 프로그램 전체에서 이 객체를 사용하기로 결정했다고 가정해 봅시다. 수많은 모듈과 수많은 객체에서 전역 시계 객체에 속성 알림(notify) 시그널을 연결합니다. 그리고 그때마다 &lt;code&gt;my_clock_get_date_time()&lt;/code&gt;을 호출해 현재 시간을 가져와서 처리합니다. 물론 이 예제에서 전달되는 &lt;code&gt;GDateTime&lt;/code&gt; 구조체는 참조 카운터 방식으로 관리되기 때문에 구조체 전달시  많은 오버헤드가 없지만, 문자열을 복사하거나 많은 데이터가 전달되는 경우라면 무시할 수 없는 상황이 발생합니다. 그래서, 위 첫번째 소스를 다음과 같이 조금 수정합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;/* myclock3.c */
+
+/* ... */
+
+struct _MyClockClass
+{
+  GObjectClass parent_class;
+
+  /* signals */
+  void (*changed) (MyClock   *clock_,
+                   GDateTime *datetime);
+};
+
+enum
+{
+  SIGNAL_CHANGED,
+  SIGNAL_LAST
+};
+
+/* ... */
+
+static guint       signals[SIGNAL_LAST];
+
+/* ... */
+
+static void
+my_clock_set_date_time (MyClock   *clock_,
+                        GDateTime *datetime)
+{
+  /* ... */
+}
+
+static void
+my_clock_real_changed (MyClock   *clock_,
+                       GDateTime *datetime)
+{
+  my_clock_set_date_time (clock_, datetime);
+}
+
+static gboolean
+my_clock_update (gpointer data)
+{
+  /* ... */
+
+  datetime = g_date_time_new_from_timeval_local (&amp;amp;now);
+  g_signal_emit (clock_, signals[SIGNAL_CHANGED], 0, datetime);
+  g_date_time_unref (datetime);
+
+  /* ... */
+}
+
+static void
+my_clock_class_init (MyClockClass *klass)
+{
+  /* ... */
+
+  klass-&amp;gt;changed = my_clock_real_changed;
+
+  signals[SIGNAL_CHANGED] =
+    g_signal_new (&amp;quot;changed&amp;quot;,
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (MyClockClass, changed),
+                  NULL,
+                  NULL,
+                  g_cclosure_marshal_VOID__POINTER,
+                  G_TYPE_NONE,
+                  1,
+                  G_TYPE_POINTER);
+}
+
+/* ... */
+
+static void
+clock_changed (MyClock   *clock_,
+               GDateTime *datetime,
+               gpointer   user_data)
+{
+  ClutterActor *text = user_data;
+  gchar        *str;
+
+  str = g_date_time_format (datetime, &amp;quot;%xn%H:%M:%S&amp;quot;);
+  clutter_text_set_text (CLUTTER_TEXT (text), str);
+  g_free (str);
+}
+
+int
+main (int    argc,
+      char **argv)
+{
+  /* ... */
+
+  /* clock */
+  clock_ = my_clock_new ();
+  g_signal_connect (clock_,
+                    &amp;quot;changed&amp;quot;,
+                    G_CALLBACK (clock_changed),
+                    text);
+
+  /* ... */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;바로 위 코드에 보이는 것처럼 &lt;code&gt;g_signal_connect()&lt;/code&gt; 호출시 연결하는 시그널 이름과 콜백 함수[&lt;code&gt;clock_changed()&lt;/code&gt;]가 더 단순하고 효율적으로 변경된 걸 확인할 수 있습니다. 콜백 함수 호출시 전달되는 인수를 그냥 사용하면 되니까 오버헤드가 매우 많이 줄어들 수 밖에 없습니다. 하지만 시그널을 정의해서 사용하는게 단순히 성능과 효율 때문만은 아닙니다. 위 예제에서는 속성이 변경되었을 때 발생하는 시그널을 정의했지만, 일반적으로 시그널은 속성 만으로 표현할 수 없는 객체의 상태 변화를 알리기 위해서 많이 사용합니다.(예: &lt;code&gt;ClutterActor::enter-event&lt;/code&gt; 시그널) 또한 속성의 변화를 통해 알 수 있더라도 더 쉽고 명확하게 이를 전파하기 위해서도 사용합니다.(예: &lt;code&gt;ClutterActor::hide&lt;/code&gt; 시그널과 &lt;code&gt;ClutterActor:visible&lt;/code&gt; 속성)&lt;/p&gt;
+&lt;p&gt;더 나아가, 시그널은 상태 변화 뿐 아니라 객체의 동작 방식을 외부에서 제어할 수 있도록 유연성을 제공하는데도 사용합니다. 더 자세한 이해를 위해 시그널 함수 포인터부터 설명하자면, 클래스 구조체 안에 선언된 시그널 함수 포인터[&lt;code&gt;MyClockClass::changed()&lt;/code&gt;]는 일종의 가상 함수(virtual function) 역할을 하면서, 시그널이 발생하면(emit) &lt;code&gt;g_signal_connect()&lt;/code&gt;를 이용해 등록된 사용자 콜백함수가 모두 실행된 뒤 맨 나중에 실행되거나 혹은 사용자 콜백 함수보다 먼저 실행됩니다. 따라서 필요 없을 경우 그냥 &lt;code&gt;NULL&lt;/code&gt;로 내버려두어도 상관없지만, 위 예제에서는 클래스 생성시 &lt;code&gt;my_clock_real_changed()&lt;/code&gt; 함수를 등록시켰습니다. &lt;code&gt;my_clock_real_changed()&lt;/code&gt;는 다시  실제로 &lt;code&gt;datetime&lt;/code&gt; 속성을 갱신하는 작업을 처리하는 &lt;code&gt;my_clock_set_date_time()&lt;/code&gt;을 호출합니다. 그리고, 기존 시간 갱신 함수[&lt;code&gt;my_clock_update()&lt;/code&gt;]에서는 직접 &lt;code&gt;my_clock_set_date_time()&lt;/code&gt;을 호출하지 않고, 시그널을 발생시켜[&lt;code&gt;g_signal_emit()&lt;/code&gt;] 작업을 처리합니다.&lt;/p&gt;
+&lt;p&gt;왜 이렇게 복잡하게 일을 나누어 처리할까요? 이렇게 구현하면 몇 가지 장점이 있기 때문입니다. 예를 들어 위 예제에서는 &lt;code&gt;datetime&lt;/code&gt; 속성이 읽기 전용으로 선언되어 있기 때문에 외부에서 그 값을 변경할 수 없습니다. 하지만, 외부에서 직접 &lt;code&gt;g_signal_emit_by_name()&lt;/code&gt; 등을 이용해 시그널을 발생시키면 시그널에 연결된 모든 콜백 함수 뿐 아니라 &lt;code&gt;my_clock_real_changed()&lt;/code&gt; 함수까지도 간접적으로 호출되어 작업을 처리하도록 할 수 있습니다. 게다가 만일 시그널에 연결된 콜백 함수 중 하나가 어떤 이유로 &lt;code&gt;g_signal_stop_emission_by_name()&lt;/code&gt; 등을 호출하면 이후 실행될 콜백 함수나 &lt;code&gt;my_clock_real_changed()&lt;/code&gt; 함수가 호출되지 않게 할 수도 있고, 심지어 객체의 클래스에 등록된 함수 포인터에 직접 자신만의 콜백 함수를 등록해서 원래 작업이 아예 수행되지 않게 할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;참고로, GTK+ / Clutter 등과 같은 GObject 기반 그래픽 툴킷 시스템은 대부분 이 시그널 콜백 함수 메커니즘을 이용해 커스텀 위젯을 만들거나 기존 액터를 상속받아 사용자가 마음껏 기능을 확장할 수 있는 길을 열어 두었습니다.(예: 
+&lt;a href=&#34;http://git.gnome.org/browse/clutter/tree/clutter/clutter-actor.c#n4856&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor.c:clutter_actor_real_paint()&lt;/code&gt;&lt;/a&gt;
+ 소스 참고)&lt;/p&gt;
+&lt;p&gt;시그널 객체는 &lt;code&gt;g_signal_new()&lt;/code&gt; 함수를 이용해 생성한 뒤 전역 &lt;code&gt;signals[]&lt;/code&gt; 배열에 ID를 저장해 둡니다. 이렇게 저장한 시그널 ID는 &lt;code&gt;g_signal_emit()&lt;/code&gt; 함수 호출시 사용합니다. 물론 이렇게 ID를 따로 저장하지 않고 &lt;code&gt;g_signal_emit_by_name()&lt;/code&gt;을 사용해 시그널 이름으로 직접 시그널을 발생시켜도 되지만, 어차피 내부적으로 시그널 이름을 ID로 변환하는 과정을 거치기 때문에 효율을 위해 객체 구현시 관례적으로 이런식으로 작성합니다. 물론 객체 외부에서는 시그널 ID를 모르기 때문에 어쩔 수 없이  &lt;code&gt;g_signal_emit_by_name()&lt;/code&gt;을 사용해야 합니다.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://developer.gnome.org/gobject/stable/gobject-Signals.html#g-signal-new&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_signal_new()&lt;/a&gt;
+ 함수의 인자 중에서 중요한 항목만 설명하면, 첫번째 항목은 시그널 이름을 정의하고, 세번째 항목은 시그널 함수 포인터가 맨 나중에 실행될 지(&lt;code&gt;G_SIGNAL_RUN_LAST&lt;/code&gt;), 또는 가장 먼저 실행될 지(&lt;code&gt;G_SIGNAL_RUN_FIRST&lt;/code&gt;) 등을 지정합니다. 네번째 항목은 클래스 구조체에 정의된 시그널 함수 포인터 위치를 지정하고, 여덟번째는 시그널 콜백 함수의 리턴 형(type), 아홉번째는 콜백 함수에게 전달할 인자의 갯수, 열번째부터는 전달될 인자의 형(types)을 차례대로 정의합니다.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://developer.gnome.org/gobject/stable/gobject-Signals.html#g-signal-new&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_signal_new()&lt;/a&gt;
+ 함수의 일곱번째 인자는 함수 호출시 인자를 처리하는 마샬링(marshalling) 함수를 지정하는데, 함수의 리턴 형(type)과 인자 목록, 인자의 각 형(type)이 정확히 일치되는 함수를 지정해야 합니다. 그런데 원하는 형태의 마샬링 함수를 GLib에서 기본으로 제공하지 않을 경우 &lt;code&gt;glib-genmarshal&lt;/code&gt; 프로그램을 이용해 직접 C 소스 코드를 생성해서 사용해야 했는데, GLib 2.30 버전부터는 그냥 &lt;code&gt;NULL&lt;/code&gt;을 지정하면 
+&lt;a href=&#34;http://sourceware.org/libffi/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libffi&lt;/a&gt;
+ 라이브러리를 이용해 구현한 &lt;code&gt;g_cclosure_marshal_generic()&lt;/code&gt; 함수가 기본으로 호출되어, 알아서 자동으로 마샬링을 처리합니다.&lt;/p&gt;
+&lt;p&gt;정리하자면, GObject 시그널은 모델-뷰(model-view) 구조나 관찰자 패턴(observer pattern)을 구현하는데 사용하기도 하지만, 더 복잡한 객체 지향 시스템을 설계할 때도 유용합니다. 하지만, 여기서는 시그널의 특징과 개념만 설명하느라 전체 기능의 반의 반도 소개되지 않은 셈입니다. 따라서 더 깊은 이해와 활용을 원하시면 반드시 참고 매뉴얼을 한 번 정독하시길 권합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;그리고&amp;hellip;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;다른 프로그래머가 왜 C++, Java, Python 처럼 좋은 언어 놔두고 C 언어 기반에서 복잡한 GObject 같은 걸 가지고 객체 지향 프로그래밍을 할려고 애쓰냐고 물어본다면,  
+&lt;a href=&#34;http://www.tux.org/lkml/#s15-3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 메일링 리스트 FAQ&lt;/a&gt;
+에 있는 유명한 다음 구절을 해석해서 미소지으며 알려주시기 바랍니다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;What&amp;rsquo;s important about object-oriented programming is the techniques, not the languages used.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;뭐, 모든 도구는 필요한 곳이 반드시 있으니까 계속 존재합니다. 다만 내가 아직 그 쓰임새를 알지 못할 뿐이죠&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Clutter 메모리 누수 디버깅</title>
+      <link>/2011/09/28/2011-09-28-clutter-memory-leak-debugging/</link>
+      <pubDate>Wed, 28 Sep 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/09/28/2011-09-28-clutter-memory-leak-debugging/</guid>
+      <description>&lt;p&gt;최근 
+&lt;a href=&#34;/2011/09/15/note-about-using-clutter/&#34;&gt;클러터를 이용한 프로그램을 개발&lt;/a&gt;
+하면서 메모리 누수 현상을 발견했습니다. 코드를 하나 하나 막아가면서 테스트를 한 결과 
+&lt;a href=&#34;http://developer.gnome.org/clutter-gst/1.3/ClutterGstVideoSink.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ClutterGstVideoSink&lt;/code&gt;&lt;/a&gt;
+ 객체를 사용하지 않으면 메모리 누수가 발생하지 않았습니다. 하지만, 아무리 소스를 분석해도 원인을 찾아낼 수 없었고, 잘못된 부분도 없는 것 같았습니다. 물론 구글링을 해도, 검색 실력이 미천한지, 답을 찾을 수 없었습니다.&lt;/p&gt;
+&lt;p&gt;그래서 결국 예전에 소개한 적 있는 
+&lt;a href=&#34;/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/&#34;&gt;구글 성능 도구(google-perftools)를 이용해 디버깅&lt;/a&gt;
+을 했습니다. 그런데 문제는, 
+&lt;a href=&#34;http://www.archlinux.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;아치 리눅스(Arch Linux)&lt;/a&gt;
+ x86_64 환경으로 개발 환경을 바꾸면서 메모리 프로파일 기능이 제대로 동작하지 않는다는 사실인데, 특히 메모리 누수 발생 지점을 정확하게 알기 위해서 필요한 함수 호출 백트레이스(backtrace) 정보가 추출되지 않는 게 가장 큰 문제였습니다. 이 문제를 해결하기 위한 과정을 기록으로 남겨봅니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;구글 성능 도구 설치&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;아치 리눅스(Arch Linux) x86_64 환경에서 구글 성능 도구(google-perftools)가 정확한 메모리 프로파일 결과를 얻으려면 
+&lt;a href=&#34;http://www.nongnu.org/libunwind/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libunwind&lt;/a&gt;
+ 라이브러리를 설치해야 하는데, 아치리눅스 
+&lt;a href=&#34;https://wiki.archlinux.org/index.php/AUR&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;AUR&lt;/a&gt;
+ 패키지를 
+&lt;a href=&#34;https://wiki.archlinux.org/index.php/Yaourt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;yaourt&lt;/a&gt;
+를 이용해 다음과 같이 쉽게 설치했습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ yaourt -S libunwind
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 다음과 같이 구글 성능 도구를 빌드하고 설치합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ cd google-perftools
+$ ./configure --prefix=/usr --enable-frame-pointers
+$ make
+$ sudo make install
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;라이브러리 패키지 재생성 및 재설치&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;정확한 함수 호출 백트레이스(backtrace) 정보를 얻기 위해 프로그램에 사용되는 모든 라이브러리를 다시 컴파일해 패키지를 다시 설치해야 하는데, 그 과정은 다음과 같습니다. (
+&lt;a href=&#34;https://wiki.archlinux.org/index.php/Debug_-_Getting_Traces&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;관련 위키 페이지&lt;/a&gt;
+ 참고)&lt;/p&gt;
+&lt;p&gt;먼저 아치 리눅스 빌드 시스템(ABS) 정보를 동기화합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo abs
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그러면 &lt;code&gt;/var/abs&lt;/code&gt; 디렉토리 밑에 모든 공식 패키지의 빌드 정보가 다운로드됩니다.&lt;/p&gt;
+&lt;p&gt;라이브러리의 패키지 빌드 옵션을 수정하기 위해, &lt;code&gt;/etc/makepkg.conf&lt;/code&gt; 파일에서 아래 부분을 찾아 디버그 심볼(&lt;code&gt;-g&lt;/code&gt;)과 프레임 포인터 포함(&lt;code&gt;-fno-omit-frame-pointer&lt;/code&gt;) 컴파일 옵션을 추가하고 빌드 옵션에서 &lt;code&gt;strip&lt;/code&gt;을 제외합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;CFLAGS=&amp;quot;-g -fno-omit-frame-pointer -march=x86-64 -mtune=generic -O2 -pipe&amp;quot;
+CXXFLAGS=&amp;quot;-g -fno-omit-frame-pointer -march=x86-64 -mtune=generic -O2 -pipe&amp;quot;
+OPTIONS=(!strip docs libtool emptydirs zipman purge)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;/var/abs/local&lt;/code&gt; 디렉토리로 이동해서(없으면 새로 생성) 다음과 같이 사용되는 프로그램에 사용되는 모든 라이브러리 패키지를 다시 생성하고 설치합니다. 예를 들어 클러터 라이브러리는 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ src=$(find /var/abs -name clutter | grep -v /var/abs/local)
+$ cp -r $src /var/abs/local
+$ cd /var/abs/local/clutter
+$ makepkg -f
+$ sudo pacman -U *.pkg.tar.xz
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위와 같은 방식으로 clutter, cogl, glib2, glibc 패키지를 다시 만들고 설치합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;메모리 프로파일링&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;이제 다음 명령으로 디버깅할 프로그램(&lt;code&gt;eview-demo&lt;/code&gt;)을 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ G_SLICE=always-malloc 
+  HEAPPROFILE=/tmp/profile 
+  HEAP_PROFILE_ALLOCATION_INTERVAL=10737418240 
+  LD_PRELOAD=/usr/lib/libtcmalloc.so 
+  ./eview-demo
+Starting tracking the heap
+Dumping heap profile to /tmp/profile.0001.heap (...)
+Dumping heap profile to /tmp/profile.0002.heap (...)
+Dumping heap profile to /tmp/profile.0003.heap (...)
+Dumping heap profile to /tmp/profile.0004.heap (...)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;정상적으로 구글 성능 도구의 메모리 프로파일러가 동작하면 위와 같은 메시지가 출력됩니다. 이제 적당한 시점에서 프로그램을 멈추고, 다음과 같이 프로파일링 데이터를 분석합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ pprof 
+    --pdf 
+    --lines 
+    --base /tmp/profile.0001.heap 
+    ./eview-demo 
+    /tmp/profile.0004.heap 
+    &amp;gt; profile-1.pdf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이렇게 생성된 그래프는 다음과 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/clutter-1-6-memory-leak-profile.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이 그래프를 분석해서 관련 코드를 분석해 보니, 결정적으로 두 군데에 문제가 있습니다. 첫번째는 &lt;code&gt;cogl_pipeline_fragend_arbfp_start()&lt;/code&gt; 함수 내부에서 생성한 &lt;code&gt;arbfp_program_state&lt;/code&gt; 객체를 해제하는 곳이 없다는 점이고, 두번째는 &lt;code&gt;cogl_pipeline_get_layers()&lt;/code&gt; 함수에서 생성한 &lt;code&gt;deprecated_get_layers_list&lt;/code&gt; 리스트를 해제하는 곳이 없다는 점입니다. 그런데 최근 클러터 1.8 버전 소스를 보면 두번째 문제는 해결이 된 것 같은데, 첫번째 문제가 있는 곳은 코드 수정이 많이 되어 해결 여부를 알 수가 없습니다.&lt;/p&gt;
+&lt;p&gt;그래서 결론은, 며칠 전에 릴리스된 클러터 1.8 안정 버전이 아치 리눅스 패키지로 올라오면 다시 메모리 누수 여부를 확인해볼 예정입니다. (GNOME 3 핵심 라이브러리를 직접 컴파일해서 사용하는게 귀찮기도 하고 두렵기도 해서입니다&amp;hellip; :)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE 2011-10-04]&lt;/strong&gt; 클러터 1.8 버전에서 확인해 보니 메모리 누수 문제가 해결된 것 같습니다. 역시, 미루기를 잘 했습니다. ;)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE 2011-10-05]&lt;/strong&gt; 다시 확인해 보니, 이제는 다른 부분에서 메모리 누수가 발생합니다. 그래서 이번에는 당당히(?) 버그 리포팅(
+&lt;a href=&#34;https://bugzilla.gnome.org/show_bug.cgi?id=660985&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Bug 660985&lt;/a&gt;
+, 
+&lt;a href=&#34;https://bugzilla.gnome.org/show_bug.cgi?id=660986&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Bug 660986&lt;/a&gt;
+) 했습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE 2011-10-10]&lt;/strong&gt; CPU 사용량이 가장 많은 함수를 프로파일링하려면 다음과 같이 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ CPUPROFILE=./cpu.prof 
+  LD_PRELOAD=/usr/lib/libtcmalloc_and_profiler.so 
+  ./eview-demo
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;정상적으로 종료한뒤 다음과 같이 CPU 사용량을 함수별로 프로파일한 그래프를 얻을 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ pprof 
+    --pdf 
+    --lines 
+    ./eview-demo 
+    ./cpu.prof
+    &amp;gt; profile-1.pdf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE 2012-02-04]&lt;/strong&gt; 최신 아치 리눅스에 포함되어 있는 
+&lt;a href=&#34;http://code.google.com/p/gperftools/issues/detail?id=396&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;glibc 2.15 버전의 버그&lt;/a&gt;
+ 때문에 프로파일링이 제대로 동작하지 않을 경우 &lt;del&gt;
+&lt;a href=&#34;http://permalink.gmane.org/gmane.comp.lib.glibc.alpha/17093&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;sscanf 관련 패치&lt;/a&gt;
+를 적용해 glibc 패키지를 다시 빌드하고 설치해야 합니다.&lt;/del&gt; glibc 2.15-5 버전으로 업그레이드하면 됩니다. 
+&lt;a href=&#34;https://bugs.archlinux.org/task/28246&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;버그 리포팅&lt;/a&gt;
+이 바로 반영되어 버렸습니다. :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터(Clutter) 사용기</title>
+      <link>/2011/09/15/2011-09-15-note-about-using-clutter/</link>
+      <pubDate>Thu, 15 Sep 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/09/15/2011-09-15-note-about-using-clutter/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터(Clutter)&lt;/a&gt;
+ 라이브러리를 이용하면서 부딪친 대부분의 문제는 성능과 관련된 것입니다. 클러터 라이브러리 자체가 느리다는 얘기가 아니라, 주로 개발하는 분야에서 요구되는 16채널 이상 다채널 라이브 / 녹화 동영상 재생을 구현할 때, 고사양 장비는 문제가 되지 않지만 저사양 임베디드 보드에서는 성능 저하가 발생하기 때문입니다. 하지만, 효율적인 2D 그래픽을 위한 3D 그래픽 라이브러리로서 클러터는 아직까지 만족스럽습니다. OpenGL 기반 라이브러리는 기존 2D 그래픽 라이브러리와 여러가지 기본 개념이 달라서, 저처럼 이쪽 세상에 입문한지 얼마 안되는 개발자는 많은 시행 착오를 겪을 수 밖에 없는데,  이미 사용해 본  
+&lt;a href=&#34;http://www.gtk.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://developer.gnome.org/gobject/stable/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GObject&lt;/a&gt;
+ 방식에 익숙한 점도 유리하게 작용했지만, 2D 그래픽 + 효과를 위한 약간의 3차원 API 조합은 복잡하고 어려운(&amp;hellip;) 3D 라이브러리를 직접 사용하는 것보다 훨씬 수월했습니다.&lt;/p&gt;
+&lt;p&gt;아무튼 그래서, 지금까지 겪은 경험 중 몇 가지를 정리해 보았습니다. 당연하지만, 아직 OpenGL에 대한 이해가 부족해 틀린 내용이 있을 수도 있으니, 감안해 주시기 바랍니다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;클러터 라이브러리는 계속 버전업 되는데 예전에 작성된 튜토리얼이나 예제는 갱신되지 않아 잘못되거나 사용을 권장하지 않는(deprecated) API를 사용하는 경우가 많이 있습니다. 가능한 클러터 개발자들이 라이브러리와 함께 직접 업데이트하는 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter-cookbook/1.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 해설서(The Clutter Cookbook)&lt;/a&gt;
+를 참고하는게 가장 정확했습니다.&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;OpenGL 기반 클러터 라이브러리 동작 방식은 일반적인 2D GUI 프로그래밍과 달리 화면, 즉 스테이지(stage)에 조그만 변화라도 있으면 그때마다 스테이지를 다시 그립니다. 즉, 클러터의 기본 단위인 액터(actor) 하나가 다시 그려져야 하면 액터가 속한 스테이지의 모든 액터를 다시 그립니다. 그리고 이로 인해 스테이지에 보이는 모든 액터의 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActorClass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;paint()&lt;/code&gt;&lt;/a&gt;
+ 함수가 매번 호출되기 때문에 이 함수를 최적화하는 게 매우 중요합니다.&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;내부적으로 캐싱(caching)이 이용되긴 하지만, 한 액터의 좌표(크기 + 위치)가 변경되면 스테이지의 모든 액터의 크기를 다시 계산하기 위해 모든 액터의 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActorClass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;allocate()&lt;/code&gt;&lt;/a&gt;
+ 함수가 호출됩니다. 예를 들어 텍스트(text) 액터 구현을 보면, 문자열이나 폰트, 크기 등이 변경되었을때 텍스트 액터를 포함하는 부모 컨테이너 액터가 변경된 크기를 감지하고 자신의 크기를 조정할 수 있도록 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-queue-relayout&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_queue_relayout()&lt;/code&gt;&lt;/a&gt;
+ 함수가 호출됩니다. 그리고, 이 함수가 호출되면 결국 스테이지 단계까지 호출이 계속된 다음, 다시 스테이지에 속한 액터의 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActorClass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;allocate()&lt;/code&gt;&lt;/a&gt;
+ 함수가 재귀적으로 호출됩니다. 따라서 액터의 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActorClass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;allocate()&lt;/code&gt;&lt;/a&gt;
+ 함수 역시 내부적으로 최적화되는 것이 좋습니다. 참고로 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-queue-relayout&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_queue_relayout()&lt;/code&gt;&lt;/a&gt;
+ 함수가 호출되면 자동으로 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-queue-redraw&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_queue_redraw()&lt;/code&gt;&lt;/a&gt;
+ 함수가 호출되어 스테이지의 모든 객체를 다시 그립니다.&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;클러터에서 기본으로 제공하는 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterBox.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;박스(ClutterBox)&lt;/a&gt;
+, 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterGroup.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그룹(CutterGroup)&lt;/a&gt;
+ 등과 같은 컨테이너 액터를 사용하지 않고 직접 컨테이너 액터를 구현해 자식 액터를 배치하고 싶거나 혹은 기존 컨테이너 액터를 상속받아 새 컨테이너 액터를 구현할 때가 있습니다. 그런데, 컨테이너 액터 좌표(크기 + 위치) 변경에 따라 자식 액터의 좌표를 자동으로 변경할 필요가 있으면 대개 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActor-allocation-changed&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;&amp;quot;allocation-changed&amp;quot;&lt;/code&gt;&lt;/a&gt;
+ 시그널을 이용해 감지한 뒤 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-size&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_size()&lt;/code&gt;&lt;/a&gt;
+, 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-position&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_position()&lt;/code&gt;&lt;/a&gt;
+ 함수 등을 이용해 자식 액터의 좌표를 조정하거나, 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterConstraint.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;제약(ClutterConstraints)&lt;/a&gt;
+ 기능을 이용하는데, 위에서 설명한 것처럼 좌표가 변환되면 자동으로 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-queue-relayout&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_queue_relayout()&lt;/code&gt;&lt;/a&gt;
+ 함수가 호출되면서 &lt;em&gt;&amp;ldquo;The actor &amp;lsquo;xxx&amp;rsquo; is currenty inside an allocation cycle; calling clutter_actor_queue_relayout() is not recommended&amp;rdquo;&lt;/em&gt; 디버그 경고 메시지가 계속 출력됩니다. 메시지니를 무시할 수도 있지만, 문제는 한 액터의 좌표 변경으로 인해 매번 화면 전체가 다시 좌표를 다시 계산하기 때문에 결국 모든 액터의 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActorClass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;allocate()&lt;/code&gt;&lt;/a&gt;
+ 함수가 계속 호출되면서 CPU 점유율이 매우 높아진다는 점입니다. 여기에 좌표를 이용한 애니메이션까지 사용하면 CPU 점유율은 상상을 초월할 정도로 올라갑니다. 이 문제를 해결하려면 반드시 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActorClass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;allocate()&lt;/code&gt;&lt;/a&gt;
+ 함수에서 자식 액터의 좌표를 지정할때 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-allocate&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_allocate*()&lt;/code&gt;&lt;/a&gt;
+ 종류의 함수만 이용해야 하고, 어쩔 수 없을 경우 
+&lt;a href=&#34;http://developer.gnome.org/glib/stable/glib-The-Main-Event-Loop.html#g-idle-add-full&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_idle_add_full()&lt;/code&gt;&lt;/a&gt;
+ 함수를 이용해 자식 액터 좌표 지정 루틴의 실행을 뒤로 조금 미룬 뒤에 좌표 중복 검사 등을 통해 가능한 화면 재구성(relayout) 작업이 덜 일어나게 해야 합니다. 메인루프 우선 순위는 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/clutter-Events.html#CLUTTER-PRIORITY-EVENTS:CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;CLUTTER_PRIORITY_EVENTS&lt;/code&gt;&lt;/a&gt;
+ 값을 사용하는 게 좋습니다.&lt;/p&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/running-clutter.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 실행에 영향을 주는 환경 변수&lt;/a&gt;
+를 이용하면 성능 조율 및 디버깅에 상당한 도움을 받을 수 있습니다. 예를 들어 
+&lt;a href=&#34;http://wiki.clutter-project.org/wiki/ClutterProfiling#Are_you_drawing_actors_unnecessarily.3F&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;COGL_DEBUG=rectangles&lt;/code&gt;&lt;/a&gt;
+ 이나 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/running-clutter.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;CLUTTER_DEBUG=&amp;quot;paint layout&amp;quot;&lt;/code&gt;&lt;/a&gt;
+ 등은 도움이 많이 됩니다.&lt;/p&gt;
+&lt;ol start=&#34;6&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterText.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;텍스트(ClutterText)&lt;/a&gt;
+ 액터의 위치가 정수가 아니라면, 즉 소수점 이하 값이 존재하는 실수일 경우  글꼴 선이 흐려지거나 뭉개지는 현상이 발생합니다. 텍스트 액터 뿐 아니라 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterRectangle.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;사각형(ClutterRectangle)&lt;/a&gt;
+ 액터처럼 그림이 아니라 직접 그려지는 액터들도 비슷한 현상이 발생합니다. 비단 액터의 위치가 정수일 지라도 이를 포함하는 상위 컨테이너 액터의 위치가 소수점 이하를 포함하는 실수일 경우, 즉 화면(stage)상 절대 좌표가 정수가 아닐 경우 이 현상이 발생합니다. 따라서 액터의 좌표를 계산해서 지정할 경우 반드시 
+&lt;a href=&#34;http://www.manpagez.com/man/3/floor/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;floor()&lt;/code&gt;&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://www.manpagez.com/man/3/ceil/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ceil()&lt;/code&gt;&lt;/a&gt;
+ 등의 함수를 이용해 소수점 아래 값을 없애주는 것이 좋습니다.&lt;/p&gt;
+&lt;ol start=&#34;7&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;액터에 배경 또는 테두리를 장식하고 싶을때 보통 떠오르는 구현 방법은 두 가지가 있습니다. 첫번째는 컨테이너 액터를 이용해 사각형 액터를 맨 아래 두고 대상 액터를 위에 두는 방법을 이용한 것이고, 두 번째는 이런 작업을 하는 커스텀 액터를 직접 구현하는 것입니다. 그런데 이보다 더 좋은 방법은, 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterEffect.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;효과(ClutterEffect)&lt;/a&gt;
+ 객체를 구현해서 사용하는 것입니다. 효과 객체가 액터 객체에 추가되면 효과의 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterEffect.html#ClutterEffectClass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;pre_paint()&lt;/code&gt; / &lt;code&gt;post_paint()&lt;/code&gt;&lt;/a&gt;
+ 함수가 액터의 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActorClass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;paint()&lt;/code&gt;&lt;/a&gt;
+ 함수 호출 전후에 자동으로 호출되므로, 동일한 디스플레이 루틴을 여러 객체에 쉽게 적용할 수 있습니다. 클러터에서 이미 기본으로 제공하는 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ch07.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;고급 효과&lt;/a&gt;
+를 사용해도 되지만, 예를 들어 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterEffect.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;텍스트에 그림자를 넣어주는 예제&lt;/a&gt;
+를 그대로 이용해 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter-cookbook/1.0/effects-basic.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;테두리 효과&lt;/a&gt;
+처럼 구현할 수도 있는 셈입니다.&lt;/p&gt;
+&lt;ol start=&#34;8&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;클러터에서 직접 그리기 위해 사용하는 OpenGL 랩퍼 API 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/cogl/stable/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Cogl&lt;/a&gt;
+ 함수를 사용할때 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/cogl/stable/cogl-Path-Primitives.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;경로(Path)&lt;/a&gt;
+ 등을 사용하지 않고 가능하다면 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/cogl/stable/cogl-Primitives.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;기본(Primitives) 함수&lt;/a&gt;
+만 사용해서 구현하는게 성능이 좋습니다.&lt;/p&gt;
+&lt;ol start=&#34;9&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://docs.clutter-project.org/docs/cogl/stable/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Cogl&lt;/a&gt;
+ 함수를 이용해 직접 그리는 방식과 모든 것을 그림 이미지로 처리하는 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterTexture.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;텍스쳐(ClutterTexture)&lt;/a&gt;
+를 이용하는 방식의 장단점을 아직 잘 모르겠습니다. 다만, 텍스쳐는 내부적으로 사용하는 메모리량이 더 많은 것이 분명하고, 현재 개발 중인 시스템에서는 수많은 채널의 비디오 동시 재생을 위해 어차피 많은 텍스쳐가 사용되기 때문에 가능한 텍스쳐 사용을 자제했습니다. 하지만 영역 크기에 따라 크기가 달라지는 GUI 부분을 구현할때는 이미지 기반 텍스쳐보다 일종의 벡터 그래픽이라고 할 수 있는 Cogl 함수를 이용해 직접 그리면 훨씬 깔끔한 GUI를 얻을 수 있는 것도 사실인 것 같습니다.&lt;/p&gt;
+&lt;ol start=&#34;10&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;비디오 재생을 위해 
+&lt;a href=&#34;http://developer.gnome.org/clutter-gst/1.3/ClutterGstVideoSink.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;비디오싱크(ClutterGstVideoSink)&lt;/a&gt;
+ 객체를 사용할 때 
+&lt;a href=&#34;http://developer.gnome.org/clutter-gst/1.3/ClutterGstVideoSink.html#ClutterGstVideoSink--update-priority&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;갱신 우선순위 (&lt;code&gt;update-priority&lt;/code&gt;)&lt;/a&gt;
+ 속성을 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/clutter-Events.html#CLUTTER-PRIORITY-REDRAW:CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;CLUTTER_PRIORITY_REDRAW&lt;/code&gt;&lt;/a&gt;
+ 값으로 낮추면 마우스 이벤트 반응 속도를 개선할 수 있습니다.&lt;/p&gt;
+&lt;ol start=&#34;11&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;정말로 빈번한 애니메이션을 구현할때는, 사용하기 쉽지만, 내부적으로 수많은 객체가 생성되고 소멸되는 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/clutter-Implicit-Animations.html#clutter-actor-animate&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_animate()&lt;/code&gt;&lt;/a&gt;
+ 대신, 번거롭지만, 
+&lt;a href=&#34;http://docs.clutter-project.org/docs/clutter/stable/ClutterTimeline.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;타임라인(ClutterTimeline)&lt;/a&gt;
+ 등을 이용해 구현하는게 CPU / 메모리 사용량을 줄이는데 도움이 됩니다.&lt;/p&gt;
+&lt;ol start=&#34;12&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;AMD(ATI) 그래픽 카드를 장착한 리눅스 상에서 클러터를 실행할때 Catalyst 상용 X 드라이버와 최신 오픈소스 X 드라이버와 성능 차이가 거의 없어진 것 같습니다. 물론 NVidia는 상용 드라이버 성능이 월등이 더 좋고, 인텔 칩셋은 오픈 소스 드라이버만 있고 성능도 좋습니다.&lt;/p&gt;
+&lt;p&gt;이해에 도움이 될까 싶어, 아직 프로토타입이고 많은 기능이 빠져있지만, 현재 개발 중인 시스템의 동작 화면을 녹화한 영상을 보여드립니다. 녹화에 사용한 프로그램은 
+&lt;a href=&#34;http://recordmydesktop.sourceforge.net/about.php&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gtk-recordMyDesktop&lt;/a&gt;
+입니다.&lt;/p&gt;
+&lt;iframe width=&#34;480&#34; height=&#34;360&#34; src=&#34;http://www.youtube.com/embed/1w0fjm0MYo8&#34;&gt;&lt;/iframe&gt;
+&lt;p&gt;GUI 프로그래밍을 할 때마다 느끼는 점은 구현하기 위한 기술도 중요하지만, 결국 사용자를 배려하면서도 아름다움을 잃지 않는 참신한 아이디어 기반의 디자인이 더 중요하다는 점입니다. 물론 그렇기 때문에 디자이너라는 직업이 따로 있는 것이겠지만, 좋은 프로그램과 삶의 다양한 모습을 많이 보고, 많이 경험하고, 많이 참고해야 하는 지적 즐거움을 언제부터인가 프로그래머들은 남의 영역이라 멀리한 채 무미건조한 기술에만 전념하고 있는 건 아닌지 모르겠습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GNOME 개발 설명서 / 동영상</title>
+      <link>/2011/07/15/2011-07-15-gnome-development-screencasts-and-tutorials/</link>
+      <pubDate>Fri, 15 Jul 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/07/15/2011-07-15-gnome-development-screencasts-and-tutorials/</guid>
+      <description>&lt;p&gt;오랜만에 
+&lt;a href=&#34;http://developer.gnome.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 개발자 센터&lt;/a&gt;
+를 들어갔더니, 모양 뿐 아니라 내용도 확 바뀌어 있습니다. 예전에도 있었는데 제가 몰랐던 건지도 모르지만, 
+&lt;a href=&#34;http://developer.gnome.org/gnome-devel-demos/unstable/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;10분짜리 설명서(10-minute tutorials)&lt;/a&gt;
+가 가장 먼저 눈에 띄었습니다. (접속한 페이지의 실제 이름은 GNOME 개발자 플랫폼 데모입니다) 이미지 보기, 기타 튜너, 메시지 보드 등과 같은 여러 예제를 통해 단순한 GTK+ 위젯 라이브러리 사용법만 보여주는것 뿐 아니라, 말 그대로 GNOME 플랫폼의 중심이 되는 
+&lt;a href=&#34;http://www.gtk.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://gstreamer.freedesktop.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GStreamer&lt;/a&gt;
+ / 
+&lt;a href=&#34;https://live.gnome.org/WebKitGtk&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;WebKitGtk&lt;/a&gt;
+ 라이브러리 등을 이용하여 유용하게 참고할 수 있는 간단한 응용 프로그램을 
+&lt;a href=&#34;http://www.anjuta.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Anjuta&lt;/a&gt;
+ 통합 개발 도구, 
+&lt;a href=&#34;http://glade.gnome.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Glade&lt;/a&gt;
+ UI 편집기를 이용하여 개발하는 방법을 설명합니다. 또한 C / C++ / JavaScript / Python / 
+&lt;a href=&#34;https://live.gnome.org/Vala&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Vala&lt;/a&gt;
+ 등과 같은 언어별 예제도 각각 제공하고 있습니다.&lt;/p&gt;
+&lt;p&gt;최근 계속 연재되는 
+&lt;a href=&#34;http://www.python.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;파이썬(Python)&lt;/a&gt;
+ 언어와 
+&lt;a href=&#34;http://www.gtk.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://gstreamer.freedesktop.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GStreamer&lt;/a&gt;
+ 라이브러리를 이용한 GNOME 개발 동영상(screencast)도 볼만합니다. 몇몇 예제는 그놈 개발자 사이트 데모 프로그램과 겹치는 것도 있습니다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://vimeo.com/25185245&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 스크린캐스트 - 01. 첫번째 GTK+ 어플리케이션&lt;/a&gt;
+ &lt;em&gt;(2011-06-16)&lt;/em&gt;: 파이썬을 이용해 기본 기능을 가진 GTK+ 프로그램 만들기&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://vimeo.com/25483019&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 스크린캐스트 - 02. 화려한 사진 어플리케이션 만들기&lt;/a&gt;
+ &lt;em&gt;(2011-06-22)&lt;/em&gt;: 파이썬과 GTK+를 이용해 간단한 사진 프로그램 만들기&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://vimeo.com/25796446&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 스크린캐스트 - 03. 멋진 계산기 만들기&lt;/a&gt;
+ &lt;em&gt;(2011-06-29)&lt;/em&gt;: 파이썬과 GTK+를 이용해 간단한 계산기 프로그램 만들기&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://vimeo.com/26100971&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 스크린캐스트 - 04. 우아한 기타 튜너 만들기&lt;/a&gt;
+ &lt;em&gt;(2011-07-07)&lt;/em&gt;: 파이썬과 GTK+, GStreamer를 이용해 기타 튜너 프로그램 만들기&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://vimeo.com/26452876&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 스크린캐스트 - 05. 매력적인 동영상 재생기 만들기&lt;/a&gt;
+ &lt;em&gt;(2011-07-15)&lt;/em&gt;: 파이썬과 GTK+, GStreamer, Clutter를 이용해 동영상 재생기 만들기&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://projects.gnome.org/gedit/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gedit&lt;/a&gt;
+ 텍스트 편집기와 
+&lt;a href=&#34;http://glade.gnome.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Glade&lt;/a&gt;
+ UI 편집기만을 이용해 파이썬 언어의 간결함과 GNOME 플랫폼 라이브러리의 강력함을 잘 보여주고 있습니다. 여담이지만, 영어가 짧아 단어만 알아듣는 본인도 코드만 보고 이해할 수 있었습니다. :)&lt;/p&gt;
+&lt;p&gt;물론 이 글에서 소개한 설명서는 대부분 아마도 많은 개발자에게 GNOME 플랫폼의 우수성을 전파하고 사용을 독려하기 위해 매우 기본적인 내용만 맛보기로 소개하기 때문에 더 심각하고(?) 자세한 내용을 알고 싶다면 각 기술에 대한 심층적인 공부가 필요합니다.&lt;/p&gt;
+&lt;p&gt;또한 GNOME 플랫폼 라이브러리라는 제목을 달고 있지만 대부분의 기술이 반드시 GNOME 환경에서만 동작하는 게 아니므로 리눅스 관련 개발자라면 한 번 들여다보는 것도 좋을 것 같습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>The Board 소개</title>
+      <link>/2010/12/23/2010-12-23-the-board-project-introduction/</link>
+      <pubDate>Thu, 23 Dec 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/12/23/2010-12-23-the-board-project-introduction/</guid>
+      <description>&lt;p&gt;힘겹게 겨우 다시 한 학기를 마무리했지만, 할 일은 여전히 밀려 있습니다. 그래서 잠시 머리도 식힐겸 요즘 관심있게 지켜보고 있는 GNOME 프로젝트 중 하나인 
+&lt;a href=&#34;http://live.gnome.org/TheBoardProject&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The Board&lt;/a&gt;
+ 프로젝트에 대해 간략하게 소개해볼까 합니다.&lt;/p&gt;
+&lt;p&gt;일단, 백마디 말보다 스크린샷 하나가 더 좋을 것 같군요.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/TheBoardProject?action=AttachFile&amp;amp;do=get&amp;amp;target=the-board.jpg&#34; alt=&#34;&#34; title=&#34;The Board Project&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이 프로그램은 쉽게 말해 다음과 같은 오프라인 보드를 컴퓨터에서 흉내내는 것입니다. 다만 아직은 개인 자료 수집용입니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/Infinite-corridor-bboard.jpeg&#34; alt=&#34;&#34; title=&#34;Infinite Corridor Bulletin Board&#34;&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://live.gnome.org/GnomeShell&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그놈 셸(GNOME Shell)&lt;/a&gt;
+과 마찬가지로, 
+&lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터(Clutter) 라이브러리&lt;/a&gt;
+를 이용해 
+&lt;a href=&#34;http://live.gnome.org/Gjs&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;자바스크립트(JavaScript) 언어&lt;/a&gt;
+로 작성되었다는 점이 흥미롭습니다. 다음은 실제 동작 화면을 캡쳐한 동영상 모음입니다.&lt;/p&gt;
+&lt;p&gt;[vimeo 13601332 w=400 h=250]&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://vimeo.com/13601332&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Introducing The Board&lt;/a&gt;
+ from 
+&lt;a href=&#34;http://vimeo.com/lucasrocha&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Lucas Rocha&lt;/a&gt;
+ on 
+&lt;a href=&#34;http://vimeo.com&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Vimeo&lt;/a&gt;
+.&lt;/p&gt;
+&lt;p&gt;[vimeo 13869009 w=400 h=250]&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://vimeo.com/13869009&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Videos in The Board&lt;/a&gt;
+ from 
+&lt;a href=&#34;http://vimeo.com/lucasrocha&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Lucas Rocha&lt;/a&gt;
+ on 
+&lt;a href=&#34;http://vimeo.com&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Vimeo&lt;/a&gt;
+.&lt;/p&gt;
+&lt;p&gt;[vimeo 15969297 w=400 h=250]&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://vimeo.com/15969297&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Toolbar in The Board&lt;/a&gt;
+ from 
+&lt;a href=&#34;http://vimeo.com/lucasrocha&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Lucas Rocha&lt;/a&gt;
+ on 
+&lt;a href=&#34;http://vimeo.com&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Vimeo&lt;/a&gt;
+.&lt;/p&gt;
+&lt;p&gt;[vimeo 16908549 w=400 h=250]&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://vimeo.com/16908549&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Context Toolbars in The Board&lt;/a&gt;
+ from 
+&lt;a href=&#34;http://vimeo.com/lucasrocha&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Lucas Rocha&lt;/a&gt;
+ on 
+&lt;a href=&#34;http://vimeo.com&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Vimeo&lt;/a&gt;
+.&lt;/p&gt;
+&lt;p&gt;[vimeo 17506246 w=400 h=250]&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://vimeo.com/17506246&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Adding to The Board&lt;/a&gt;
+ from 
+&lt;a href=&#34;http://vimeo.com/lucasrocha&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Lucas Rocha&lt;/a&gt;
+ on 
+&lt;a href=&#34;http://vimeo.com&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Vimeo&lt;/a&gt;
+.&lt;/p&gt;
+&lt;p&gt;개발 로그를 들여다보면 로컬 웹서버를 구동시켜 웹브라우저에서도 접근할 수 있는 인터페이스가 추가되고 있는 것도 같은데, 언젠가는 현재 인터넷의 글목록 방식 게시판이 아닌 이와 같이 실생활을 모방한 방식의 인터넷 게시판도 등장하지 않을까&amp;hellip; 상상해봅니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GLib 테스트 프레임워크 사용하기</title>
+      <link>/2010/02/12/2010-02-12-using-glib-test-framework/</link>
+      <pubDate>Fri, 12 Feb 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/02/12/2010-02-12-using-glib-test-framework/</guid>
+      <description>&lt;p&gt;GLib 라이브러리 2.16 버전부터 지원하는 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;테스트 프레임워크&lt;/a&gt;
+는 C 언어용 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Unit_testing&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;유닛테스트&lt;/a&gt;
+ 도구입니다. 물론 많은 유닛 테스트 도구가 이미 존재하지만, GLib 라이브러리 기반 C 언어 프로그램이라면 굳이 다른 라이브러리를 사용하는 것보다는 이미 지원하는 훌륭한 도구를 사용하는게 더 좋겠지요. 참고로,
+&lt;a href=&#34;http://www.gtk.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+&lt;/a&gt;
+, 
+&lt;a href=&#34;http://clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter&lt;/a&gt;
+ 등 같은 프로젝트도 이미 이 기능을 이용해 테스트 코드를 작성하고 있으므로 알아두면 도움이 됩니다. 모든게 그렇지만, 알고나면 별게 아니므로 기본 개념과 API 사용법만 충실히 이해하면 됩니다.&lt;/p&gt;
+&lt;p&gt;**기본 개념 및 사용법
+**&lt;/p&gt;
+&lt;p&gt;유닛테스트 개념은 스몰토크, 자바, C++처럼 언어적으로 객체지향 개념을 지원하는 언어에서 시작했기 때문에 C 언어에 그대로 적용하기에는 조금 까다로운 점이 많습니다. 그래서 GLib 테스트 프레임워크는 유닛테스트에서 기본 개념과 테스트 실행 방식만 빌려옵니다. 우선 알아야하는 기본 개념은 다음과 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;테스트 케이스 (Test Case) : 가장 기본이 되는 하나의 테스트 단위입니다. GLib에서는 하나의 테스트 함수(function)가 이 역할을 합니다.&lt;/li&gt;
+&lt;li&gt;픽스쳐 (Fixture) : 고정 설치된 물건이라는 뜻처럼, 테스트 케이스 실행 전후에 항상 실행하는 함수를 의미합니다. 실제로는, 테스트 함수를 실행하기 위해 필요한 환경을 미리 구축하거나(setup) 실행 후 리소스를 정리하는(teardown) 함수, 그리고 이와 함께 사용되는 사용자 데이터(data)로 구성됩니다. 참고로, GLib에서는 각 테스트간 의존성을 피하기 위해 모든 테스트 케이스를 실행할때마다 매번 픽스쳐를 새로 구성하는 방식(fresh fixture)을 사용합니다.&lt;/li&gt;
+&lt;li&gt;테스트 슈트 (Test Suite) : 여러 테스트 케이스를 묶은 그룹입니다. 트리 구조처럼 테스트 슈트 여러개를 묶어 더 큰 테스트 슈트를 구성할 수도 있습니다. GLib에서는 테스트 경로(path)라는 개념으로 사용합니다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;개념은 조금 복잡한 것 같지만, 복잡하고 다양한 테스트 케이스를 그룹화하면 나중에 테스트 슈트별로 테스트를 진행할 수도 있는 등 많은 장점이 있습니다. 그리고 GLib이 제공하는 커맨드라인 도구를 이용하면 테스트 결과를 XML로 출력할 수도 있고, HTML 문서로 자동 변환할 수도 있는데 이 경우에도 테스트 슈트를 구성해 두면 많은 도움이 됩니다.&lt;/p&gt;
+&lt;p&gt;물론 GLib은 정교하게 테스트 슈트와 테스트 케이스, 픽스쳐를 구성할 수 있는 많은 API를 제공하지만, 복잡한 과정을 API 호출 하나로 처리할 수 있는 기능도 제공합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;g_test_add_func (&amp;quot;/onvif/nvc-connections&amp;quot;, test_onvif_nvc_connections);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 예제에서 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add-func&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_add_func()&lt;/code&gt;&lt;/a&gt;
+ 함수는 &amp;ldquo;onvif&amp;rdquo; 테스트 슈트 밑에 &amp;ldquo;nvc-connections&amp;rdquo; 이름의 테스트 케이스를 추가합니다. 테스트시 실행할 함수는 사용자가 직접 구현한 &lt;code&gt;test_onvif_nvc_connections()&lt;/code&gt; 함수입니다. &lt;code&gt;g_test_add_func()&lt;/code&gt; 함수가 테스트 슈트를 자동으로 생성해 주기 때문에 별도의 추가 작업이 불필요합니다. 비슷한 기능의 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add-data-func&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_add_data_func()&lt;/code&gt;&lt;/a&gt;
+ 함수는 테스트 함수에 데이터를 전달할 수 있어서, 한 함수로 데이터만 바꿔서 테스트하고자 할때 유용합니다. 하지만, 두 API는 픽스쳐를 지정할 수 없으므로, 픽스쳐를 사용하려면 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_add()&lt;/code&gt;&lt;/a&gt;
+ 함수를 이용해야 합니다.일단, 간단한 예제 코드를 보여드리면 다음과 같습니다. (&amp;quot;
+&lt;a href=&#34;http://blogs.gnome.org/timj/2008/06/24/23062008-writing-unit-tests-with-glib/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Writing Unit Tests with GLib&lt;/a&gt;
+&amp;rdquo; 글에서 발췌했습니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;glib.h&amp;gt;
+
+static void
+simple_test_case (void)
+{
+  /* a suitable test */
+  g_assert (g_bit_storage (1) == 1);
+
+  /* a test with verbose error message */
+  g_assert_cmpint (g_bit_storage (1), ==, 1);
+}
+
+int
+main (int argc, char **argv)
+{
+  /* initialize test program */
+  g_test_init (&amp;amp;argc, &amp;amp;argv, NULL);
+
+  /* hook up your test functions */
+  g_test_add_func (&amp;quot;/Simple Test Case&amp;quot;, simple_test_case);
+
+  /* run tests from the suite */
+  return g_test_run ();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 코드를 &lt;code&gt;g-test-sample1.c&lt;/code&gt; 파일로 저장하고 컴파일 후 실행하면 다음과 같은 결과를 볼 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ gcc -o g-test-sample1 g-test-sample1.c `pkg-config --cflags --libs glib-2.0`
+$ ./g-test-sample1
+/Simple Test Case: OK
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 결과를 재활용하기 위해 XML 형식으로 저장하거나, HTML 문서로 만들고 싶다면 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/gtester.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gtester&lt;/a&gt;
+ / 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/gtester-report.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gtester-report&lt;/a&gt;
+ 프로그램을 사용하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ gtester -o sample-log.xml g-test-sample1
+TEST: g-test-sample1... (pid=2771)
+PASS: g-test-sample1
+$ gtester-report sample-log.xml &amp;gt; sample-log.html
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위와 같이 실행하여 생성한 HTML 문서 결과는 다음과 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/gtester-report-screenshot.png&#34; alt=&#34;&#34; title=&#34;gtester-report screenshot&#34;&gt;&lt;/p&gt;
+&lt;p&gt;참고로, gtester 프로그램의 인수로 여러 테스트 실행 파일을 한꺼번에 전달하면 모든 테스트 실행 파일의 테스트 슈트가 하나의 결과로 통합됩니다.&lt;/p&gt;
+&lt;p&gt;위 코드에서 사용한 테스트 코드를 보면 제일 먼저 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-init&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_init()&lt;/code&gt;&lt;/a&gt;
+ 함수가 나타납니다. 이 함수는 테스트 기능을 초기화하는데, 리퍼런스 매뉴얼을 보시면 프로그램 실행 인수를 통해 사용자가 여러 테스트 옵션을 지정할 수 있는 걸 알 수 있습니다. 물론 특정 테스트 슈트만 실행하게 하는 옵션도 인수로 지정할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;테스트 함수를 보면 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-assert-cmpint&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_assert_cmpint()&lt;/code&gt;&lt;/a&gt;
+라는 다소 생소한 API가 보이는데, GLib은 테스트 코드를 위해 이와 비슷한 매크로를 더 제공합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define g_assert             (expr)
+#define g_assert_not_reached ()
+#define g_assert_cmpstr      (s1, cmp, s2)
+#define g_assert_cmpint      (n1, cmp, n2)
+#define g_assert_cmpuint     (n1, cmp, n2)
+#define g_assert_cmphex      (n1, cmp, n2)
+#define g_assert_cmpfloat    (n1,cmp,n2)
+#define g_assert_no_error    (err)
+#define g_assert_error       (err, dom, c)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 매크로를 사용하여 테스트 코드를 작성하면 더 친절하고 자세한 에러 메시지를 출력합니다. 예를 들어 다음 코드는,&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;gchar *string = &amp;quot;foo&amp;quot;; g_assert_cmpstr (string, ==, &amp;quot;bar&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이런 메시지를 출력합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;ERROR: assertion failed (string == &amp;quot;bar&amp;quot;): (&amp;quot;foo&amp;quot; ==  &amp;quot;bar&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;물론 기본적으로 실패한 경우에만 메시지를 보여줍니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;그 외 더 많은&amp;hellip;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;지금까지 설명한 기본 기능 외에도 표준출력 / 표준에러 메시지를 표시하지 않도록 한 뒤 이 메시지에서 특정 문자열을 확인한다든가, 항상 동일한 패턴의 난수를 생성하여 이를 테스트에 이용하거나,  테스트에 시간이 얼마나 더 걸리는지 측정할 수도 있습니다. 프로그램을 종료시키는 치명적인 에러가 발생하는 경우도 테스트할 수 있고, 여러가지 테스트 모드(quick / slow / performace 등)를 두어 프로그램 인자를 이용해 원하는 테스트 코드만 실행할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;더 많은 활용 예제가 GLib 자체 테스트 코드에(
+&lt;a href=&#34;http://git.gnome.org/browse/glib/tree/glib/tests/testing.c&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;glib/tests/testing.c&lt;/a&gt;
+) 있으므로, 별로 길지 않으니, 직접 확인해 보시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;프로젝트에 활용하기&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;MVP 개발 모델과 TDD + 유닛테스트 도구를 이용하여 응용 프로그램을 개발하면(
+&lt;a href=&#34;/2008/12/17/presenter-first-development/&#34;&gt;Presenter First 개발&lt;/a&gt;
+) 더 빠르고 쉽게 튼튼한 코드를 만들 수 있으니, 한 번 검토해 보시기 바랍니다. 개발자가 TDD 방법론을 주저하는 이유 중 하나가 테스트 코드까지 만들다 보니 늘어나는 코드량과 늘어나는 개발 시간 때문인데, 테스트 코드를 그대로 실제 코드로 재활용할 수 있다면 얘기가 달라지겠죠.&lt;/p&gt;
+&lt;p&gt;프로젝트 일일빌드시 테스트 루틴도 동작하도록 한뒤 자동으로 테스트 결과를 웹사이트에 게재하는 것도 좋은 개발 습관입니다. 아예 코드 수정 후 저장소에 커밋하면 반드시 모든 테스트 케이스를 통과해야만 커밋되도록 저장소를 설정할 수도 있지만, 엄청난 서버 부하를 야기할 수 있으므로, 테스트 케이스를 통과한 코드만 커밋할 수 있도록 가이드라인을 규정하는 것도 좋습니다.&lt;/p&gt;
+&lt;p&gt;유닛테스트는 특정 객체나 모듈의 모든 API가 항상 정상적으로 동작하는지를 검사하기 위해 사용합니다. 그래서 가장 기본적인 사용법은 공개 함수를 다양한 인수로 호출한 뒤 그 결과값을 확인하는 방식입니다. 하지만 실무에서는 그렇게 단순한(?) 버그만 존재하는게 아니라서, 특정 시나리오나 특정 조건을 만족할 경우에만 버그 현상이 재현되는 경우도 많습니다. 이러한 경우, 버그에 대한 테스트 케이스를 추가하고 이 케이스에 대한 테스트가 통과할때까지 디버깅을 합니다. 이렇게 해두면 동일한 버그가 나중에 재발하는 걸 방지할 수 있습니다. 대부분 회사에서는 버그(이슈)관리시스템을 사용하므로 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-bug&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_bug()&lt;/code&gt;&lt;/a&gt;
+ API를 사용하면 편리합니다.&lt;/p&gt;
+&lt;p&gt;참고로, GTK+ 라이브러리는 GLib 테스트 프레임워크를 기반으로 마우스 버튼 동작이나 키보드 입력을 에뮬레이션하는 기능처럼 
+&lt;a href=&#34;http://library.gnome.org/devel/gtk/stable/gtk-Testing.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GUI 프로그램 테스트용 API&lt;/a&gt;
+를 제공합니다. 더불어 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Xvfb&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Xvfb&lt;/a&gt;
+ 같은 더미 X서버를 이용하면 원격 터미널이나 cron 작업처럼 실제 X서버가 없는 환경에서도 GUI 프로그램 테스트 진행이 가능합니다. 꼭 GTK+ 프로그램이 아니더라도, 폰트 렌더링 루틴이 정확한 그래픽 비트맵을 생성하는지, 특정 항목을 선택하고 특정 행동을 취했을때 정상적으로 문자열이 표시되는지 등도 테스트 케이스로 작성할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;테스트 케이스 실행 방식 및 테스트 코드 위치&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;위 예제처럼 테스트 케이스를 특정 주제별로 나누어 각각의 실행파일로 만들어도 되지만, 테스트 케이스를 초기화하는 부분을 잘 정리하여 테스트 케이스를 여러 모듈로 분리한 뒤,  모든 테스트 케이스를 통째로 하나의 실행파일로 만들어도 됩니다. 이렇게 하면 추가적인 스크립트나 도구의 도움없이도 명령어 한번 실행으로 모든 테스트 케이스를 실행할 수 있기 때문에 더 편리할 수 있습니다. 또는 Clutter 프로젝트처럼 테스트 모듈을 각각 공유라이브러리로 만들어 플러그인처럼 로드해서 실행하는 방법도 있습니다.&lt;/p&gt;
+&lt;p&gt;하지만, 위 방식은 모두 실제 코드와 테스트 코드가 서로 다른 파일에 존재하는 방식입니다. 테스트 코드가 실제 코드와 하나의 파일에 존재한다면 테스트 코드 작성이 더 일상화되고 자연스러워질 수 있습니다. 그러므로, 프로그램 실행 파일 크기가 별로 문제가 되지 않는다면, 또는 릴리스 / 디버그 모드를 분리하여 컴파일하도록 구성된 프로젝트라면,  프로그램에 특정 옵션을 주었을 경우에만 테스트 케이스 실행 모드로 동작하게 하면 됩니다. 물론 특정 테스트 프로그램은 예제로 사용하기 위해 분리할 수도 있겠지만, 모듈이나 객체의 고유 기능만 테스트하는 코드라면 같은 파일에 있는게 더 자연스러울 수 있습니다. 예를 들어 GObject 객체라면, 속성(properties) / 시그널(signal) 이름이 갑자기 변경되었을때 이를 참조하는 모듈이 문제를 일으키지 않도록 하기 위해, &amp;lsquo;validate-properties&amp;rsquo;, &amp;lsquo;validate-signals&amp;rsquo; 등의 테스트 케이스를 추가한뒤 통과하지 못했을 경우 
+&lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-message&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_message()&lt;/code&gt;&lt;/a&gt;
+ 등을 이용해 이를 참조하는 모듈을 찾아 수정하라는 강조 메시지를 표시하는 것도 가능합니다. 또한 특정 시그널이 정상적으로 발생하는지, 순서대로 발생하는지 확인할 수 있습니다. 그리고 무엇보다도, 같은 파일에 있으면 내부 자료구조에도 접근할 수 있으므로 내부 로직에 대한 테스트 코드를 작성하는 것도 가능해집니다.&lt;/p&gt;
+&lt;p&gt;따라서 무조건 한 가지 방식만 고집하기보다, 적절하게 필요에 따라 알맞는 방식을 선택하는 것이 중요합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;결론&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;뭐 다른 결론이 있을리 없을만큼 유닛 테스트와 리그레션 테스트(regression test) 등은 이미 소프트웨어 개발 분야 전반에 광범위하게 사용하고 있습니다. 다만, C 언어를 이용해 개발하는 경우 리거시(legacy) 코드가 너무 많거나, 마땅한 테스트 도구를 찾지 못했거나, 여러가지 이유로 도입하지 못하는 경우가 많은데, 함께 잘 극복하고 익숙해져서 더 좋은 방향으로 나아가야 하지 않을까&amp;hellip; 생각해 봅니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터와 GTK</title>
+      <link>/2009/09/08/2009-09-08-clutter-and-gtk/</link>
+      <pubDate>Tue, 08 Sep 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/09/08/2009-09-08-clutter-and-gtk/</guid>
+      <description>&lt;p&gt;`
+&lt;a href=&#34;http://blog.didrocks.fr/index.php/post/Design-experience-and-demos-in-GTK-Clutter&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Design experience and demos in GTK and Clutter&lt;/a&gt;
+&amp;rsquo; 라는 포스트가 얼마 전에 올라왔는데 이제야 리뷰를 해봅니다. 이 포스트를 클릭해서 들어가 보시면 데모 동영상이 여러개 있는데, 클러터 안에 GTK 노트북 위젯을 넣어 여러가지 효과를 보여주고 있습니다. 이 포스트는 &lt;span style=&#34;background-color:#ffffff;&#34;&gt;`
+&lt;a href=&#34;http://dannipenguin.livejournal.com/280866.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;animating GTK+, Clutter-Gtk, client-side-windows and demos&lt;/a&gt;
+&amp;rsquo; 포스트에서 설명한 방식을 더 확장하고 실용적인 예제를 보여주고 있는 셈인데, GTK Client Side Window + ClutterGtk를 이용하고 있습니다.&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;클러터를 이용해 사용자 인터페이스를 만들때 불편한 점 중 하나는 버튼, 입력상자, 라디오 버튼 등과 같은 위젯 툴킷이 없기 때문에 모두 직접 만들어야 한다는 점입니다. 물론 모블린 프로젝트에서 사용하고 있는 클러터 기반 툴킷 라이브러리도 있고 클러터 예제 디렉토리에 여러가지 참고할 만한 샘플이 있긴 하지만, QT나 GTK 같은 라이브러리처럼 풍부한 기능은 제공하지 않습니다. 이 데모가 유용한 이유는, GTK 위젯을 그대로 클러터 안에 포함할 수 있는 것은 물론, 기존 GTK 위젯의 동작을 확장하여 자연스러운 애니메이션 효과를 마음대로 추가할 수 있다는 점을 보여주고 있기 때문입니다.&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;물론, 단순히 예쁘고 화려한 인터페이스 효과를 추가하는게 목적이 아니라, 이를 통해 사용자가 더 쉽게 이해하고 사용하기 편한 인터페이스를 제공할 수 있다는 점이 더 중요한 것 같습니다.&lt;/span&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터 1.0 애니메이션 API</title>
+      <link>/2009/08/03/2009-08-03-clutter-1-0-animation-api/</link>
+      <pubDate>Mon, 03 Aug 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/08/03/2009-08-03-clutter-1-0-animation-api/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://lists.o-hand.com/clutter/2982.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 1.0 버전이 릴리스&lt;/a&gt;
+ 된지 한참 되었습니다&amp;hellip;:) 몇몇 GLES 플랫폼에서 동작하지 않는다는 보고도 있고, clutter-gst / clutter-gtk 같은 라이브러리는 지금도 동작은 하지만 의존하는 다른 프로젝트 진행상황과 맞물린 관계로 완전히 마무리된 
+&lt;a href=&#34;http://lists.o-hand.com/clutter/2983.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;1.0 버전은 조금 지연&lt;/a&gt;
+된다는 말도 있고 하지만, 1.0 정식 버전은 매우 많은 성능 개선과 API가 추가되었습니다.&lt;/p&gt;
+&lt;p&gt;이 글에서는 1.0 API 변경 내용 중에 우선 
+&lt;a href=&#34;http://www.clutter-project.org/docs/clutter/stable/migrating-ClutterEffect.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;애니메이션 관련 내용&lt;/a&gt;
+을 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;0.8 버전까지 간단한 일회성 애니메이션 효과를 구현하기 위해 사용하던 ClutterEffect API가 사라지고 &lt;code&gt;clutter_actor_animate()&lt;/code&gt; 함수로 완전히 교체되었습니다. 물론 복잡한 애니메이션에는 여전히 ClutterBehaviour / ClutterTimeline / ClutterScore 등과 같은 객체를 사용해야 하지만, 단순한 효과를 위해 복잡하게 ClutterEffectTemplate 객체를 만들어 사용하던 방식이 완전히 바뀐 셈입니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;clutter_actor_animate()&lt;/code&gt; 함수의 원형(prototype)을 보면 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ClutterAnimation *
+clutter_actor_animate (ClutterActor *actor,
+                       gulong        mode,
+                       guint         duration,
+                       const gchar  *first_property_name,
+                       ...);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;인수를 살펴보면, 액터(actor)에 대해 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/clutter-Implicit-Animations.html#ClutterAnimationMode&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;애니메이션 모드&lt;/a&gt;
+(mode)와 기간(duration)을 지정한 뒤 변화시킬 속성(properties) 목록과 목표값을 원하는만큼 지정하면 됩니다. 이 함수가 돌려주는 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/clutter-Implicit-Animations.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterAnimation&lt;/a&gt;
+ 객체는 애니메이션이 끝나면 &amp;ldquo;completed&amp;rdquo; 시그널을 발생하고 자동으로 소멸됩니다. 물론 단순한 애니메이션 뿐 아니라 기존 ClutterTimeline / ClutterAlpha 객체와 연동하여 더 다양하고 정교한 제어도 가능합니다.&lt;/p&gt;
+&lt;p&gt;예를 들어 다음 코드는 250 밀리초 동안 &amp;lsquo;rectangle&amp;rsquo; 액터의 크기(width*height)를 현재 크기에서 100*100 크기로 변경하면서 투명도를 0으로 서서히 변경합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;clutter_actor_animate (rectangle, CLUTTER_LINEAR, 250,
+                       &amp;quot;width&amp;quot;, 100.0,
+                       &amp;quot;height&amp;quot;, 100.0,
+                       &amp;quot;opacity&amp;quot;, 0,
+                       NULL);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;액터의 속성(properties)을 변경하지 않고 애니메이션 동안 특정값으로 고정시킬 수도 있습니다. 다음 예제는 애니메이션 기간 동안 &amp;ldquo;rotation-angle-z&amp;rdquo; 속성을 현재 각도에서 360도로 변경하지만, &amp;ldquo;rotation-center-z&amp;rdquo; 속성은 고정된 &amp;ldquo;center&amp;rdquo; 변수값으로 고정합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;clutter_actor_animate (actor, CLUTTER_EASE_IN, 100,
+                       &amp;quot;rotation-angle-z&amp;quot;, 360,
+                       &amp;quot;fixed::rotation-center-z&amp;quot;, &amp;amp;center,
+                       NULL);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;단순히 액터의 속성을 변경하는 것 뿐 아니라 ClutterAnimation 객체의 시그널 핸들러를 직접 연결할 수도 있습니다. 다음 예제는 투명도가 0이 되어 애니메이션이 완료되면 자동으로 액터를 안보이게 합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;static void
+on_animation_completed (ClutterAnimation *animation,
+                        ClutterActor     *actor)
+{
+  clutter_actor_hide (actor);
+}
+
+clutter_actor_animate (actor, CLUTTER_EASE_IN, 100,
+                       &amp;quot;opacity&amp;quot;, 0,
+                       &amp;quot;signal::completed&amp;quot;,
+                         on_animation_completed, actor,
+                       NULL);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;또는 다음과 같이 사용할 수도 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;static void
+on_animation_completed (ClutterActor *actor,
+                        gpointer data)
+{
+  clutter_actor_hide (actor);
+}
+
+clutter_actor_animate (actor, CLUTTER_EASE_IN, 100,
+                       &amp;quot;opacity&amp;quot;, 0,
+                       &amp;quot;signal-swapped::completed&amp;quot;,
+                         on_animation_completed, actor,
+                       NULL);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;지금까지 간단하게 설명했지만, 언제나 그렇듯이, 애니메이션 관련 API 종류와 동작 방식에 대한 더 세부적인 내용은 
+&lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.9/docs/tutorial/html/sec-animations.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;튜토리얼&lt;/a&gt;
+과 
+&lt;a href=&#34;http://www.clutter-project.org/docs/clutter/stable/clutteranimation.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;참고 설명서&lt;/a&gt;
+를 반드시 참고하시기 바랍니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>2009 GUADEC 클러터 발표 자료</title>
+      <link>/2009/07/25/2009-07-25-2009-guadec-clutter-slides/</link>
+      <pubDate>Sat, 25 Jul 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/07/25/2009-07-25-2009-guadec-clutter-slides/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.clutter-project.org/blog/?p=78&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 블로그&lt;/a&gt;
+에 GUADEC 2009에서 발표한 클러터 관련 발표 자료가 공개되었습니다.&lt;/p&gt;
+&lt;p&gt;클러터 1.0에 대한 간략한 소개와 더불어 향후 개발 방향에 대한 설명한 게 하나, 1.0에서 대폭 변경된 애니메이션 API를 이용해 더 복잡한 애니메이션을 만드는 기본적인 방법을 설명한 게 하나 있군요. 발표 자료까지 공개한 걸 보니, 이제 정말로 클러터 1.0 릴리스가 임박한 것 같습니다.&lt;/p&gt;
+&lt;p&gt;여담이지만, GUI 라이브러리 개발자들이라서 그런지, 슬라이드 역시 그래픽컬(?)하고 아기자기한 인상을 주는군요. :)&lt;/p&gt;
+&lt;p&gt;사족) 새벽 취중에 끄적였던 노랫말 가사 일부가 &lt;strong&gt;재수없으면&lt;/strong&gt; 개정된 저작권법에 걸릴 수도 있지 않겠냐는 친구의 농담을 대낮에 듣고 덜컥 겁이 나는 바람에 결국 맘 편하게 지워버렸습니다&amp;hellip; :(&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>X 윈도우 비디오 가속(VA) API</title>
+      <link>/2009/07/13/2009-07-13-x-window-video-acceleration-api-overview/</link>
+      <pubDate>Mon, 13 Jul 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/07/13/2009-07-13-x-window-video-acceleration-api-overview/</guid>
+      <description>&lt;p&gt;기존 X 윈도우 프로그래밍에서 하드웨어 가속 기능을 이용하여  YUV 형식의 비디오를 재생하거나 MPEG2 코덱을 디코딩하려면  
+&lt;a href=&#34;http://en.wikipedia.org/wiki/X_video_extension&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Xv (X Video)&lt;/a&gt;
+와 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/X-Video_Motion_Compensation&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;XvMC (X Video Motion Compensation)&lt;/a&gt;
+ 확장(extension) API를 사용해야 합니다. 하지만 몇년 전부터 이러한 X 윈도우 확장 API의 한계를 벗어나기 위해 업체별로 각각 별도의 API 라이브러리를 제공하고 있는데, 인텔의 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Video_Acceleration_API&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;VA (Video Acceleration) API&lt;/a&gt;
+, NVIDIA의  
+&lt;a href=&#34;http://en.wikipedia.org/wiki/VDPAU&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;VDPAU (Video Decode and Presentation API for Unix)&lt;/a&gt;
+, ATI의 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/X-Video_Bitstream_Acceleration&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;XvBA (X-Video Bitstream Acceleration)&lt;/a&gt;
+ API 등이 그 예입니다. (물론 이를 지원하는 최신 그래픽카드 칩셋이 장착되어 있어야 하는데, 인텔의 경우 G45 칩셋부터 가능하다고 합니다) 참고로 CPU 점유율 66.3 ~ 98.4% 정도를 사용하는 고해상도 H.264 / VC1 비디오 재생이 하드웨어 가속 기능을 이용하면 0.6% 이하로 낮아진다는 
+&lt;a href=&#34;http://gwenole.beauchesne.info/en/blog/2009/06/22/video_decode_acceleration_benchmarks&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;벤치마킹 결과&lt;/a&gt;
+도 있습니다.&lt;/p&gt;
+&lt;p&gt;이러한 여러 업체의 독자적인 API가, 
+&lt;a href=&#34;http://lwn.net/Articles/339349/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN 기사&lt;/a&gt;
+에서 정리한 것처럼, 이제는 인텔 API로 통합되어 가고 있습니다.  VDPAU / XvBA 기능이 VA API의 백엔드(backend)로 구현하는 작업이 진행되고 있어 VA API만 지원해도 응용 프로그램은 쉽게 다른 업체의 하드웨어 가속 기능을 사용할 수 있게 되는 것입니다. 물론 MPlayer, FFmpeg, VLC 같은 대표적인 비디오 관련 응용 프로그램은 VA API를 이미 지원하거나 지원하기 위해 준비하고 있습니다.&lt;/p&gt;
+&lt;p&gt;VA API는 비디오 디코딩 뿐 아니라 기존 Xv 확장 API에서 처리하던 색상 공간 변환 (color space conversion), 감마 교정 (gamma correction), 확대 (scaling) 외에 기타 비디오 작업을 처리합니다. 게다가 앞으로는 인텔에서 제공하는 하드웨어 가속 인코딩 기능까지 지원할 예정인 것 같습니다. (2009년 하반기에 발표할 예정인 인텔 Moorestown 모바일 플랫폼에서 지원하는 것 같습니다) 더 나아가 클러터(Clutter) 같은 툴킷 라이브러리에서 직접 사용할 수 있도록 OpenGL 텍스쳐(texture)에 직접 렌더링하는 기능도 지원할 예정이라는군요.&lt;/p&gt;
+&lt;p&gt;그래픽 하드웨어 칩셋의 인코더 / 디코더 기능을 이용하는 기능은 얼핏 리눅스 커널 V4L2 기반의 하드웨어 인코더 / 디코더 API와 중복된다는 느낌도 있지만, VA API는 디코딩한 데이터가 바로 그래픽 카드 프레임 버퍼에 저장되어 표시되기 때문에 별도의 디스플레이 과정이 불필요하다는 점이 다릅니다. 또한 인코더 / 디코더 보드는 대부분 다채널 동시 인코딩 / 디코딩을 지원하지만, VA API는 한 번에 하나의 비디오만 처리할 수 있다는 점도 다릅니다.&lt;/p&gt;
+&lt;p&gt;아직은 모두 오픈소스가 아닌 업체가 제공하는 바이너리 X 윈도우 드라이버에서만 동작하는 것 같지만, 나중에 분명 필요하게 될 때가 있을 것 같으니, VA API 사용법도 한 번 둘러봐야 할 것 같습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터와 모블린(Moblin)</title>
+      <link>/2009/07/07/2009-07-07-clutter-and-moblin/</link>
+      <pubDate>Tue, 07 Jul 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/07/07/2009-07-07-clutter-and-moblin/</guid>
+      <description>&lt;p&gt;최근 들어 제 블로그에 방문수가 많아지는 게 이상해서 확인해보니 클러터(clutter) 라이브러리 관련 정보를 찾다가 오신 분이 많더군요.&lt;/p&gt;
+&lt;p&gt;2008년 10월 즈음부터 메일링 리스트에서 메인 개발자 이메일 주소가 인텔로 바뀌는가 싶더니 조금 후에 인텔에서 공식적으로 클러터 프로젝트를 지원하는 것을 공표하고, 급기야 인텔이 차세대 넷북 플랫폼으로 밀고 있는 
+&lt;a href=&#34;http://moblin.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;모블린(Moblin)&lt;/a&gt;
+ 프로젝트의 핵심 라이브러리로 자리잡으면서 사람들이 클러터에 관심을 가지게 된 게 아닌가 싶습니다. 물론 
+&lt;a href=&#34;/2009/06/02/gnome-3-shell/&#34;&gt;그놈 3.0 셸(shell)을 클러터 기반으로 개발&lt;/a&gt;
+중이고, 현재 개발 버전 GTK+ (2.17) 메인 소스에 클러터에 GTK+ 위젯을 쉽게 넣어 연동할 수 있도록 도와주는 
+&lt;a href=&#34;http://live.gnome.org/GTK%2B/ClientSideWindows&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클라이언트-방식-윈도우(client-side-windows)&lt;/a&gt;
+ 구현이 반영된 것도 사람들의 호기심을 증가시킨 것 같습니다. 게다가 이제는 인터넷을 찾아보면 클러터를 사용하는 게임이나 프로젝트도 점점 늘어나는 추세이고, 조만간 성능과 API가 대폭 개선된 클러터 1.0 버전이 출시될 예정이라 기다리는 사람이 많은 것 같습니다.&lt;/p&gt;
+&lt;p&gt;모블린 프로젝트를 인텔이 대놓고 지원하는 이유를 명확히 알 수는 없지만, 제 개인적으로는 꽤 관심이 가는 플랫폼입니다. 모블린의 명시적인 타겟은 인텔칩 기반 넷북 또는 모바일 장비지만, 산업용 임베디드 시스템에 적용해도 매우 유용하지 않을까 생각해 봅니다. 많은 분들이 알고 계실테지만, 전철 광고 모니터나 아파트 엘레베이터 광고 모니터, DVR, 티겟 발권기, 키오스크 등등 헤아릴 수 없이 많은 산업용 장비가 실제로는 PC 메인보드를 기반으로 한 임베디드 시스템인데, 대부분 윈도우 XP 또는 윈도우 XP 임베디드를 사용하고 있습니다. (물론 ARM, PowerPC를 기반으로 한 소형 임베디드 시스템도 많지요&amp;hellip;)  그런데 만일 안정적이고 네트웍에 강한 리눅스 운영체제 위에 3D 그래픽 기술을 몰라도 쉽게 화려한 효과의 GUI 인터페이스를 구현할 수 있는 클러터 라이브러리가 무료로 제공되다면, 비록 당장은 아니더라도, 개발자라면 한 번쯤은 진지하게 고민해봐야 할 것 같습니다. 라이센스 비용이 절감되는 것은 물론, 모든 소스가 공개되어 있는 것은 말할 필요도 없고, 대부분의 리눅스 소프트웨어를 그대로 컴파일해서 사용할 수 있다는 점도 매력적인 장점입니다. (물론 윈도우 개발자가 리눅스 개발자로 거듭나기 위한 비용을 무시할 수는 없겠지만&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;아무튼, 클러터 1.0이 공식적으로 출시되면 변경사항도 정리해야 하고, 틈틈히 모블린 문서도 들여다봐야 하고&amp;hellip; H.264, HD, ONVIF, iPhone, Git, &amp;hellip;&lt;/p&gt;
+&lt;p&gt;누가 술 한 잔 사주면 좋을 것 같은 시절입니다. :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GNOME 3.0 셸(GNOME Shell) 소개</title>
+      <link>/2009/06/02/2009-06-02-gnome-3-shell/</link>
+      <pubDate>Tue, 02 Jun 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/06/02/2009-06-02-gnome-3-shell/</guid>
+      <description>&lt;p&gt;GNOME 3.0의 기본 프로그램 역할을 하게 될 
+&lt;a href=&#34;http://live.gnome.org/GnomeShell&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그놈 셸(GNOME Shell)&lt;/a&gt;
+에 대한 소식이 요즘 많이 보이는군요. 하지만 역시 엔지니어라서 그런지, 사용자 관점의 변화보다 기술적인 면에 더 관심이 갈 수 밖에 없는터라 그 부분을 조금 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;새로운 셸은 기존에 컴피즈(Compiz)가 했던 3D 컴포지트 기능을 내장하면서 메타시티(Metacity)가 담당했던 윈도우 관리자 역할과 그놈 패널(GNOME Panel) 역할을 동시에 담당합니다. 그런데, 지금보다 더 직관적이고 화려한(?) 인터페이스를 구현하는 것은 물론 많은 개발자가 쉽게 패널 애플릿을 작성할 수 있도록 과감하게도 
+&lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터(Clutter)&lt;/a&gt;
+ 라이브러리와 자바스크립트(JavaScript) 언어를 이용해 구현하고 있습니다.&lt;/p&gt;
+&lt;p&gt;물론 그렇다고 모든 그놈 플랫폼에서 GTK+ 라이브러리를 클러터 라이브러리로 대체하는 것은 아니고 그놈 셸을 작성하는데만 사용하는 것으로 일단 제한하고 있습니다. 클러터보다는 아무래도 GTK+ 자체가 더 복잡한 인터페이스를 요구하는 많은 어플리케이션에 적합하기 때문입니다. 그러나 그놈 셸처럼 화려하고 직관적인 인터페이스를 구현하기 위해서는 클러터 라이브러리가 더 적합하다는 판단인 것 같습니다.&lt;/p&gt;
+&lt;p&gt;하지만 자바스크립트 언어의 도입은 약간 충격적입니다. 그동안 파이썬, 루비, 펄, 심지어 Vala  등과 같은 언어까지 새로 만들어가면서도 무언지 모를 아쉬움에 선택을 못하더니, (그래도 결국 C++은 사용하지 않고 :-) C 언어를 대체할 언어를 찾아가던 그놈 개발자들이 결국 전 세계에서 가장 많은 (웹 프로그래머) 사용자를 가진 언어를 선택하게 된 셈입니다. 물론 여기에는 점점 성능이 좋아지는 자바스크립트 인터프리터 엔진의 역할도 큰 것 같습니다.&lt;/p&gt;
+&lt;p&gt;자바스크립트 인터프리터 엔진은 현재 모질라 트레이스몽키(TraceMonkey) 기반의 
+&lt;a href=&#34;http://live.gnome.org/Gjs&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Gjs&lt;/a&gt;
+와 웹킷(WebKit) 자바스크립트 엔진 기반의 
+&lt;a href=&#34;http://live.gnome.org/Seed&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Seed&lt;/a&gt;
+를 동시에 고려하고 있는듯 합니다. 둘 모두 활발하게 개발되고 있고 각각의 장단점이 있기 때문에 지금 현 시점에서 굳이 하나를 선택하지는 않는 것 같습니다.(
+&lt;a href=&#34;http://lwn.net/Articles/333930/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN 기사&lt;/a&gt;
+ 참조)&lt;/p&gt;
+&lt;p&gt;또한 쉽게 자바스크립트 언어를 선택하게 된 배경에는 최근에 멋지게 데뷔한 
+&lt;a href=&#34;http://live.gnome.org/GObjectIntrospection&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GObject Introspection&lt;/a&gt;
+ 라이브러리의 역할도 큰 것 같습니다. 참고로 이 라이브러리는 GObject 기반 라이브러리를 어떤 언어에도 쉽게 바인딩할 수 있도록 도와줍니다.&lt;/p&gt;
+&lt;p&gt;언제나 그렇듯이, 직접적인 그놈 개발자는 아니지만, KDE처럼 성급하게 새로운 기술을 실험하지 않고 점진적으로 이미 잘 개발된 라이브러리를 바탕으로 조금씩 혁신을 이루어가는 그놈 쪽 개발 과정을 보고 있노라면 흐뭇하기만 합니다. 특히나 저처럼 이쪽으로 먹고 사는 사람들한테는 더욱&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스에서 위치 인식 소프트웨어</title>
+      <link>/2009/02/03/2009-02-03-location-aware-softwares-in-linux/</link>
+      <pubDate>Tue, 03 Feb 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/02/03/2009-02-03-location-aware-softwares-in-linux/</guid>
+      <description>&lt;p&gt;&amp;lsquo;
+&lt;a href=&#34;http://arstechnica.com/open-source/news/2009/01/location-awareness-comes-to-the-linux-platform.ars&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Location-aware software comes to the Linux platform&lt;/a&gt;
+&amp;rsquo; 글에서 모바일 위치 정보와 지도 렌더링을 오픈소스 리눅스 플랫폼에서 처리하는 방법을 정리해 놓았는데, 나중을 위해 간략하게 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;가장 먼저 소개하는 프레임웍은 
+&lt;a href=&#34;http://www.freedesktop.org/wiki/Software/GeoClue&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GeoClue&lt;/a&gt;
+입니다. GeoClue는 로컬에 장착된 GPS 장치 뿐 아니라 GSMLoc 등과 같은 여러가지 위치 정보를 일종의 표준화된 형식으로 D-Bus를 통해 알려줍니다. (GSMLoc은 이 글을 통해 처음 알게된 건데 GSM 방식 휴대폰의 무선기지국 위치를 측정해 현재 휴대폰의 위치를 판단하는 기법이라고 합니다) GeoClue는 이미 Glib 기반 C API도 제공하고 있기 때문에 이를 이용한 위치 정보 어플리케이션을 개발하면 여러가지 GPS 장치 뿐 아니라 GeoClue 방식을 따르는 다양한 위치 정보를 이용할 수 있다는 장점이 있습니다.&lt;/p&gt;
+&lt;p&gt;이렇게 얻어진 위치 정보를 표시하기 위해 가장 관심받고 있는 라이브러리는 
+&lt;a href=&#34;http://blog.pierlux.com/projects/libchamplain/en/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libchamplain&lt;/a&gt;
+입니다. OpenStreetMap이나 OpenAerialMap 같은 인터넷 지도 서버를 이용하면서, 렌더링에는 
+&lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter&lt;/a&gt;
+라이브러리를 사용하지만 GTK+ 위젯 기반이기 때문에 쉽게 그놈 / GTK+ 어플리케이션에도 사용이 가능합니다. 이미 그놈 프로젝트의 기본 이미지 보기 프로그램인 EOG에도 플러그인이 추가되었고, 인스턴트 메신저에도 적용되고 있습니다. (예를 들어 iPhone이나 최신 디지털 카메라는 촬영시 GPS 정보를 이미지에 저장하는데, 이를 읽어들여 이미지를 볼때 이미지를 촬영한 장소의 지도 이미지를 함께 보여줍니다. 또한 메신저 친구 목록에서 친구를 클릭하면 현재 친구가 위치한 장소가 어디인지 알려주고 지도에 표시해 주기도 하는 거죠. 허락없이 무단링크한 다음 스크린샷을 확인해 보시길&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/eog-champlain.png&#34; alt=&#34;&#34; title=&#34;EOG에서 champlain 플러그인 사용 화면&#34;&gt;&lt;/p&gt;
+&lt;p&gt;참고로, 이 소프트웨어들은 일반 데스크탑이나 서버 뿐 아니라 휴대폰, PDA 등과 같은 모바일 장치에서도 사용할 수 있습니다. 따라서 앞으로는 웹서비스 뿐 아니라 일반 어플리케이션도 위치 정보와 지도 서비스를 활용해 계속 진화하지 않을까 예측해 봅니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Clutter 액터 구현하기 (Implementing Actors)</title>
+      <link>/2009/01/16/2009-01-16-implementing-clutter-actors/</link>
+      <pubDate>Fri, 16 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/16/2009-01-16-implementing-clutter-actors/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;(클러터 튜토리얼&lt;/a&gt;
+ 내용이 조금 더 남아 있지만 여기까지만 정리할 생각입니다. 나머지는 아직까지 관심 밖이라서&amp;hellip; 아무튼 
+&lt;a href=&#34;http://www.clutter-project.org/docs/clutter/stable/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 API 문서&lt;/a&gt;
+는 대강이라도 한 번 훑어봐야 더 정확하게 사용할 수 있을 것 같습니다)&lt;/p&gt;
+&lt;p&gt;클러터가 제공하는 액터만으로 뭔가 부족함을 느낀다면 이제 직접 새로운 액터를 구현할 때입니다. 새로운 액터를 구현하는 작업은 GTK+ 위젯처럼 GObject 기반 객체를 만드는 과정과 거의 비슷합니다. 제일 먼저 &lt;code&gt;G_DEFINE_TYPE()&lt;/code&gt; 매크로를 이용해 ClutterActor 파생 객체를 정의합니다. 예를 들어 새로운 객체 이름이 ClutterTriangle이라면 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;G_DEFINE_TYPE (ClutterTriangle, clutter_triangle, CLUTTER_TYPE_ACTOR);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 &lt;code&gt;ClutterActor::paint()&lt;/code&gt; 가상 함수를 구현합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;static void
+clutter_triangle_class_init (ClutterTriangleClass *klass)
+{
+  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
+
+  actor_class-&amp;gt;paint = clutter_triangle_paint;
+  ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;기본적인 액터 정보는 ClutterActor 기본 클래스에서 얻을 수 있습니다. 가령 
+&lt;a href=&#34;http://www.clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-get-geometry&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_get_geometry()&lt;/code&gt;&lt;/a&gt;
+ 함수로 좌표와 크기를 얻을 수 있고, 
+&lt;a href=&#34;http://www.clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-get-opacity&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_get_opacity()&lt;/code&gt;&lt;/a&gt;
+ 함수로 불투명도를 얻을 수 있습니다.&lt;/p&gt;
+&lt;p&gt;ClutterActor::paint() 함수에서 실제 그리기 작업을 구현할때는 OpenGL API를 사용해야 합니다. OpenGL ES나 일반적인 OpenGL 환경에서 문제없이 동작하게 하려면 클러터에서 제공하는 COGL API를 사용합니다. 예를 들면 
+&lt;a href=&#34;http://www.clutter-project.org/docs/cogl/stable/cogl-Primitives.html#cogl-rectangle&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;cogl_rectangle()&lt;/code&gt;&lt;/a&gt;
+이나 
+&lt;a href=&#34;http://www.clutter-project.org/docs/cogl/stable/cogl-General-API.html#cogl-push-matrix&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;cogl_push_matrix()&lt;/code&gt;&lt;/a&gt;
+ 등이 그것입니다.&lt;/p&gt;
+&lt;p&gt;그리기 함수와 더불어 지정한 색상으로 실루엣(silhouette)을 그려주는 &lt;code&gt;ClutterActor::pick()&lt;/code&gt; 가상 함수도 구현해야 합니다. 클러터는 이 함수를 이용해 스크린외영역(offscreen)에 단일한 색상으로 모든 액터의 실루엣을 그려 놓은 뒤 커서가 위치한 좌표의 액터가 무엇인지 확인하는데 사용합니다. 따라서 새로운 액터가 단순하다면 그리기 함수에서 사용한 코드를 그대로 사용해도 됩니다.&lt;/p&gt;
+&lt;p&gt;나머지 대부분의 가상 함수는 필요한 경우에만 다시 구현하면 됩니다.&lt;/p&gt;
+&lt;p&gt;다음 예제는 삼각형을 그려주는 액터를 구현한 코드입니다.&lt;/p&gt;
+&lt;p&gt;파일 : triangle-actor.h&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#ifndef _CLUTTER_TUTORIAL_TRIANGLE_ACTOR_H
+#define _CLUTTER_TUTORIAL_TRIANGLE_ACTOR_H
+
+#include &amp;lt;glib-object.h&amp;gt;
+#include &amp;lt;clutter/clutter-actor.h&amp;gt;
+#include &amp;lt;clutter/clutter-color.h&amp;gt;
+
+G_BEGIN_DECLS
+
+#define CLUTTER_TYPE_TRIANGLE clutter_triangle_get_type()
+
+#define CLUTTER_TRIANGLE(obj) 
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), 
+  CLUTTER_TYPE_TRIANGLE, ClutterTriangle))
+
+#define CLUTTER_TRIANGLE_CLASS(klass) 
+  (G_TYPE_CHECK_CLASS_CAST ((klass), 
+  CLUTTER_TYPE_TRIANGLE, ClutterTriangleClass))
+
+#define CLUTTER_IS_TRIANGLE(obj) 
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), 
+  CLUTTER_TYPE_TRIANGLE))
+
+#define CLUTTER_IS_TRIANGLE_CLASS(klass) 
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), 
+  CLUTTER_TYPE_TRIANGLE))
+
+#define CLUTTER_TRIANGLE_GET_CLASS(obj) 
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), 
+  CLUTTER_TYPE_TRIANGLE, ClutterTriangleClass))
+
+typedef struct _ClutterTriangle        ClutterTriangle;
+typedef struct _ClutterTriangleClass   ClutterTriangleClass;
+typedef struct _ClutterTrianglePrivate ClutterTrianglePrivate;
+
+struct _ClutterTriangle
+{
+  ClutterActor           parent;
+
+  /*&amp;lt; private &amp;gt;*/
+  ClutterTrianglePrivate *priv;
+}; 
+
+struct _ClutterTriangleClass
+{
+  ClutterActorClass parent_class;
+};
+
+GType clutter_triangle_get_type (void) G_GNUC_CONST;
+
+ClutterActor *clutter_triangle_new              (void);
+ClutterActor *clutter_triangle_new_with_color   (const ClutterColor *color);
+
+void          clutter_triangle_get_color        (ClutterTriangle   *triangle,
+                                                 ClutterColor       *color);
+void          clutter_triangle_set_color        (ClutterTriangle   *triangle,
+                                                 const ClutterColor *color);
+
+G_END_DECLS
+
+#endif
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;파일 : triangle-actor.c&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;quot;triangle_actor.h&amp;quot;
+#include &amp;lt;cogl/cogl.h&amp;gt;
+
+G_DEFINE_TYPE (ClutterTriangle, clutter_triangle, CLUTTER_TYPE_ACTOR);
+
+enum
+{
+  PROP_0,
+  PROP_COLOR
+};
+
+#define CLUTTER_TRIANGLE_GET_PRIVATE(obj) 
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), 
+   CLUTTER_TYPE_TRIANGLE, ClutterTrianglePrivate))
+
+struct _ClutterTrianglePrivate
+{
+  ClutterColor color;
+};
+
+static void
+do_triangle_paint (ClutterActor *self, const ClutterColor *color)
+{
+  ClutterTriangle        *triangle = CLUTTER_TRIANGLE(self);
+  ClutterTrianglePrivate *priv;
+  ClutterGeometry         geom;
+  ClutterFixed            coords[6];
+
+  triangle = CLUTTER_TRIANGLE(self);
+  priv = triangle-&amp;gt;priv;
+
+  cogl_push_matrix();
+
+  clutter_actor_get_geometry (self, &amp;amp;geom);
+
+  cogl_color (color);
+
+  /* Paint a triangle:
+   *
+   * The parent paint call will have translated us into position so
+   * paint from 0, 0 */
+  coords[0] = CLUTTER_INT_TO_FIXED (0);
+  coords[1] = CLUTTER_INT_TO_FIXED (0);
+
+  coords[2] = CLUTTER_INT_TO_FIXED (0);
+  coords[3] = CLUTTER_INT_TO_FIXED (geom.height);
+
+  coords[4] = CLUTTER_INT_TO_FIXED (geom.width);
+  coords[5] = CLUTTER_INT_TO_FIXED (geom.height);
+
+  cogl_path_polygon (coords, 3);
+  cogl_path_fill ();
+
+  cogl_pop_matrix();
+}
+
+static void
+clutter_triangle_paint (ClutterActor *self)
+{
+  ClutterTriangle *triangle = CLUTTER_TRIANGLE(self);
+  ClutterTrianglePrivate *priv = triangle-&amp;gt;priv;
+
+  /* Paint the triangle with the actor&#39;s color: */
+  ClutterColor color;
+  color.red   = priv-&amp;gt;color.red;
+  color.green = priv-&amp;gt;color.green;
+  color.blue  = priv-&amp;gt;color.blue;
+  color.alpha = clutter_actor_get_opacity (self);
+
+  do_triangle_paint (self, &amp;amp;color);
+}
+
+static void
+clutter_triangle_pick (ClutterActor *self, const ClutterColor *color)
+{
+  /* Paint the triangle with the pick color, offscreen.
+     This is used by Clutter to detect the actor under the cursor
+     by identifying the unique color under the cursor. */
+  do_triangle_paint (self, color);
+}
+
+static void
+clutter_triangle_set_property (GObject      *object,
+                               guint         prop_id,
+                               const GValue *value,
+                               GParamSpec   *pspec)
+{
+  ClutterTriangle *triangle = CLUTTER_TRIANGLE(object);
+
+  switch (prop_id)
+    {
+    case PROP_COLOR:
+      clutter_triangle_set_color (triangle, g_value_get_boxed (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+  }
+}
+
+static void
+clutter_triangle_get_property (GObject    *object,
+                               guint       prop_id,
+                               GValue     *value,
+                               GParamSpec *pspec)
+{
+  ClutterTriangle *triangle = CLUTTER_TRIANGLE(object);
+  ClutterColor     color;
+
+  switch (prop_id)
+    {
+    case PROP_COLOR:
+      clutter_triangle_get_color (triangle, &amp;amp;color);
+      g_value_set_boxed (value, &amp;amp;color);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
+}
+
+static void
+clutter_triangle_finalize (GObject *object)
+{
+  G_OBJECT_CLASS (clutter_triangle_parent_class)-&amp;gt;finalize (object);
+}
+
+static void
+clutter_triangle_dispose (GObject *object)
+{
+  G_OBJECT_CLASS (clutter_triangle_parent_class)-&amp;gt;dispose (object);
+}
+
+static void
+clutter_triangle_class_init (ClutterTriangleClass *klass)
+{
+  GObjectClass        *gobject_class = G_OBJECT_CLASS (klass);
+  ClutterActorClass *actor_class = CLUTTER_ACTOR_CLASS (klass);
+
+  /* Provide implementations for ClutterActor vfuncs: */
+  actor_class-&amp;gt;paint = clutter_triangle_paint;
+  actor_class-&amp;gt;pick = clutter_triangle_pick;
+
+  gobject_class-&amp;gt;finalize     = clutter_triangle_finalize;
+  gobject_class-&amp;gt;dispose      = clutter_triangle_dispose;
+  gobject_class-&amp;gt;set_property = clutter_triangle_set_property;
+  gobject_class-&amp;gt;get_property = clutter_triangle_get_property;
+
+  /**
+   * ClutterTriangle:color:
+   *
+   * The color of the triangle.
+   */
+  g_object_class_install_property (gobject_class,
+                                   PROP_COLOR,
+               g_param_spec_boxed (&amp;quot;color&amp;quot;,
+                                   &amp;quot;Color&amp;quot;,
+                                   &amp;quot;The color of the triangle&amp;quot;,
+                                   CLUTTER_TYPE_COLOR,
+                                   G_PARAM_READABLE | G_PARAM_WRITABLE));
+
+  g_type_class_add_private (gobject_class, sizeof (ClutterTrianglePrivate));
+}
+
+static void
+clutter_triangle_init (ClutterTriangle *self)
+{
+  ClutterTrianglePrivate *priv;
+
+  self-&amp;gt;priv = priv = CLUTTER_TRIANGLE_GET_PRIVATE (self);
+
+  priv-&amp;gt;color.red = 0xff;
+  priv-&amp;gt;color.green = 0xff;
+  priv-&amp;gt;color.blue = 0xff;
+  priv-&amp;gt;color.alpha = 0xff;
+}
+
+/**
+ * clutter_triangle_new:
+ *
+ * Creates a new #ClutterActor with a rectangular shape.
+ *
+ * Return value: a new #ClutterActor
+ */
+ClutterActor*
+clutter_triangle_new (void)
+{
+  return g_object_new (CLUTTER_TYPE_TRIANGLE, NULL);
+}
+
+/**
+ * clutter_triangle_new_with_color:
+ * @color: a #ClutterColor
+ *
+ * Creates a new #ClutterActor with a rectangular shape
+ * and with @color.
+ *
+ * Return value: a new #ClutterActor
+ */
+ClutterActor *
+clutter_triangle_new_with_color (const ClutterColor *color)
+{
+  return g_object_new (CLUTTER_TYPE_TRIANGLE,
+               &amp;quot;color&amp;quot;, color,
+               NULL);
+}
+
+/**
+ * clutter_triangle_get_color:
+ * @triangle: a #ClutterTriangle
+ * @color: return location for a #ClutterColor
+ *
+ * Retrieves the color of @triangle.
+ */
+void
+clutter_triangle_get_color (ClutterTriangle *triangle,
+                            ClutterColor     *color)
+{
+  ClutterTrianglePrivate *priv;
+
+  g_return_if_fail (CLUTTER_IS_TRIANGLE (triangle));
+  g_return_if_fail (color != NULL);
+
+  priv = triangle-&amp;gt;priv;
+
+  color-&amp;gt;red = priv-&amp;gt;color.red;
+  color-&amp;gt;green = priv-&amp;gt;color.green;
+  color-&amp;gt;blue = priv-&amp;gt;color.blue;
+  color-&amp;gt;alpha = priv-&amp;gt;color.alpha;
+}
+
+/**
+ * clutter_triangle_set_color:
+ * @triangle: a #ClutterTriangle
+ * @color: a #ClutterColor
+ *
+ * Sets the color of @triangle.
+ */
+void
+clutter_triangle_set_color (ClutterTriangle   *triangle,
+                 const ClutterColor *color)
+{
+  ClutterTrianglePrivate *priv;
+
+  g_return_if_fail (CLUTTER_IS_TRIANGLE (triangle));
+  g_return_if_fail (color != NULL);
+
+  g_object_ref (triangle);
+
+  priv = triangle-&amp;gt;priv;
+
+  priv-&amp;gt;color.red = color-&amp;gt;red;
+  priv-&amp;gt;color.green = color-&amp;gt;green;
+  priv-&amp;gt;color.blue = color-&amp;gt;blue;
+  priv-&amp;gt;color.alpha = color-&amp;gt;alpha;
+
+  clutter_actor_set_opacity (CLUTTER_ACTOR (triangle),
+                             priv-&amp;gt;color.alpha);
+
+  if (CLUTTER_ACTOR_IS_VISIBLE (CLUTTER_ACTOR (triangle)))
+    clutter_actor_queue_redraw (CLUTTER_ACTOR (triangle));
+
+  g_object_notify (G_OBJECT (triangle), &amp;quot;color&amp;quot;);
+  g_object_unref (triangle);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;테스트 프로그램은 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;clutter/clutter.h&amp;gt;
+#include &amp;quot;triangle_actor.h&amp;quot;
+#include &amp;lt;stdlib.h&amp;gt;
+
+int main(int argc, char *argv[])
+{
+  ClutterColor stage_color = { 0x00, 0x00, 0x00, 0xff };
+  ClutterColor actor_color = { 0xff, 0xff, 0xff, 0x99 };
+
+  clutter_init (&amp;amp;argc, &amp;amp;argv);
+
+  /* Get the stage and set its size and color: */
+  ClutterActor *stage = clutter_stage_get_default ();
+  clutter_actor_set_size (stage, 200, 200);
+  clutter_stage_set_color (CLUTTER_STAGE (stage), &amp;amp;stage_color);
+
+  /* Add our custom actor to the stage: */
+  ClutterActor *actor = clutter_triangle_new_with_color (&amp;amp;actor_color);
+  clutter_actor_set_size (actor, 100, 100);
+  clutter_actor_set_position (actor, 20, 20);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
+  clutter_actor_show (actor);
+
+  /* Show the stage: */
+  clutter_actor_show (stage);
+
+  /* Start the main loop, so we can respond to events: */
+  clutter_main ();
+
+  return EXIT_SUCCESS;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터(Clutter) 사용하기 (5)</title>
+      <link>/2009/01/16/2009-01-16-using-clutter-5/</link>
+      <pubDate>Fri, 16 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/16/2009-01-16-using-clutter-5/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 튜토리얼&lt;/a&gt;
+ 계속 이어집니다.&lt;/p&gt;
+&lt;p&gt;**효과(Effects) - 자연스러운 애니메이션
+**&lt;/p&gt;
+&lt;p&gt;클러터는 애니메이션을 쉽게 구현하기 위해 효과(effect) 기능을 제공합니다. 시간에 따라 하나의 액터 속성을 변경하기 위해 타임라인과 간단한 숫자 계산을 이용한 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;여러가지 효과(effect) 함수&lt;/a&gt;
+를 이용할 수 있습니다. 예를 들어 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html#clutter-effect-fade&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_effect_fade()&lt;/code&gt;&lt;/a&gt;
+는 액터의 불투명도(opacity)를 단계적으로 변화시키고, 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html#clutter-effect-rotate&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_effect_rotate()&lt;/code&gt;&lt;/a&gt;
+는 단계적으로 액터를 회전시키는데(rotate), 이때 불투명도와 회전도는 프로그래머가 등록하는 &lt;code&gt;alpha_func&lt;/code&gt; 콜백을 호출해서 계산합니다.&lt;/p&gt;
+&lt;p&gt;효과 기능을 사용하려면 제일 먼저 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html#clutter-effect-template-new&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_effect_template_new()&lt;/code&gt;&lt;/a&gt;
+를 이용하여 ClutterEffectTemplate 객체를 하나 만들어야 합니다. 이때 타임라인 객체와 ClutterAlphaFunc 형태의 콜백을 함께 지정해야 합니다. 이 콜백은 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/ClutterAlpha.html#clutter-alpha-get-timeline&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_alpha_get_timeline()&lt;/code&gt;&lt;/a&gt;
+을 호출해서 타임라인 객체를 얻은 뒤, 현재 프레임 번호(
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/ClutterTimeline.html#clutter-timeline-get-current-frame&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_timeline_get_current_frame()&lt;/code&gt;&lt;/a&gt;
+)와 총 프레임 수(
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/ClutterTimeline.html#clutter-timeline-get-n-frames&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_timeline_get_n_frames()&lt;/code&gt;&lt;/a&gt;
+)를 기반으로 알파값을 계산하여 반환하면 됩니다. 반환하는 값은 0과 
+&lt;a href=&#34;CLUTTER_ALPHA_MAX_ALPHA&#34;&gt;&lt;code&gt;CLUTTER_ALPHA_MAX&lt;/code&gt;_ALPHA&lt;/a&gt;
+ 사이의 값이어야 하며, 이 값의 의미는 사용하는 효과에 따라 다릅니다. 예를 들어 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html#clutter-effect-fade&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_effect_fade()&lt;/code&gt;&lt;/a&gt;
+를 사용할때 
+&lt;a href=&#34;CLUTTER_ALPHA_MAX_ALPHA&#34;&gt;&lt;code&gt;CLUTTER_ALPHA_MAX_ALPHA&lt;/code&gt;&lt;/a&gt;
+ 값은 불투명도 100%를 의미합니다. 물론 모든 계산을 직접 할 수도 있지만 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/ClutterAlpha.html#CLUTTER-ALPHA-SINE:CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;CLUTTER_ALPHA_SINE&lt;/code&gt;&lt;/a&gt;
+처럼 미리 정의된 콜백 함수를 이용하면 쉽게 자연스러운 움직임을 얻을 수 있습니다. 다음 그림은 미리 정의된 몇가지 알파 콜백 함수가 반환하는 값을 그래프로 표현한 것입니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/clutter-alpha-func.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이렇게 만들어진 ClutterEffectTemplate 객체를 사용하려는 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_effect_*()&lt;/code&gt;&lt;/a&gt;
+ 함수를 호출하면서 전달하면 됩니다.&lt;/p&gt;
+&lt;p&gt;여러가지 타임라인을 여러가지 효과와 사용할때는 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html#clutter-effect-template-set-timeline-clone&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_effect_template_set_timeline_clone()&lt;/code&gt;&lt;/a&gt;
+을 이용하여 타임라인을 복제하도록 하면, 원본 타임라인을 변경해서 다른 효과에 사용할 수 있으므로, 다른 효과에 영향을 주지 않고 쉽게 재활용이 가능합니다. ClutterTimeline 객체와 마찬가지로 ClutterEffectTemplate 객체도 사용이 끝난후 &lt;code&gt;g_object_unref()&lt;/code&gt;를 이용하여 리소스를 해제해야 합니다. 참고로, 효과 함수를 호출한 이후 템플릿을 더 이상 사용하지 않는다면 바로 해제해도 됩니다.&lt;/p&gt;
+&lt;p&gt;효과 함수는 실제로 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterBehaviour.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterBehaviour&lt;/a&gt;
+ 객체를 감싼 단순화된 API라고 말할 수 있습니다. 하지만 효과 함수는 한 번에 하나의 액터만 제어할 수 있고 타임라인이 실행중인 동안에는 효과를 변경할 수 없습니다. 이러한 단점을 피하고 더 복잡한 효과를 원한다면 움직임(Behaviours) 객체를 직접 사용해야 합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;움직임(Behaviours) - 더 자연스럽고 강력한 애니메이션&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;효과 기능은 간단하지만, 더 복잡하고 다양한 애니메이션을 제어하기에는 부족하기 때문에 가끔은 움직임(Behaviours) 객체를 직접 사용해야 하는 경우가 있습니다. 효과 함수와 달리 움직임 객체를 사용하면 여러 액터를 동시에 제어할 수 있고 타임라인이 실행중이라도 움직임 파라메터를 변경할 수 있습니다. 예를 들어 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterBehaviourPath.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterBehaviourPath&lt;/a&gt;
+는 액터를 지정한 경로(path)를 따라 움직이는데, 매 프레임마다 &lt;code&gt;alpha_func&lt;/code&gt; 콜백을 호출해서 경로상의 위치를 계산합니다. 다음 그림은 경로 상에서 알파 함수의 효과를 그래프로 표현한 것입니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/clutter-path-alpha-func.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;콜백 함수 동작 방식은 효과(effect) 함수에서 사용하는 것과 동일합니다.&lt;/p&gt;
+&lt;p&gt;타임라인이 무한루프 방식으로 동작하지 않을 경우, 움직임(behaviour)의 타임라인이 시작되면 움직임은 항상 마지막 점에 도달한 뒤 거기서 끝납니다. 예를 들자면, 액터는 타임라인에서 지정한 총 프레임 수와 초당 프레임 수에서 지정한 만큼 변경되면서 마지막 지점에 도달할때까지 경로를 따라 움직입니다.&lt;/p&gt;
+&lt;p&gt;액터와 마찬가지로 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterAlpha.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterAlpha&lt;/a&gt;
+ 객체도 부동 참조(floating reference)를 가지고 있으므로 움직임 객체에 더한 다음에 따로 리소스를 해제할 필요가 없습니다. 하지만 움직임 객체는 아니므로 사용이 끝난 뒤에 &lt;code&gt;g_object_unref()&lt;/code&gt;를 이용하여 리소스를 해제해야 합니다.&lt;/p&gt;
+&lt;p&gt;클러터에서 제공하는 기본 움직임은 다음과 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterBehaviourBspline.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterBehaviourBspline&lt;/a&gt;
+: 스플라인을 따라 액터가 이동&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterBehaviourDepth.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterBehaviourDepth&lt;/a&gt;
+: Z축을 따라 액터가 이동&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterBehaviourEllipse.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterBehaviourEllipse&lt;/a&gt;
+: 타원을 따라 액터가 이동&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/ClutterBehaviourOpacity.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterBehaviourOpacity&lt;/a&gt;
+: 액터의 불투명도 변화&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/ClutterBehaviourPath.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterBehaviourPath&lt;/a&gt;
+: 일련의 점으로 정의된 경로를 따라 액터가 이동&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/ClutterBehaviourRotate.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterBehaviourRotate&lt;/a&gt;
+: 액터가 회전&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/ClutterBehaviourScale.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterBehaviourScale&lt;/a&gt;
+: 액터가 확대 또는 축소&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터(Clutter) 사용하기 (6)</title>
+      <link>/2009/01/16/2009-01-16-using-clutter-6/</link>
+      <pubDate>Fri, 16 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/16/2009-01-16-using-clutter-6/</guid>
+      <description>&lt;p&gt;지금까지 예제가 단편적이라면 이번에는 조금 제대로 된 기능하는 코드입니다. 이 예제는 이미지 파일을 읽어들여 타원 주위로 회전시키며 보여줍니다. 사용자가 이미지를 클릭하면 맨 앞으로 오면서 확대되면서 파일 이름도 보여줍니다. 먼저 스크린샷부터.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/clutter-image-viewer.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;여러 타임라인과 움직임 객체를 이용해서 조금 복잡해 보이지만, 아마도 실제 어플리케이션은 이보다 훨씬 더 유연하고 기능적으로 동작해야겠지요. 주석을 우리말로 번역하고, 원본보다 조금 더 속도감있게 변경한 소스는 다음과 같습니다. (조금 길지요&amp;hellip;)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;clutter/clutter.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+static ClutterActor *stage = NULL;
+
+/* 파일 이름을 보여주기 위한 레이블 액터 */
+static ClutterActor *label_filename = NULL;
+
+/* 모든 이미지를 타원 주위로 회전화기 위한 타임라인 */
+static ClutterTimeline *timeline_rotation = NULL;
+
+/* 이미지 하나를 위로 올리고 확대하기 위한 타임라인과 움직임 객체 */
+static ClutterTimeline *timeline_moveup = NULL;
+static ClutterBehaviour *behaviour_scale = NULL;
+static ClutterBehaviour *behaviour_path = NULL;
+static ClutterBehaviour *behaviour_opacity = NULL;
+
+/* 이미지 목록을 보여줄 타원의 좌표와 크기 */
+static const gint ELLIPSE_Y = 390;
+static const gint ELLIPSE_HEIGHT = 450; /* 90도 회전된 상태에서 앞뒤 거리 */
+static const gint IMAGE_HEIGHT = 100;
+
+static double angle_step = 30;
+
+typedef struct _Item
+{
+  ClutterActor *actor;
+  ClutterBehaviour *ellipse_behaviour;
+  gchar* filepath;
+} Item;
+
+/* 맨 앞으로 오게 할 이미지 항목 */
+static Item *item_at_front = NULL;
+
+static GSList *list_items = NULL;
+
+static void rotate_all_until_item_is_at_front (Item *item);
+
+static gdouble
+angle_in_360 (gdouble angle)
+{
+  gdouble result = angle;
+
+  while (result &amp;gt;= 360)
+    result -= 360;
+
+  return result;
+}
+
+static void
+on_foreach_clear_list_items (gpointer data, gpointer user_data)
+{
+  Item* item = (Item*)data;
+
+  /* 액터는 스테이지가 없어질때 자동으로 정리되므로 해제할 필요가 없습니다. */
+  g_object_unref (item-&amp;gt;ellipse_behaviour);
+  g_free (item-&amp;gt;filepath);
+  g_free (item);
+}
+
+static void
+scale_texture_default (ClutterActor *texture)
+{
+  int pixbuf_height = 0;
+
+  /* 이미지의 세로 크기를 얻습니다. */
+  clutter_texture_get_base_size (CLUTTER_TEXTURE (texture),
+                 NULL, &amp;amp;pixbuf_height);
+
+  const gdouble scale = pixbuf_height ?
+    IMAGE_HEIGHT /  (gdouble)pixbuf_height : 0;
+
+  /* 기준 높이에 맞게 스케일링합니다. */
+  clutter_actor_set_scale (texture, scale, scale);
+}
+
+static void
+load_images (const gchar* directory_path)
+{
+  g_return_if_fail (directory_path);
+
+  /* 현재 이미지 목록을 비웁니다. */
+  g_slist_foreach (list_items, on_foreach_clear_list_items, NULL);
+  g_slist_free (list_items);
+
+  /* 새로운 목록을 초기화합니다. */
+  list_items = NULL;
+
+  /* 디렉토리에 있는 이미지 목록을 얻습니다. */
+  GError *error = NULL;
+  GDir* dir = g_dir_open (directory_path, 0, &amp;amp;error);
+  if (error)
+    {
+      g_warning (&amp;quot;g_dir_open() failed: %sn&amp;quot;, error-&amp;gt;message);
+      g_clear_error (&amp;amp;error);
+      return;
+    }
+
+  const gchar* filename = NULL;
+  while ((filename = g_dir_read_name(dir)))
+    {
+      gchar* path = g_build_filename (directory_path, filename, NULL);
+
+      /* 이미지 파일로부터 텍스쳐 액터를 만듭니다. */
+      ClutterActor *actor = clutter_texture_new_from_file (path, NULL);
+      if (actor)
+    {
+      Item* item = g_new0 (Item, 1);
+
+      item-&amp;gt;actor = actor;
+      item-&amp;gt;filepath = g_strdup (path);
+
+      /* 모든 이미지가 같은 높이가 되도록 스케일링합니다. */
+      scale_texture_default (item-&amp;gt;actor);
+
+      list_items = g_slist_append (list_items, item);
+    }
+
+      g_free (path);
+    }
+
+  g_dir_close (dir);
+}
+
+static gboolean
+on_texture_button_press (ClutterActor *actor,
+             ClutterEvent *event,
+             gpointer      user_data)
+{
+  /* 이미지 회전 타임라인이 실행중이면 이벤트를 무시합니다.
+   * 즉, 이미지가 움직이고 있는 도중에 발생하는 마우스 버튼 클릭을 무시합니다.
+   */
+  if (timeline_rotation &amp;amp;&amp;amp; clutter_timeline_is_playing (timeline_rotation))
+    {
+      printf (&amp;quot;on_texture_button_press(): ignoringn&amp;quot;);
+      return FALSE;
+    }
+
+  Item *item = (Item *) user_data;
+
+  /* 선택한 아이템이 맨 앞에 올때까지 이미지 목록을 회전시킵니다. */
+  rotate_all_until_item_is_at_front (item);
+
+  return TRUE;
+}
+
+static void
+add_to_ellipse_behaviour (ClutterTimeline *timeline_rotation,
+              gdouble          start_angle,
+              Item            *item)
+{
+  g_return_if_fail (timeline_rotation);
+
+  ClutterAlpha *alpha =
+    clutter_alpha_new_full (timeline_rotation,
+                CLUTTER_ALPHA_SINE_INC,
+                NULL,
+                NULL);
+
+  /* 타원을 따라 동작할 움직임 객체를 만듭니다. */
+  item-&amp;gt;ellipse_behaviour =
+    clutter_behaviour_ellipse_new (alpha,
+                   320, ELLIPSE_Y,
+                   ELLIPSE_HEIGHT, ELLIPSE_HEIGHT,
+                   CLUTTER_ROTATE_CW,
+                   angle_in_360 (start_angle),
+                   angle_in_360 (start_angle + 360));
+
+  /* X축 기준으로 타원의 축 기울입니다. */
+  clutter_behaviour_ellipse_set_angle_tilt (
+    CLUTTER_BEHAVIOUR_ELLIPSE (item-&amp;gt;ellipse_behaviour),
+    CLUTTER_X_AXIS,
+    -90);
+
+  /* ClutterAlpha 객체는 따로 해제할 필요가 없습니다. */
+
+  /* 액터에 움직임을 적용합니다. */
+  clutter_behaviour_apply (item-&amp;gt;ellipse_behaviour, item-&amp;gt;actor);
+}
+
+static void
+add_image_actors (void)
+{
+  int x = 20;
+  int y = 0;
+  gdouble angle = 0;
+  GSList *list = list_items;
+
+  /* 이미지 갯수로 회전시 이미지 간격을 계산합니다. */
+  if (list)
+    angle_step = 360 / g_slist_length (list);
+
+  while (list)
+    {
+      /* 이미지 액터를 스테이지에 넣습니다. */
+      Item *item = (Item *) list-&amp;gt;data;
+      ClutterActor *actor = item-&amp;gt;actor;
+      clutter_container_add_actor (CLUTTER_CONTAINER (stage), actor);
+
+      /* 초기 좌표를 지정합니다. */
+      clutter_actor_set_position (actor, x, y);
+      y += 100;
+
+      /* 기본적으로 스테이지만 이벤트를 발생할 수 있으므로,
+       * 액터도 이벤트를 발생할 수 있게 합니다.
+       */
+      clutter_actor_set_reactive (actor, TRUE);
+
+      /* 버튼 클릭 시그널에 핸들러 함수를 연결합니다. */
+      g_signal_connect (actor, &amp;quot;button-press-event&amp;quot;,
+            G_CALLBACK (on_texture_button_press), item);
+
+      /* 타원 액터에 움직임을 추가합니다. */
+      add_to_ellipse_behaviour (timeline_rotation, angle, item);
+      angle += angle_step;
+
+      clutter_actor_show (actor);
+
+      list = g_slist_next (list);
+    }
+}
+
+/* 이 기그널 핸들러는 선택한 이미지가 확대되어 위로 이동하는 타임라인이
+ * 완료되었을때 호출됩니다.
+ */
+static void
+on_timeline_moveup_completed (ClutterTimeline* timeline,
+                              gpointer         user_data)
+{
+  /* 타임라인 객체를 해제합니다. */
+  g_object_unref (timeline_moveup);
+  timeline_moveup = NULL;
+
+  g_object_unref (behaviour_scale);
+  behaviour_scale = NULL;
+
+  g_object_unref (behaviour_path);
+  behaviour_path = NULL;
+
+  g_object_unref (behaviour_opacity);
+  behaviour_opacity = NULL;
+}
+
+/* 이 시그널 핸들러는 이미지가 타원을 따라 회전하는 타임라인이 완료되었을때
+ * 호출됩니다.
+ */
+static void
+on_timeline_rotation_completed (ClutterTimeline* timeline,
+                                gpointer         user_data)
+{
+  /* 모든 이미지가 회전하다가 클릭한 이미지가 맨 앞에 온 상태입니다.
+   * 이제 맨 앞의 이미지를 크게 보여주고 파일 이름도 표시합니다.
+   */
+
+  /* 이미지를 변형합니다. */
+  ClutterActor *actor = item_at_front-&amp;gt;actor;
+  timeline_moveup = clutter_timeline_new(15 /* frames */,
+                     30 /* frames per second */);
+  ClutterAlpha *alpha = clutter_alpha_new_full (timeline_moveup,
+                        CLUTTER_ALPHA_SINE_INC,
+                        NULL, NULL);
+
+  /* 현재 크기에서 약 2배 크기로 확대합니다. */
+  gdouble scale_start = 0;
+  clutter_actor_get_scale (actor, &amp;amp;scale_start, NULL);
+  const gdouble scale_end = scale_start * 1.8;
+
+  behaviour_scale =
+    clutter_behaviour_scale_new (alpha,
+                 scale_start, scale_start,
+                 scale_end, scale_end);
+  clutter_behaviour_apply (behaviour_scale, actor);
+
+  /* 그림을 위 방향을 이동합니다. */
+  ClutterKnot knots[2];
+  knots[0].x = clutter_actor_get_x (actor);
+  knots[0].y = clutter_actor_get_y (actor);
+  knots[1].x = knots[0].x;
+  knots[1].y = knots[0].y - 250;
+  behaviour_path =
+    clutter_behaviour_path_new (alpha, knots, G_N_ELEMENTS(knots));
+  clutter_behaviour_apply (behaviour_path, actor);
+
+  /* 파일 이름을 조금씩 보여줍니다. */
+  clutter_label_set_text (CLUTTER_LABEL (label_filename),
+              item_at_front-&amp;gt;filepath);
+  behaviour_opacity = clutter_behaviour_opacity_new (alpha, 0, 255);
+  clutter_behaviour_apply (behaviour_opacity, label_filename);
+
+  /* 모든 움직임(behaviours)을 시작합니다.
+   * 또한 완료되었을때 핸들러를 연결합니다.
+   */
+  g_signal_connect (timeline_moveup, &amp;quot;completed&amp;quot;,
+                    G_CALLBACK (on_timeline_moveup_completed), NULL);
+  clutter_timeline_start (timeline_moveup);
+}
+
+static void
+rotate_all_until_item_is_at_front (Item *item)
+{
+  g_return_if_fail (item);
+
+  clutter_timeline_stop(timeline_rotation);
+
+  /* 선택한 이미지를 위로 올려 보여주는 타임라인이 동작중이라면
+   * 당장 멈추게 합니다.
+   */
+  if (timeline_moveup)
+    clutter_timeline_stop (timeline_moveup);
+
+  clutter_actor_set_opacity (label_filename, 0);
+
+  /* 선택한 이미지 항목의 번호를 얻습니다. */
+  const gint pos = g_slist_index (list_items, item);
+
+  g_assert (pos != -1);
+
+  if (!item_at_front &amp;amp;&amp;amp; list_items)
+    item_at_front = (Item *) list_items-&amp;gt;data;
+
+  /* 현재 맨 앞에 있는 항목의 번호를 얻습니다. */
+  gint pos_front = 0;
+  if (item_at_front)
+    pos_front = g_slist_index (list_items, item_at_front);
+
+  g_assert (pos_front != -1);
+
+  /* 첫번째 항목의 시작 / 끝 각도를 계산합니다. */
+  const gdouble angle_front = 180;
+  gdouble angle_start = angle_front - (angle_step * pos_front);
+  angle_start = angle_in_360 (angle_start);
+  gdouble angle_end = angle_front - (angle_step * pos);
+
+  gdouble angle_diff = 0;
+
+  /* 모든 이미지 항목의 끝 각도를 설정합니다. */
+  GSList *list = list_items;
+  while (list)
+    {
+      Item *this_item = (Item*)list-&amp;gt;data;
+
+      /* 이미지 크기를 원래대로 되돌립니다. */
+      scale_texture_default (this_item-&amp;gt;actor);
+
+      angle_start = angle_in_360 (angle_start);
+      angle_end = angle_in_360 (angle_end);
+
+      /* 현재 맨 앞 있는 항목일 경우 360도 더 회전하게 함니다. */
+      if (item_at_front == item)
+    angle_end += 360;
+      angle_end = angle_in_360 (angle_end);
+
+      clutter_behaviour_ellipse_set_angle_start (
+        CLUTTER_BEHAVIOUR_ELLIPSE (this_item-&amp;gt;ellipse_behaviour),
+    angle_start);
+
+      clutter_behaviour_ellipse_set_angle_end (
+        CLUTTER_BEHAVIOUR_ELLIPSE (this_item-&amp;gt;ellipse_behaviour), angle_end);
+
+      /* 선택한 항목일 경우 */
+      if (this_item == item)
+    {
+      if (angle_start &amp;lt; angle_end)
+        angle_diff =  angle_end - angle_start;
+      else
+        angle_diff = 360 - (angle_start - angle_end);
+    }
+
+      /* TODO: Set the number of frames, depending on the angle.
+       * otherwise the actor will take the same amount of time to reach
+       * the end angle regardless of how far it must move, causing it to
+       * move very slowly if it does not have far to move.
+       */
+      angle_end += angle_step;
+      angle_start += angle_step;
+      list = g_slist_next (list);
+    }
+
+  /* 속도는 같지만 이동해야 할 거리만큼 프레임 수를 조절합니다. */
+  gint pos_to_move = 0;
+  if (pos_front &amp;lt; pos)
+    {
+      const gint count = g_slist_length (list_items);
+      pos_to_move = count + (pos - pos_front);
+    }
+  else
+    {
+      pos_to_move = pos_front - pos;
+    }
+
+  clutter_timeline_set_n_frames (timeline_rotation, angle_diff / 5);
+
+  /* 타임라인이 끝난뒤 맨 앞에 위치해야할 항목을 기억합니다. */
+  item_at_front = item;
+
+  clutter_timeline_start (timeline_rotation);
+}
+
+int
+main (int argc, char *argv[])
+{
+  ClutterColor stage_color = { 0xB0, 0xB0, 0xB0, 0xff }; /* light gray */
+
+  clutter_init (&amp;amp;argc, &amp;amp;argv);
+
+  /* 스테이지를 얻어 크기와 색상을 정합니다. */
+  stage = clutter_stage_get_default ();
+  clutter_actor_set_size (stage, 800, 600);
+  clutter_stage_set_color (CLUTTER_STAGE (stage), &amp;amp;stage_color);
+
+  /* 파일 이름을 보여주기 위한 레이블 액터를 만들고, 일단 안보이게 합니다. */
+  label_filename = clutter_label_new ();
+  ClutterColor label_color = { 0x60, 0x60, 0x90, 0xff }; /* blueish */
+  clutter_label_set_color (CLUTTER_LABEL (label_filename), &amp;amp;label_color);
+  clutter_label_set_font_name (CLUTTER_LABEL (label_filename), &amp;quot;Sans 24&amp;quot;);
+  clutter_actor_set_position (label_filename, 10, 10);
+  clutter_actor_set_opacity (label_filename, 0); /* hidden */
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), label_filename);
+  clutter_actor_show (label_filename);
+
+  /* 이미지 목록 밑에 보여줄 사각형을 만듭니다. */
+  ClutterColor rect_color = { 0xff, 0xff, 0xff, 0xff }; /* white */
+  ClutterActor *rect = clutter_rectangle_new_with_color (&amp;amp;rect_color);
+  clutter_actor_set_height (rect, ELLIPSE_HEIGHT + 20);
+  clutter_actor_set_width (rect, clutter_actor_get_width (stage) + 100);
+
+  /* 사각형을 이미지 목록 밑에 위치하도록 합니다. */
+  clutter_actor_set_position (rect,
+    -(clutter_actor_get_width (rect) - clutter_actor_get_width (stage)) / 2,
+    ELLIPSE_Y + IMAGE_HEIGHT - (clutter_actor_get_height (rect) / 2));
+
+  /* X축을 기준으로 사각형을 눕힙니다. */
+  clutter_actor_set_rotation (rect, CLUTTER_X_AXIS, -90,
+                  0, (clutter_actor_get_height (rect) / 2), 0);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), rect);
+  clutter_actor_show (rect);
+
+  /* 스테이지를 보이게 합니다. */
+  clutter_actor_show (stage);
+
+  /** 이미지를 회전시킬 타임라인을 만들고,
+   * 회전이 끝났을때 실행할 핸들러를 연결합니다.
+   */
+  timeline_rotation = clutter_timeline_new(60 /* frames */,
+                       30 /* frames per second */);
+  g_signal_connect (timeline_rotation, &amp;quot;completed&amp;quot;,
+            G_CALLBACK (on_timeline_rotation_completed), NULL);
+
+  /* 이미지를 로드하고 각각에 대한 액터를 만듭니다. */
+  load_images (&amp;quot;./images/&amp;quot;);
+  add_image_actors ();
+
+  /* clutter_timeline_set_loop(timeline_rotation, TRUE); */
+
+  /* 첫번째 이미지가 선택된 것처럼 회전을 시작합니다. */
+  if (list_items)
+    rotate_all_until_item_is_at_front ((Item*)list_items-&amp;gt;data);
+
+  /* 메인 이벤트 루프를 시작합니다. */
+  clutter_main ();
+
+  /* 모든 이미지 목록을 해제합니다. */
+  g_slist_foreach(list_items, on_foreach_clear_list_items, NULL);
+  g_slist_free (list_items);
+
+  g_object_unref (timeline_rotation);
+
+  return EXIT_SUCCESS;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터(Clutter) 사용하기 (2)</title>
+      <link>/2009/01/15/2009-01-15-using-clutter-2/</link>
+      <pubDate>Thu, 15 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/15/2009-01-15-using-clutter-2/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 튜토리얼&lt;/a&gt;
+ 내용을 계속 정리해 봅니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;액터 (Actors) - 배우&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;클러터는 3차원 공간 속에서 2차원 표면(surfaces)을 다루는 캔버스 API입니다. 그래서, 기본 클러터 액터는 2차원 도형이지만 좌표는 3차원입니다. 하지만, 깊이(depth) 개념은 없습니다. 따라서 액터 테두리만 정면 화면에 걸치도록 정확하게 회전되었다면 이론적으로 안보이게 됩니다. 복잡한 3차원 객체가 필요하다면 OpenGL ES API를 이용해 새로운 액터를 구현해도 되지만, 이 방법은 나중에 살펴보기로 하고 여기서는 기본 액터 종류를 살펴보겠습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterStage.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterStage&lt;/a&gt;
+ : 무대 자체&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterRectangle.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterRectangle&lt;/a&gt;
+ : 사각형&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterLabel.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterLabel&lt;/a&gt;
+ : 텍스트 표시하기&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterEntry.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterEntry&lt;/a&gt;
+ : 사용자 편집 가능한 텍스트&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterTexture.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterTexture&lt;/a&gt;
+ : 이미지&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;액터는 &lt;code&gt;clutter_container_add()&lt;/code&gt;를 이용하여 스테이지에 추가할 수 있습니다. 물론 위치와 크기가 명시되어야 합니다. 모든 액터는 ClutterActor 객체에서 파생하므로 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-position&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_position()&lt;/code&gt;&lt;/a&gt;
+을 이용해 x,y 좌표를 설정하고 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-depth&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_depth()&lt;/code&gt;&lt;/a&gt;
+를 이용해 z 좌표를 설정합니다. z 좌표값이 클수록 화면에서 멀어집니다. 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-size&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_size()&lt;/code&gt;&lt;/a&gt;
+는 액터의 크기를 조절합니다. 액터의 위치는 스테이지(부모 컨테이너)의 좌상단(0,0)을 기준으로 상대적인 위치입니다. 이 기준값은 &lt;code&gt;clutter_actor_set_anchor_point()&lt;/code&gt;를 이용해 변경할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;GTK+ 위젯과 마찬가지로 클러터 액터도 처음 생성되었을 때는 보이는 상태가 아니기 때문에 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-show&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_show()&lt;/code&gt;&lt;/a&gt;
+를 호출해야 비로소 보여집니다. 물론 다시 안보이게 하려면 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-hide&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_hide()&lt;/code&gt;&lt;/a&gt;
+를 사용하면 됩니다. 또한 GTK+ 위젯 시스템과 동일한 부동 참조(floating reference) 개념을 사용하여 리소스를 관리합니다. (더 자세한 내용이 궁금하신 분은 &amp;lsquo;
+&lt;a href=&#34;/2008/12/28/gtk-memory-management/&#34;&gt;GTK+ 메모리 관리&lt;/a&gt;
+&amp;rsquo; 항목을 참고하세요)&lt;/p&gt;
+&lt;p&gt;모든 액터는 당연히 확대 및 축소(scaling), 회전(rotation) 시킬 수 있고, 부분적으로 투명하게 할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;액터의 크기를 확대하거나 축소하려면 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-scale&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_scale()&lt;/code&gt;&lt;/a&gt;
+을 호출합니다. 유의할 점은 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-size&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_size()&lt;/code&gt;&lt;/a&gt;
+로 지정한 크기는 변하지 않습니다. 그래서 
+&lt;a href=&#34;clutter_actor_set_scale%28%29&#34;&gt;&lt;code&gt;clutter_actor_set_scale()&lt;/code&gt;&lt;/a&gt;
+을 다시 호출하면 원래 크기를 기준으로 스케일됩니다.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-rotation&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_rotation()&lt;/code&gt;&lt;/a&gt;
+을 호출하면 지정한 축(axis)을 기준으로 원하는 각도만큼 회전합니다. 예를 들어, 축으로 &lt;code&gt;CLUTTER_X_AXIS&lt;/code&gt;을 지정하면 y,z 방향 인수만 지정할 수 있습니다. 이 기능 역시 액터의 위치와 크기에는 영향을 미치지 않습니다.&lt;/p&gt;
+&lt;p&gt;액터의 일부 영역만 보이도록(clipping) 하려면 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-clip&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_clip()&lt;/code&gt;&lt;/a&gt;
+을 호출하면 됩니다. 예를 들어 매우 큰 컨테이너 액터를 만들고 스크롤 효과를 내면서 일부 영역만 보이도록 하는데 사용할 수 있습니다. 클립핑 영역을 해제하려면 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-remove-clip&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_remove_clip()&lt;/code&gt;&lt;/a&gt;
+을 호출하면 됩니다. 클립핑 밖의 영역은 비디오 메모리도 사용안하고, 연산 작업에서도 제외됩니다.&lt;/p&gt;
+&lt;p&gt;액터를 현재 위치에서 상대적으로 움직이라면 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-move-by&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_move_by()&lt;/code&gt;&lt;/a&gt;
+ 또는 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-depth&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_depth()&lt;/code&gt;&lt;/a&gt;
+를 호출하면 됩니다.&lt;/p&gt;
+&lt;p&gt;이제 여기까지 설명한 액터의 기본 동작에 대한 예제 코드를 살펴보시기 바랍니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;clutter/clutter.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+int main(int argc, char *argv[])
+{
+  ClutterColor stage_color = { 0x00, 0x00, 0x00, 0xff };
+  ClutterColor actor_color = { 0xff, 0xff, 0xff, 0x99 };
+
+  clutter_init (&amp;amp;argc, &amp;amp;argv);
+
+  /* 스테이지를 얻어 크기와 색상을 정합니다. */
+  ClutterActor *stage = clutter_stage_get_default ();
+  clutter_actor_set_size (stage, 200, 200);
+  clutter_stage_set_color (CLUTTER_STAGE (stage), &amp;amp;stage_color);
+
+  /* 스테이지에 사각형을 더합니다. */
+  ClutterActor *rect = clutter_rectangle_new_with_color (&amp;amp;actor_color);
+  clutter_actor_set_size (rect, 100, 100);
+  clutter_actor_set_position (rect, 20, 20);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), rect);
+  clutter_actor_show (rect);
+
+  /* X축을 기준으로 20도 회전합니다.
+   * (상단 테두리 기준으로 돌기)
+   */
+  clutter_actor_set_rotation (rect, CLUTTER_X_AXIS, -20, 0, 0, 0);
+
+  /* 스테이지에 레이블을 추가합니다. */
+  ClutterActor *label = clutter_label_new_full (&amp;quot;Sans 12&amp;quot;, &amp;quot;Some Text&amp;quot;, &amp;amp;actor_color);
+  clutter_actor_set_size (label, 500, 500);
+  clutter_actor_set_position (label, 20, 150);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), label);
+  clutter_actor_show (label);
+
+  /* X축 방향으로 300% 확대합니다. */
+  clutter_actor_set_scale (label, 3.00, 1.0);
+
+  /* 오른쪽으로 10, 위쪽으로 10 이동합니다. */
+  clutter_actor_move_by (label, 10, -10);
+
+  /* Z축으로 20 더 가깝게 이동합니다. */
+  clutter_actor_set_depth (label, -20);
+
+  /* 스테이지를 보이게 합니다. */
+  clutter_actor_show (stage);
+
+  /* 메인 이벤트 루프를 시작합니다. */
+  clutter_main ();
+
+  return EXIT_SUCCESS;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 코드를 실행하면 다음과 같은 화면을 얻을 수 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/clutter-actor-example.png&#34; alt=&#34;clutter-actor-example&#34; title=&#34;clutter-actor-example&#34;&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터(Clutter) 사용하기 (3)</title>
+      <link>/2009/01/15/2009-01-15-using-clutter-3/</link>
+      <pubDate>Thu, 15 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/15/2009-01-15-using-clutter-3/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 튜토리얼&lt;/a&gt;
+ 내용 계속됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;컨테이너 (Containers) - 그릇&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;어떤 클러터 액터는 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterContainer.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterContainer&lt;/a&gt;
+ 인터페이스를 구현합니다. 이 액터는 자식 액터를 담을 수 있고, 목록이나 표 형태처럼 각각에 상대적인 위치를 지정할 수도 있습니다. 더 나아가 변환(transformation)이나 속성(properties) 변경을 한꺼번에 모든 자식에게 적용할 수 있습니다. 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterContainer.html#clutter-container-add&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_container_add()&lt;/code&gt;&lt;/a&gt;
+ 함수를 이용하면 자식 액터를 컨테이너에 추가할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterStage.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterStage&lt;/a&gt;
+ 자신도 하나의 컨테이너입니다. 따라서 모든 종류의 자식 액터를 담을 수 있습니다. 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterGroup.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterGroup&lt;/a&gt;
+도 또다른 컨테이너입니다. 스테이지와 달리 그룹은 복수 객체가 가능하고, ClutterGroup이 다시 다른 ClutterGroup을 포함할 수도 있습니다. 그리고, 이 역시 하나의 액터이기 때문에 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_*()&lt;/code&gt;&lt;/a&gt;
+ API를 모두 사용할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;GTK+ 프로그래밍 경험이 있는 분이라면 이쯤에서, 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterActor&lt;/a&gt;
+ 객체가 GTK+에서 GtkWidget 객체와 동일한 개념이라는 걸 알 수 있을 겁니다. 그래서 모든 클러터 액터 / 그룹 / 스테이지를 새로 만들면 반환되는 객체 형식은 항상 ClutterActor입니다.&lt;/p&gt;
+&lt;p&gt;다음 예제는 하나의 그룹에 두 액터를 넣은 다음, 그룹을 변경하면 자동으로 자식 액터에게 적용되는 모습을 보여주고 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;clutter/clutter.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+int main(int argc, char *argv[])
+{
+  ClutterColor stage_color = { 0x00, 0x00, 0x00, 0xff };
+  ClutterColor actor_color = { 0xff, 0xff, 0xff, 0x99 };
+
+  clutter_init (&amp;amp;argc, &amp;amp;argv);
+
+  /* 스테이지를 얻어 크기와 색상을 정합니다. */
+  ClutterActor *stage = clutter_stage_get_default ();
+  clutter_actor_set_size (stage, 200, 200);
+  clutter_stage_set_color (CLUTTER_STAGE (stage), &amp;amp;stage_color);
+
+  /* 스테이지에 그룹을 추가합니다. */
+  ClutterActor *group = clutter_group_new ();
+  clutter_actor_set_position (group, 40, 40);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), group);
+  clutter_actor_show (group);
+
+  /* 사각형을 그룹에 추가합니다. */
+  ClutterActor *rect = clutter_rectangle_new_with_color (&amp;amp;actor_color);
+  clutter_actor_set_size (rect, 50, 50);
+  clutter_actor_set_position (rect, 0, 0);
+  clutter_container_add_actor (CLUTTER_CONTAINER (group), rect);
+  clutter_actor_show (rect);
+
+  /* 레이블을 그룹에 추가합니다. */
+  ClutterActor *label = clutter_label_new_full (&amp;quot;Sans 9&amp;quot;, &amp;quot;Some Text&amp;quot;, &amp;amp;actor_color);
+  clutter_actor_set_position (label, 0, 60);
+  clutter_container_add_actor (CLUTTER_CONTAINER (group), label);
+  clutter_actor_show (label);
+
+  /* 그룹을 X축 방향으로 120% 확대합니다. */
+  clutter_actor_set_scale (group, 3.00, 1.0);
+
+  /* 그룹을 Z축 기준으로 회전합니다. */
+  clutter_actor_set_rotation (group, CLUTTER_Z_AXIS, 10, 0, 0, 0);
+
+  /* 스테이지를 보이게 합니다. */
+  clutter_actor_show (stage);
+
+  /* 메인 이벤트 루프를 시작합니다. */
+  clutter_main ();
+
+  return EXIT_SUCCESS;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;더 자세한 컨테이너 기능은 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterContainer.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;clutter_container_*()&lt;/a&gt;
+ API를 참고하시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;이벤트 (Events) - 사용자 입력 처리&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;ClutterActor 객체는 사용자와 액터가 상호작용할때 발생하는 시그널(signals)을 가지고 있습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActor-button-press-event&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;button-press-event&lt;/code&gt;&lt;/a&gt;
+: 액터 위에서 마우스 버튼을 누르면 발생&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActor-button-release-event&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;button-release-event&lt;/code&gt;&lt;/a&gt;
+: 액터 위에서 마우스 버튼을 떼면 발생&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActor-motion-event&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;motion-event&lt;/code&gt;&lt;/a&gt;
+: 액터 위에서 마우스 포인터가 움직이면 발생&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActor-enter-event&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;enter-event&lt;/code&gt;&lt;/a&gt;
+: 마우스 포인터가 액터 영역 안으로 들어왔을때 발생&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#ClutterActor-leave-event&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;leave-event&lt;/code&gt;&lt;/a&gt;
+: 마우스 포인터가 액터 영역 밖으로 나갔을때 발생&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;예를 들어, 액터를 사용자가 눌렀는지 감지하려면 다음과 같이 시그널 핸들러 콜백을 연결하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;g_signal_connect (actor, &amp;quot;button-press-event&amp;quot;,
+                  G_CALLBACK (actor_button_pressed), NULL);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다른 방법으로, 액터의 부모가 되는 ClutterStage에 시그널 핸들러 콜백을 연결한 뒤, 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterStage.html#clutter-stage-get-actor-at-pos&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_stage_get_actor_at_pos()&lt;/code&gt;&lt;/a&gt;
+를 이용하여 어떤 액터와 관련이 있는 이벤트인지 확인할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;성능 최적화를 위해 클러터는 모든 이벤트 시그널을 기본적으로 발생하지 않습니다. 그래서, 스테이지가 아닌 액터로부터 이벤트 시그널을 받으려면 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-set-reactive&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_set_reactive()&lt;/code&gt;&lt;/a&gt;
+를 호출해서 액터가 이벤트를 수신할지 여부를 설정해야 합니다. 움직임 관련 이벤트(motion-event, enter-event, leave-event)를 한꺼번에 모든 액터가 수신할지 여부는 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/clutter-General.html#clutter-set-motion-events-enabled&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_set_motion_events_enabled()&lt;/code&gt;&lt;/a&gt;
+를 이용해 설정할 수 있습니다. 이는 마치 GTK+에서 gtk_widget_set_events()를 이용하여 위젯별로 처리할 이벤트를 설정하는 것과 비슷합니다.&lt;/p&gt;
+&lt;p&gt;이벤트 시그널 핸들러가 발생한 이벤트에 대한 모든 처리를 다 수행한다면 TRUE 값을 반환해서 연결된 다른 핸들러나 다른 액터에게 더 이상 전달되지 않도록 해야 합니다. 반대의 경우 FALSE를 반환해서 다른 핸들러나 다른 액터에게 전달되도록 할 수 있습니다. 클러터는 스테이지가 가장 먼저 이벤트를 수신하도록 하고, 이때 &lt;code&gt;capture-event&lt;/code&gt; 시그널을 발생합니다. 스테이지가 이벤트를 처리하지 않으면, 계층적으로 자식 액터에게 전달되면서 &lt;code&gt;capture-event&lt;/code&gt; 시그널을 발생합니다. 만일 어떤 액터도 이 이벤트를 처리하지 않았다면 다시 각각 세부적인 이벤트(가령 &lt;code&gt;button-press-event&lt;/code&gt;, &lt;code&gt;key-press-event&lt;/code&gt;)가 자식 액터부터 발생해서 반대로 상위 방향으로 올라가면서 처리될때까지 시그널을 발생합니다. 따라서 처리가 완료되었다면 반드시 TRUE를 반환해야 클러터 어플리케이션 전체가 효율적으로 동작하게 됩니다.&lt;/p&gt;
+&lt;p&gt;일반적으로 액터는 키 초점(key focus)을 가지고 있을때만 키보드 이벤트를 받지만, 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/clutter-General.html#clutter-grab-pointer&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_grab_pointer()&lt;/code&gt;&lt;/a&gt;
+와 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/clutter-General.html#clutter-grab-keyboard&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_grab_keyboard()&lt;/code&gt;&lt;/a&gt;
+를 이용하여 포인터나 키보드를 강제로 잡게 함으로써(grabbing) 모든 이벤트를 받게 할 수도 있습니다. 예를 들어, 드래그 앤 드롭 기능을 구현할때 마우스 버튼을 누른 다음 포인터가 스테이지 윈도우 바깥으로 나가더라도 마우스 버튼 떼기 이벤트를 받게 할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;다음 예제는 지금까지 설명한 내용을 보여주기 위해 이벤트 발생시 관련 메시지를 콘솔에 출력합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;clutter/clutter.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+static gboolean
+on_stage_button_press (ClutterStage *stage, ClutterEvent *event, gpointer data)
+{
+  gint x = 0;
+  gint y = 0;
+  clutter_event_get_coords (event, &amp;amp;x, &amp;amp;y);
+
+  g_print (&amp;quot;Clicked stage at (%d, %d)n&amp;quot;, x, y);
+
+  /* 마우스 버튼 누른 위치에 액터가 있는지 검사합니다.
+   * 물론 액터의 시그널에 직접 연결할 수도 있습니다.
+   */
+  ClutterActor *rect = clutter_stage_get_actor_at_pos (stage, x, y);
+  if (!rect)
+    return FALSE;
+
+  if (CLUTTER_IS_RECTANGLE (rect))
+    g_print (&amp;quot;  A rectangle is at that position.n&amp;quot;);
+
+  return TRUE; /* 다른 핸들러가 이벤트를 더이상 처리못하게 합니다. */
+}
+
+static gboolean
+on_rect_button_press (ClutterRectangle *rect, ClutterEvent *event, gpointer data)
+{
+  gint x = 0;
+  gint y = 0;
+  clutter_event_get_coords (event, &amp;amp;x, &amp;amp;y);
+
+  g_print (&amp;quot;Clicked rectangle at (%d, %d)n&amp;quot;, x, y);
+
+  /* clutter_main_quit(); */
+
+  return TRUE; /* 다른 핸들러가 이벤트를 더이상 처리못하게 합니다. */
+}
+
+static gboolean
+on_rect_button_release (ClutterRectangle *rect, ClutterEvent *event, gpointer data)
+{
+  gint x = 0;
+  gint y = 0;
+  clutter_event_get_coords (event, &amp;amp;x, &amp;amp;y);
+
+  g_print (&amp;quot;Click-release on rectangle at (%d, %d)n&amp;quot;, x, y);
+
+  return TRUE; /* 다른 핸들러가 이벤트를 더이상 처리못하게 합니다. */
+}
+
+static gboolean
+on_rect_motion (ClutterRectangle *rect, ClutterEvent *event, gpointer data)
+{
+  g_print (&amp;quot;Motion in the rectangle.n&amp;quot;);
+
+  return TRUE; /* 다른 핸들러가 이벤트를 더이상 처리못하게 합니다. */
+}
+
+static gboolean
+on_rect_enter (ClutterRectangle *rect, ClutterEvent *event, gpointer data)
+{
+  g_print (&amp;quot;Entered rectangle.n&amp;quot;);
+
+  return TRUE; /* 다른 핸들러가 이벤트를 더이상 처리못하게 합니다. */
+}
+
+static gboolean
+on_rect_leave (ClutterRectangle *rect, ClutterEvent *event, gpointer data)
+{
+  g_print (&amp;quot;Left rectangle.n&amp;quot;);
+
+  return TRUE; /* 다른 핸들러가 이벤트를 더이상 처리못하게 합니다. */
+}
+
+int main(int argc, char *argv[])
+{
+  ClutterColor stage_color = { 0x00, 0x00, 0x00, 0xff };
+  ClutterColor label_color = { 0xff, 0xff, 0xff, 0x99 };
+
+  clutter_init (&amp;amp;argc, &amp;amp;argv);
+
+  /* 스테이지를 얻어 크기와 색상을 정합니다. */
+  ClutterActor *stage = clutter_stage_get_default ();
+  clutter_actor_set_size (stage, 200, 200);
+  clutter_stage_set_color (CLUTTER_STAGE (stage), &amp;amp;stage_color);
+
+  /* 스테이지의 마우스 클릭 시그널에 핸들러를 연결합니다. */
+  g_signal_connect (stage, &amp;quot;button-press-event&amp;quot;,
+                    G_CALLBACK (on_stage_button_press), NULL);
+
+  /* 사각형을 스테이지에 추가합니다. */
+  ClutterActor *rect = clutter_rectangle_new_with_color (&amp;amp;label_color);
+  clutter_actor_set_size (rect, 100, 100);
+  clutter_actor_set_position (rect, 50, 50);
+  clutter_actor_show (rect);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), rect);
+
+  /* 사각형 액터가 이벤트를 받을 수 있게 합니다.
+   * 기본적으로 스테이지만 이벤트를 받을 수 있습니다.
+   */
+  clutter_actor_set_reactive (rect, TRUE);
+
+  /* 사각형 액터의 이벤트 시그널에 핸들러를 연결합니다. */
+  g_signal_connect (rect, &amp;quot;button-press-event&amp;quot;,
+                    G_CALLBACK (on_rect_button_press), NULL);
+  g_signal_connect (rect, &amp;quot;button-release-event&amp;quot;,
+                    G_CALLBACK (on_rect_button_release), NULL);
+  g_signal_connect (rect, &amp;quot;motion-event&amp;quot;,
+                    G_CALLBACK (on_rect_motion), NULL);
+  g_signal_connect (rect, &amp;quot;enter-event&amp;quot;,
+                    G_CALLBACK (on_rect_enter), NULL);
+  g_signal_connect (rect, &amp;quot;leave-event&amp;quot;,
+                    G_CALLBACK (on_rect_leave), NULL);
+
+  /* 스테이지를 보이게 합니다. */
+  clutter_actor_show (stage);
+
+  /* 메인 이벤트 루프를 시작합니다. */
+  clutter_main ();
+
+  return EXIT_SUCCESS;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다음은 클러터에서 애니메이션 효과를 구현하는데 사용하는 타임라인(Timelines)에 대해 설명할 예정입니다. 대략 12개 장으로 구성된 튜터리얼을 지금까지 5개 장까지 했으니 대략 7개 정도가 더 남았네요. 근데 이제부터는 점점 내용도 많아지고 분량도 많아져서 슬슬 피곤함이&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터(Clutter) 사용하기 (4)</title>
+      <link>/2009/01/15/2009-01-15-using-clutter-4/</link>
+      <pubDate>Thu, 15 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/15/2009-01-15-using-clutter-4/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 튜토리얼&lt;/a&gt;
+ 계속 이어집니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;타임라인 (Timelines)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterTimeline.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterTimeline&lt;/a&gt;
+은 시간이 흐르는 동안 액터의 모양이나 위치를 자동으로 변경하는데 사용합니다. 다음에 설명할 효과(effect)나 움직임(behaviour)와 함께 사용할 수도 있지만 직접 사용할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;타임라인 객체는 지정한 초당 프레임 수를 기준으로 시간이 되면 각 프레임이 그려질 수 있도록 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterTimeline.html#ClutterTimeline-new-frame&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;new-frame&lt;/code&gt;&lt;/a&gt;
+ 시그널을 발생합니다. 그러면 시그널 핸들러에서 액터의 속성을 변경하면 됩니다. 물론 스테이지에 있는 여러 액터의 속성을 동시에 변경할 수도 있습니다. (물론 이외에도 몇 가지 시그널이 더 있습니다)&lt;/p&gt;
+&lt;p&gt;타임라인 객체를 만드는 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterTimeline.html#clutter-timeline-new&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_timeline_new()&lt;/code&gt;&lt;/a&gt;
+ 함수는 총 프레임 수(n_frames)와 초당 프레임 수(fps)를 인수로 받습니다. 따라서 이 값을 기준으로 전체 지속 시간을 예측할 수 있습니다. 타임라인은 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterTimeline.html#clutter-timeline-start&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_timeline_start()&lt;/code&gt;&lt;/a&gt;
+를 호출해야 비로소 시작합니다. 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterTimeline.html#clutter-timeline-stop&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_timeline_stop()&lt;/code&gt;&lt;/a&gt;
+을 호출하기 전까지 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterTimeline.html#clutter-timeline-set-loop&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_timeline_set_loop()&lt;/code&gt;&lt;/a&gt;
+를 이용하여 무한히 반복하게 할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;여러 타임라인을 동시에 시작하거나 정지, 또는 순서대로 실행하려면 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterScore.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterScore&lt;/a&gt;
+ 객체를 사용합니다. 일종의 타임라인 제어기 역할을 하는 셈입니다. 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterScore.html#clutter-score-append&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_score_append()&lt;/code&gt;&lt;/a&gt;
+는 두 개의 타임라인을 인수로 받는데, 첫번째는 부모(parent) 타임라인이고 두번째가 추가할 타임라인입니다. 추가되는 타임라인은 부모가 끝난 다음에 실행됩니다. 부모가 NULL인 타임라인은 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterTimeline.html#clutter-timeline-start&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_timeline_start()&lt;/code&gt;&lt;/a&gt;
+을 호출하면 바로 시작합니다.&lt;/p&gt;
+&lt;p&gt;예를 들어 다음 예제는 timeline1이 끝난 다음에 timeline2, timeline3가 동시에 시작합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;  ClutterTimeline *timeline1, *timeline2, *timeline3;
+  ClutterScore *score;
+
+  timeline1 = clutter_timeline_new_for_duration (1000);
+  timeline2 = clutter_timeline_new_for_duration (500);
+  timeline3 = clutter_timeline_new_for_duration (500);
+
+  score = clutter_score_new ();
+
+  clutter_score_append (score, NULL,       timeline1);
+  clutter_score_append (score, timeline1, timeline2);
+  clutter_score_append (score, timeline1, timeline3);
+
+  clutter_score_start (score);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;클러터 액터와 달리 타임라인 객체는 부동 참조(floating reference)가 없기 때문에 사용이 끝난 다음에는 &lt;code&gt;g_object_unref()&lt;/code&gt;로 리소스를 해제해야 합니다. 사용이 끝나는 시점이 모호할 경우 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterTimeline.html#ClutterTimeline-completed&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;completed&lt;/code&gt;&lt;/a&gt;
+ 시그널에 핸들러를 등록해서 처리해도 됩니다.&lt;/p&gt;
+&lt;p&gt;다음 예제는 하나가 끝난 뒤 다른 하나가 시작하는 두 개의 타임라인을 포함하는 하나의 스코어 객체를 보여줍니다. 이 스코어 객체는 무한히 반복하고, 첫번째 타임라인은 사각형을 회전시키며 두번째 타임라인은 사각형을 수평을 이동시킵니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;clutter/clutter.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+ClutterActor *rect = NULL;
+
+gint rotation_angle = 0;
+gint color_change_count = 0;
+
+/* 사각형을 회전시키고 색상을 변경 */
+void
+on_timeline_rotation_new_frame (ClutterTimeline *timeline,
+                                gint             frame_num,
+                                gpointer         data)
+{
+  rotation_angle += 1;
+  if(rotation_angle &amp;gt;= 360)
+    rotation_angle = 0;
+
+  /* X축을 기준으로 시계방향으로 회전시킵니다. */
+  clutter_actor_set_rotation (rect, CLUTTER_X_AXIS,
+    rotation_angle, 0, 0, 0);
+
+  /* 색삭을 변경합니다.
+   * (This is a silly example, making the rectangle flash):
+   */
+  ++color_change_count;
+  if(color_change_count &amp;gt; 100)
+    color_change_count = 0;
+
+  if(color_change_count == 0)
+  {
+    ClutterColor rect_color = { 0xff, 0xff, 0xff, 0x99 };
+    clutter_rectangle_set_color (CLUTTER_RECTANGLE (rect), &amp;amp;rect_color);
+  }
+  else if (color_change_count == 50)
+  {
+    ClutterColor rect_color = { 0x10, 0x40, 0x90, 0xff };
+    clutter_rectangle_set_color (CLUTTER_RECTANGLE (rect), &amp;amp;rect_color);
+  }
+}
+
+/* 사각형 움직이기 */
+void
+on_timeline_move_new_frame (ClutterTimeline *timeline,
+                            gint             frame_num,
+                            gpointer         data)
+{
+  gint x_position = clutter_actor_get_x (rect);
+
+  x_position += 1;
+  if (x_position &amp;gt;= 150)
+    x_position = 0;
+
+  clutter_actor_set_x (rect, x_position);
+}
+
+int main(int argc, char *argv[])
+{
+  ClutterColor stage_color = { 0x00, 0x00, 0x00, 0xff };
+  ClutterColor rect_color = { 0xff, 0xff, 0xff, 0x99 };
+
+  clutter_init (&amp;amp;argc, &amp;amp;argv);
+
+  /* 스테이지를 얻어 크기와 색상을 정합니다. */
+  ClutterActor *stage = clutter_stage_get_default ();
+  clutter_actor_set_size (stage, 200, 200);
+  clutter_stage_set_color (CLUTTER_STAGE (stage), &amp;amp;stage_color);
+
+  /* 스테이지에 사각형을 추가합니다. */
+  rect = clutter_rectangle_new_with_color (&amp;amp;rect_color);
+  clutter_actor_set_size (rect, 70, 70);
+  clutter_actor_set_position (rect, 50, 100);
+  clutter_container_add_actor (CLUTTER_CONTAINER (stage), rect);
+  clutter_actor_show (rect);
+
+  /* 스테이지를 보이게 합니다. */
+  clutter_actor_show (stage);
+
+  /* 스코어 객체를 하나 만들어 타임라인 객체 두개를 추가합니다.
+   * 두번째 타임라인은 첫번째가 멈춘 뒤에 시작합니다. */
+  ClutterScore *score = clutter_score_new ();
+  clutter_score_set_loop (score, TRUE);
+
+  ClutterTimeline *timeline_rotation =
+    clutter_timeline_new (200 /* 총프레임수 */, 120 /* 초당프레임수(fps) */);
+  g_signal_connect (timeline_rotation, &amp;quot;new-frame&amp;quot;,
+                    G_CALLBACK (on_timeline_rotation_new_frame), NULL);
+  clutter_score_append (score, NULL, timeline_rotation);
+
+  ClutterTimeline *timeline_move =
+    clutter_timeline_new (200 /* 총프레임수 */, 120 /* 초당프레임수(fps) */);
+  g_signal_connect (timeline_move, &amp;quot;new-frame&amp;quot;,
+                    G_CALLBACK (on_timeline_move_new_frame), NULL);
+  clutter_score_append (score,  timeline_rotation, timeline_move);
+
+  clutter_score_start (score);
+
+  /* 메인 이벤트 루프를 시작합니다. */
+  clutter_main ();
+
+  g_object_unref (timeline_rotation);
+  g_object_unref (timeline_move);
+  g_object_unref (score);
+
+  return EXIT_SUCCESS;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 클러터를 이용한 기본적인 애니메이션 원리를 알게 되었군요.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터(Clutter) 사용하기 (1)</title>
+      <link>/2009/01/14/2009-01-14-using-clutter-1/</link>
+      <pubDate>Wed, 14 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/14/2009-01-14-using-clutter-1/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터(Clutter)&lt;/a&gt;
+는 C 언어로 구현한 2D 그래픽 사용자 인터페이스 라이브러리입니다. 2D임에도 불구하고 OpenGL 또는 OpenGL ES를 렌더링에 사용하며, GLib의 GObject 기반으로 API가 구성되어 있습니다. 뭐, 소개하자면 끝이 없고, 더 궁금한 분은 공식 홈페이지를 참고하기 바랍니다. 이 글은 
+&lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 튜토리얼&lt;/a&gt;
+을 중심으로 실제 사용하는 방법을 몇 차례에 나누어 정리하려 합니다. (현재 1.0 버전이 활발하게 개발 중이지만, 일단 0.8 버전을 기준으로 작성합니다)&lt;/p&gt;
+&lt;p&gt;**소개 / 설치 / 컴파일
+**&lt;/p&gt;
+&lt;p&gt;제일 먼저, 클러터 세상에서 존재하는 몇가지 개념부터 설명해야겠군요. 첫번째로 설명할 녀석은 액터(actors)입니다. 말 그대로 배우 역할을 하는 다양한 객체입니다. 그 다음에는 스테이지(stage), 즉 무대입니다. 배우가 온갖 연기를 펼치는 공간(canvas)입니다. 클러터는 카이로(cairo) 라이브러리처럼 공간이 보여질때마다 매번 그려야 하는 방식이 아니라 모든 액터의 상태가 유지되는 방식으로, 프로그래머는 액터를 움직이거나 회전시키기만 하면 그려주는 건 클러터 라이브러리가 알아서 합니다. (부분적으로 Z축 이동도 가능합니다)&lt;/p&gt;
+&lt;p&gt;3D 엔진을 사용함에도 클러터 라이브러리가 2D 라이브러리라고 표방하는 이유는 사용자 인터페이스에는 아직까지 3D 효과가 가미된 2D 인터페이스가 더 실용적이기 때문입니다. 미려한 2D 인터페이스를 쉽게 구현하도록 애니메이션과 타임라인 등과 같은 기능도 제공합니다. 그리고 임베디드 시스템에서 사용 가능하도록 OpenGL ES를 사용하기 때문에 데스크탑 뿐 아니라 다양한 플랫폼에 적용할 수 있습니다. (물론 아직까지는 리눅스 기반일 뿐입니다)&lt;/p&gt;
+&lt;p&gt;클러터를 설치하는 가장 쉬운 방법은 우분투 최신 배포판을 설치하고 libclutter* 패키지를 모두 설치하는 것입니다. 아니라면 각 배포판의 패키지를 찾아보거나 홈페이지에서 언급한 방법대로 설치하시기 바랍니다. (보통 대부분의 라이브러리 설명 문서나 책은 설치에만 몇십 페이지를 할애하지만, 지금 이 글은 목적이 다르기 때문에&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;컴파일에 필요한 옵션은 &amp;lsquo;&lt;code&gt;pkg-config clutter-0.8 --cflags&lt;/code&gt;&amp;rsquo;, 링크에 필요한 옵션은 &amp;lsquo;&lt;code&gt;pkg-config clutter-0.8 --libs&lt;/code&gt;&amp;rsquo; 명령으로 얻을 수 있습니다. 따라서 이 내용을 적당히 Makefile이나 관련 빌드 스크립트에 추가하면 됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;스테이지 (Stage) - 무대&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;클러터 어플리케이션은 최소한 하나의 ClutterStage 객체가 있어야 합니다. 이 스테이지는 사각형, 이미지, 텍스트와 같은 액터(actors)를 가집니다. 아이러니하게도(?) ClutterStage 객체는 ClutterActor 객체에서 파생되었습니다. 따라서 모든 GTK+ 위젯이 GtkWidget 객체를 상속받기 때문에 &lt;code&gt;gtk_widget_*()&lt;/code&gt; API를 사용할 수 있듯이, ClutterStage 객체에도 모든 &lt;code&gt;clutter_actor_*()&lt;/code&gt; API를 사용할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;클러터를 초기화하기 위해서 항상 제일 먼저 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/clutter-General.html#clutter-init&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_init()&lt;/code&gt;&lt;/a&gt;
+을 호출합니다. 그러면 
+&lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterStage.html#clutter-stage-get-default&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_stage_get_default()&lt;/code&gt;&lt;/a&gt;
+를 이용하여 기본 스테이지를 얻을 수 있으며, 하나의 윈도우와 연결되어 있습니다. 물론 GtkClutterEmbed 위젯을 이용하면 GTK+ 어플리케이션에서 하나의 위젯처럼 마음껏 스테이지를 사용할 수 있습니다. (하지만 실제로 마음껏은 아니고, 백엔드 엔진이 다중 스테이지를 지원하지는 여부를 &lt;code&gt;clutter_feature_available()&lt;/code&gt;를 이용해 확인해야 합니다)&lt;/p&gt;
+&lt;p&gt;너무 설명이 길었군요. 마우스 버튼에 반응하는 클러터 스테이지를 한번 만들어 봅시다. (여담이지만, 튜토리얼 코드는 무조건 직접 입력해보시기 바랍니다. 가장 빨리 익숙해지는 방법입니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;clutter/clutter.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+static gboolean
+on_stage_button_press (ClutterStage *stage, ClutterEvent *event, gpointer data)
+{
+  gint x = 0;
+  gint y = 0;
+
+  clutter_event_get_coords (event, &amp;amp;x, &amp;amp;y);
+
+  g_print (&amp;quot;Stage clicked at (%d, %d)n&amp;quot;, x, y);
+
+  return TRUE; /* 다른 핸들러가 이 이벤트를 처리하지 않게 합니다. */
+}
+
+int main(int argc, char *argv[])
+{
+  ClutterColor stage_color = { 0x00, 0x00, 0x00, 0xff }; /* 검정색 */
+
+  clutter_init (&amp;amp;argc, &amp;amp;argv);
+
+  /* 스테이지를 얻어 크기와 색상을 정합니다. */
+  ClutterActor *stage = clutter_stage_get_default ();
+  clutter_actor_set_size (stage, 200, 200);
+  clutter_stage_set_color (CLUTTER_STAGE (stage), &amp;amp;stage_color);
+
+  /* 스테이지를 보이게 합니다. */
+  clutter_actor_show (stage);
+
+  /* 스테이지를 마우스 버튼으로 클릭하면 처리할 시그널 핸들러를 연결합니다. */
+  g_signal_connect (stage, &amp;quot;button-press-event&amp;quot;,
+                    G_CALLBACK (on_stage_button_press), NULL);
+
+  /* 메인 이벤트 루프를 시작합니다. */
+  clutter_main ();
+
+  return EXIT_SUCCESS;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;컴파일하는 방법은 다음과 같습니다. (파일 이름이 &lt;code&gt;stage.c&lt;/code&gt;일 경우)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;gcc -Wall -g stage.c -o stage `pkg-config clutter-0.8 --cflags --libs`
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;뭐 싱겁지만, 이렇게 클러터 프로그래밍이 시작되었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;(참고)&lt;/strong&gt; 몇몇 그래픽 카드에서 Compiz 환경에서 실행시 오동작한다면 Compiz를 사용하지 않도록 설정을 변경해야 합니다. 왜냐하면 클러터도 3D 하드웨어 가속을 사용하고 Compiz도 사용하기 때문에 충돌이 발생할 수 있기 때문입니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;스테이지 위젯 (Stage Widget) - GTK+ 어플리케이션 속으로&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;앞에서 잠깐 언급한 것처럼, GtkClutterEmbed 위젯은 ClutterStage 객체를 GTK+ 윈도우 안에 하나의 위젯처럼 넣을 수 있게 합니다. 
+&lt;a href=&#34;http://www.clutter-project.org/docs/clutter-gtk/stable/GtkClutterEmbed.html#gtk-clutter-embed-new&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;gtk_clutter_embed_new()&lt;/code&gt;&lt;/a&gt;
+로 위젯을 만들어 다른 위젯처럼 컨테이너 안에 넣은 뒤, 
+&lt;a href=&#34;http://www.clutter-project.org/docs/clutter-gtk/stable/GtkClutterEmbed.html#gtk-clutter-embed-get-stage&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;gtk_clutter_embed_get_stage()&lt;/code&gt;&lt;/a&gt;
+로 ClutterStage 객체를 얻을 수 있습니다. 다만 GtkClutterEmbed 위젯을 사용할때는 &lt;code&gt;clutter_init()&lt;/code&gt; 대신 
+&lt;a href=&#34;http://www.clutter-project.org/docs/clutter-gtk/stable/clutter-gtk-Utility-Functions.html#gtk-clutter-init&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;gtk_clutter_init()&lt;/code&gt;&lt;/a&gt;
+를 호출해서 초기화해야 하고, &lt;code&gt;clutter_main()&lt;/code&gt; 대신 &lt;code&gt;gtk_main()&lt;/code&gt; 함수로 메인 루프를 실행합니다.&lt;/p&gt;
+&lt;p&gt;다음 예제는 앞의 예제를 조금 확장해서 GtkClutterEmbed 위젯을 사용하고 버튼을 클릭할때마다 배경 색상을 바꿉니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;gtk/gtk.h&amp;gt;
+#include &amp;lt;clutter/clutter.h&amp;gt;
+#include &amp;lt;clutter-gtk/gtk-clutter-embed.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+ClutterActor *stage = NULL;
+
+static gboolean
+on_button_clicked (GtkButton *button, gpointer user_data)
+{
+  static gboolean already_changed = FALSE;
+
+  if(already_changed)
+    {
+      ClutterColor stage_color = { 0x00, 0x00, 0x00, 0xff }; /* 검정 */
+      clutter_stage_set_color (CLUTTER_STAGE (stage), &amp;amp;stage_color);
+    }
+  else
+    {
+      ClutterColor stage_color = { 0x20, 0x20, 0xA0, 0xff }; /* 파랑? */
+      clutter_stage_set_color (CLUTTER_STAGE (stage), &amp;amp;stage_color);
+    }
+
+  already_changed = !already_changed;
+
+  return TRUE; /* 다른 핸들러가 이 이벤트를 처리하지 않게 합니다. */
+}
+
+static gboolean
+on_stage_button_press (ClutterStage *stage, ClutterEvent *event, gpointer user_data)
+{
+  gint x = 0;
+  gint y = 0;
+
+  clutter_event_get_coords (event, &amp;amp;x, &amp;amp;y);
+
+  g_print (&amp;quot;Stage clicked at (%d, %d)n&amp;quot;, x, y);
+
+  return TRUE; /* 다른 핸들러가 이 이벤트를 처리하지 않게 합니다. */
+}
+
+int main(int argc, char *argv[])
+{
+  ClutterColor stage_color = { 0x00, 0x00, 0x00, 0xff }; /* 검정색 */
+
+  gtk_clutter_init (&amp;amp;argc, &amp;amp;argv);
+
+  /* 윈도우와 자식 위젯을 만듭니다. */
+  GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+
+  GtkWidget *vbox = gtk_vbox_new (FALSE, 6);
+  gtk_container_add (GTK_CONTAINER (window), vbox);
+  gtk_widget_show (vbox);
+
+  GtkWidget *button = gtk_button_new_with_label (&amp;quot;Change Color&amp;quot;);
+  gtk_box_pack_end (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+  gtk_widget_show (button);
+
+  g_signal_connect (button, &amp;quot;clicked&amp;quot;,
+                    G_CALLBACK (on_button_clicked), NULL);
+
+  /* 윈도우가 닫히면 어플리케이션을 종료합니다. */
+  g_signal_connect (window, &amp;quot;hide&amp;quot;,
+                    G_CALLBACK (gtk_main_quit), NULL);
+
+  /* 클러터 위젯을 만들어 넣습니다. */
+  GtkWidget *clutter_widget = gtk_clutter_embed_new ();
+  gtk_box_pack_start (GTK_BOX (vbox), clutter_widget, TRUE, TRUE, 0);
+  gtk_widget_show (clutter_widget);
+
+  /* 클러터 위젯 크기를 변경합니다.
+   * 왜냐하면 GtkClutterEmbed 위젯을 사용할때는 직접 변경할 수 없기 때문입니다.
+   */
+  gtk_widget_set_size_request (clutter_widget, 200, 200);
+
+  /* 스테이지를 얻어 크기와 색상을 정합니다. */
+  stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (clutter_widget));
+  clutter_stage_set_color (CLUTTER_STAGE (stage), &amp;amp;stage_color);
+
+  /* 스테이지를 보이게 합니다. */
+  clutter_actor_show (stage);
+
+  /* 스테이지를 마우스 버튼으로 클릭하면 처리할 시그널 핸들러를 연결합니다. */
+  g_signal_connect (stage, &amp;quot;button-press-event&amp;quot;,
+                    G_CALLBACK (on_stage_button_press), NULL);
+
+  /* GTK+ 윈도우를 보이게 합니다. */
+  gtk_widget_show (GTK_WIDGET (window));
+
+  /* 메인 이벤트 루프를 시작합니다. */
+  gtk_main ();
+
+  return EXIT_SUCCESS;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;컴파일하는 방법은 다음과 같습니다. (파일 이름이 &lt;code&gt;stage-embed.c&lt;/code&gt;일 경우)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;gcc -Wall -g stage-embed.c -o stage-embed 
+    `pkg-config clutter-0.8 clutter-gtk-0.8--cflags --libs`
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;뭐 싱겁지만, 이렇게 클러터 프로그래밍이 시작되었습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GTK&#43; Animation Effects</title>
+      <link>/2007/07/25/2007-07-25-gtk-animation-effects/</link>
+      <pubDate>Wed, 25 Jul 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/07/25/2007-07-25-gtk-animation-effects/</guid>
+      <description>&lt;p&gt;점점 화려해지는 GUI 추세를 이제서야 인식했는지, GTK+ / GNOME 에서도 애니메이션 효과에 대한 논의와 구현이 점점 활발해지고 있는 것 같다. 아직 GTK+ 메인 소스에 반영되려면 시간이 더 걸릴 것 같지만 
+&lt;a href=&#34;http://bugzilla.gnome.org/show_bug.cgi?id=444659&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GtkTimeline&lt;/a&gt;
+ 이라는 기본적인 시간 관리 객체가 이미 논의 중이고, 이를 기반으로 여러 개발자들이 여기저기에 적용해보기도 하고 있다. (
+&lt;a href=&#34;http://blogs.gnome.org/carlosg/2007/06/06/animateinanimate/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GtkPathBar 스크롤 효과&lt;/a&gt;
+, 
+&lt;a href=&#34;http://micke.hallendal.net/archives/2007/07/bling_in_gtk.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;iPhone 방식 슬라이드 효과&lt;/a&gt;
+, 
+&lt;a href=&#34;http://codeposts.blogspot.com/2007/07/iphone-like-virtual-keyboard.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;iPhone 방식 가상키보드&lt;/a&gt;
+)&lt;/p&gt;
+&lt;p&gt;GtkTimeline API가 참고한 소스 중 하나라고 하는 
+&lt;a href=&#34;http://clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter&lt;/a&gt;
+ 라이브러리는 OpenGL을 렌더링 엔진으로 사용하는데, GObject 기반으로 GTK+와 친근한 방식의 API를 제공하여 이미 여러 프로젝트에서 사용하고 있는 것 같다. 
+&lt;a href=&#34;http://butterfeet.org/?p=38&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter를 이용한 간단한 프리젠테이션 도구&lt;/a&gt;
+, 
+&lt;a href=&#34;http://butterfeet.org/?p=39&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;휴대폰 인터페이스&lt;/a&gt;
+ 등과 같은 예제도 점점 늘어나고 있다. 하지만 OpenGL 기반이라 임베디드 시스템이나 그래픽칩셋이 3D 가속을 지원하지 않는 환경에서는 활용하기 어렵다는 점이 아쉽다. 아직
+&lt;a href=&#34;http://blogs.gnome.org/timj/2007/07/17/17072007-opengl-for-gdkgtk/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;OpenGL API로 모든 2D 그래픽을 대체하는 건 시기상조일 수도 있다는 얘기&lt;/a&gt;
+도 심심챦게 나오고 있고&amp;hellip;&lt;/p&gt;
+&lt;p&gt;참고로 더 나열해보자면, QT 계열에서는 이미 
+&lt;a href=&#34;http://zrusin.blogspot.com/2007/07/scripter.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;코딩하면서 바로 캔버스 API를 테스트할 수 있는 스크립트 엔진&lt;/a&gt;
+도 지원한다. 
+&lt;a href=&#34;http://www.enlightenment.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;E17&lt;/a&gt;
+의 
+&lt;a href=&#34;http://www.enlightenment.org/p.php?p=about/libs&amp;amp;l=en&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;EFL 라이브러리&lt;/a&gt;
+는 이미 오래전부터 Evas, Edje 등으로 조금 앞선 플랫폼을 제공하더니 이제는 
+&lt;a href=&#34;http://www.fluffyspider.com/demos/live_videos/live_videos.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;EFL 기반 솔루션을 제공하는 업체&lt;/a&gt;
+도 생겨났다. 최근의 
+&lt;a href=&#34;http://www.mizi.com/content/view/4/5/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;미지리서치 Prizm 플랫폼&lt;/a&gt;
+도 휴대폰에서 화려한 UI 효과를 쉽게 구현하도록 도와주고 있다.(glib 기반이라 반가웠다)&lt;/p&gt;
+&lt;p&gt;물론 좋은 오픈소스 라이브러리와 플랫폼이 참 많지만, 이미 오랜 시간을 GTK+와 함께 해왔더니 쉽게 다른 플랫폼으로 바꾸기가 어려운 것 같다. 하지만, 언제나 그렇듯이 잘 설계되고 잘 구현된 오픈 소스 프로젝트를 들여다보는 일은 즐겁다. 가능하면 참여중인 프로젝트에 적용해보고도 싶고, 더 나아가 프로젝트에 직접 참여해보기도 싶지만, 언제나 그렇듯이&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

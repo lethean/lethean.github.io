@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Git | 대체로 무해함</title>
+    <link>/tags/git/</link>
+      <atom:link href="/tags/git/index.xml" rel="self" type="application/rss+xml" />
+    <description>Git</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Wed, 09 Mar 2016 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Git</title>
+      <link>/tags/git/</link>
+    </image>
+    
+    <item>
+      <title>git bisect 이용한 리눅스 PCI 드라이버 디버깅</title>
+      <link>/2016/03/09/2016-03-09-git-bisect-linux-pci-driver-debugging/</link>
+      <pubDate>Wed, 09 Mar 2016 00:00:00 +0000</pubDate>
+      <guid>/2016/03/09/2016-03-09-git-bisect-linux-pci-driver-debugging/</guid>
+      <description>&lt;p&gt;리눅스 커널 4.3 버전으로 업그레이드하면서부터 
+&lt;a href=&#34;http://www.highpoint-tech.com/USA_new/series_rr272x_configuration.htm&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;RocketRAID&lt;/a&gt;
+ RAID 장치가 동작하지 않았다. 컴파일 오류도 없고 로딩에도 문제가 없는데, 응답이 너무 느려서 거의 동작하지 않는 거나 마찬가지다. 구글링을 해도 해결 방법을 찾을 수 없었는데, 아마도 업체에서 제공하는 커널 드라이버라서 사용자가 적어서일 수도 있다. 이렇게 심각한 문제라면 4.3.x 안정 버전이나 4.4 버전에서 해결될 것이라 생각하고 기다렸다. 하지만 4.4 버전이 출시되어도 증상은 동일했다. 결국 직접 원인을 찾기로 했다. 분명한 건 리눅스 커널 4.2 버전까지 정상적으로 동작했는데 4.3 버전부터 동작하지 않는다는 사실이다.&lt;/p&gt;
+&lt;p&gt;정상적으로 동작하는 리눅스 커널 4.2.5 버전에서는 &lt;code&gt;rr272x_1x&lt;/code&gt; 모듈이 인터럽트 16을 할당받아 동작하는데,&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ cat /proc/interrupts
+...
+ 16:      13629       3699       2326       1683  IR-IO-APIC  16-fasteoi   ehci_hcd:usb1, rr272x_1x
+...
+
+$ dmesg | grep rr272x
+...
+[    1.619829] rr272x_1x:adapter at PCI 1:0:0, IRQ 16
+...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;오동작하는 리눅스 커널 4.4.1 버전에서는 인터럽트 11을 할당받지만 실제 인터럽트xi는 발생하지 않고,&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ cat /proc/interrupts
+...
+ 11:          0          0          0          0  IR-IO-APIC  11-edge      rr272x_1x
+ 16:     199999          0          1          1  IR-IO-APIC  16-fasteoi   ehci_hcd:usb1
+...
+
+$ dmesg | grep rr272x
+...
+[    1.639672] rr272x_1x:adapter at PCI 1:0:0, IRQ 11
+...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;인터럽트 16을 아무도 처리하지 않아서 커널이 경고 메시지를 출력한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[    5.750969] irq 16: nobody cared (try booting with the &amp;quot;irqpoll&amp;quot; option)
+[    5.750973] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G     U     O    4.4.1-1-ARCH #1
+[    5.750974] Hardware name: Supermicro C7Z97-OCE/C7Z97-OCE, BIOS 2.0 06/22/2015
+[    5.750975]  0000000000000000 bf85cf29362dfeed ffff880856c03e68 ffffffff812c7f39
+[    5.750977]  ffff88082e06ae00 ffff880856c03e90 ffffffff810d1053 ffff88082e06ae00
+[    5.750978]  0000000000000000 0000000000000010 ffff880856c03ec8 ffffffff810d13de
+[    5.750980] Call Trace:
+[    5.750981]  &amp;lt;IRQ&amp;gt;  [&amp;lt;ffffffff812c7f39&amp;gt;] dump_stack+0x4b/0x72
+[    5.750988]  [&amp;lt;ffffffff810d1053&amp;gt;] __report_bad_irq+0x33/0xc0
+[    5.750990]  [&amp;lt;ffffffff810d13de&amp;gt;] note_interrupt+0x23e/0x280
+[    5.750992]  [&amp;lt;ffffffff810ce6d7&amp;gt;] handle_irq_event_percpu+0xa7/0x1b0
+[    5.750994]  [&amp;lt;ffffffff810ce819&amp;gt;] handle_irq_event+0x39/0x60
+[    5.750995]  [&amp;lt;ffffffff810d1be9&amp;gt;] handle_fasteoi_irq+0x89/0x150
+[    5.750997]  [&amp;lt;ffffffff81018c7a&amp;gt;] handle_irq+0x1a/0x30
+[    5.751000]  [&amp;lt;ffffffff815944db&amp;gt;] do_IRQ+0x4b/0xd0
+[    5.751002]  [&amp;lt;ffffffff815925c2&amp;gt;] common_interrupt+0x82/0x82
+[    5.751002]  &amp;lt;EOI&amp;gt;  [&amp;lt;ffffffff81447c14&amp;gt;] ? cpuidle_enter_state+0x124/0x290
+[    5.751006]  [&amp;lt;ffffffff81447db7&amp;gt;] cpuidle_enter+0x17/0x20
+[    5.751008]  [&amp;lt;ffffffff810b79b2&amp;gt;] call_cpuidle+0x32/0x60
+[    5.751010]  [&amp;lt;ffffffff81447d93&amp;gt;] ? cpuidle_select+0x13/0x20
+[    5.751012]  [&amp;lt;ffffffff810b7c72&amp;gt;] cpu_startup_entry+0x292/0x370
+[    5.751014]  [&amp;lt;ffffffff815858c9&amp;gt;] rest_init+0x89/0x90
+[    5.751015]  [&amp;lt;ffffffff81906013&amp;gt;] start_kernel+0x483/0x4a4
+[    5.751017]  [&amp;lt;ffffffff81905120&amp;gt;] ? early_idt_handler_array+0x120/0x120
+[    5.751019]  [&amp;lt;ffffffff81905339&amp;gt;] x86_64_start_reservations+0x2a/0x2c
+[    5.751020]  [&amp;lt;ffffffff81905485&amp;gt;] x86_64_start_kernel+0x14a/0x16d
+[    5.751021] handlers:
+[    5.751025] [&amp;lt;ffffffffa0093410&amp;gt;] usb_hcd_irq [usbcore]
+[    5.751026] Disabling IRQ #16
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;인터럽트 번호가 잘못 할당된 것 같은데 원인을 찾아야 했다. 결국 무식하지만 가장 확실한 방법을 사용하기로 결심하고, &lt;code&gt;git bisect&lt;/code&gt; 명령을 이용해 리눅스 커널 4.2 버전과 4.3 버전 사이에서 문제를 일으키는 커밋을 찾아야 했다. 물론 매번 커널을 다시 컴파일하고 테스트하는 작업은 오래 걸리지만 다행히 성능 좋은 개발 서버에서 돌려서 시간을 많이 단축할 수 있었고 약 하루 정도 만에 문제의 커밋을 찾았다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;
+$ git bisect start 6a13feb9c82803e2b815eca72fa7a9f5561d7861 64291f7db5bd8150a74ad2036f1037e6a0428df2
+$ git bisect log
+# bad: [6a13feb9c82803e2b815eca72fa7a9f5561d7861] Linux 4.3
+# good: [64291f7db5bd8150a74ad2036f1037e6a0428df2] Linux 4.2
+git bisect start &#39;6a13feb9c82803e2b815eca72fa7a9f5561d7861&#39; &#39;64291f7db5bd8150a74ad2036f1037e6a0428df2&#39;
+# bad: [807249d3ada1ff28a47c4054ca4edd479421b671] Merge branch &#39;upstream&#39; of git://git.linux-mips.org/pub/scm/ralf/upstream-linus
+git bisect bad 807249d3ada1ff28a47c4054ca4edd479421b671
+# bad: [102178108e2246cb4b329d3fb7872cd3d7120205] Merge tag &#39;armsoc-drivers&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/arm/arm-soc
+git bisect bad 102178108e2246cb4b329d3fb7872cd3d7120205
+# good: [c8192ba416397ad6ce493f186da40767ce086c3b] Merge tag &#39;for-v4.3&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/sre/linux-power-supply
+git bisect good c8192ba416397ad6ce493f186da40767ce086c3b
+# bad: [7073bc66126e3ab742cce9416ad6b4be8b03c4f7] Merge branch &#39;core-rcu-for-linus&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+git bisect bad 7073bc66126e3ab742cce9416ad6b4be8b03c4f7
+# bad: [26f8b7edc9eab56638274f5db90848a6df602081] Merge tag &#39;pci-v4.3-changes&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/helgaas/pci
+git bisect bad 26f8b7edc9eab56638274f5db90848a6df602081
+# good: [cf9d615f7f5842ca1ef0f28ed9f67a97d20cf6fc] Merge tag &#39;regulator-v4.3&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator
+git bisect good cf9d615f7f5842ca1ef0f28ed9f67a97d20cf6fc
+# good: [edc837da4b54a01ba6fa3c29b411e35d1a8430ca] Merge tag &#39;leds_for_4.3&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/j.anaszewski/linux-leds
+git bisect good edc837da4b54a01ba6fa3c29b411e35d1a8430ca
+# bad: [5a4f3cf0d1f02884c0a64488d22b3bb4bce31b44] Merge branches &#39;pci/irq&#39;, &#39;pci/misc&#39;, &#39;pci/resource&#39; and &#39;pci/virtualization&#39; into next
+git bisect bad 5a4f3cf0d1f02884c0a64488d22b3bb4bce31b44
+# good: [932c435caba8a2ce473a91753bad0173269ef334] PCI: Add dev_flags bit to access VPD through function 0
+git bisect good 932c435caba8a2ce473a91753bad0173269ef334
+# good: [cd66d5c3df7c96cbf75010b964b94032ceca8889] Merge branches &#39;pci/host-designware&#39;, &#39;pci/host-xgene&#39; and &#39;pci/host-xilinx&#39; into next
+git bisect good cd66d5c3df7c96cbf75010b964b94032ceca8889
+# bad: [5f2269916b0e509f2926346b58209abfa8316143] PCI/MSI: Free legacy IRQ when enabling MSI/MSI-X
+git bisect bad 5f2269916b0e509f2926346b58209abfa8316143
+# bad: [991de2e59090e55c65a7f59a049142e3c480f7bd] PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()
+git bisect bad 991de2e59090e55c65a7f59a049142e3c480f7bd
+# good: [890e4847587fcff5eb0438e90992ad7d2a261f33] PCI: Add pcibios_alloc_irq() and pcibios_free_irq()
+git bisect good 890e4847587fcff5eb0438e90992ad7d2a261f33
+# first bad commit: [991de2e59090e55c65a7f59a049142e3c480f7bd] PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;바로 이 커밋이 원인이었다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;commit 991de2e59090e55c65a7f59a049142e3c480f7bd
+Author: Jiang Liu &amp;lt;jiang.liu@linux.intel.com&amp;gt;
+Date:   Wed Jun 10 16:54:59 2015 +0800
+
+    PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()
+
+    To support IOAPIC hotplug, we need to allocate PCI IRQ resources on demand
+    and free them when not used anymore.
+
+    Implement pcibios_alloc_irq() and pcibios_free_irq() to dynamically
+    allocate and free PCI IRQs.
+
+    Remove mp_should_keep_irq(), which is no longer used.
+
+    [bhelgaas: changelog]
+    Signed-off-by: Jiang Liu &amp;lt;jiang.liu@linux.intel.com&amp;gt;
+    Signed-off-by: Bjorn Helgaas &amp;lt;bhelgaas@google.com&amp;gt;
+    Acked-by: Thomas Gleixner &amp;lt;tglx@linutronix.de&amp;gt;
+
+:040000 040000 765e2d5232d53247ec260b34b51589c3bccb36ae f680234a27685e94b1a35ae2a7218f8eafa9071a M	arch
+:040000 040000 d55a682bcde72682e883365e88ad1df6186fd54d f82c470a04a6845fcf5e0aa934512c75628f798d M	drivers
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 커밋에 대한 자세한 정보를 얻기 위해 인터넷을 검색하니, 약간 허무하지만, 동일한 문제가 이미 보고되어 있었다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.spinics.net/lists/linux-pci/msg48507.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PCI device driver broken between 4.2 and 4.3&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;https://bugzilla.kernel.org/show_bug.cgi?id=111211&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;TA1-PCI card worked in v4.2, fails in v4.3&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;해당 
+&lt;a href=&#34;https://bugzilla.kernel.org/show_bug.cgi?id=111211&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;버그질라&lt;/a&gt;
+에 간단한 댓글을 달면서 공식 해결 방법을 기다렸지만, 공식 커널에 적용되려면 너무 시간이 오래 걸릴 것 같아서 직접 드라이버 
+&lt;a href=&#34;https://gist.github.com/lethean/e2e53ca15b1c97cee45a&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;패치&lt;/a&gt;
+를 만들어 적용했더니 문제없이 동작했다. 일종의 편법이긴 하지만, &lt;code&gt;pci_register_driver()&lt;/code&gt; 함수를 미리 호출한 다음에 &lt;code&gt;pci_get_device()&lt;/code&gt; 함수를 이용하는 원래 초기화 함수를 호출하도록 변경했다.&lt;/p&gt;
+&lt;p&gt;그런데 조금 성급했는지, 아니면 심각한 버그라고 판단했는지 리눅스 4.5 RC 버전에 바로 
+&lt;a href=&#34;https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=6c777e8799a93e3bdb67bec622429e1b48dc90fb&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;반영&lt;/a&gt;
+되었다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;commit 6c777e8799a93e3bdb67bec622429e1b48dc90fb
+Author: Bjorn Helgaas &amp;lt;bhelgaas@google.com&amp;gt;
+Date:   Wed Feb 17 12:26:42 2016 -0600
+
+    Revert &amp;quot;PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()&amp;quot;
+
+    991de2e59090 (&amp;quot;PCI, x86: Implement pcibios_alloc_irq() and
+    pcibios_free_irq()&amp;quot;) appeared in v4.3 and helps support IOAPIC hotplug.
+
+    Олег reported that the Elcus-1553 TA1-PCI driver worked in v4.2 but not
+    v4.3 and bisected it to 991de2e59090.  Sunjin reported that the RocketRAID
+    272x driver worked in v4.2 but not v4.3.  In both cases booting with
+    &amp;quot;pci=routirq&amp;quot; is a workaround.
+
+    I think the problem is that after 991de2e59090, we no longer call
+    pcibios_enable_irq() for upstream bridges.  Prior to 991de2e59090, when a
+    driver called pci_enable_device(), we recursively called
+    pcibios_enable_irq() for upstream bridges via pci_enable_bridge().
+
+    After 991de2e59090, we call pcibios_enable_irq() from pci_device_probe()
+    instead of the pci_enable_device() path, which does *not* call
+    pcibios_enable_irq() for upstream bridges.
+
+    Revert 991de2e59090 to fix these driver regressions.
+
+    Link: https://bugzilla.kernel.org/show_bug.cgi?id=111211
+    Fixes: 991de2e59090 (&amp;quot;PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()&amp;quot;)
+    Reported-and-tested-by: Олег Мороз &amp;lt;oleg.moroz@mcc.vniiem.ru&amp;gt;
+    Reported-by: Sunjin Yang &amp;lt;fan4326@gmail.com&amp;gt;
+    Signed-off-by: Bjorn Helgaas &amp;lt;bhelgaas@google.com&amp;gt;
+    Acked-by: Rafael J. Wysocki &amp;lt;rafael@kernel.org&amp;gt;
+    CC: Jiang Liu &amp;lt;jiang.liu@linux.intel.com&amp;gt;
+
+ arch/x86/include/asm/pci_x86.h |  2 ++
+ arch/x86/pci/common.c          | 20 +++++++++++---------
+ arch/x86/pci/intel_mid_pci.c   |  7 ++-----
+ arch/x86/pci/irq.c             | 15 ++++++++++++++-
+ drivers/acpi/pci_irq.c         |  9 ++++++++-
+ 5 files changed, 37 insertions(+), 16 deletions(-)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참 좋은 세상이다 ;)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>less 명령어가 끝나도 내용을 지우지 않게 하기</title>
+      <link>/2016/03/07/2016-03-07-exit-less-without-clearing-the-screen/</link>
+      <pubDate>Mon, 07 Mar 2016 00:00:00 +0000</pubDate>
+      <guid>/2016/03/07/2016-03-07-exit-less-without-clearing-the-screen/</guid>
+      <description>&lt;p&gt;&lt;code&gt;git diff&lt;/code&gt;, &lt;code&gt;git log&lt;/code&gt; 같은 명령어는 내부적으로 다시 &lt;code&gt;less&lt;/code&gt; 프로그램을
+사용합니다. 그런데 언젠가부터 갑자기 명령어가 끝나면 내용이 지워지면서 원래
+화면이 표시되어 여간 불편했는데, 그 이유를 조사해 보니 Zsh 셸을 사용하면서
+설치한 
+&lt;a href=&#34;https://github.com/robbyrussell/oh-my-zsh&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Oh My Zsh&lt;/a&gt;
+ 때문이었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;~/.oh-my-zsh/lib/misc.zsh&lt;/code&gt; 파일에 다음과 같이 되어 있는데,&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;export PAGER=&amp;quot;less&amp;quot;
+export LESS=&amp;quot;-R&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아래와 같이 수정하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;export PAGER=&amp;quot;less&amp;quot;
+export LESS=&amp;quot;-R -F -X&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;구글링으로 참조한 링크는 아래와 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://superuser.com/questions/106637/less-command-clearing-screen-upon-exit-how-to-switch-it-off&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;lsquo;less&amp;rsquo; command clearing screen upon exit - how to switch it off?&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://unix.stackexchange.com/questions/38634/is-there-any-way-to-exit-less-without-clearing-the-screen&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Is there any way to exit “less” without clearing the screen?&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;:)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Gource 소스 저장소 시각화 프로그램</title>
+      <link>/2010/04/23/2010-04-23-gource-source-visualization/</link>
+      <pubDate>Fri, 23 Apr 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/04/23/2010-04-23-gource-source-visualization/</guid>
+      <description>&lt;p&gt;LWN.net 기사 중에서 
+&lt;a href=&#34;http://lwn.net/Articles/382468/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;소스 코드 작업 시각화 관련 기사&lt;/a&gt;
+를 보고 재미있을 것 같아 
+&lt;a href=&#34;http://code.google.com/p/gource/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Gource&lt;/a&gt;
+ 프로그램을 이용해 회사에서 진행중인 프로젝트에 적용해 보았습니다.&lt;/p&gt;
+&lt;iframe width=&#34;480&#34; height=&#34;360&#34; src=&#34;http://www.youtube.com/embed/RUwDxM28EBA&#34;&gt;&lt;/iframe&gt;
+&lt;p&gt;만드는 방법은 우선 필요한 패키지를 설치하고(Ubuntu 기준)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo apt-get install gource ffmpeg
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Git 저장소가 있는 디렉토리로 이동해서 다음과 같이 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ gource 
+    -s 0.01 
+    --auto-skip-seconds 0.1 
+    --file-idle-time 500 
+    --disable-progress 
+    --output-framerate 25 
+    --highlight-all-users 
+    -800x600 
+    --stop-at-end 
+    --output-ppm-stream - | 
+  ffmpeg 
+    -y 
+    -b 1000K 
+    -r 17 
+    -f image2pipe 
+    -vcodec ppm 
+    -i - 
+    -vcodec mpeg4 
+    gource-edc-20100423.avi
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;프로젝트에 참여했던 사람들 이름이 나타났다 사라지는 걸 보면 기분이 약간 묘해지는 것 같습니다 ;)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Subversion 프로젝트 Git 기반으로 이전</title>
+      <link>/2009/10/01/2009-10-01-migration-projects-from-subversion-to-git/</link>
+      <pubDate>Thu, 01 Oct 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/10/01/2009-10-01-migration-projects-from-subversion-to-git/</guid>
+      <description>&lt;p&gt;회사에서 개발하는 모든 프로젝트 소스는 (이제는 당연하겠지만) 버전 관리 시스템을 이용해 관리합니다. 2001년부터 CVS를 사용하다가 2004년에 Subversion으로 이전하여 지금까지 사용했습니다. 그리고 이번달에 사전 조사와 학습, 개발자 세미나 등을 거쳐 Git으로 이전하게 되었는데, 그 과정에서 몇 가지 기록해 둘 만한 내용을 정리했습니다.&lt;/p&gt;
+&lt;p&gt;Git 자체를 학습하고 이해하는데는 
+&lt;a href=&#34;http://progit.org/book/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Pro Git&lt;/a&gt;
+ 책이 가장 유용했습니다. 서버 구축과 계정 관리 뿐 아니라 수많은 Git 관련 온라인 문서를 보면서 애매하고 답답했던 내용을 가장 쉽게 설명한 책인 것 같습니다. 국내에는 아직 수입이 안된 것 같지만, 온라인으로 공개되어 있어 읽는데 문제는 없습니다.&lt;/p&gt;
+&lt;p&gt;기존  Subversion 저장소를 Git으로 변환하기 위해 
+&lt;a href=&#34;http://github.com/schwern/svn2git&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;svn2git&lt;/a&gt;
+ 프로그램을 조금 수정해서 사용했습니다. svn2git 프로그램은 여러 스크립트 버전이 있는데 링크한 펄 버전이 가장 튼튼했습니다. 수정한 부분은 변환 작업 마지막의 trunk 브랜치를 master 로 자동으로 변경해 주는 부분인데, 몇몇 저장소에서 오동작을 일으켜 실행하지 않도록 주석 처리한 것 뿐입니다. 한가지 유의할 점은, 서브버전에서 마지막 커밋이 이루어진 브랜치가 Git에서 master 브랜치가 되므로,  trunk에서 마지막 커밋임을 확인해야 합니다. 변환 작업은 저장소가 운영되고 있는 서버에서 직접 &amp;lsquo;file:///&amp;rsquo; URL 접근을 이용해 처리했는데, 왜냐하면 가끔 네트웍 오류나 웹서버 오류가 발생할 경우 처음부터 다시 실행해야 하는 문제가 있기 때문입니다.&lt;/p&gt;
+&lt;p&gt;윈도우(Windows)에서는  
+&lt;a href=&#34;http://code.google.com/p/msysgit/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;msysgit&lt;/a&gt;
+ + 
+&lt;a href=&#34;http://code.google.com/p/tortoisegit/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;TortoiseGit&lt;/a&gt;
+ 프로그램을 사용하고, 맥(Mac)은 기본으로 제공하는 설치 프로그램을 이용했습니다. 
+&lt;a href=&#34;http://code.google.com/p/gitextensions/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Git Extensions&lt;/a&gt;
+은 비주얼 스튜디오 확장 기능도 있지만, 안정성이나 유용성이 조금 부족하다는 느낌을 받았습니다.&lt;/p&gt;
+&lt;p&gt;&amp;lsquo;git push&#39;시에 자동으로 메일링 리스트나 특정 메일 주소로 메일을 전송하는 기능은 Git 소스에 들어있는 기본 훅(hook) 스크립트 대신 
+&lt;a href=&#34;http://git.gnome.org/cgit/gitadmin-bin/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME Git 관리 스크립트&lt;/a&gt;
+에 들어있는 gnome-post-receive-mail 스크립트를 조금 수정해서 사용했습니다. 커밋 로그 메시지에 &amp;lsquo;Bug #1111&amp;rsquo; 같은 문자열이 있으면 자동으로 버그질라 데이터베이스에 추가하는 기능은 아직 이전하지 못했습니다. 구글링을 해보면 몇몇 비슷한 스크립트를 찾을 수 있으나 맘에 드는 게 없다는 점도 이유 중 하나이지만, GNOME 프로젝트처럼 &amp;lsquo;git bz&amp;rsquo; 같은 명령을 이용해 직접 버그질라에 버그를 등록하거나(file), 첨부파일로 커밋 로그 추가, 상태 변화 등을 할 수 있는 방식으로 변화를 꾀하는 것도 좋을 것 같아 고민 중에 있습니다.&lt;/p&gt;
+&lt;p&gt;기본 Subversion 저장소를 Git으로 이전할때 가장 고민이 되었던 부분은 Subversion의 svn:externals 속성을 이용해 복잡하게 연결되어 있는 수많은 프로젝트를 어떻게 관리할 것인가였습니다. 처음에는 Git이 제공하는 Submodules 기능을 이용하려 했으나 생각보다 복잡한 것 같아서 일단 팀원들이 모두 Git에 어느 정도 익숙해진 다음에 적용하기로 하고, 대신 자동으로 하위 모듈까지 내려 받는 스크립트(예:git-pull-all.sh)를 최상위 디렉토리에 두고 사용하기로 했습니다. 대신 여러 프로젝트에서 공유하는 여러 프로젝트를 하나의 프로젝트로 소스를 합친 뒤 모든 프로젝트에서는 단 하나의 공유 프로젝트만 연결하도록 저장소 구조를 대폭 단순화했습니다.&lt;/p&gt;
+&lt;p&gt;아무튼 이전 작업은 마무리했지만, 한동안은 Subversion에서 벗어나 Git에 익숙해지기까지 시행착오를 많이 겪을 것 같고, 작업 방식이나 브랜치 / 안정버전 관리 방식 등도 Git에 더 친숙한 방식으로 변경해가야 할 것 같은 생각이 듭니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GLib과 GTK&#43;도 Subversion에서 Git으로 이동</title>
+      <link>/2009/04/01/2009-04-01-glib-gtk-moved-to-git/</link>
+      <pubDate>Wed, 01 Apr 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/04/01/2009-04-01-glib-gtk-moved-to-git/</guid>
+      <description>&lt;p&gt;2009년 4월 1일을 기준으로 GNOME 프로젝트의 핵심이 되는 glib, gtk, pango, atk 프로젝트가 기존 서브버전에서 
+&lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-March/msg00206.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;git으로 소스 버전 관리 시스템을 변경&lt;/a&gt;
+했습니다. 한동안 어떤 버전 관리 시스템을 사용할지 논의가 많았는데, 결국 대세를 거를 수는 없었던 모양입니다. 달라진 사용법은 
+&lt;a href=&#34;http://live.gnome.org/GitMigration&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Git이전하기&lt;/a&gt;
+ 위키 페이지에 계속 정리되고 있으니 참고하시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;참고로, 초기 버전과 달리 최신 버전의 git은 이진(binary) 파일 처리 / 외부(external) 프로젝트 연결 등을 지원합니다. 또한 기존 서브버전 저장소와 동시에 유지할 수 있는 방법(git-svn)도 존재합니다. 하지만 아직 아쉬운 점은 멀티플랫폼 지원, 물론 커맨드 라인 방식으로는 지금도 가능하지만, 하지만 윈도우 탐색기 인터페이스에서 벗어나기 싫어하는 게으른 개발자들에게 커맨드 라인 방식을 강요할 근거가 아직은 부족한 것 같습니다. 윈도우 플랫폼에서 TortoiseSVN처럼 탐색기와 통합된 git 클라이언트만 있다면 지금 당장이라도 회사 개발 프로젝트에 도입할 수 있을 것 같은데&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Git을 이용한 소스코드 관리</title>
+      <link>/2006/07/03/2006-07-03-manage-source-code-using-git/</link>
+      <pubDate>Mon, 03 Jul 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/07/03/2006-07-03-manage-source-code-using-git/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www-128.ibm.com/developerworks/linux/library/l-git/?ca=dgr-lnxw07UsingGit&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;lsquo;Manage source code using Git&amp;rsquo;&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;이 글은 리누스 토발즈가 개발하고 리눅스 커널과 여러 오픈소스 프로젝트 개발에 사용하고 있는 git 소스 코드 관리 시스템에 대한 개략적인 튜토리얼이다. 자세한 기술적인 내용이라기보다 처음 접하는 이들에게 필요한 일종의 소개서 정도 되는 수준이다.&lt;/p&gt;
+&lt;p&gt;그런데 이 글을 읽으면서 과연 현재 회사에서 사용하고 있는 
+&lt;a href=&#34;http://subversion.tigris.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;서브버전(subversion)&lt;/a&gt;
+을 git으로 대체가 가능할까 궁금해졌다. 이미 서브버전에 있거나 git가 더 나은 점은 대략 다음과 같이 요약할 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;브랜치 작업이 빠르고 쉽다 (subversion도 역시)&lt;/li&gt;
+&lt;li&gt;오프라인 작업을 지원해서, 로컬 커밋을 나중에 한꺼번에 할 수 있다. (subversion도 브랜치를 이용하면 가능하지만, 오프라인은 안됨)&lt;/li&gt;
+&lt;li&gt;커밋이 프로젝트 전체에 걸쳐 원자성을 가진다 (subversion도 역시)&lt;/li&gt;
+&lt;li&gt;모든 작업트리는 전체 프로젝트 히스토리를 담고 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;하지만 subversion에 있지만 git에는 약간 부족한 기능들은 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;윈도우즈(windows)와 같은 멀티 플랫폼 지원&lt;/span&gt; : 커맨드라인 툴과 QGit 등을 이용하면 되겠지만, TortoiseSVN, Eclipse 등에 익숙한 사용자에겐 아직 무리&lt;/li&gt;
+&lt;li&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;바이너리 &amp;amp; 텍스트 파일 인식 구분 처리&lt;/span&gt; : 라인구분자, 바이너리 diff 처리 등등등&lt;/li&gt;
+&lt;li&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;사용자 인증&lt;/span&gt; : git는 훅을 통해 구현하는 것 같은데, 복잡해 보인다&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;즉, 위의 이유로 인해 아직은 도입이 망설여진다. 하지만, SVN 서버가 회사 내부 네트웍에 있어서 집이나 다른 곳에서 작업할때 커밋하기 불편하거나, 여러 브랜치를 관리하다보면 필요한 독립적인 분산 저장소 등이 필요하다고 느낄때는 아마 다시 git을 검토하고 있을 지도 모른다.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

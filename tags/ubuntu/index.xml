@@ -1,0 +1,1158 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ubuntu | 대체로 무해함</title>
+    <link>/tags/ubuntu/</link>
+      <atom:link href="/tags/ubuntu/index.xml" rel="self" type="application/rss+xml" />
+    <description>Ubuntu</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 22 Feb 2011 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Ubuntu</title>
+      <link>/tags/ubuntu/</link>
+    </image>
+    
+    <item>
+      <title>사진 파일 이름 변경하기</title>
+      <link>/2011/02/22/2011-02-22-renaming-photo-files/</link>
+      <pubDate>Tue, 22 Feb 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/02/22/2011-02-22-renaming-photo-files/</guid>
+      <description>&lt;p&gt;요즘 디지털 카메라나 휴대폰으로 촬영한 JPEG 파일에는 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/EXIF&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;EXIF&lt;/a&gt;
+ 정보가 삽입되어 있어서 나름 유용할 때가 많습니다. 카메라에 대한 자세한 사양(?) 정보에는 관심이 없지만, 촬영한 시각이라든지 카메라를 세워서 촬영했는지 여부는 물론, 카메라 GPS 옵션을 켜면 기록되는 촬영 장소의 정확한 좌표는 가끔 두려울 때도 있습니다.&lt;/p&gt;
+&lt;p&gt;아무튼 요즘은 윈도우나 맥 부럽지 않은 리눅스 사진 관리 프로그램들이 많이 있어서 편하긴 한데, 이런 프로그램들이 존재하기 전부터, EXIF 정보가 포함되지도 않았던 시절부터 디렉토리별로 관리해오던 습관을 버리지 못하는 게 문제입니다. 예를 들어 폴더는 알아보기 쉽게 &lt;code&gt;YYYYMMDD-장소또는이벤트이름&lt;/code&gt; 식으로 이름짓고, 안에 들어있는 JPEG 파일은 &lt;code&gt;YYYYMMDD-hhmmss-photo.jpg&lt;/code&gt;, 동영상 파일은 &lt;code&gt;YYYYMMDD-hhmmss-movie.mp4&lt;/code&gt; 식으로 이름을 지어 줍니다.&lt;/p&gt;
+&lt;p&gt;물론, 이런 작업을 모두 수작업으로 하지는 않습니다. EXIF 정보에 문외한이던 시절에는 
+&lt;a href=&#34;http://live.gnome.org/gthumb&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gthumb&lt;/a&gt;
+ 같은 프로그램의 이름일괄변경(&lt;code&gt;Rename...&lt;/code&gt;) 기능을 이용해 자동으로 날짜 뒤에 일련번호를 붙이기도 했습니다.&lt;/p&gt;
+&lt;p&gt;하지만 요즘은 그것도 귀찮아서 &lt;code&gt;exiv2&lt;/code&gt; / &lt;code&gt;rename&lt;/code&gt; 명령어를 이용해 한꺼번에 변경해 버립니다. 
+&lt;a href=&#34;http://www.exiv2.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;exiv2&lt;/code&gt;&lt;/a&gt;
+ 프로그램을 이용해 EXIF 정보에 들어있는 촬영 시각을 기준으로 사진 파일 이름을 변경하고,  &lt;code&gt;rename&lt;/code&gt; 명령어를 이용해 대문자로 된 &lt;code&gt;.JPG&lt;/code&gt; 확장자를 소문자 &lt;code&gt;.jpg&lt;/code&gt; 확장자로 한번에 변경합니다. 예를 들어 위에서 설명한 예처럼 파일 이름을 변경하려면 사진 파일이 들어 있는 디렉토리에서 다음과 같이 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ rename .JPG .jpg *.JPG
+$ exiv2 -r &#39;%Y%m%d-%H%M%S-photo&#39; -k rename *.jpg
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;rename&lt;/code&gt; 명령어는 대부분 배포판에 기본으로 설치되어 있으나 &lt;code&gt;exiv2&lt;/code&gt; 프로그램은 수동으로 패키지를 설치해야 할 수도 있습니다. 게다가, 우분투의 &lt;code&gt;rename&lt;/code&gt; 명령어는 perl 패키지에 포함되어 있는 버전인데 아치 리눅스는 util-linux 패키지에 포함되어 있는 거라 사용법이 조금 다릅니다. 참고로 위 예제는 아치 리눅스 버전입니다. 하지만 &lt;code&gt;exiv2&lt;/code&gt;, &lt;code&gt;rename&lt;/code&gt; 명령어 모두 매뉴얼 페이지를 보면 자세한 사용 예제가 있으므로 쉽게 사용할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;그리고 이 글은 사실, 나이가 들수록 자꾸만 옵션을 잊어버려 다시 찾기 귀찮아서 기록하고 있습니다&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>LG XNOTE C1 노트북 우분투 사용시 사운드 재생 문제</title>
+      <link>/2010/08/09/2010-08-09-sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</link>
+      <pubDate>Mon, 09 Aug 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/08/09/2010-08-09-sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</guid>
+      <description>&lt;p&gt;오랫동안 묵혀두었던 LG XNOTE C1 노트북에 우분투를 설치했는데, 사운드 카드를 통해 오디오가 재생되지 않았습니다. 한동안 오디오를 재생할 일이 없어서 그냥 사용하다가, 오늘 갑자기 필요해져서 급하게 문제를 해결했는데, 그 과정을 기록해 둡니다.&lt;/p&gt;
+&lt;p&gt;일단 확인 결과 사운드 카드 관련 드라이버는 모두 정상적으로 동작합니다. 하지만, 역시나 가장 문제 많은 &lt;code&gt;snd-hda-intel&lt;/code&gt; 드라이버를 사용하고 있었습니다. 그래서 더 정확히 사용하는 모델을 확인하기 위해 &lt;code&gt;/proc/asound/pcm&lt;/code&gt; 파일을 열어보니 다음과 같이 &lt;strong&gt;ALC883&lt;/strong&gt; 모델을 사용하고 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;00-00: ALC883 Analog : ALC883 Analog : playback 1 : capture 1
+00-01: ALC883 Digital : ALC883 Digital : playback 1 : capture 1
+00-02: ALC883 Analog : ALC883 Analog : capture 1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 이 칩셋을 사용하는 모델 목록을 얻기 위해 리눅스 커널 소스 문서 디렉토리에서 해당 파일을 검색합니다.(&lt;code&gt;Documentation/sound/alsa/HD-Audio-Models.txt&lt;/code&gt;) 그러면 ALC883 칩은 다음과 같은 목록이 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ALC882/883/885/888/889
+======================
+  3stack-dig    3-jack with SPDIF I/O
+  6stack-dig    6-jack digital with SPDIF I/O
+  arima         Arima W820Di1
+  targa         Targa T8, MSI-1049 T8
+  asus-a7j      ASUS A7J
+  asus-a7m      ASUS A7M
+  macpro        MacPro support
+  mb5           Macbook 5,1
+  macmini3      Macmini 3,1
+  mba21         Macbook Air 2,1
+  mbp3          Macbook Pro rev3
+  imac24        iMac 24&#39;&#39; with jack detection
+  imac91        iMac 9,1
+  w2jc          ASUS W2JC
+  3stack-2ch-dig        3-jack with SPDIF I/O (ALC883)
+  alc883-6stack-dig     6-jack digital with SPDIF I/O (ALC883)
+  3stack-6ch    3-jack 6-channel
+  3stack-6ch-dig 3-jack 6-channel with SPDIF I/O
+  ...
+  auto          auto-config reading BIOS (default)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 남은 일은 &lt;code&gt;/etc/modprobe.d/alsa-base.conf&lt;/code&gt; 파일 마지막 부분에 다음과 같은 내용을 추가하고, 위 문서에 있는 각 모델 이름을 지정하고 재부팅한 뒤 사운드 재생 테스트 과정을 모든 모델에 대해 반복합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;options snd-hda-intel model=3stack-dig
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다행히 제 경우 첫번째 모델이었습니다. 빙고!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[추가 - 2010.08.19]&lt;/strong&gt; 우분투 10.10 알파 버전에서는 터치패드 버튼도 이상 동작합니다. 여러 사이트를 참고 했지만, 일단 다음 내용을 위와 동일한 방법으로 추가해서 일반 마우스처럼 사용하고 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;options psmouse proto=imps
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투 10.10 한글 글꼴 설정</title>
+      <link>/2010/08/06/2010-08-06-ubuntu-10-10-korean-font-configuration/</link>
+      <pubDate>Fri, 06 Aug 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/08/06/2010-08-06-ubuntu-10-10-korean-font-configuration/</guid>
+      <description>&lt;p&gt;Btrfs 파일 시스템을 사용해 보려고 새로 나온 우분투 10.10 버전을 설치했습니다. 그런데, 아니나 다를까 한글 글꼴 설정은 여전히 맘에 들지 않는군요. 예전에는 이것 저것 쉽게 찾아 고쳤는데, 시간이 점점 흘러서 그 과정을 자꾸 잊어버리게 되다 보니 오늘은 조금 더 많이 헤매게 되어 기록해 두려고 합니다.&lt;/p&gt;
+&lt;p&gt;먼저 메인 글꼴로 사용하는 나눔글꼴은 우분투 저장소에 패키지(ttf-nanum, ttf-nanum-coding)가 이미 올라와 있어서 그대로 설치해서 사용했습니다. 더불어 기본적인 MS 글꼴 패키지(ttf-mscorefonts-installer)를 설치하고, 터미널 글꼴로 사용하는 드로이드 글꼴(ttf-droid)을 설치하고 
+&lt;a href=&#34;/2010/07/19/hinting-for-different-fonts/&#34;&gt;cairo 라이브러리 패치 작업을 한 뒤&lt;/a&gt;
+ &amp;lsquo;&lt;strong&gt;시스템-기본 설정-모양&lt;/strong&gt;&amp;lsquo;은 다음 그림과 같이 설정했습니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/gnome-appearance-properties.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이제 글꼴 설정 파일을 건드려야 하는데, 제일  먼저 &lt;code&gt;/etc/fonts/conf.d/&lt;/code&gt; 디렉토리에서 &lt;span style=&#34;text-decoration:line-through;&#34;&gt;&lt;code&gt;10-hinting-slight.conf&lt;/code&gt; 파일과&lt;/span&gt; &lt;code&gt;29-language-selector-ko-kr.conf&lt;/code&gt; 파일을 삭제합니다. 그래야 일반적인 영문 / 한글 글꼴에 대한 힌팅이 예쁘게 동작합니다. 그 다음에 같은 디렉토리의 &lt;code&gt;69-language-selector-ko-kr.conf&lt;/code&gt; 파일을 다음과 같이 수정합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot;?&amp;gt;
+&amp;lt;!DOCTYPE fontconfig SYSTEM &amp;quot;fonts.dtd&amp;quot;&amp;gt;
+&amp;lt;fontconfig&amp;gt;
+
+&amp;lt;!-- Set preferred Korean fonts --&amp;gt;
+&amp;lt;match target=&amp;quot;pattern&amp;quot;&amp;gt;
+  &amp;lt;test qual=&amp;quot;any&amp;quot; name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;sans-serif&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;family&amp;quot; mode=&amp;quot;prepend&amp;quot; binding=&amp;quot;strong&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;DejaVu Sans&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;UnDotum&amp;lt;/string&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;pattern&amp;quot;&amp;gt;
+  &amp;lt;test qual=&amp;quot;any&amp;quot; name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;serif&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;family&amp;quot; mode=&amp;quot;prepend&amp;quot; binding=&amp;quot;strong&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;DejaVu Serif&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔명조&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;UnBatang&amp;lt;/string&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;pattern&amp;quot;&amp;gt;
+  &amp;lt;test qual=&amp;quot;any&amp;quot; name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;monospace&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;family&amp;quot; mode=&amp;quot;prepend&amp;quot; binding=&amp;quot;strong&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;Droid Sans Mono&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;DejaVu Sans Mono&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕코딩&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;Guseul&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;UnDotum&amp;lt;/string&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+   &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumGothic&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕코딩&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumGothicCoding&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;맑은 고딕&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;Malgun Gothic&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;UnDotum&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;UnBatang&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+    &amp;lt;const&amp;gt;hintmedium&amp;lt;/const&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+  &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;나눔명조&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumMyeongjo&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+    &amp;lt;const&amp;gt;hintslight&amp;lt;/const&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+  &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;DejaVu Sans Mono&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;Droid Sans Mono&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+    &amp;lt;const&amp;gt;hintslight&amp;lt;/const&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+ &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+ &amp;lt;string&amp;gt;Andale Mono&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Arial Black&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Arial&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Comic Sans MS&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Courier New&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Georgia&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Impact&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Tahoma&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Times New Roman&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Trebuchet MS&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Verdana&amp;lt;/string&amp;gt;
+ &amp;lt;string&amp;gt;Webdings&amp;lt;/string&amp;gt;
+ &amp;lt;/test&amp;gt;
+ &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+ &amp;lt;const&amp;gt;hintmedium&amp;lt;/const&amp;gt;
+ &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;/fontconfig&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;뭐, ﻿대충 이 정도만 설정해도 깔끔한 모양의 글꼴을 볼 수 있습니다.&lt;/p&gt;
+&lt;p&gt;사족) Btrfs 파일 시스템은 많은 디스크 I/O가 동시에 걸리면 시스템 전체가 느려지는 듯한 느낌이 여전히 듭니다. 뭐, 앞으로 조금씩 더 좋아지겠지요.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE-2010.12.23]&lt;/strong&gt; 이 포스트를 작성하는 시점에서는 아직 Ubuntu 글꼴이 패포판에 포함되지 않았던 시점이라서 이를 사용한 fontconfig 설정으로 업데이트 했습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE-2011.01.04]&lt;/strong&gt; 한동안 크로미엄 브라우저만 사용하다가 최근 다시 파이어폭스를 사용하다보니 MS 글꼴이 이쁘게 나오지 않는 걸 확인하고 이를 반영했습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>글꼴마다 다른 힌팅 사용하기</title>
+      <link>/2010/07/19/2010-07-19-hinting-for-different-fonts/</link>
+      <pubDate>Mon, 19 Jul 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/07/19/2010-07-19-hinting-for-different-fonts/</guid>
+      <description>&lt;p&gt;구글 리더를 읽다가 어떤 분이 
+&lt;a href=&#34;http://blog.digital-scurf.org/2010/07/13#dev-fonts&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;터미널 글꼴로 &amp;lsquo;Droid Sans Mono&amp;rsquo; 사용한 포스트&lt;/a&gt;
+를 보고 따라해 보았습니다. 그런데, 이상하게도 글꼴이 예쁘지 않아서 확인해 보니 폰트 설정에서 힌팅(hinting)을 살짝(slight)만 사용하도록 설정해야 했습니다. 사실, 대부분의 영문 폰트는 힌팅을 살짝 주어야 원래 의도대로 멋지게 표시되는 경우가 많습니다. (아래 그림에서 폰트 설정 화면 참조)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/gnome-font-properties.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;그런데 문제는, 이 설정을 이용하면 나눔글꼴과 같은 일부 한글 글꼴이 오히려 안 이쁘게 표시됩니다. 특히 나눔고딕은 힌팅을 중간(hintmedium)이나 충분히(hintfull) 사용해야 합니다. 그런데 위 그림을 보면 나눔고딕 역시 정상적으로 표시되고 있습니다. 이 포스트는 그 과정을 정리한 것입니다. 사용환경은 우분투 10.04 배포판이고, 
+&lt;a href=&#34;http://packages.debian.org/sid/ttf-nanum&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;나눔글꼴&lt;/a&gt;
+과 
+&lt;a href=&#34;http://packages.debian.org/sid/ttf-nanum-coding&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;나눔고딕코딩&lt;/a&gt;
+ 글꼴은 데비안 패키지를 직접 내려받아 설치했습니다. 우분투 저장소에도 조만간 반영되겠지요.&lt;/p&gt;
+&lt;p&gt;먼저 폰트별로 다른 힌팅 스타일을 사용하기 위해 폰트 설정에서, 나눔글꼴 계열 힌팅 스타일을 충분히(hintfull)로 변경합니다. &lt;code&gt;~/.fonts.conf&lt;/code&gt; 파일을 편집해도 되지만, 제 경우 그냥 ﻿﻿&lt;code&gt;﻿/etc/fonts/conf.avail/69-language-selector-ko-kr.conf&lt;/code&gt; 파일에 다음 내용을 추가했습니다. 그래야 루트 사용자를 포함한 모든 사용자가 사용할 수 있고, 다른 설정 항목도 모두 거기 있어서 나중에 다시 설치할때 파일 하나만 복사해서 사용하기 때문입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+  &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumGothic&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔명조&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumMyeongjo&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕코딩&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumGothicCoding&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+    &amp;lt;const&amp;gt;hintfull&amp;lt;/const&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그런데 문제는, 이 설정이 먹혀들지 않는다는 점입니다. 이상하게도 파이어폭스나 크롬브라우저, KDE 등에서는 잘 적용되는데, 정작 그놈 터미널이나 모든 그놈 프로그램에서는 적용이 되지 않았습니다. 검색해보니, GTK+ 툴킷을 포함한 대부분 그놈 프로그램이 사용하는 카이로(cairo) 라이브러리에 
+&lt;a href=&#34;http://bugs.freedesktop.org/show_bug.cgi?id=11838&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;관련 버그&lt;/a&gt;
+가 이미 보고되어 있는데 아직 패키가 반영되지 않은 상태였습니다. 카이로 라이브러리가 힌팅의 경우 FontConfig 설정을 따르지 않고 무조건 그놈 글꼴 설정, 더 정확히 말하면 X 리소스의 Xft.hintstyle 값만 사용하기 때문이었습니다.&lt;/p&gt;
+&lt;p&gt;그래서 다음과 같은 과정을 거쳐 직접 빌드한 패키지를 설치해서 사용하고 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ apt-get source libcairo2 # 패키지 소스 내려받기
+$ sudo apt-get build-dep libcairo2 # 빌드를 위한 패키지 내려받기
+$ cd cairo-*
+$ vi src/cairo-ft-font.c # 위 버그질라에 등록된 패치 적용
+$ vi debian/changelog # 패키지 버전 올림
+$ dpkg-buildpackage -rfakeroot # 패키지 생성
+$ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;패키지 생성 방법을 익힌게 거의 10년 전 쯤 데비안 사용 시절이라 요즘은 어떻게 만드는지 잘 모르겠지만, 다행히도 위 방식도 제대로 동작하는 것 같아 그냥 사용하고 있습니다. 요즘은 우분투 PPA도 활성화되었고, 빌드 방식도 더 간단해진 것 같긴 한데, 게을러서&amp;hellip; :)&lt;/p&gt;
+&lt;p&gt;결론은, Droid Sans Mono 글꼴을 터미널 글꼴로 잘 사용하고 있습니다. 참, 이 글꼴 역시 다음과 같이 쉽게 설치할 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo apt-get install ttf-droid
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그런데, 위 패치가 아직까지도 최근 cairo 소스에는 반영되지 않은 것 같아 약간 아쉽군요.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투 10.10 기본 파일시스템 - Btrfs</title>
+      <link>/2010/05/16/2010-05-16-btrfs-as-the-default-filesystem-in-ubuntu-10-10/</link>
+      <pubDate>Sun, 16 May 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/05/16/2010-05-16-btrfs-as-the-default-filesystem-in-ubuntu-10-10/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;/2010/01/25/btrfs-for-a-while/&#34;&gt;Btrfs 사용기&lt;/a&gt;
+를 포스팅한 지 얼마 되지도 않았는데, 우분투 배포판 10.10 버전 기본 파일시스템으로 
+&lt;a href=&#34;http://www.netsplit.com/2010/05/14/btrfs-by-default-in-maverick/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Btrfs를 사용할지도 모른다는 소식&lt;/a&gt;
+이 들려옵니다. 인텔(Intel) 모블린(Moblin)과 노키아(Nokia) 마에모(Maemo) 플랫폼이 통합된 
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=news_item&amp;amp;px=ODIzOA&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;미고(MeeGo) 플랫폼에서도 Btrfs 파일시스템을 채택&lt;/a&gt;
+하더니 바로 우분투 다음 버전도 채택할 지 모른다는 얘기입니다.&lt;/p&gt;
+&lt;p&gt;세부 일정은, Btrfs 파일시스템 안정성과 성능은 일단 2010년 10월 릴리스에 사용하는 리눅스 커널 2.6.35 버전에서 어느 정도 완성된다는 가정하에, GRUB2 부트로더를 지원하고 알파(alpha) 릴리스부터 사용자 피드백을 받아 파일시스템 개발자와 충분한 피드백을 주고 받아 안정화 하는 방식으로 진행할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;아무튼, 이렇게 되면 Btrfs 파일시스템을 설치 옵션으로 제공함으로써 패키지 업데이트 전후 스냅샷 복구 기능을 Btrfs를 이용해 지원하는 페도라(Fedora) 배포판처럼, 사용자가 직접 느낄 수 있는 기능이 우분투에도 추가되면 재미있고 유용해 질 수 있을 것 같습니다. 게다가, SSD 디스크에 최적화되어 있다는 마운트 옵션도 궁금하고, 요즘 관심을 가지고 있는 Ceph 분산 파일 시스템도 테스트해 볼 수 있을테고&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Gource 소스 저장소 시각화 프로그램</title>
+      <link>/2010/04/23/2010-04-23-gource-source-visualization/</link>
+      <pubDate>Fri, 23 Apr 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/04/23/2010-04-23-gource-source-visualization/</guid>
+      <description>&lt;p&gt;LWN.net 기사 중에서 
+&lt;a href=&#34;http://lwn.net/Articles/382468/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;소스 코드 작업 시각화 관련 기사&lt;/a&gt;
+를 보고 재미있을 것 같아 
+&lt;a href=&#34;http://code.google.com/p/gource/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Gource&lt;/a&gt;
+ 프로그램을 이용해 회사에서 진행중인 프로젝트에 적용해 보았습니다.&lt;/p&gt;
+&lt;iframe width=&#34;480&#34; height=&#34;360&#34; src=&#34;http://www.youtube.com/embed/RUwDxM28EBA&#34;&gt;&lt;/iframe&gt;
+&lt;p&gt;만드는 방법은 우선 필요한 패키지를 설치하고(Ubuntu 기준)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo apt-get install gource ffmpeg
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Git 저장소가 있는 디렉토리로 이동해서 다음과 같이 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ gource 
+    -s 0.01 
+    --auto-skip-seconds 0.1 
+    --file-idle-time 500 
+    --disable-progress 
+    --output-framerate 25 
+    --highlight-all-users 
+    -800x600 
+    --stop-at-end 
+    --output-ppm-stream - | 
+  ffmpeg 
+    -y 
+    -b 1000K 
+    -r 17 
+    -f image2pipe 
+    -vcodec ppm 
+    -i - 
+    -vcodec mpeg4 
+    gource-edc-20100423.avi
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;프로젝트에 참여했던 사람들 이름이 나타났다 사라지는 걸 보면 기분이 약간 묘해지는 것 같습니다 ;)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투에서 ccache 사용하기</title>
+      <link>/2010/02/04/2010-02-04-using-ccache-in-ubuntu/</link>
+      <pubDate>Thu, 04 Feb 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/02/04/2010-02-04-using-ccache-in-ubuntu/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.google.co.kr/search?hl=ko&amp;amp;newwindow=1&amp;amp;q=ccache&amp;amp;btnG=%EA%B2%80%EC%83%89&amp;amp;lr=lang_ko&amp;amp;aq=f&amp;amp;oq=&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ccache&lt;/a&gt;
+는 워낙 유명하고 오래된 개발 도구라서, 검색해보면 우리말로 된 글도 많이 찾을 수 있으므로 자세한 설명은 생략하고, 최근에 다른 개발 장비를 구축할 일이 있어서 검토해보다가, 페도라는 이미 기본으로 ccache를 사용하도록 되어 있고, 우분투 / 데비안 계열에서도 매우 쉽게 사용할 수 있도록 되어 있는 걸 알게 되었습니다. 그래서 다시 한 번 정리합니다.&lt;/p&gt;
+&lt;p&gt;먼저 패키지를 설치합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install ccache
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;/etc/environment&lt;/code&gt; 파일을 열어 &lt;code&gt;PATH&lt;/code&gt; 변수 맨 앞에 &lt;code&gt;&#39;/usr/lib/ccache&#39;&lt;/code&gt; 를 추가합니다. 예를 들어 아래와 같다면&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;PATH=&amp;quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다음과 같이 변경합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;PATH=&amp;quot;/usr/lib/ccache:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다시 로그인하면 모든 gcc, g++ 명령은 자동으로 ccache를 이용하게 됩니다.&lt;/p&gt;
+&lt;p&gt;물론 본인 계정에서만 사용하고 싶다면, 홈디렉토리 밑의 &lt;code&gt;.bashrc&lt;/code&gt; 또는 &lt;code&gt;.bash_profile&lt;/code&gt;, &lt;code&gt;.profile&lt;/code&gt; 파일에 다음과 같은 내용을 추가하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;export PATH=&amp;quot;/usr/lib/ccache:$PATH&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;GCC가 느리다고 불평하는 일이 조금 줄어들까요?&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>아주 잠시 Btrfs 파일시스템을 사용해보고</title>
+      <link>/2010/01/25/2010-01-25-btrfs-for-a-while/</link>
+      <pubDate>Mon, 25 Jan 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/01/25/2010-01-25-btrfs-for-a-while/</guid>
+      <description>&lt;p&gt;요즘 여기
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=article&amp;amp;item=ext4_btrfs_2633&amp;amp;num=1&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;저기&lt;/a&gt;
+서 Btrfs 파일시스템 얘기가 많아서, 한번 써봐야겠다 싶어 우분투 개발버전(lucid, linux kernel 2.6.32) 저장소를 확인해보니 패키지 하나만(btrfs-tools) 설치하면 되길래 홈디렉토리를 btrfs 파일시스템으로 교체해 보았습니다. 그리고 스트레스 테스트를 위해 회사에서 유지하는 모든 프로젝트의 Git 저장소를 내려받고(clone) 동시에 컴파일을 해봤습니다.&lt;/p&gt;
+&lt;p&gt;그리고 지금, 다시 Ext4 파일시스템으로 되돌린 상태에서 동일하게 Git 저장소를 내려받으며 이 글을 적고 있습니다. 체감 속도가 느린 것은 물론, 오랜만에 마우스 움직임이 끊기는 현상까지 경험했습니다. CPU 리소스 점유율은 또 얼마나 높은지&amp;hellip;(압축 옵션을 사용하지 않았음에도 불구하고) 적어도 읽기 성능은 좋다고 하던데, 여러 프로세스가 동시에 접근할 때는 형편없이 저하되는 걸 목격했습니다.&lt;/p&gt;
+&lt;p&gt;뭐, 물론 아직도 활발하게 개발중이고, 좋은 기능도 많이  있는 것 같지만(그래서 그만큼의 리소스가 더 필요한 걸지도&amp;hellip;), 경험적 결론은, 아직 서버나 제품에 사용하기에는 시기상조라는 겁니다.&lt;/p&gt;
+&lt;p&gt;기회가 되면  SSD 디스크에서도 테스트해보고 싶은데, 가난한 개발자라서&amp;hellip; (술값만 줄여도 되려나&amp;hellip;?)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>여러 개의 마우스 동시에 사용하기</title>
+      <link>/2010/01/20/2010-01-20-using-multiple-mouses-with-xor/</link>
+      <pubDate>Wed, 20 Jan 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/01/20/2010-01-20-using-multiple-mouses-with-xor/</guid>
+      <description>&lt;p&gt;구글 리더에서 오늘치 내용을 읽다가 &amp;lsquo;가
+&lt;a href=&#34;http://ao2.it/en/blog/2010/01/19/poor-mans-multi-touch-using-multiple-mice-xorg&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;난한 사람의 멀티 터치: Xorg에서 여러 개의 마우스 사용하기&lt;/a&gt;
+&amp;rsquo; 블로그를 보고 따라해 보았더니 바로 되는 걸 확인하고 기록으로 남겨둡니다. (참고로, 제가 사용하는 배포판은 우분투 개발 버전(lucid)입니다)&lt;/p&gt;
+&lt;p&gt;두 개의 마우스를 장착했을때 두 개의 포인터가 생성되고, 각각 따로 동작하는 것은 물론 마우스 별로 커서를 지정할 수도 있습니다. 하지만 아직 GTK+를 비롯한 많은 어플리케이션이 멀티 마우스를 고려하지 않아 창 이동이나 포커스 등과 같은 문제가 원하는 대로 동작하지는 않지만, 언제나 그렇듯이 시간이 지나면 조금씩 나아지리라 생각됩니다.&lt;/p&gt;
+&lt;p&gt;저자는 자신이 GIMP 작업을 할 때 하나는 도구나 색상을 고르고, 다른 하나는 그리기 작업에 사용함으로 실제 도움이 많이 되고 있다고 하는데, 단순히 하나의 컴퓨터 화면을 여러 사람이 동시에 사용할 수 있다는 점보다, 사용자 인터페이스 관점에서 멀티 터치를 비롯한 많은 아이디어가 X 어플리케이션에 적용할 수 있는 기반이 될 것으로 여겨집니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투에서 이더넷 장치 변경시 장치번호 초기화</title>
+      <link>/2009/08/14/2009-08-14-init-eth-dev-number-when-lan-card-changes-in-ubuntu/</link>
+      <pubDate>Fri, 14 Aug 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/08/14/2009-08-14-init-eth-dev-number-when-lan-card-changes-in-ubuntu/</guid>
+      <description>&lt;p&gt;이더넷 랜카드를 교체하거나, 온보드 이더넷을 CMOS에서 비활성화하고 랜카드만 사용하고 싶거나 또는 그 반대인 경우, 우분투에서 사용하는 udev 데몬은 자동으로 새로 인식한 이더넷 장치에게는 기존 이더넷 장치와 충돌하지 않도록 새로운 이더넷 번호를 할당하고 기억합니다. 예를 들면, eth0 장치가 없는데도, eth0 대신 eth1 장치로 인식하게 됩니다.&lt;/p&gt;
+&lt;p&gt;이는 장치마다 다른 설정을 장비 구성이 달라지더라도 고유하게 계속 유지할 수 있도록 하기 위함인데, 때로는 거슬리기도 하고, 당연히 eth0 장치가 있다고 가정하고 동작하는 프로그램이 있는 경우 골치 아파집니다.&lt;/p&gt;
+&lt;p&gt;이럴 때 쉽게 해결하는 방법은, 다음과 같이 이 정보를 기억하고 있는 파일을 지우고 재부팅하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo rm /etc/udev/rules.d/70-persistent-net.rules
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고로 CDROM 관련 설정도 있는데, 타이핑이 귀찮을 경우 다음과 같이 해도 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo rm /etc/udev/rules.d/*
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;왜냐하면 건드리면 피곤해지는 udev 기본 설정 파일은 &lt;code&gt;/lib/udev/rules.d/&lt;/code&gt; 디렉토리에 따로 저장되기 때문입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투 구글 크롬 브라우저</title>
+      <link>/2009/08/03/2009-08-03-chromium-browser-in-ubuntu/</link>
+      <pubDate>Mon, 03 Aug 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/08/03/2009-08-03-chromium-browser-in-ubuntu/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.google.com/chrome&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;구글 크롬(Google Chrome)&lt;/a&gt;
+의 리눅스 버전 오픈소스 프로젝트인 크로미엄(Chromium)을 우분투에 설치하고 사용하고 있습니다. 
+&lt;a href=&#34;http://www.ubuntugeek.com/how-to-install-chromium-google-chrome-in-ubuntu-using-deb-package.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이 사이트&lt;/a&gt;
+에서 설명한 방법을 따라 쉽게 저장소를 추가하고 자동으로 일일 업데이트가 가능하도록 했는데, 저는 karmic 개발 버전을 사용하고 있으므로, 저장소 경로에서 &amp;lsquo;jaunty&amp;rsquo;  대신 &amp;lsquo;karmic&#39;을 사용했습니다.&lt;/p&gt;
+&lt;p&gt;물론 크로미엄을 예전에도 사용해 보았지만, 불안정하고 아직 많은 기능이 구현되지 않았던 시절이라 한동안 사용을 미루어 두었는데, 최근 개발 관련 소식이 많이 보이길래 한 번 다시 설치해 본 건데, 안정성은 물론 체감 성능이 매우 쾌적해졌군요. 이를 느낄 수 있는 것 중 하나가 바로, 제가 사용하는 장비 중 하나인 IBM ThinkPad X40에서 워드프레스 에디터 비주얼(Visual) 방식으로 글을 적는데 아무 불편함이 없습니다. 파이어폭스 3.5 버전과 비교해도 역시 전반적인 체감 속도가 훨씬 빠르게 느껴집니다. 인텔 드라이버 성능이 개선된 것 또는 Compiz 사용 여부와는 상관없이 상대적으로 체감 속도는 빠릅니다. 게다가 작은 노트북 화면을 충분히 사용할 수 있도록 배려한 UI도 맘에 들고&amp;hellip; (메모리 사용량은 아직 어떻게 비교해야할 지 모르겠군요. 크로미엄은 워낙 여러 프로세스가 사용되기 때문에&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;그래서 낼름 기본 브라우저를 크로미엄으로 변경하고, 가끔 테스트하고 사용해보던 웹킷 기반 브라우저 패키지도 다 지우고(epiphany-browser, midori, arora) 이것 저것 익숙해져 가고 있는데, 뉴스에서 본 것처럼 플래시 같은 플러그인이 지원되긴 하지만 아직 불안정해서 기본으로 꺼져 있군요. 하지만 뭐, 플래시가 필요한 사이트를 자주 접속하면 편이 아니라서&amp;hellip; :)&lt;/p&gt;
+&lt;p&gt;아무튼, 윈도우에서 인터넷 익스플로러가 거의 독점이었듯이 오랬동안 리눅스에서, 어쩔수없이, 독점이었던 파이어폭스를 아쉬워하면서 계속 사용할 이유가 점점 사라져 가는 듯한 느낌이 드는군요.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투에서 서브버전 저장소 운영하기</title>
+      <link>/2009/07/16/2009-07-16-manage-subversion-repositories-in-ubuntu/</link>
+      <pubDate>Thu, 16 Jul 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/07/16/2009-07-16-manage-subversion-repositories-in-ubuntu/</guid>
+      <description>&lt;p&gt;회사에서 사용하는 버전 관리 시스템을 Git으로 이전하기 전에, 나중에 또 언젠가 다시 필요할 지 모르는 일이므로, 7년동안 운영해 왔던 Subversion 서버 구성과 운영 방식을 기록해 둡니다. 물론, 우분투 리눅스 환경이고 로컬 / 외부 네트웍 모두에서 svn.example.com 주소로 어디에서든 서브버전에 접근할 수 있도록 환경을 구성하는데 목적이 있습니다.&lt;/p&gt;
+&lt;p&gt;제일 먼저 서브버전 패키지를 설치합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install subversion
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;우분투처럼 데비안(Debian GNU/Linux) 기반 리눅스는 대부분 저장소(repository) 기본 디렉토리가 &lt;code&gt;/var/lib/svn&lt;/code&gt; 디렉토리입니다. 배포판 규칙을 어기는게 괜히 꺼림칙하므로 이 디렉토리를 지우고 다른 디스크 또는 파티션에 있는 디렉토리를 심볼링 링크로 연결합니다. (여기서는 &lt;code&gt;/opt/svn&lt;/code&gt; 입니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo rm /var/lib/svn
+$ sudo ln -sf /opt/svn /var/lib/svn
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;HTTP 방식으로 서브버전을 운영하기 위해 설정합니다. 서브버전이 동작하는 서버는 외부 인터넷에 공개되지 않은 내부 서버입니다. 하지만 내부 서버는 아파치 뿌락찌(proxy) 기능을 이용해 외부에서도 접근 가능하도록 합니다.&lt;/p&gt;
+&lt;p&gt;어쨌듯 아파치(Apache) 웹 서버에서 HTTP 방식으로 접근할 수 있도록 서브버전 아파치 모듈을 설치하고 활성화합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install libapache2-svn
+$ sudo a2enmod dav_svn
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;서브버전 아파치 모듈 설정(&lt;code&gt;/etc/apache2/mods-available/dav_svn.conf&lt;/code&gt;)을 다음과 같이 수정합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;Location /svn&amp;gt;
+DAV svn
+
+SVNParentPath /var/lib/svn
+
+AuthType Basic
+AuthName &amp;quot;Subverion Repositories&amp;quot;
+AuthUserFile /etc/subversion/dav_svn.passwd
+Require valid-user
+Order allow,deny
+Allow from all
+
+AuthzSVNAccessFile /etc/subversion/dav_svn.authz
+&amp;lt;/Location&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 설정은 &lt;code&gt;http://svn.example.com/svn/&lt;/code&gt; URL을 시작으로 여러 서브버전 저장소를 두도록 합니다.&lt;/p&gt;
+&lt;p&gt;이제 사용자 인증 관련 설정을 해야하는데 우선 &lt;code&gt;/etc/subversion/dav_svn.authz&lt;/code&gt; 파일을 다음과 같이 설정합니다. 이 파일을 각 저장소별로 접근할 수 있는 사용자를 그룹지어 접근 권한을 제어하는데 사용합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Groups configuration
+[groups]
+developers = lethean,user1,user2,user3
+project1 = user1,user2
+project2 = user2,user3
+guests = guest
+
+# Repositories configuration
+[project1:/]
+@project1 = rw
+
+[project2:/]
+@developers = rw
+@project2 = r
+
+# All repositories
+[/]
+@developers = rw
+* =
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 실제 사용자 목록을 담고 있는 &lt;code&gt;/etc/subversion/dav_svn.passwd&lt;/code&gt; 파일을 만듭니다. 이 파일은 &lt;code&gt;htpasswd&lt;/code&gt; 프로그램을 이용해 갱신하는데, 여기서는 &amp;lsquo;Basic&amp;rsquo; 인증 방식으로 사용하므로 &amp;lsquo;-m&amp;rsquo; 옵션을 추가해야 합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo touch /etc/subversion/dav_svn.passwd
+$ sudo htpasswd -m /etc/subversion/dav_svn.passwd lethean
+$ sudo htpasswd -m /etc/subversion/dav_svn.passwd user1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 사용자 관리와 웹서버 관련 설정은 끝났으니 서브버전 저장소 설정을 할 차례입니다.&lt;/p&gt;
+&lt;p&gt;서브버전 저장소를 HTTP 웹 프로토콜을 통해 무리없이 접근하려면 먼저 사용자 권한을 수정해야 합니다. 우분투의 기본 웹서버 접근 계정은 &lt;code&gt;www-data&lt;/code&gt; 이므로, 이를 &lt;code&gt;src&lt;/code&gt; 그룹에 추가합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo addgroup www-data src
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 서브버전 저장소의 권한을 변경하여 &lt;code&gt;src&lt;/code&gt; 그룹이 서브버전 저장소에 접근할 수 있도록 합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo chgrp -R src /var/lib/svn
+$ sudo chmod -R g+rws /var/lib/svn
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아파치 웹서버를 재시작합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo /etc/init.d/apache2 restart
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 서브버전 저장소를 설정합니다. 이 작업은 모든 저장소에 각각 해야 하므로 여기서는 &amp;lsquo;hello&amp;rsquo; 프로젝트라고 가정합니다. 제일 먼저 소스가 제출(commit)되었을때 메일이 발송되고, 버그질라(Bugzilla) 댓글(comments)에 자동으로 추가되도록 &lt;code&gt;/var/lib/svn/hello/hooks/post-commit&lt;/code&gt; 파일을 다음과 같이 편집합니다. 여기서는 모든 소스 코드, 문서가 UTF-8 인코딩을 사용한다고 가정하고, svn-commit-log@example.com 주소로 메일을 전송합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+REPOS=&amp;quot;$1&amp;quot;
+REV=&amp;quot;$2&amp;quot;
+
+REPOS_NAME=`basename $REPOS`
+
+# uncomment below if system locale is not UTF-8
+#export LANG=ko_KR.UTF-8
+
+/usr/lib/subversion/hook-scripts/commit-email.pl 
+  --from &amp;quot;svn-commit@example.com&amp;quot; 
+  -s &amp;quot;SVN: $REPOS_NAME&amp;quot; 
+  -h example.com 
+  &amp;quot;$REPOS&amp;quot; &amp;quot;$REV&amp;quot; svn-commit-log@example.com
+
+/usr/lib/subversion/hook-scripts/svn2bugzilla.rb 
+  &amp;quot;$REPOS&amp;quot; &amp;quot;$REV&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 실행 권한을 줍니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo chmod +x /var/lib/svn/hello/hooks/post-commit
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참, 버그질라로 메일을 보내기 위해 루비를 설치하고,&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install ruby
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;/usr/lib/subversion/hook-scripts/svn2bugzilla.rb&lt;/code&gt; 파일을 다음 내용으로 채운뒤,&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/ruby
+require &#39;rubygems&#39;
+require &#39;active_record&#39;
+require &#39;set&#39;
+require &#39;fileutils&#39;
+
+# If your Subversion usernames are not the same as your
+# Bugzilla usernames, map them here.
+USER_MAP = {&amp;quot;lovemetender&amp;quot; =&amp;gt; &amp;quot;lovemetender@example.com&amp;quot;}
+USER_DOMAIN = &amp;quot;example.com&amp;quot;
+
+# Location of svnlook binary. Change as necessary.
+SVNLOOK = &amp;quot;/usr/bin/svnlook&amp;quot;
+
+# Configure your AR connection here.
+# Bugzilla supports both MySQL and PostgreSQL.
+AR_CONFIG = {:adapter =&amp;gt; &#39;mysql&#39;,
+ :host =&amp;gt; &#39;database.example.com&#39;,
+ :port =&amp;gt; 3306,
+ :database =&amp;gt; &#39;bugzilla&#39;,
+ :username =&amp;gt; &#39;bugmaster&#39;,
+ :password =&amp;gt; &#39;bugpassword&#39; }
+
+# You should not have to change anything below this line.
+
+if ARGV[0].nil? || ARGV[1].nil?
+ puts &amp;quot;Usage: svn2bugzilla.rb repos_path revision&amp;quot;
+ puts &amp;quot;To be used as a subversion post-commit hook.&amp;quot;
+ exit
+end
+
+REPOS_PATH = ARGV[0]
+REVISION = ARGV[1]
+
+ActiveRecord::Base.establish_connection(AR_CONFIG)
+
+ActiveRecord::Base.connection.execute &#39;set character set utf8&#39; 
+
+# These are the three Bugzilla tables we&#39;ll be dealing with.
+# It&#39;d probably be less code just to query the database directly,
+# bug using ActiveRecord is more fun!
+
+class Bug &amp;lt; ActiveRecord::Base
+ set_primary_key &amp;quot;bug_id&amp;quot;
+ # longdescs has a column named &#39;type&#39; which doesn&#39;t play well with AR.
+ # select the columns we need manually.
+ has_many :longdescs, :select =&amp;gt; &amp;quot;comment_id, bug_id, who, bug_when, thetext&amp;quot;
+end
+
+# longdescs is the comments table.
+class Longdesc &amp;lt; ActiveRecord::Base
+ set_primary_key &amp;quot;comment_id&amp;quot;
+ belongs_to :bug
+ belongs_to :profile, :foreign_key =&amp;gt; &amp;quot;who&amp;quot;
+end
+
+# profiles is the user table
+class Profile &amp;lt; ActiveRecord::Base
+ set_primary_key &amp;quot;userid&amp;quot;
+end
+
+class Commit
+ def initialize(repository_path, revision_number)
+ @repository = File.basename repository_path
+ @revision_number = revision_number
+ @log_message = `#{SVNLOOK} log #{repository_path} -r #{revision_number}`.strip
+ @date = `#{SVNLOOK} date #{repository_path} -r #{revision_number}`.strip
+ @files_changed = `#{SVNLOOK} changed #{repository_path} -r #{revision_number}`.strip
+ @author = `#{SVNLOOK} author #{repository_path} -r #{revision_number}`.strip
+ end
+
+ def message
+ &amp;lt;&amp;lt;MESSAGE
+#{@log_message}
+
+Repository: #{@repository}
+Revision: #{@revision_number}
+Author: #{@author}
+Date: #{@date}
+Changes:
+#{@files_changed}
+
+http://svn.example.com/cgi-bin/viewvc.cgi/#{@repository}?revision=#{@revision_number}&amp;amp;view=revision
+MESSAGE
+ end
+
+ def author
+ if USER_MAP[@author].nil?
+ return &amp;quot;#{@author}@#{USER_DOMAIN}&amp;quot;
+ end
+
+ USER_MAP[@author]
+ end
+
+ # return a Set of unique bug numbers in the commit message
+ def bug_numbers
+ bugs = Set.new
+ @log_message.scan(/bugD{1,3}(d+)/i).each do |match|
+ bugs &amp;lt;&amp;lt; match[0]
+ end
+
+ bugs
+ end
+end
+
+# Do the actual work of submitting the comment to the database
+
+commit = Commit.new(REPOS_PATH, REVISION)
+commit.bug_numbers.each do |bug|
+ bug = Bug.find_by_bug_id(bug)
+
+ next if bug.nil?
+
+ user = Profile.find_by_login_name(commit.author)
+
+ next if user.nil?
+
+ bug.longdescs.create(:who =&amp;gt; user.id,
+ :thetext =&amp;gt; commit.message,
+ :bug_when =&amp;gt; Time.now)
+end
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 스크립트 소스를 조금 살펴보시면 버그질라 MySQL 데이터베이스 서버에 대한 접근 정보를 설정하는 부분과, 메일 텍스트 본문에 ViewVC 웹인터페이스를 직접 연결하는 부분이 있으므로, 필요에 맞게 수정해야 합니다. 이제 스크립트에 실행 권한을 줍니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo chmod +x /usr/lib/subversion/hook-scripts/svn2bugzilla.rb
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;자 이제 마지막, 외부로 공개된 서버에서 접근시 내부 서브버전 서버로 연결하기 위해 공개 서버의 &lt;code&gt;/etc/apache2/sites-available/svn.example.com&lt;/code&gt; 파일을 다음과 같이 편집합니다. 여기서는 공식 서브버전 서버 도메인 이름이 svn.example.com이고 (물론 네임서버에서  IP  주소는 외부로 공개된 서버와 동일합니다) 실제 서브버전 서버 IP는 192.168.0.141 이라고 가정합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;VirtualHost *&amp;gt;
+  ServerAdmin lethean@example.com
+  ServerName svn.example.com
+  ErrorLog /var/log/apache2/svn.example.com-error.log
+  CustomLog /var/log/apache2/svn.example.com-access.log combined
+  UseCanonicalName Off
+  ProxyVia On
+  ProxyRequests Off
+  ProxyPreserveHost On
+  ProxyPass / http://192.168.0.141:80/
+  ProxyPassReverse / http://192.168.0.141:80/
+  ProxyPassReverse / http://svn.example.com:80/
+&amp;lt;/VirtualHost&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 이 호스트를 활성화하고 아파치를 재시작합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo a2ensite svn.example.com
+$ sudo /etc/init.d/apache2 restart
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;음&amp;hellip; 더 이상 생각나는게 있으면 채워 나가야겠지만, 일단 오늘은 여기까지&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투 9.04 릴리스, 하지만...</title>
+      <link>/2009/04/23/2009-04-23-ubuntu-904-release-however/</link>
+      <pubDate>Thu, 23 Apr 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/04/23/2009-04-23-ubuntu-904-release-however/</guid>
+      <description>&lt;p&gt;우분투 9.04 버전이 릴리스 되었지만 안정화되려면 업데이트를 조금 더 기다려야 할 것 같습니다. 
+&lt;a href=&#34;http://www.ubuntu.com/getubuntu/releasenotes/904&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;릴리스 노트&lt;/a&gt;
+를 보면 인텔 드라이버 성능 저하와 디스플레이 멈춤(freeze), EXT4 파일 시스템 불안정, 945보드에서 디스크 인식 문제 등 많은 문제가 언급되어 있군요. 한글 글꼴 설정도 조금 문제가 있어 수정이 필요한 것 같고&amp;hellip;&lt;/p&gt;
+&lt;p&gt;6개월 간격으로 정식 릴리스를 무조건 해야 하니 발생하는 어쩔 수 없는 일이긴 하지만, 이번 릴리스는 X서버와 비디오 드라이버, 커널과 드라이버가 모두 급격하게 신기술로 이전되어 아직 충분히 안정화가 안 된 상황과 배포판 릴리스 시기가 맞물려 더욱 심한 것 같습니다.&lt;/p&gt;
+&lt;p&gt;물론, 인텔 그래픽 카드 사용 안하면 됩니다. EXT4 파일시스템 대신 그대로 안정적인 EXT3 파일 시스템을 사용하면 됩니다. 몇가지 부족한 부분은 튜닝하면 되겠지요. 하지만, 하드웨어를 교체할 수 없거나 제품에 사용하려고 계획 중이라면 아쉬운 기분으로 조금 더 기다려야 할 것 같습니다. 대부분의 문제가 굳이 우분투 배포판만의 문제는 아니니까요&amp;hellip;&lt;/p&gt;
+&lt;p&gt;그나저나, 
+&lt;a href=&#34;http://www.linux-mag.com/id/7308/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Btrfs 파일시스템 벤치마크 기사&lt;/a&gt;
+가 나올 정도로 안정화가 눈에 띄게 좋아진 것 같군요. 과연 성능과 기능 두 마리 토끼를 모두 잡을 수 있을 지 정말 기대됩니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>sudo 비밀번호 안물어보게 하기</title>
+      <link>/2009/01/07/2009-01-07-skip-sudo-password-prompt/</link>
+      <pubDate>Wed, 07 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/07/2009-01-07-skip-sudo-password-prompt/</guid>
+      <description>&lt;p&gt;sudo를 이용해 루트 권한으로 프로그램을 실행하거나, 패키지 관리자처럼 루트 권한이 필요한 GUI 프로그램을 실행할때마다 비밀번호 물어보는게 귀찮다면 다음과 같이 안물어보게 할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;먼저 /etc/sudoers 파일을 편집하게 위해 visudo 명령을 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo visudo
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;맨 밑으로 가면 기본적으로 admin 그룹에 대한 설정이 있는데, 이 행을 고치거나 자신의 계정에 관한 설정을 새로 추가하면서 &amp;lsquo;NOPASSWD:&amp;rsquo; 항목을 명시하고 편집을 끝냅니다.  (여기서 계정은 lethean)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;%admin ALL=(ALL) ALL
+lethean ALL=(ALL) NOPASSWD: ALL
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이후 모든 sudo 명령 실행시 더 이상 비밀번호를 물어보지 않습니다.&lt;/p&gt;
+&lt;p&gt;물론, 자리를 비웠을때 누군가 내 계정으로 루트 권한 작업을 마음대로 할 수 있는 보안상의 위험을 상관할 필요가 없을 경우에만 사용하시기 바랍니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 한글 글꼴 설정</title>
+      <link>/2009/01/07/2009-01-07-ubuntu-8-10-korean-font-config/</link>
+      <pubDate>Wed, 07 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/07/2009-01-07-ubuntu-8-10-korean-font-config/</guid>
+      <description>&lt;p&gt;Ubuntu 설치시 한국어를 선택하면 한글을 사용하는데 별 문제가 없는 것 같지만, 글꼴이나 입력기 등이 조금 문제가 있기 때문에 &amp;lsquo;시스템&amp;rsquo; -&amp;gt; &amp;lsquo;관리&amp;rsquo; -&amp;gt; &amp;lsquo;언어&amp;rsquo; 설정에서 &amp;lsquo;지원되는 언어&#39;에 &amp;lsquo;한국어&#39;를 선택하고, 기본 언어로 &amp;lsquo;한국어&#39;를 선택해주면 한글 관련 패키지와 설정이 자동으로 설치됩니다.&lt;/p&gt;
+&lt;p&gt;하지만 이렇게 해도 기본 한글 글꼴 설정이 별로 미려하지 않은데, 제 경우 기본 글꼴 설정을 다음과 같이 변경해서 사용하고 있습니다.&lt;/p&gt;
+&lt;p&gt;먼저 &lt;code&gt;/etc/fonts/conf.d/29-language-selector-ko-kr.conf&lt;/code&gt; 파일은 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;fontconfig&amp;gt;
+
+&amp;lt;!-- Turn on antialias and hinting with hintmedium for ttf-Unfonts --&amp;gt;
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+        &amp;lt;test name=&amp;quot;family&amp;quot; compare=&amp;quot;contains&amp;quot;&amp;gt;
+                &amp;lt;string&amp;gt;Un&amp;lt;/string&amp;gt;
+        &amp;lt;/test&amp;gt;
+        &amp;lt;edit name=&amp;quot;antialias&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+        &amp;lt;bool&amp;gt;true&amp;lt;/bool&amp;gt;
+    &amp;lt;/edit&amp;gt;
+        &amp;lt;edit name=&amp;quot;hinting&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+        &amp;lt;bool&amp;gt;true&amp;lt;/bool&amp;gt;
+    &amp;lt;/edit&amp;gt;
+    &amp;lt;edit name=&amp;quot;hintsytle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+        &amp;lt;const&amp;gt;hintmedium&amp;lt;/const&amp;gt;
+    &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;!-- Turn off antialias and autohint for ttf-alee depending on pixelsize --&amp;gt;
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+        &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+                &amp;lt;string&amp;gt;Guseul&amp;lt;/string&amp;gt;
+        &amp;lt;/test&amp;gt;
+        &amp;lt;edit name=&amp;quot;autohint&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+        &amp;lt;bool&amp;gt;true&amp;lt;/bool&amp;gt;
+    &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+        &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+                &amp;lt;string&amp;gt;Guseul&amp;lt;/string&amp;gt;
+                &amp;lt;string&amp;gt;Guseul Mono&amp;lt;/string&amp;gt;
+        &amp;lt;/test&amp;gt;
+    &amp;lt;test name=&amp;quot;pixelsize&amp;quot; compare=&amp;quot;more&amp;quot;&amp;gt;
+        &amp;lt;int&amp;gt;11&amp;lt;/int&amp;gt;
+    &amp;lt;/test&amp;gt;
+    &amp;lt;test name=&amp;quot;pixelsize&amp;quot; compare=&amp;quot;less&amp;quot;&amp;gt;
+        &amp;lt;int&amp;gt;16&amp;lt;/int&amp;gt;
+    &amp;lt;/test&amp;gt;
+    &amp;lt;edit name=&amp;quot;antialias&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+        &amp;lt;bool&amp;gt;false&amp;lt;/bool&amp;gt;
+    &amp;lt;/edit&amp;gt;
+        &amp;lt;edit name=&amp;quot;autohint&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+        &amp;lt;bool&amp;gt;false&amp;lt;/bool&amp;gt;
+    &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+
+&amp;lt;/fontconfig&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;두번째로 &lt;code&gt;/etc/fonts/conf.d/69-language-selector-ko-kr.conf&lt;/code&gt; 파일은 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;fontconfig&amp;gt;
+
+&amp;lt;!-- Set preferred Korean fonts --&amp;gt;
+    &amp;lt;match target=&amp;quot;pattern&amp;quot;&amp;gt;
+        &amp;lt;test qual=&amp;quot;any&amp;quot; name=&amp;quot;family&amp;quot;&amp;gt;
+            &amp;lt;string&amp;gt;serif&amp;lt;/string&amp;gt;
+        &amp;lt;/test&amp;gt;
+        &amp;lt;edit name=&amp;quot;family&amp;quot; mode=&amp;quot;prepend&amp;quot; binding=&amp;quot;strong&amp;quot;&amp;gt;
+            &amp;lt;string&amp;gt;DejaVu Serif&amp;lt;/string&amp;gt;
+            &amp;lt;string&amp;gt;NanumMyeongjo&amp;lt;/string&amp;gt;
+            &amp;lt;string&amp;gt;UnBatang&amp;lt;/string&amp;gt;
+        &amp;lt;/edit&amp;gt;
+    &amp;lt;/match&amp;gt;
+    &amp;lt;match target=&amp;quot;pattern&amp;quot;&amp;gt;
+        &amp;lt;test qual=&amp;quot;any&amp;quot; name=&amp;quot;family&amp;quot;&amp;gt;
+            &amp;lt;string&amp;gt;sans-serif&amp;lt;/string&amp;gt;
+        &amp;lt;/test&amp;gt;
+        &amp;lt;edit name=&amp;quot;family&amp;quot; mode=&amp;quot;prepend&amp;quot; binding=&amp;quot;strong&amp;quot;&amp;gt;
+            &amp;lt;string&amp;gt;DejaVu Sans&amp;lt;/string&amp;gt;
+            &amp;lt;string&amp;gt;NanumGothic&amp;lt;/string&amp;gt;
+            &amp;lt;string&amp;gt;UnDotum&amp;lt;/string&amp;gt;
+            &amp;lt;string&amp;gt;Guseul&amp;lt;/string&amp;gt;
+        &amp;lt;/edit&amp;gt;
+    &amp;lt;/match&amp;gt;
+    &amp;lt;match target=&amp;quot;pattern&amp;quot;&amp;gt;
+        &amp;lt;test qual=&amp;quot;any&amp;quot; name=&amp;quot;family&amp;quot;&amp;gt;
+            &amp;lt;string&amp;gt;monospace&amp;lt;/string&amp;gt;
+        &amp;lt;/test&amp;gt;
+        &amp;lt;edit name=&amp;quot;family&amp;quot; mode=&amp;quot;prepend&amp;quot; binding=&amp;quot;strong&amp;quot;&amp;gt;
+            &amp;lt;string&amp;gt;DejaVu Sans Mono&amp;lt;/string&amp;gt;
+            &amp;lt;string&amp;gt;Guseul&amp;lt;/string&amp;gt;
+            &amp;lt;string&amp;gt;UnDotum&amp;lt;/string&amp;gt;
+        &amp;lt;/edit&amp;gt;
+    &amp;lt;/match&amp;gt;
+
+&amp;lt;!-- Bind EunGuseul Mono with Bitstream Vera Sans Mono --&amp;gt;
+&amp;lt;match target=&amp;quot;pattern&amp;quot;&amp;gt;
+    &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+        &amp;lt;string&amp;gt;Guseul&amp;lt;/string&amp;gt;
+    &amp;lt;/test&amp;gt;
+    &amp;lt;edit mode=&amp;quot;append&amp;quot; binding=&amp;quot;strong&amp;quot; name=&amp;quot;family&amp;quot;&amp;gt;
+        &amp;lt;string&amp;gt;DejaVu Sans Mono&amp;lt;/string&amp;gt;
+    &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt; 
+
+&amp;lt;/fontconfig&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위에서는 기본 글꼴로 영문은 DejaVu Sans 글꼴 계열, 한국어는 네이버 나눔 글꼴 계열을 사용하고 있습니다. 참고로, Adobe 플래시에서 한글이 깨지지 않게 하려면 한글 글꼴을 영문 글꼴보다 위에 두면 됩니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>X 윈도우 자동 로그인하기</title>
+      <link>/2008/07/21/2008-07-21-x-window-auto-login/</link>
+      <pubDate>Mon, 21 Jul 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/07/21/2008-07-21-x-window-auto-login/</guid>
+      <description>&lt;p&gt;GDM 등과 같이 덩치가 큰 디스플레이 관리자를 사용하지 않고, 시스템 부팅후 자동으로 X 서버를 실행하고 특정 계정으로 로그인한뒤 자동으로 특정 프로그램을 실행하는 기능은 의외로 많이 사용합니다. 이 글에서는 여러가지 방법 중에 제가 알고 있는 몇가지 방법을 정리해 보았습니다. 적용 가능한 배포판은 데비안(Debian) 혹은 우분투(Ubuntu) 리눅스 기반입니다.&lt;/p&gt;
+&lt;h3 id=&#34;첫번째-방법---init-데몬-이용하기&#34;&gt;첫번째 방법 - init 데몬 이용하기&lt;/h3&gt;
+&lt;p&gt;&amp;ldquo;
+&lt;a href=&#34;http://www.enricozini.org/2008/tips/lightweight-autologin.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;How to autologin X without a display manager&lt;/a&gt;
+&amp;rdquo; 글에서 설명하는 방법입니다.&lt;/p&gt;
+&lt;p&gt;먼저 init 데몬이 자동으로 실행할 수 있도록 &lt;code&gt;/etc/inittab&lt;/code&gt; 파일에 다음 항목을 추가합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;6:23:respawn:/sbin/getty -L -n -l /usr/local/sbin/autologin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 항목은 시스템 시작시 자동으로 &lt;code&gt;/usr/local/sbin/autologin&lt;/code&gt; 프로그램을 실행합니다. 또한 프로그램이 종료해도 다시 자동으로 재시작합니다. 이제 사용자 로그인 과정을 자동으로 수행하도록 하려면 &lt;code&gt;/usr/local/sbin/autologin&lt;/code&gt; 프로그램을 다음과 같이 작성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+/bin/login -f root
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 &lt;code&gt;-f&lt;/code&gt; 뒤에 로그인할 계정을 적어줍니다. 이제 계정 홈 디렉토리에 있는 셸 스크립트 시작 파일(&lt;code&gt;~/.bash_profile&lt;/code&gt;)을 수정해서 마지막에 다음 항목을 넣어줍니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;startx
+logout
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 스크립트는 X 서버를 시작하고 종료시 자동으로 로그아웃을 합니다. 마지막으로 X 서버가 실행하면서 자동으로 수행될 스크립트를 만들어야 합니다. 계정 홈 디렉토리에 있는 X 서버 시작 파일(&lt;code&gt;~/.xsession&lt;/code&gt; 또는 &lt;code&gt;~/.xinitrc&lt;/code&gt;)을 다음과 같이 작성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+my-window-manager &amp;amp;
+
+# If the touch screen is not calibrated, run the calibration
+while [ ! -f /etc/touchscreen-calibration ]
+do
+  calibrate-touchscreen
+done
+
+# Run the main application: if it ends, the session ends
+main-application
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;제일 먼저 창 관리자(여기서는 &amp;lsquo;my-window-manager&amp;rsquo;)를 백그라운드로 실행합니다. 그리고 필요한 선행작업(여기서는 &amp;lsquo;calibrate-touchscreen&amp;rsquo;)을 처리한 뒤 실제 어플리케이션(main-application)을 실행합니다.&lt;/p&gt;
+&lt;h3 id=&#34;두번째-방법---upstart-데몬-이용하기&#34;&gt;두번째 방법 - upstart 데몬 이용하기&lt;/h3&gt;
+&lt;p&gt;우분투 리눅스는 init 데몬 대신 
+&lt;a href=&#34;http://upstart.ubuntu.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Upstart&lt;/a&gt;
+ 데몬을 이용하여 시스템 초기화 작업을 처리합니다. 따라서 첫번째 방법에서 &lt;code&gt;/etc/inittab&lt;/code&gt; 파일을 수정하는 대신 &lt;code&gt;/etc/event.d/&lt;/code&gt; 디렉토리에 시작 파일을 등록해야 합니다. 예를 들면 &lt;code&gt;/etc/event.d/autostart&lt;/code&gt; 파일을 다음과 같이 작성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on runlevel 2
+start on runlevel 6
+respawn
+exec /sbin/getty -L -n -l /usr/local/sbin/autologin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 내용은 런레벨 2,6 에서 해당 프로그램을 실행하고 종료시 자동으로 재시작하도록 합니다. 나머지는 첫번째 방법과 동일합니다.&lt;/p&gt;
+&lt;h3 id=&#34;세번째-방법---런레벨run-level-이용하기&#34;&gt;세번째 방법 - 런레벨(run-level) 이용하기&lt;/h3&gt;
+&lt;p&gt;init 데몬이든 Upstart 데몬이든 상관없이 동작하는 방법입니다. 먼저 다음과 같은 스크립트를 &lt;code&gt;/etc/init.d/autologin&lt;/code&gt; 파일로 만들어 줍니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+/usr/local/sbin/my-startx &amp;amp;
+exit 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 런레벨 2로 동작한다는 가정하에 스크립트가 자동 실행할 수 있도록 다음 명령을 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# chmod +x /etc/init.d/autologin
+# update-rc.d autologin defaults 05
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 마지막 &amp;lsquo;05&#39;는 런레벨에서 다른 데몬보다 먼저 실행하도록 결정해주는 우선순위입니다. 이제 &lt;code&gt;/usr/local/sbin/my-startx&lt;/code&gt; 스크립트를 작성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+while true; do
+  sleep 1
+  echo &amp;quot;xinit /root/.xinitrc -- /etc/X11/xinit/xserverrc&amp;quot; 
+  | su - root
+done
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 스크립트는 루트(root) 계정으로 X를 시작하면서 /root/.xinitrc 파일을 시작 스크립트 파일로 지정합니다. 따라서, 이 방법은 위 두가지와 다르게 사용자 셸(bash)을 거치지 않고 직접 X 서버를 실행합니다. 그리고, 다른 방법과 마찬가지로 종료시 자동으로 X를 재시작합니다.  X 실행 이후 시작하는 스크립트는 다른 방법과 동일합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>ThinkPad X40 &#43; Ubuntu &#43; Power Saving</title>
+      <link>/2007/09/21/2007-09-21-thinkpad-x40-ubuntu-power-saving/</link>
+      <pubDate>Fri, 21 Sep 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/09/21/2007-09-21-thinkpad-x40-ubuntu-power-saving/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.linuxpowertop.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PowerTop&lt;/a&gt;
+ 유틸리티를 실행하면 전원을 절약할 수 있는 여러가지 방법도 친절하게 설명해주는데, 이 정보를 바탕으로 ThinkPad X40 노트북에 맞게 켤때마다 자동으로 설정하는 스크립트를 만들어봤다. Ubuntu Gutsy 배포판에서 사용하면 약간 과장해서 50% 이상 배터리 수명이 연장되는 걸 체감할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+#
+# Power Save Tunings for ThinkPad X40
+#
+
+# enable wireless power saving mode
+iwpriv eth1 set_power 5
+
+# enable AC97 powersave mode
+echo 1 &amp;gt; /sys/module/snd_ac97_codec/parameters/power_save
+
+# enable USB autosuspend
+echo 1 &amp;gt; /sys/module/usbcore/parameters/autosuspend
+for dev in /sys/bus/usb/devices/*; do
+  file=$dev/power/autosuspend
+  [ -f $file ] &amp;amp;&amp;amp; echo 1 &amp;gt; $file
+done
+
+# increase the VM dirty writeback time from 5.00 to 15 seconds
+echo 1500 &amp;gt; /proc/sys/vm/dirty_writeback_centisecs
+
+# enable laptop-mode
+echo 5 &amp;gt; /proc/sys/vm/laptop_mode
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 스크립트를 자동으로 실행하게 하는 방법은 다음과 같다. 먼저 다음과 같이 에디터를 열어 위 내용을 입력한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# sudo gedit /etc/init.d/thinkpad-x40-powersave
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;실행권한을 준다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# sudo chmod +x /etc/init.d/thinkpad-x40-powersave
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;부팅시 자동으로 실행하도록 한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# sudo update-rc.d thinkpad-x40-powersave defaults
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;바로 적용하려면 &lt;code&gt;sudo /etc/init.d/thinkpad-x40-powersave&lt;/code&gt;와 같이 직접 실행해도 된다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투에서 루트 파일시스템 마운트 옵션 변경하기</title>
+      <link>/2007/08/09/2007-08-09-root-filesystem-mount-options-in-ubuntu/</link>
+      <pubDate>Thu, 09 Aug 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/08/09/2007-08-09-root-filesystem-mount-options-in-ubuntu/</guid>
+      <description>&lt;p&gt;커널트랩에 올라온 
+&lt;a href=&#34;http://kerneltrap.org/node/14148&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;마운트 옵션을 이용한 성능 최적화&lt;/a&gt;
+ 글을 보고 우분투 리눅스에도 적용시켜보기로 했다. 다른 파티션은 모두 &lt;code&gt;/etc/fstab&lt;/code&gt; 파일에서 직접 &amp;lsquo;noatime,data=writeback&amp;rsquo; 옵션만 추가하면 되는데 루트 파일 시스템은 조금 손질이 더 갔다.&lt;/p&gt;
+&lt;p&gt;데비안 기반 시스템은 처음에는 루트 파일 시스템을 읽기전용(read-only)으로 마운트한 뒤 initrd 기반 초기화 과정을 수행하고, 나중에 다시 &lt;code&gt;/etc/fstab&lt;/code&gt; 정보를 기반으로 루트파일 시스템을 다시 정상적인 쓰기 가능하도록 마운트한다.(remount) 그런데 이때 &amp;lsquo;noatime&amp;rsquo; 등과 같은 옵션은 정상적으로 동작하지만 &amp;lsquo;data=writeback&amp;rsquo; 등과 같은 옵션은 재마운트시 불가능하다는 메시지를 내면서 마운트에 실패하고 읽기전용 상태로 남아버린다.&lt;/p&gt;
+&lt;p&gt;이 문제의 해결 방법은 여러가지가 있겠지만, 내가 선택한 방법은 먼저 &lt;code&gt;/etc/fstab&lt;/code&gt; 에는 &amp;lsquo;noatime&amp;rsquo; 옵션만 추가하고, &lt;code&gt;/boot/grub/menu.lst&lt;/code&gt; 파일에서 defoptions 항목에 &amp;lsquo;rootflags=data=writeback&amp;rsquo; 을 추가하고, &lt;code&gt;update-grub&lt;/code&gt; 명령을 실행하고 재부팅하면 적용된다.&lt;/p&gt;
+&lt;p&gt;성능이 좋은 PC의 경우 이 옵션이 있을 때와 없을 경우 차이점을 별로 못 느끼지만 X40 노트북에서는 어느 정도 체감 속도가 향상된 것을 느낄 수 있다. 더욱이
+&lt;a href=&#34;http://tracker-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;tracker&lt;/a&gt;
+ 데몬 때문에 디스크가 혹사당하기 시작한 다음부터는 더욱더&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>DBus or Upstart</title>
+      <link>/2007/07/25/2007-07-25-dbus-or-upstart/</link>
+      <pubDate>Wed, 25 Jul 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/07/25/2007-07-25-dbus-or-upstart/</guid>
+      <description>&lt;p&gt;Dbus를 이용해 이제는 시스템 데몬과 같은 프로그램까지 실행할 수 있게 될 것 같다.(
+&lt;a href=&#34;http://hughsient.livejournal.com/31169.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Dbus System Activation is upstream&lt;/a&gt;
+ 참고) 디자인 문서를 보니, 다음과 같이 서비스 파일을 정의하면 해당 메시지가 발생했을때 해당 서버가 동작하는 방식이다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[D-BUS Service]
+Name=org.me.test
+Exec=/usr/sbin/dbus-test-server.py
+User=ftp
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다음과 같이 직접 실행할 수도 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;dbus-send --system --print-reply 
+ --dest=org.freedesktop.DBus 
+ /org/freedesktop/DBus 
+ org.freedesktop.DBus.StartServiceByName 
+ string:org.freedesktop.Hal uint32:0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이렇게 되면 현재 Ubuntu 시스템의 기반이 되는 upstart나 기존의 sysvinit 등과 같은 시스템 초기화 시스템도 불필요해질 수있다고 하는데, 단순히 메시지 기반 병렬 실행 기능만으로는 서비스간 의존성이나 초기화 과정의 많은 예외처리까지는 어렵지 않을까 싶다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 7.04 (feisty) 느린 SSH 접속</title>
+      <link>/2007/04/19/2007-04-19-ubuntu-704-feisty-slow-ssh/</link>
+      <pubDate>Thu, 19 Apr 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/04/19/2007-04-19-ubuntu-704-feisty-slow-ssh/</guid>
+      <description>&lt;p&gt;Ubuntu 7.04에서 ssh 접속 등을 시도할때 다른 시스템보다 초기 접속이 느린 이유가 
+&lt;a href=&#34;https://bugs.launchpad.net/ubuntu/&amp;#43;source/avahi/&amp;#43;bug/94940&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;avahi-daemon 관련 설정 때문&lt;/a&gt;
+이라고 한다. 그래서 /etc/nsswitch.conf 파일에서 &amp;lsquo;hosts:&amp;rsquo; 부분을 다음과 같이 수정해보았더니, 역시 빨리 접속된다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;hosts:          files dns
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;정식 릴리스에 반영되기에는 시간이 촉박한 것 같다&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Pango 1.15.2 한글 표시 문제</title>
+      <link>/2006/12/23/2006-12-23-pango-1152-hangul-display-problem/</link>
+      <pubDate>Sat, 23 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/23/2006-12-23-pango-1152-hangul-display-problem/</guid>
+      <description>&lt;p&gt;한글 메일링 리스트에서 pango 라이브러리 최적화 논의가 오고 가더니 그 결과가 최신 버전에 이미 반영된 모양이다. 엊그제(?) 우분투 개발 버전에 새로 1.15.2-0ubuntu1 버전 패키지가 올라왔는데, 릴리스 변동 사항에 포함되어 있었다. 문제는 몇몇 한글 글자가 흩어져서(?) 표시되는 현상이 발생하길래, 조금 있으면 버그가 수정되어 올라오겠지 기다리다가 참지 못하고 오늘 결국 직접 원인을 찾아보았더니, 의외로 빨리 해결책을 얻을 수 있었다.&lt;/p&gt;
+&lt;p&gt;그놈 버그질라에 이미 &amp;lsquo;
+&lt;a href=&#34;http://bugzilla.gnome.org/show_bug.cgi?id=388581&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Composing jamo is broken in pango-1.15.2&amp;rsquo;&lt;/a&gt;
+ 항목으로 같은 현상이 보고되어 있었고 거기에 추가된 패치를 적용해보니 다시 정상적으로 한글이 표시된다.&lt;/p&gt;
+&lt;p&gt;이런 경우가 내겐, 오픈소스의 매력을 느끼는 순간이다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Upstart 0.3</title>
+      <link>/2006/12/19/2006-12-19-upstart-03/</link>
+      <pubDate>Tue, 19 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/19/2006-12-19-upstart-03/</guid>
+      <description>&lt;p&gt;어느샌가 Upstart가 0.3 버전으로 올라가더니(우분투 개발버전 feisty), 공식적인 Upstart 홈페이지도 생겼다.(아래 링크 참고) 개발자가 0.3 버전에서 새로 추가된 사항을 정리해 놨으니 나도 한 번 다시 정리해 본다.&lt;/p&gt;
+&lt;span style=&#34;font-weight:bold;&#34;&gt;
+ 작업 만들기(Writing Jobs)&lt;/span&gt;
+&lt;p&gt;업스타트(Upstart)는 데몬(daemon)의 시작 / 중지 / 감시 작업을 스스로 한다. &lt;code&gt;start-stop-daemon&lt;/code&gt; 등을 이용하여 개발자가 스스로 관리해야 하는 것과 다르게 프로그램 경로와 인수만 주면 된다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;exec /usr/bin/dbus-daemon
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;물론 셸스크립트도 사용할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;script   echo /usr/share/apport/apport &amp;gt; /proc/sys/kernel/crashdump-helperend script
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;데몬이 시작(start)되기 전/후(pre/post)와 중지(stop)되기 전/후(pre/post)에 원하는 작업도 할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;pre-start script   mkdir -p /var/run/dbus   chown messagebus:messagebus /var/run/dbusend script
+
+post-start script   # wait for listen on port 80   while ! nc -q0 localhost 80 /dev/null 2&amp;gt;&amp;amp;1; do       sleep 1;   doneend script
+
+post-stop script   rm -f /var/run/dbus/pid
+
+pre-stop script   # disable the queue, wait for it to become empty   fooctl disable   while fooq &amp;gt;/dev/null; do        sleep 1   doneend script
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 &lt;code&gt;script&lt;/code&gt; 대신 &lt;code&gt;exec&lt;/code&gt;를 사용하면 스크립트(script) 대신 바이너리를 실행할 수도 있다.&lt;/p&gt;
+&lt;span style=&#34;font-weight:bold;&#34;&gt;
+ 이벤트(Events)&lt;/span&gt;
+&lt;p&gt;0.3 버전에서 이벤트는 더 정교해졌다고 하는데, 단순히 시스템이 보내는 이벤트 이름 뿐 아니라 인수(arguments)와 환경변수도 전달할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;initctl emit network-interface-up eth0 -DIFADDR=00:11:D8:98:1B:37
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 명령은 이벤트와 모든 결과를 출력하고 이벤트가 완전히 처리될때까지 끝나지 않게 한다. 이와 같이 전달된 인수는 다음처럼 스크립트에서 사용할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on network-interface-upscript   [ $1 = lo ] &amp;amp;&amp;amp; exit 0   grep -q $IFADDR /etc/network/blacklist &amp;amp;&amp;amp; exit 0   # etc.end script
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아니면 다음과 같이 &lt;code&gt;start on&lt;/code&gt; 과 &lt;code&gt;stop on&lt;/code&gt; 구문에서 직접 일치하는지 검사할 수도 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on block-device-added sda*
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;작업의 상태 변화로 인한 이벤트도 변경되었다. 이전에는 작업이나 이벤트 모두 같은 이름공간(namespace)를 공유했는데, 혼동을 일으킬 뿐 아니라 실제로 작업 이름을 이용하는 이벤트 이름은 문제를 일으키기도 한다.&lt;/p&gt;
+&lt;p&gt;이렇게 발생한 두개의 주요 이벤트는 간단하게 &lt;code&gt;started&lt;/code&gt; 와 &lt;code&gt;stopped&lt;/code&gt; 로 칭한다. 이를 통해 작업이 완전하게 로드되어 실행되고 있거나, 반대로 완전히 종료됨을 알 수 있다. 작업 이름은 이 이벤트의 인수로 받게 된다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on started dbus
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;started&lt;/code&gt; 이벤트는 &lt;code&gt;post-start&lt;/code&gt; 작업이 끝나기 전에는 발생하지 않는다. 따라서 &lt;code&gt;post-start&lt;/code&gt; 작업은 데몬에 아직 연결할 수 없는 다른 작업들이 시작하는 것을 지연할 수 있다.&lt;/p&gt;
+&lt;p&gt;같은 식으로 &lt;code&gt;stopped&lt;/code&gt; 이벤트는 &lt;code&gt;post-stop&lt;/code&gt; 작업이 끝날때까지 발생하지 않는다.&lt;/p&gt;
+&lt;p&gt;작업이 발생시키는 다른 두개의 이벤트는 약간 특별하다. &lt;code&gt;starting&lt;/code&gt;과 &lt;code&gt;stopping&lt;/code&gt;이 그것인데, 이 이벤트가 처리될때까지는 작업이 시작하거나 중지하지 못하게 한다. 즉, 데이터베이스 서버가 멈추었을때 해야할 작업이 있는데, 그러나 실제로 종료되기 전에 처리해야 한다면 다음과 같이 사용할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on stopping mysqlexec /usr/bin/backup-db.py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;MySQL이 백업이 끝나기 전까지 종료되지 않을 것이다.&lt;/p&gt;
+&lt;p&gt;이 런 경우는 특히 다른 데몬에 의존하는 데몬일 경우 유용하다. 예를 들어 HAL은 DBUS를 필요로 하는데, DBUS가 실행되기 전에는 시작하면 안되고 DBUS는 HAL이 끝나기 전에 멈추면 안된다. 따라서 HAL 작업은 다음과 같다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on started dbusstop on stopping dbus
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;같은 식으로 Tomcat이 설치되어 있다면 Apache는 Tomcat이 실행되기 전에는 시작하면 안되고, Tomcat는 Apache가 종료될때까지 멈추면 안된다. 따라서 Tomcat 작업은 다음과 같다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on starting apachestop on stopped apache
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;실패(Failure)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;항 상 모든게 부드럽게 흘러가는 게 아니므로 가끔 작업이 수행이 태스크가 실패할 수도 있고 데몬이 죽을 수도 있다. upstart는 죽은(crashed) 데몬을 자동으로 재시작하게 할 수도 있고, 다른 작업에게 이를 알려줄 수도 있다. stopping 과 stopped 이벤트에 추가되는 failed 인수가 그것이다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on stopped typo failedscript  echo &amp;quot;typo failed again :-(&amp;quot; | mail -s &amp;quot;type failed&amp;quot; rootend script
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이벤트 실패로 인해 어떤 작업이 시작되거나 멈추었다면, 이벤트 자체가 실패했다는 것을 발견할 수도 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on network-interface-up/failed
+&lt;/code&gt;&lt;/pre&gt;
+&lt;span style=&#34;font-weight:bold;&#34;&gt;
+ 상태(States)&lt;/span&gt;
+&lt;p&gt;네트웍 인터페이스를 구성하거나 블럭 장치를 검사하고 마운트하는 작업은 대개 이벤트의 결과로서 동작하는 반면, 서비스는 조금 더 복잡하다.&lt;/p&gt;
+&lt;p&gt;서비스는 특정 이벤트가 발생했을때가 아니라 대개 시스템이 어떤 상태에 있을 경우 동작해야 한다. 따라서 upstart는 변화를 정의하는 이벤트를 참조하여 복잡한 시스템 상태를 설명할 수 있도록 한다.&lt;/p&gt;
+&lt;p&gt;예를 들어 많은 서비스가 파일시스템이 마운트되어 있을 경우에만 동작해야 하고, 최소 하나의 네트웍 디바이스가 올라와 있어야 한다. 이러한 시기가 시작되고 끝나는 것을 가리키는 이벤트를 이용해 조합하면 다음과 같이 사용할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from fhs-filesystem-mounted until fhs-filesystem-unmountedand from network-up until network-down
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;until&lt;/code&gt; 연산자는 두 이벤트 사이트의 기간을 정의하고, &lt;code&gt;and&lt;/code&gt; 연산자는 두 기간을 동시에 적용하도록 한다.&lt;/p&gt;
+&lt;p&gt;디스플레이 매니저가 실행되고 있는 경우에만 동작하려면 다음과 같이 기술할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from started gdm until stopping gdmor from started kdm until stopping kdm
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;네트웍 인터페이스가 올라온뒤 bind9이 시작하기 전에 실행하고 싶다면 다음과 같이 기술하면 된다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;on network-interface-up and from startup until started bind9
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이처럼 &amp;ldquo;복합 이벤트 구성&amp;quot;은 어느 작업 파일에나 올 수 있다. 그리고 어느 작업 파일이나 다른 작업에 대한 리퍼런스로 동작할 수 있다. 다른 작업과 동시에 시작하고 멈출 수도 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;with apache
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;exec&lt;/code&gt;나 &lt;code&gt;script&lt;/code&gt; 절을 생략하면, 다른 작업이 리퍼런스로 사용할 수 있도록 상태만 정의한다. 그런 식으로 &lt;code&gt;multiuser&lt;/code&gt; 상태 역시 단순히 상태를 정의하는 작업 파일이다.&lt;/p&gt;
+&lt;p&gt;보너스로 덧붙이자면, 이러한 상태들도 &lt;code&gt;pre-start&lt;/code&gt;, &lt;code&gt;post-stop&lt;/code&gt; 등을 응용할 수 있다.&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://upstart.ubuntu.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Upstart 공식 홈페이지&lt;/a&gt;
+ - 언제 생겼지?&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.netsplit.com/blog/articles/2006/12/14/upstart-0-3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Upstart 0.3&lt;/a&gt;
+ - 개발자 블로그&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>FontConfig 2.4 in Ubuntu Feisty</title>
+      <link>/2006/12/01/2006-12-01-fontconfig-24-in-ubuntu-feisty-2/</link>
+      <pubDate>Fri, 01 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/01/2006-12-01-fontconfig-24-in-ubuntu-feisty-2/</guid>
+      <description>&lt;p&gt;폰트 설정 방식이 바뀐다고 적은지 하루만에 &lt;code&gt;language-selector.conf&lt;/code&gt; 파일을 적용하는 기능이 추가되었다. 다만 파이어폭스 등에서 은돋움 폰트 모양이 내 맘에 안들기 때문에 &lt;code&gt;/usr/share/language-selector/fontconfig/ko_KR&lt;/code&gt; 파일에서 &lt;code&gt;hintmedium&lt;/code&gt; 을 모두 &lt;code&gt;hintfull&lt;/code&gt; 로 변경만 해주니 다시 쾌적한 폰트 환경으로 돌아오게 되었다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>FontConfig 2.4 in Ubuntu Feisty</title>
+      <link>/2006/11/30/2006-11-30-fontconfig-24-in-ubuntu-feisty/</link>
+      <pubDate>Thu, 30 Nov 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/11/30/2006-11-30-fontconfig-24-in-ubuntu-feisty/</guid>
+      <description>&lt;p&gt;그렇다. 한동안 잠잠하더니 fontconfig 패키지가 2.4.1 버전으로 올라가면서 폰트 관련 설정이 대폭 변경되었다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/etc/fonts/language-selector.conf&lt;/code&gt; 파일은 아예 참조도 안하고, 설정 파일도 철저하게(?) 분리되고 위치도 &lt;code&gt;/etc/fonts/conf.d&lt;/code&gt;와 &lt;code&gt;/etc/fonts/conf.avail&lt;/code&gt;로 나뉘어 설치와 사용을 구분하고 있다. 폰트 캐시 파일은 폰트가 위치한 각 디렉토리에 &lt;code&gt;fonts.cache-1&lt;/code&gt;로 유지하더니 이제는 &lt;code&gt;/var/cache/fontconfig&lt;/code&gt;로 통합되었다. 변동사항을 보니 이렇게 한군데로 모은뒤 메모리맵핑된 영역을 모든 프로세스가 공유하는 방식으로 바뀌면서 전체적인 어플리케이션 시작 속도 향상을 꾀한 것도 같다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>I810 &#43; Compiz in Ubuntu</title>
+      <link>/2006/11/30/2006-11-30-i810-compiz-in-ubuntu/</link>
+      <pubDate>Thu, 30 Nov 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/11/30/2006-11-30-i810-compiz-in-ubuntu/</guid>
+      <description>&lt;p&gt;많은 사람들이 3D 데스크탑 효과를 얻기 위해 
+&lt;a href=&#34;http://www.beryl-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Beryl 프로젝트&lt;/a&gt;
+ 결과물을 이용하는데, 내 경우 Beryl 보다 심플한 설정 인터페이스를 지닌 오리지널 
+&lt;a href=&#34;http://www.go-compiz.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Compiz 윈도우 매니저&lt;/a&gt;
+를 더 선호한다. 특히 노트북처럼 1.4Hz CPU지만 전원절약을 위해 대부분 시간을 600MHz로 동작하고, 비디오카드도 인텔 계열(I810)이라서, 무분별하게(?) 화려한 Beryl 프로젝트보다 Compiz 프로젝트가 더 적합한 것 같다.&lt;/p&gt;
+&lt;p&gt;회사에서 작업용으로 사용한 장비의 경우도 NVidia 비디오카드이고 CPU도 넉넉하지만 굳이 Compiz를 사용하는데, Beryl을 이용하면 발생하는 가끔 윈도우가 까맣게 보이는 현상이 Compiz의 경우 발생하지 않기 때문이다.&lt;/p&gt;
+&lt;p&gt;우분투의 경우 XGL을 설치하지 않아도 &amp;lsquo;
+&lt;a href=&#34;http://gandalfn.wordpress.com/compiz-repository/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Ubuntu Compiz Repository&lt;/a&gt;
+&amp;rsquo; 페이지의 설명을 따라 몇 개 패키지만 설치하면 자동으로 설치한다. 특히 여기서 &lt;span style=&#34;font-weight:bold;&#34;&gt;개발 버전(development branch)&lt;/span&gt;를 설치하면 Beryl 프로젝트에 있는 대부분의 플러그인도 비슷하게 사용할 수 있다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Upstart in Universe of Ubuntu Edgy</title>
+      <link>/2006/09/08/2006-09-08-upstart-in-universe-of-ubuntu-edgy/</link>
+      <pubDate>Fri, 08 Sep 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/09/08/2006-09-08-upstart-in-universe-of-ubuntu-edgy/</guid>
+      <description>&lt;p&gt;(&lt;a href=&#34;http://www.netsplit.com/blog/work/canonical/upstart.html&#34;&gt;http://www.netsplit.com/blog/work/canonical/upstart.html&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;caps&#34;&gt;UNIX&lt;/span&gt; System V부터 현재 대부분의 리눅스 배포판에 지금까지 사용하는 sysvinit 시스템이 Ubuntu Edgy 버전에서 upstart라는 이벤트-작업(job) 기반 시스템으로 교체되고 있다. 현존하는 initng, launchd, SMF 등과 같은 sysvinit의 다른 대안을 선택하지 않고 우분투 팀에서 새로 만들어가고 있는 것 같다.&lt;/p&gt;
+&lt;p&gt;아마도 가장 큰 변화는 USB 메모리나 USB 네트웍 장치처럼 실행 중에 추가되고 삭제되는 환경을 고려한다는 점이고, 이벤트 기반으로 시스템 초기화 스크립트(/etc/rcS.d)가 재작성되고, 결국에는 모든 패키지의 데몬이 upstart 방식으로 변경될 것 같다.&lt;/p&gt;
+&lt;p&gt;과연 upstart 방식이 우분투 리눅스에서만 사용하게 될 것인가, 다른 배포판에도 영향을 끼칠 것인가는 아직 미지수다. 하지만 지금까지 대부분 Unix / Linux 사용자와 관리자에게 너무나 당연하게 여겨졌던 /etc/rc?.d 데몬 방식이 변경되면, 새로 공부할게 한 가지 더 늘어나게 되겠군..&lt;/p&gt;
+&lt;p&gt;dbus, udev, hal, &amp;hellip; 리눅스도 이제 충분히 (개발자에게는) 복잡한 시스템이 되어가고 있다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>VMWare USB in Ubuntu</title>
+      <link>/2006/03/11/2006-03-11-vmware-usb-in-ubuntu/</link>
+      <pubDate>Sat, 11 Mar 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/03/11/2006-03-11-vmware-usb-in-ubuntu/</guid>
+      <description>&lt;p&gt;우분투 리눅스는 항상 최신 아키텍쳐를 반영하기 때문에 기존 API나 아키텍쳐를 기반으로 동작하는 써드파티 어플리케이션이 동작 안하는 경우가 가끔 있는데, VMWare도 그 중 하나인 것 같다.&lt;/p&gt;
+&lt;p&gt;언젠가부터 USB 장치를 VMWare 윈도우즈에서 인식을 못한다고 생각했는데, 오늘 검색해 보니 VMWare가 근거로 하는 &lt;code&gt;/proc/bus/usb&lt;/code&gt; 디렉토리 내용이 없어서였다. 다음 줄을 &lt;code&gt;/etc/fstab&lt;/code&gt; 파일에 추가해 주고 재부팅하거나, &lt;code&gt;mount -a&lt;/code&gt; 명령으로 마운트해준 다음 VMWare를 재시작하면 정상적으로 USB 장치를 인식하게 된다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;none        /proc/bus/usb    usbfs  defaults      0    0
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>VMware /dev/parport0 in Ubuntu</title>
+      <link>/2006/02/28/2006-02-28-vmware-devparport0-in-ubuntu/</link>
+      <pubDate>Tue, 28 Feb 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/02/28/2006-02-28-vmware-devparport0-in-ubuntu/</guid>
+      <description>&lt;p&gt;Ubuntu 리눅스에서 VMware를 돌리고, 그 안에서 JTAG 케이블을 이용해 부트로더를 올리는 작업을 하기 위해서는 무엇보다 VMware가 &lt;code&gt;/dev/parport0&lt;/code&gt; 를 찾을 수 있도록 해주어야 한다. 매번 반복되면서 기록을 남기지 않아 오늘도 다시 고생&amp;hellip; 여기에 그 방법을 남겨 놓는다.&lt;/p&gt;
+&lt;p&gt;먼저 ppdev 커널 모듈을 올린다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;modprobe ppdev
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아예 &lt;code&gt;/etc/modules&lt;/code&gt; 에 등록시켜 두는 것이 좋다.
+일반 계정으로 접근이 가능하도록 &lt;code&gt;/etc/group&lt;/code&gt; 에서 lp 부분을 다음과 같이 수정한다. (여기 lethean이 일반 계정이다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;lp❌7:cupsys,lethean
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이게 전부다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>SCIM in Ubuntu</title>
+      <link>/2006/01/12/2006-01-12-scim-in-ubuntu/</link>
+      <pubDate>Thu, 12 Jan 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/01/12/2006-01-12-scim-in-ubuntu/</guid>
+      <description>&lt;p&gt;Ubuntu(dapper) 리눅스에서 지금까지 사용하던 
+&lt;a href=&#34;http://nabi.kldp.net/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;나비(nabi)&lt;/a&gt;
+ 입력기를 
+&lt;a href=&#34;http://www.scim-im.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SCIM&lt;/a&gt;
+으로 대체하기로 했다.
+한국어 뿐 아니라 일본어, 중국어 입력이 필요해지기 시작했고, 현재 개발중인 제품의 기본 입력기로 장착하기 위해 미리 사용해 보기 위해서이기도 하다.&lt;/p&gt;
+&lt;p&gt;설치하는 순서하는 다음과 같다.&lt;/p&gt;
+&lt;p&gt;우선 먼저 SCIM 관련 패키지와 일본어 한자 입력을 위한 Canna 한자 서버 패키지를 설치한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# sudo apt-get remove nabi
+# sudo apt-get install scim scim-gtk-immodule
+# sudo apt-get install scim-hangul scim-canna scim-pinyin
+# sudo apt-get install canna # for japanese dict server
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;X가 기동될때 자동으로 시작할 수 있도록 다음과 같은 작업을 해준다. (im-switch, update-alternatives 등의 데비안 도구를 사용할 수도 있지만 이 방법이 내겐 더 명확하다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# cd /etc/X11/xinit/xinput.d
+# sudo cat &amp;gt; scim
+XIM=SCIM
+XIM_PROGRAM=/usr/bin/scim
+XIM_ARGS=&amp;quot;-d&amp;quot;
+GTK_IM_MODULE=scim
+DEPENDS=&amp;quot;scim,scim-gtk2-immodule&amp;quot;
+[CTRL-D]
+# ln -sf scim ko_KR
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 X를 재시작하거나, 시스템을 재시작하면 특별한 설정없이 자동으로 SCIM 입력기가 실행된다.&lt;/p&gt;
+&lt;p&gt;여기까지만 해도 문제는 없지만, 입력 전환 키가 [CTRL-SPACE]라서, 익숙한 [SHIFT-SPACE]를 사용하기 위해 SCIM 설정에서 키를 추가해주기만 하면 된다.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

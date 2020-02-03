@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Build | 대체로 무해함</title>
+    <link>/tags/build/</link>
+      <atom:link href="/tags/build/index.xml" rel="self" type="application/rss+xml" />
+    <description>Build</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Thu, 17 Mar 2016 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Build</title>
+      <link>/tags/build/</link>
+    </image>
+    
+    <item>
+      <title>Ninja 빌드 도구 소개</title>
+      <link>/2016/03/17/2016-03-17-about-ninja-build/</link>
+      <pubDate>Thu, 17 Mar 2016 00:00:00 +0000</pubDate>
+      <guid>/2016/03/17/2016-03-17-about-ninja-build/</guid>
+      <description>&lt;p&gt;&amp;lsquo;
+&lt;a href=&#34;http://www.bloter.net/archives/252083&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;2015년 주목받은 신인 오픈소스 SW 11선&lt;/a&gt;
+&amp;rsquo; 기사와 Dropbox 클라이언트의 다음 버전을 
+&lt;a href=&#34;https://www.rust-lang.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Rust&lt;/a&gt;
+ 언어와 
+&lt;a href=&#34;http://bazel.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Bazel&lt;/a&gt;
+로 만든다는 
+&lt;a href=&#34;https://www.reddit.com/r/rust/comments/4adabk/the_epic_story_of_dropboxs_exodus_from_the_amazon/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;글&lt;/a&gt;
+을 보고 궁금증이 생겨 잠시 Bazel 빌드 도구를 살펴보았다. 하지만 아직 윈도 플랫폼을 지원하지 않고 &lt;del&gt;Java 언어로 구현되어 있어서&lt;/del&gt; 당분간 사용을 보류.&lt;/p&gt;
+&lt;p&gt;그러다가 문득 요즘에는 어떤 빌드 시스템이 인기 있는지 궁금해서 조사해 보니, 지난 몇 년 사이에 
+&lt;a href=&#34;https://ninja-build.org&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Ninja&lt;/a&gt;
+라는 빌드 도구가 계속 언급되는 걸 발견했다. 
+&lt;a href=&#34;https://cmake.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CMake&lt;/a&gt;
+, 
+&lt;a href=&#34;https://code.google.com/p/gyp/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GYP&lt;/a&gt;
+ 같은 전통의 빌드 시스템이 Make 빌드 파일뿐 아니라 Ninja 빌드 파일도 생성한다. 심지어 
+&lt;a href=&#34;https://www.chromium.org/developers/how-tos/build-instructions-chromeos&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Chromium 브라우저 빌드&lt;/a&gt;
+도 Ninja를 사용하는 방식으로 변경되었다.&lt;/p&gt;
+&lt;p&gt;반나절 정도 걸려 Ninja 빌드 파일을 만들고 실행해 본 소감은 만족 반 실망 반인 것 같다. 항상 
+&lt;a href=&#34;https://ccache.samba.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ccache&lt;/a&gt;
+를 사용하기 때문에 이와 맞물려 더한 감도 있지만, 체감 빌드 속도는 대만족이다. 하지만 단순한 기능을 보완하기 위해 별도의 도구가 더 필요한 점은 아쉽다.&lt;/p&gt;
+&lt;p&gt;Ninja의 장점은 빠른 빌드 속도와 리눅스 / 윈도 / 맥 운영체제를 포함하는 멀티 플랫폼 지원이다. 빠른 속도를 얻기 위해 시스템에 장착된 모든 CPU를 모두 사용해서 병렬로 작업을 처리한다. &lt;code&gt;make -jN&lt;/code&gt; 명령에서 &lt;code&gt;N&lt;/code&gt;에 시스템 CPU 갯수를 지정한 것과 같은 셈이다. 하지만 조금 다뤄보니 병렬 작업에 대한 고려를 많이 했다는 느낌을 받는다. 병렬 처리되는 작업의 결과 내용을 섞어서 표시하지 않고 버퍼링 했다가 따로따로 출력한다거나 Make처럼 세심하게 신경 쓰지 않아도 대부분 작업을 병렬로 잘 처리한다.&lt;/p&gt;
+&lt;p&gt;쉬운 문법과 사용법도 장점이다. 1~2시간 정도면 매뉴얼을 다 읽을 수 있을 정도로 문법이 단순하고 양도 적다. 
+&lt;a href=&#34;https://www.gnu.org/software/make/manual/html_node/Implicit-Rules.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Make의 암묵적인 규칙&lt;/a&gt;
+ 같은 게 전혀 없어서 외우거나 혼란스러운 것도 없다. 하지만 이 단순함은 반대로 치명적인 단점이기도 하다.&lt;/p&gt;
+&lt;p&gt;예를 들어 Make에서는 &lt;code&gt;A = $(shell pkg-config --cflags libuv)&lt;/code&gt;처럼 명령어 실행 결과를 변수에 담거나, &lt;code&gt;A += $(B)&lt;/code&gt;, &lt;code&gt;A ?= src&lt;/code&gt; 같이 다양한 조건을 이용해 변수를 조작할 수 있는데 Ninja에서는 &lt;code&gt;a = $b&lt;/code&gt; 단순 대입 문법이 전부다. 심지어 환경 변수도 사용할 수 없다. 조건문 같은 건 상상도 할 수 없다. 다양한 운영체제를 지원하기 위해 유닉스 셸 실행 기능이 빠진 건 이해할 수 있지만, 환경 변수나 조건문이 없다는 건 Make처럼 혼자서 모든 다양한 경우에 대한 작업을 다 할 수 없다는 뜻이기도 하다. 그래서 홈페이지에도 Ninja를 직접 사용하지 말고 
+&lt;a href=&#34;https://github.com/ninja-build/ninja/wiki/List-of-generators-producing-ninja-build-files&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Ninja 빌드 파일을 자동으로 만드는 다른 도구&lt;/a&gt;
+를 추천하는 것 같다.&lt;/p&gt;
+&lt;p&gt;참고로 Sublime Text 같은 텍스트 에디터에서 Ninja 문법을 지원하거나 
+&lt;a href=&#34;https://www.chromium.org/developers/sublime-text#TOC-Building-with-ninja&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;빌드 명령어 실행&lt;/a&gt;
+을 위한 설정 방법은 대부분 구글에서 검색하면 쉽게 발견된다. 다음은 리눅스에서 Sublime Text를 사용할 때 필요한 Ninja 빌드 시스템 내용인데, 따로 적어두는 이유는 Chromium 사이트의 내용과 조금 다르기 때문이다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;{
+ &amp;quot;shell_cmd&amp;quot;: &amp;quot;ninja&amp;quot;,
+ // ${folder} or ${file_path}
+ &amp;quot;working_dir&amp;quot;: &amp;quot;${folder}&amp;quot;,
+ // (file_path):(line_number):(column):(error_message)
+ &amp;quot;file_regex&amp;quot;: &amp;quot;^([^:\n]*):([0-9]+):?([0-9]+)?:? (.*)$&amp;quot;  
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

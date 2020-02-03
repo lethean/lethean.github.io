@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="요즘은 비동기 이벤트 루프가 필요하면 GLib 라이브러리 대신 libuv 라이브러리를 주로 사용한다. GLib 라이브러리의 기능은 거의 완벽하다. 하지만 아주 가끔 멀티 스레드 환경에">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2016/03/08/2016-03-08-note-about-libuv/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2016/03/08/2016-03-08-note-about-libuv/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2016/03/08/2016-03-08-note-about-libuv/">
+  <meta property="og:title" content="libuv 사용기 | 대체로 무해함">
+  <meta property="og:description" content="요즘은 비동기 이벤트 루프가 필요하면 GLib 라이브러리 대신 libuv 라이브러리를 주로 사용한다. GLib 라이브러리의 기능은 거의 완벽하다. 하지만 아주 가끔 멀티 스레드 환경에"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2016-03-08T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T19:56:33&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2016/03/08/2016-03-08-note-about-libuv/"
+  },
+  "headline": "libuv 사용기",
+  
+  "datePublished": "2016-03-08T00:00:00Z",
+  "dateModified": "2020-02-03T19:56:33+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "요즘은 비동기 이벤트 루프가 필요하면 GLib 라이브러리 대신 libuv 라이브러리를 주로 사용한다. GLib 라이브러리의 기능은 거의 완벽하다. 하지만 아주 가끔 멀티 스레드 환경에"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>libuv 사용기 | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>libuv 사용기</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>요즘은 비동기 이벤트 루프가 필요하면 
+<a href="https://en.wikipedia.org/wiki/GLib" target="_blank" rel="noopener">GLib</a>
+ 라이브러리 대신 
+<a href="http://libuv.org/" target="_blank" rel="noopener">libuv</a>
+ 라이브러리를 주로 사용한다.</p>
+<p>GLib 라이브러리의 기능은 거의 완벽하다. 하지만 아주 가끔 멀티 스레드 환경에서 idle 함수가 이유 없이 실행되지 않는다. 또한 여러 기능이 점점 추가되고 통합되면서 점점 무거워지고 있다. 게다가 이제는 단순히 리눅스 / 윈도 플랫폼뿐 아니라 Mac OS / iOS / Android 등과 같은 모바일 플랫폼까지 고려해야 하는데 GLib 라이브러리는 이 부분에서 매우 취약하다. 이로 인해 네트워킹에 특화되어 있으면서 상대적으로 더 가볍고 멀티 플랫폼에서 성능과 안정성이 더 많이 검증된 libuv 라이브러리를 사용하게 된다.</p>
+<p>libuv 라이브러리는, 이미 대세를 지나 조금씩 거품이 빠지고 있는지도 모르는, 
+<a href="https://nodejs.org/" target="_blank" rel="noopener">Node.js</a>
+의 핵심 엔진이다. 
+<a href="https://plus.google.com/&#43;SunjinYang/posts/7yTEjEv3VC4" target="_blank" rel="noopener">처음 관심을 가졌던 때</a>
+와 달리 지금은 
+<a href="http://libuv.org/" target="_blank" rel="noopener">공식 사이트</a>
+와 
+<a href="http://docs.libuv.org/en/v1.x/" target="_blank" rel="noopener">API 문서</a>
+도 매우 잘 정리되어 있다.</p>
+<p>하지만 지난 몇 년간 libuv 라이브러리를 여기저기 사용해보니, 역시나 완벽한 소프트웨어는 없다고, 처음에는 좋은 점만 보이더니 이제는 아쉬움이 더해간다. 물론 그래도 당분간은 다른 대안이 없어서 계속 사용할 예정이기 때문에 그동안 틈틈이 적었던 기록(이라 적어 놓고 불만이라고 읽는 기록)을 정리해 본다.</p>
+<hr>
+<p>비동기 이벤트 핸들에 우선순위 개념이 없어서 조금 아쉽다. 물론 GLib 메인 루프에만 있는 개념이고 대부분 비동기 이벤트 라이브러리에도 없기 때문에 필요하면 직접 구현해야 한다.</p>
+<p><code>uv_idle_t</code>와 <code>uv_prepare_t</code> / <code>uv_check_t</code> 핸들의 차이는 무엇일까? <code>uv_idle_t</code>는 I/O 또는 <code>uv_timer_t</code>가 없어도 실행되도록 하기 위해 
+<a href="http://docs.libuv.org/en/v1.x/idle.html" target="_blank" rel="noopener">I/O 대기 시간(polling time)이 항상 0이 되어</a>
+ CPU 사용률이 100%가 된다. 하지만, <code>uv_prepare_t</code> / <code>uv_check_t</code> 핸들은 I/O가 있을 때만 I/O 앞과 뒤에서 실행된다. 즉, I/O 작업이 없으면 아예 호출되지 않는다.</p>
+<p><code>uv_fs_*()</code> 함수를 실행한 다음에 <code>uv_fs_req_cleanup()</code> 함수를 호출하지 않으면 메모리 누수 귀신을 만나게 된다. 파일 입출력을 TCP / UDP처럼 스트림 기반 비동기 방식으로 만들지 않은 이유를 모르겠다. 윈도 플랫폼에서 소켓과 파일이 전혀 다르기 때문에 그럴 수도 있지만 유닉스 기반에서는 오히려 더 좋은 성능을 보여줄 텐데 말이다.</p>
+<p><code>uv_timer_t</code>에 반복(repeat)을 지정하면 정확한 주기에 동작한다. 예를 들어 5초 반복인데 콜백 함수가 2초간 실행되면 3초 후에 다시 실행된다. GLib의 <code>g_timeout_*()</code> 함수는 5초 간격(interval)이라면 콜백 함수가 2초간 실행되어도 5초 이후에 다시 실행된다.</p>
+<p>리눅스에서 시리얼 장치처럼 libuv가 직접 지원하지 않는 파일 디스크립터를 연결하려면 <code>uv_poll_t</code>를 사용하면 된다. <code>uv_tty_t</code>는 터미널이나 콘솔에만 사용해야 한다.</p>
+<p>다른 스레드가 특정 지점에 도달할 때까지 기다려야 한다면 <code>uv_barrier_t</code>를 사용하면 편리하다. 예를 들어 새 스레드를 생성하고 그 스레드가 특정 위치까지 실행될 때까지 대기하는 목적으로 사용하면 된다.</p>
+<p>하나의 <code>uv_loop_t</code> 개체와 연결된 모든 libuv 함수는 <code>uv_run()</code> 함수가 실행된 스레드에서만 호출되어야 한다. 심지어 <code>uv_*_init()</code> 함수도 같은 스레드에서 호출해야 한다. <code>uv_async_send()</code> 함수가 유일한 예외인데, 이것만 사용해서 스레드 간에 통신하기에는 조금 부족하다. 스레드 간 통신에 TCP / UDP / 파이프 등을 이용해도 되지만 오버헤드가 발생할 수밖에 없다. 예를 들어 GLib 같은 경우 특정 스레드에서 어떤 함수를 호출하고 싶으면 해당 스레드에서 실행 중인 루프의 콘텍스트에 <code>g_idle_add()</code> / <code>g_timeout_add()</code> 종류의 함수를 이용해서 쉽게 추가할 수 있다. 하지만 libuv에서는 메시지 큐 또는 채널 같은 자료구조를 구현해서 메시지를 전달하면 그 메시지를 해독해서 특정 함수를 실행하거나 작업을 진행해야 한다. 어쩌면 libuv / Node.js 개발자가 멀티 스레드를 지양하고 멀티 프로세스를 지향하는 구조를 선호하기 때문일 수도 있다. C 언어의 특성상 다양한 방식이 존재하기 때문에 필요에 따라 직접 구현해서 사용하기를 권장하는 건지도 모르겠다. 하지만 적어도 
+<a href="https://gobyexample.com/channels" target="_blank" rel="noopener">Go 언어의 채널</a>
+이나 
+<a href="http://rustbyexample.com/std_misc/channels.html" target="_blank" rel="noopener">Rust 언어의 채널</a>
+처럼 널리 사용되는 스레드 간 통신 방법을 libuv 라이브러리가 제공해주면 더 좋을 것 같다.</p>
+<p><code>uv_close()</code> 함수를 호출해도 핸들의 리소스가 실제로 해제되는 시점이 <code>uv_run()</code> 루프 내부라는 점도 불편하다. 이 때문에 핸들과 연관된 리소스를 해제하기 위해 콜백 함수라는 한 단계를 더 거쳐야 한다. 이는 매우 귀찮은 작업인데, 수많은 libuv 예제 소스에는 리소스 해제를 고려하지 않고 대부분 static 변수를 사용하지만, 실전에서는 메모리 누수와 개체의 라이프 사이클을 신경 써야 하기 때문이다. 예를 들어 현재 TCP 연결을 끊고 나서 다른 정보로 다시 TCP 연결을 생성해야 할 때, 콜백 함수가 호출되기 전까지의 그 위험한 순간에 TCP 연결에 대한 핸들을 가리키는 변수에 접근하게 되면 재앙이 발생한다.</p>
+<p>
+<a href="https://ko.wikipedia.org/wiki/Misra_c" target="_blank" rel="noopener">안전한 C 프로그래밍</a>
+을 하고 싶어도 동적인 메모리 할당 / 해제 작업을 피할 수가 없다. 물론 <code>uv_read_start()</code> 함수는 읽기 작업 전에 버퍼를 할당해야 하는 것처럼 보이지만 큰 버퍼를 미리 할당하고 포인터와 크기만 잘 조작해도 된다. 하지만 핸들 자체가 실행 중에 다른 인수로 다시 시작해야 하는 경우처럼 복잡한 단계를 거쳐야 하는 건 어쩔 수 없다.</p>
+<p><code>uv_read_start()</code> 함수는 매우 편리하다. 그런데 연결이 끊기거가 에러가 발생했을때 
+<a href="http://docs.libuv.org/en/v1.x/stream.html#c.uv_read_cb" target="_blank" rel="noopener">문서</a>
+와 다른 패턴을 종종 경험한다.</p>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/libuv/">libuv</a>
+  
+  <a class="badge badge-light" href="/tags/glib/">GLib</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2016/03/08/2016-03-08-note-about-libuv/&amp;text=libuv%20%ec%82%ac%ec%9a%a9%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2016/03/08/2016-03-08-note-about-libuv/&amp;t=libuv%20%ec%82%ac%ec%9a%a9%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=libuv%20%ec%82%ac%ec%9a%a9%ea%b8%b0&amp;body=/2016/03/08/2016-03-08-note-about-libuv/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2016/03/08/2016-03-08-note-about-libuv/&amp;title=libuv%20%ec%82%ac%ec%9a%a9%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=libuv%20%ec%82%ac%ec%9a%a9%ea%b8%b0%20/2016/03/08/2016-03-08-note-about-libuv/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2016/03/08/2016-03-08-note-about-libuv/&amp;title=libuv%20%ec%82%ac%ec%9a%a9%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2012/03/19/2012-03-19-detect-change-of-ip-address-and-link-status-in-linux/">리눅스 IP 주소 / 링크 상태 변경 여부 감지하기</a></li>
+      
+      <li><a href="/2012/02/24/2012-02-24-oop-with-gobject-5/">GObject 객체 지향 프로그래밍 (5)</a></li>
+      
+      <li><a href="/2011/06/15/2011-06-15-vala-language-introduction/">Vala 언어 소개</a></li>
+      
+      <li><a href="/2011/03/07/2011-03-07-using-gudev/">GUDev 사용하기</a></li>
+      
+      <li><a href="/2010/10/02/2010-10-02-glib-2-26-0-release/">GLib 2.26.0 출시</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,2681 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux | 대체로 무해함</title>
+    <link>/tags/linux/</link>
+      <atom:link href="/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <description>Linux</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Wed, 09 Mar 2016 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Linux</title>
+      <link>/tags/linux/</link>
+    </image>
+    
+    <item>
+      <title>git bisect 이용한 리눅스 PCI 드라이버 디버깅</title>
+      <link>/2016/03/09/2016-03-09-git-bisect-linux-pci-driver-debugging/</link>
+      <pubDate>Wed, 09 Mar 2016 00:00:00 +0000</pubDate>
+      <guid>/2016/03/09/2016-03-09-git-bisect-linux-pci-driver-debugging/</guid>
+      <description>&lt;p&gt;리눅스 커널 4.3 버전으로 업그레이드하면서부터 
+&lt;a href=&#34;http://www.highpoint-tech.com/USA_new/series_rr272x_configuration.htm&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;RocketRAID&lt;/a&gt;
+ RAID 장치가 동작하지 않았다. 컴파일 오류도 없고 로딩에도 문제가 없는데, 응답이 너무 느려서 거의 동작하지 않는 거나 마찬가지다. 구글링을 해도 해결 방법을 찾을 수 없었는데, 아마도 업체에서 제공하는 커널 드라이버라서 사용자가 적어서일 수도 있다. 이렇게 심각한 문제라면 4.3.x 안정 버전이나 4.4 버전에서 해결될 것이라 생각하고 기다렸다. 하지만 4.4 버전이 출시되어도 증상은 동일했다. 결국 직접 원인을 찾기로 했다. 분명한 건 리눅스 커널 4.2 버전까지 정상적으로 동작했는데 4.3 버전부터 동작하지 않는다는 사실이다.&lt;/p&gt;
+&lt;p&gt;정상적으로 동작하는 리눅스 커널 4.2.5 버전에서는 &lt;code&gt;rr272x_1x&lt;/code&gt; 모듈이 인터럽트 16을 할당받아 동작하는데,&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ cat /proc/interrupts
+...
+ 16:      13629       3699       2326       1683  IR-IO-APIC  16-fasteoi   ehci_hcd:usb1, rr272x_1x
+...
+
+$ dmesg | grep rr272x
+...
+[    1.619829] rr272x_1x:adapter at PCI 1:0:0, IRQ 16
+...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;오동작하는 리눅스 커널 4.4.1 버전에서는 인터럽트 11을 할당받지만 실제 인터럽트xi는 발생하지 않고,&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ cat /proc/interrupts
+...
+ 11:          0          0          0          0  IR-IO-APIC  11-edge      rr272x_1x
+ 16:     199999          0          1          1  IR-IO-APIC  16-fasteoi   ehci_hcd:usb1
+...
+
+$ dmesg | grep rr272x
+...
+[    1.639672] rr272x_1x:adapter at PCI 1:0:0, IRQ 11
+...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;인터럽트 16을 아무도 처리하지 않아서 커널이 경고 메시지를 출력한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[    5.750969] irq 16: nobody cared (try booting with the &amp;quot;irqpoll&amp;quot; option)
+[    5.750973] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G     U     O    4.4.1-1-ARCH #1
+[    5.750974] Hardware name: Supermicro C7Z97-OCE/C7Z97-OCE, BIOS 2.0 06/22/2015
+[    5.750975]  0000000000000000 bf85cf29362dfeed ffff880856c03e68 ffffffff812c7f39
+[    5.750977]  ffff88082e06ae00 ffff880856c03e90 ffffffff810d1053 ffff88082e06ae00
+[    5.750978]  0000000000000000 0000000000000010 ffff880856c03ec8 ffffffff810d13de
+[    5.750980] Call Trace:
+[    5.750981]  &amp;lt;IRQ&amp;gt;  [&amp;lt;ffffffff812c7f39&amp;gt;] dump_stack+0x4b/0x72
+[    5.750988]  [&amp;lt;ffffffff810d1053&amp;gt;] __report_bad_irq+0x33/0xc0
+[    5.750990]  [&amp;lt;ffffffff810d13de&amp;gt;] note_interrupt+0x23e/0x280
+[    5.750992]  [&amp;lt;ffffffff810ce6d7&amp;gt;] handle_irq_event_percpu+0xa7/0x1b0
+[    5.750994]  [&amp;lt;ffffffff810ce819&amp;gt;] handle_irq_event+0x39/0x60
+[    5.750995]  [&amp;lt;ffffffff810d1be9&amp;gt;] handle_fasteoi_irq+0x89/0x150
+[    5.750997]  [&amp;lt;ffffffff81018c7a&amp;gt;] handle_irq+0x1a/0x30
+[    5.751000]  [&amp;lt;ffffffff815944db&amp;gt;] do_IRQ+0x4b/0xd0
+[    5.751002]  [&amp;lt;ffffffff815925c2&amp;gt;] common_interrupt+0x82/0x82
+[    5.751002]  &amp;lt;EOI&amp;gt;  [&amp;lt;ffffffff81447c14&amp;gt;] ? cpuidle_enter_state+0x124/0x290
+[    5.751006]  [&amp;lt;ffffffff81447db7&amp;gt;] cpuidle_enter+0x17/0x20
+[    5.751008]  [&amp;lt;ffffffff810b79b2&amp;gt;] call_cpuidle+0x32/0x60
+[    5.751010]  [&amp;lt;ffffffff81447d93&amp;gt;] ? cpuidle_select+0x13/0x20
+[    5.751012]  [&amp;lt;ffffffff810b7c72&amp;gt;] cpu_startup_entry+0x292/0x370
+[    5.751014]  [&amp;lt;ffffffff815858c9&amp;gt;] rest_init+0x89/0x90
+[    5.751015]  [&amp;lt;ffffffff81906013&amp;gt;] start_kernel+0x483/0x4a4
+[    5.751017]  [&amp;lt;ffffffff81905120&amp;gt;] ? early_idt_handler_array+0x120/0x120
+[    5.751019]  [&amp;lt;ffffffff81905339&amp;gt;] x86_64_start_reservations+0x2a/0x2c
+[    5.751020]  [&amp;lt;ffffffff81905485&amp;gt;] x86_64_start_kernel+0x14a/0x16d
+[    5.751021] handlers:
+[    5.751025] [&amp;lt;ffffffffa0093410&amp;gt;] usb_hcd_irq [usbcore]
+[    5.751026] Disabling IRQ #16
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;인터럽트 번호가 잘못 할당된 것 같은데 원인을 찾아야 했다. 결국 무식하지만 가장 확실한 방법을 사용하기로 결심하고, &lt;code&gt;git bisect&lt;/code&gt; 명령을 이용해 리눅스 커널 4.2 버전과 4.3 버전 사이에서 문제를 일으키는 커밋을 찾아야 했다. 물론 매번 커널을 다시 컴파일하고 테스트하는 작업은 오래 걸리지만 다행히 성능 좋은 개발 서버에서 돌려서 시간을 많이 단축할 수 있었고 약 하루 정도 만에 문제의 커밋을 찾았다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;
+$ git bisect start 6a13feb9c82803e2b815eca72fa7a9f5561d7861 64291f7db5bd8150a74ad2036f1037e6a0428df2
+$ git bisect log
+# bad: [6a13feb9c82803e2b815eca72fa7a9f5561d7861] Linux 4.3
+# good: [64291f7db5bd8150a74ad2036f1037e6a0428df2] Linux 4.2
+git bisect start &#39;6a13feb9c82803e2b815eca72fa7a9f5561d7861&#39; &#39;64291f7db5bd8150a74ad2036f1037e6a0428df2&#39;
+# bad: [807249d3ada1ff28a47c4054ca4edd479421b671] Merge branch &#39;upstream&#39; of git://git.linux-mips.org/pub/scm/ralf/upstream-linus
+git bisect bad 807249d3ada1ff28a47c4054ca4edd479421b671
+# bad: [102178108e2246cb4b329d3fb7872cd3d7120205] Merge tag &#39;armsoc-drivers&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/arm/arm-soc
+git bisect bad 102178108e2246cb4b329d3fb7872cd3d7120205
+# good: [c8192ba416397ad6ce493f186da40767ce086c3b] Merge tag &#39;for-v4.3&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/sre/linux-power-supply
+git bisect good c8192ba416397ad6ce493f186da40767ce086c3b
+# bad: [7073bc66126e3ab742cce9416ad6b4be8b03c4f7] Merge branch &#39;core-rcu-for-linus&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+git bisect bad 7073bc66126e3ab742cce9416ad6b4be8b03c4f7
+# bad: [26f8b7edc9eab56638274f5db90848a6df602081] Merge tag &#39;pci-v4.3-changes&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/helgaas/pci
+git bisect bad 26f8b7edc9eab56638274f5db90848a6df602081
+# good: [cf9d615f7f5842ca1ef0f28ed9f67a97d20cf6fc] Merge tag &#39;regulator-v4.3&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator
+git bisect good cf9d615f7f5842ca1ef0f28ed9f67a97d20cf6fc
+# good: [edc837da4b54a01ba6fa3c29b411e35d1a8430ca] Merge tag &#39;leds_for_4.3&#39; of git://git.kernel.org/pub/scm/linux/kernel/git/j.anaszewski/linux-leds
+git bisect good edc837da4b54a01ba6fa3c29b411e35d1a8430ca
+# bad: [5a4f3cf0d1f02884c0a64488d22b3bb4bce31b44] Merge branches &#39;pci/irq&#39;, &#39;pci/misc&#39;, &#39;pci/resource&#39; and &#39;pci/virtualization&#39; into next
+git bisect bad 5a4f3cf0d1f02884c0a64488d22b3bb4bce31b44
+# good: [932c435caba8a2ce473a91753bad0173269ef334] PCI: Add dev_flags bit to access VPD through function 0
+git bisect good 932c435caba8a2ce473a91753bad0173269ef334
+# good: [cd66d5c3df7c96cbf75010b964b94032ceca8889] Merge branches &#39;pci/host-designware&#39;, &#39;pci/host-xgene&#39; and &#39;pci/host-xilinx&#39; into next
+git bisect good cd66d5c3df7c96cbf75010b964b94032ceca8889
+# bad: [5f2269916b0e509f2926346b58209abfa8316143] PCI/MSI: Free legacy IRQ when enabling MSI/MSI-X
+git bisect bad 5f2269916b0e509f2926346b58209abfa8316143
+# bad: [991de2e59090e55c65a7f59a049142e3c480f7bd] PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()
+git bisect bad 991de2e59090e55c65a7f59a049142e3c480f7bd
+# good: [890e4847587fcff5eb0438e90992ad7d2a261f33] PCI: Add pcibios_alloc_irq() and pcibios_free_irq()
+git bisect good 890e4847587fcff5eb0438e90992ad7d2a261f33
+# first bad commit: [991de2e59090e55c65a7f59a049142e3c480f7bd] PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;바로 이 커밋이 원인이었다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;commit 991de2e59090e55c65a7f59a049142e3c480f7bd
+Author: Jiang Liu &amp;lt;jiang.liu@linux.intel.com&amp;gt;
+Date:   Wed Jun 10 16:54:59 2015 +0800
+
+    PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()
+
+    To support IOAPIC hotplug, we need to allocate PCI IRQ resources on demand
+    and free them when not used anymore.
+
+    Implement pcibios_alloc_irq() and pcibios_free_irq() to dynamically
+    allocate and free PCI IRQs.
+
+    Remove mp_should_keep_irq(), which is no longer used.
+
+    [bhelgaas: changelog]
+    Signed-off-by: Jiang Liu &amp;lt;jiang.liu@linux.intel.com&amp;gt;
+    Signed-off-by: Bjorn Helgaas &amp;lt;bhelgaas@google.com&amp;gt;
+    Acked-by: Thomas Gleixner &amp;lt;tglx@linutronix.de&amp;gt;
+
+:040000 040000 765e2d5232d53247ec260b34b51589c3bccb36ae f680234a27685e94b1a35ae2a7218f8eafa9071a M	arch
+:040000 040000 d55a682bcde72682e883365e88ad1df6186fd54d f82c470a04a6845fcf5e0aa934512c75628f798d M	drivers
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 커밋에 대한 자세한 정보를 얻기 위해 인터넷을 검색하니, 약간 허무하지만, 동일한 문제가 이미 보고되어 있었다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.spinics.net/lists/linux-pci/msg48507.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PCI device driver broken between 4.2 and 4.3&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;https://bugzilla.kernel.org/show_bug.cgi?id=111211&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;TA1-PCI card worked in v4.2, fails in v4.3&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;해당 
+&lt;a href=&#34;https://bugzilla.kernel.org/show_bug.cgi?id=111211&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;버그질라&lt;/a&gt;
+에 간단한 댓글을 달면서 공식 해결 방법을 기다렸지만, 공식 커널에 적용되려면 너무 시간이 오래 걸릴 것 같아서 직접 드라이버 
+&lt;a href=&#34;https://gist.github.com/lethean/e2e53ca15b1c97cee45a&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;패치&lt;/a&gt;
+를 만들어 적용했더니 문제없이 동작했다. 일종의 편법이긴 하지만, &lt;code&gt;pci_register_driver()&lt;/code&gt; 함수를 미리 호출한 다음에 &lt;code&gt;pci_get_device()&lt;/code&gt; 함수를 이용하는 원래 초기화 함수를 호출하도록 변경했다.&lt;/p&gt;
+&lt;p&gt;그런데 조금 성급했는지, 아니면 심각한 버그라고 판단했는지 리눅스 4.5 RC 버전에 바로 
+&lt;a href=&#34;https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=6c777e8799a93e3bdb67bec622429e1b48dc90fb&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;반영&lt;/a&gt;
+되었다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;commit 6c777e8799a93e3bdb67bec622429e1b48dc90fb
+Author: Bjorn Helgaas &amp;lt;bhelgaas@google.com&amp;gt;
+Date:   Wed Feb 17 12:26:42 2016 -0600
+
+    Revert &amp;quot;PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()&amp;quot;
+
+    991de2e59090 (&amp;quot;PCI, x86: Implement pcibios_alloc_irq() and
+    pcibios_free_irq()&amp;quot;) appeared in v4.3 and helps support IOAPIC hotplug.
+
+    Олег reported that the Elcus-1553 TA1-PCI driver worked in v4.2 but not
+    v4.3 and bisected it to 991de2e59090.  Sunjin reported that the RocketRAID
+    272x driver worked in v4.2 but not v4.3.  In both cases booting with
+    &amp;quot;pci=routirq&amp;quot; is a workaround.
+
+    I think the problem is that after 991de2e59090, we no longer call
+    pcibios_enable_irq() for upstream bridges.  Prior to 991de2e59090, when a
+    driver called pci_enable_device(), we recursively called
+    pcibios_enable_irq() for upstream bridges via pci_enable_bridge().
+
+    After 991de2e59090, we call pcibios_enable_irq() from pci_device_probe()
+    instead of the pci_enable_device() path, which does *not* call
+    pcibios_enable_irq() for upstream bridges.
+
+    Revert 991de2e59090 to fix these driver regressions.
+
+    Link: https://bugzilla.kernel.org/show_bug.cgi?id=111211
+    Fixes: 991de2e59090 (&amp;quot;PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()&amp;quot;)
+    Reported-and-tested-by: Олег Мороз &amp;lt;oleg.moroz@mcc.vniiem.ru&amp;gt;
+    Reported-by: Sunjin Yang &amp;lt;fan4326@gmail.com&amp;gt;
+    Signed-off-by: Bjorn Helgaas &amp;lt;bhelgaas@google.com&amp;gt;
+    Acked-by: Rafael J. Wysocki &amp;lt;rafael@kernel.org&amp;gt;
+    CC: Jiang Liu &amp;lt;jiang.liu@linux.intel.com&amp;gt;
+
+ arch/x86/include/asm/pci_x86.h |  2 ++
+ arch/x86/pci/common.c          | 20 +++++++++++---------
+ arch/x86/pci/intel_mid_pci.c   |  7 ++-----
+ arch/x86/pci/irq.c             | 15 ++++++++++++++-
+ drivers/acpi/pci_irq.c         |  9 ++++++++-
+ 5 files changed, 37 insertions(+), 16 deletions(-)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참 좋은 세상이다 ;)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스에서 시간 변경 감지하기</title>
+      <link>/2015/02/17/2015-02-17-detect-time-change-with-timerfd-in-linux/</link>
+      <pubDate>Tue, 17 Feb 2015 00:00:00 +0000</pubDate>
+      <guid>/2015/02/17/2015-02-17-detect-time-change-with-timerfd-in-linux/</guid>
+      <description>&lt;p&gt;&lt;code&gt;systemd&lt;/code&gt; 데몬은 가끔 &amp;ldquo;Time has been changed&amp;quot;라는 로그 메시지를 출력합니다. 그래서 과연 어떤 방식으로 시간이 변경되는 이벤트를 감지하는지 궁금해서 
+&lt;a href=&#34;http://cgit.freedesktop.org/systemd/systemd/tree/src/core/manager.c#n1920&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;소스 코드&lt;/a&gt;
+를 한 번 들여다보았습니다.&lt;/p&gt;
+&lt;p&gt;일반적으로 
+&lt;a href=&#34;http://man7.org/linux/man-pages/man2/timerfd_create.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;timerfd_create()&lt;/code&gt;&lt;/a&gt;
+ 함수는 지연되어 실행하거나 주기적으로 처리해야 작업을 실행할 때 사용합니다. 맨 페이지의 예제 소스는 이러한 용도로 완벽합니다. 그런데 &lt;code&gt;systemd&lt;/code&gt;에서는 &lt;code&gt;timerfd_settime()&lt;/code&gt; 함수를 호출할 때 두 번째 인수에 &lt;code&gt;TFD_TIMER_CANCEL_ON_SET&lt;/code&gt; 값을 전달합니다. 이 값은 맨 페이지에도 없어서 구글 검색을 해보니 
+&lt;a href=&#34;http://man7.org/tlpi/api_changes/#Linux-3.0&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;glibc API 변경 문서&lt;/a&gt;
+에서 다음과 같이 설명된 부분을 찾을 수 있었습니다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The timerfd_settime() system call adds a TFD_TIMER_CANCEL_ON_SET flag.
+If this flag is set for a CLOCK_REALTIME absolute (TFD_TIMER_ABSTIME) timer,
+then the timer is expired if the clock is reset.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;즉, 커널 내부 시계(clock)가 초기화(reset)되면 타이머가 만기되어(expired) 이벤트가 발생한다는 내용입니다. 그리고 눈으로 읽는 것만으로는 역시 잊어버릴 것 같아서, 
+&lt;a href=&#34;https://gist.github.com/lethean/446cea944b7441228298#file-timechange-c&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;예제 프로그램을 간단하게 수정&lt;/a&gt;
+해서 시간이 변경되는 여러 경우를 실험해보니, 직접 시간을 변경하거나 NTP 시간 동기화로 인한 시간 변경은 감지하는데, 시간대(time zone) 변경은 감지하지 못하는군요. 게다가 사람이 보기에는 같지만 아주 조금만 달라져도, 추측하기에는 시간 변경 함수가 호출만 되어도, 이벤트가 발생합니다. 게다가 시간이 앞으로 이동했는지 뒤로 이동했는지도 알 방법이 없고&amp;hellip;&lt;/p&gt;
+&lt;p&gt;아무튼, 오늘도 역시 여전히 아는 것보다 모르는 게 더 많다는 사실을 새삼 깨닫게 된 하루입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Raspberry Pi &#43; X11 &#43; Clutter(&#43; Cogl)</title>
+      <link>/2015/02/16/2015-02-16-try-cogl-with-x11-on-raspberry-pi/</link>
+      <pubDate>Mon, 16 Feb 2015 00:00:00 +0000</pubDate>
+      <guid>/2015/02/16/2015-02-16-try-cogl-with-x11-on-raspberry-pi/</guid>
+      <description>&lt;p&gt;결론부터 말하자면 실패한 해킹에 대한 기록입니다.&lt;/p&gt;
+&lt;p&gt;Raspberry Pi 2 장비를 하나 얻게 되어, 이삼일 정도 클러터(Clutter) 라이브러리가 제대로 동작하도록 삽질을 했습니다.&lt;/p&gt;
+&lt;p&gt;구글에는 X 서버, 즉 X 윈도 없이 리눅스 프레임 버퍼 위에서 EGL + GLES2 API를 이용하는 방법은 많이 나와 있는데, X11 + EGL + GLES2 조합은 없어서 여기저기 구글링을 통해 얻은 정보를 이용해 Cogl 예제 디렉터리에 있는 프로그램들이, 비록 전체화면 방식이기는 하지만, 문제없이 실행되게 하는 데까지는 성공했습니다. (
+&lt;a href=&#34;https://gist.github.com/lethean/ac21450495dddc597f79#file-cogl-1-8-raspberrypi-patch&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;패치 파일&lt;/a&gt;
+과 
+&lt;a href=&#34;https://gist.github.com/lethean/ac21450495dddc597f79#file-cogl-build-sh&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;빌드 스크립트&lt;/a&gt;
+)&lt;/p&gt;
+&lt;p&gt;하지만 Clutter 예제 프로그램을 돌리면 여러 가지 경고를 내고 멈추거나 아무 메시지도 출력하지 않고 CPU 점유율만 차지하는 경우가 발생합니다. EGL + Raspberry Pi API가 전혀 생소한 것은 물론 Cogl + Clutter 연결 고리도 잘 모르지만, 다른 할 일도 많고, 내일모레부터는 설 연휴이기도 하고, 당장 급한 일도 아니라 일단 이 상태에서 작업을 멈추었습니다.&lt;/p&gt;
+&lt;p&gt;혹시 Clutter / Cogl 라이브러리를 Raspberry Pi 상에서 깔끔하게 돌아가게 하는 패치나 소스를 알고 계신 분 있나요? 아마도 회사에서 업무로 Raspberry Pi를 건드리는 분 중에는 분명 이미 작업한 분이 있을 것 같은데&amp;hellip;&lt;/p&gt;
+&lt;p&gt;시간이 지날수록 구글링 실력도 점점 줄어드는 것 같고&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스에서 이더넷 프레임 보내고 받기</title>
+      <link>/2015/02/10/2015-02-10-send-receive-raw-ethernet-frames-with-custom-ether-type-in-linux/</link>
+      <pubDate>Tue, 10 Feb 2015 00:00:00 +0000</pubDate>
+      <guid>/2015/02/10/2015-02-10-send-receive-raw-ethernet-frames-with-custom-ether-type-in-linux/</guid>
+      <description>&lt;p&gt;다음에 진행할 프로젝트를 위해 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Ethernet_frame&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이더넷 프레임&lt;/a&gt;
+ 패킷을 리눅스에서 소켓 API를 이용해 직접 읽고 쓰는 방법이 필요해서 조사한 결과를 남겨봅니다.&lt;/p&gt;
+&lt;p&gt;언제나처럼 구글의 도움을 받아 발견한 &amp;ldquo;
+&lt;a href=&#34;https://austinmarton.wordpress.com/2012/06/03/receiving-raw-packets-in-linux-without-pcap/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Receiving raw packets in Linux without pcap&lt;/a&gt;
+&amp;rdquo; 글의 코드를 참고해서 샘플로 구현한 소스는 
+&lt;a href=&#34;https://gist.github.com/lethean/5fb0f493a1968939f2f7&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;여기&lt;/a&gt;
+에서 확인할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;윈본 소스와 다른 점은, 알려져 있는 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/EtherType&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이더넷 타입&lt;/a&gt;
+ 대신 자신만의 고유 타입을 사용하고, 브로드캐스트 주소도 인식하면서 간단한 메시지를 전송하거나 수신합니다.&lt;/p&gt;
+&lt;p&gt;컴파일 방법은 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ gcc -Wall -o ethcom ethcom.c
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;사용법은 &lt;code&gt;-l&lt;/code&gt; 옵션을 주면 수신 모드로 동작하고, &lt;code&gt;-i&lt;/code&gt; 옵션으로 네트워크 인터페이스 이름(기본 &lt;code&gt;eth0&lt;/code&gt;)을 지정할 수 있고, &lt;code&gt;-d&lt;/code&gt; 옵션으로 전송할 대상 주소(기본 &lt;code&gt;ff:ff:ff:ff:ff:ff&lt;/code&gt;)를 지정할 수 있습니다. 예를 들어 다음과 같이 입력하면 &amp;lsquo;Hello, World&amp;rsquo; 문자열을 이더넷 네트워크에 브로드캐스트합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo ./ethcom &amp;quot;Hello, World&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다른 장비에서 수신 모드로 실행하면 다음과 같이 문자열을 수신합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo ./ethcom -l
+60:a4:4c:xx:xx:xx -&amp;gt; ff:ff:ff:ff:ff:ff Hello, World
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고로, 실행할 때 반드시 루트(root) 권한이어야 합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 IP 주소 / 링크 상태 변경 여부 감지하기</title>
+      <link>/2012/03/19/2012-03-19-detect-change-of-ip-address-and-link-status-in-linux/</link>
+      <pubDate>Mon, 19 Mar 2012 00:00:00 +0000</pubDate>
+      <guid>/2012/03/19/2012-03-19-detect-change-of-ip-address-and-link-status-in-linux/</guid>
+      <description>&lt;p&gt;리눅스에서 IP 주소가 변경되었거나 링크 상태 변경 여부(예를 들어 랜선이 꽂히거나 빠졌을때)를 자동으로 감지하는 C 코드입니다. &lt;code&gt;ifconfig&lt;/code&gt; 명령등의 결과를 파싱하는 방법이 아닌 리눅스 커널 &lt;code&gt;rtnetlink(7)&lt;/code&gt; 프로토콜과 &lt;code&gt;getifaddrs()&lt;/code&gt; 함수를 이용해 직접 처리합니다. 참조한 소스는 여러군데가 있는데 모두 구글링이 가능하므로 결과물만 기록으로 남겨둡니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+#include &amp;lt;errno.h&amp;gt;
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/types.h&amp;gt;
+#include &amp;lt;sys/socket.h&amp;gt;
+#include &amp;lt;ifaddrs.h&amp;gt;
+#include &amp;lt;net/if.h&amp;gt;
+#include &amp;lt;netdb.h&amp;gt;
+#include &amp;lt;netinet/in.h&amp;gt;
+#include &amp;lt;linux/netlink.h&amp;gt;
+#include &amp;lt;linux/rtnetlink.h&amp;gt;
+
+static int
+create_sock (const char *nic)
+{
+  struct sockaddr_nl addr;
+  int                sock;
+
+  memset (&amp;amp;addr, 0, sizeof (addr));
+  addr.nl_family = AF_NETLINK;
+  addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR | RTMGRP_IPV6_IFADDR;
+
+  sock = socket (PF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (sock &amp;lt; 0)
+    {
+      fprintf (stderr, &amp;quot;failed to open NETLINK_ROUTE socket for %s - %s(%d)&amp;quot;,
+               nic, strerror (errno), errno);
+      return -1;
+    }
+
+  if (bind (sock, (struct sockaddr *)&amp;amp;addr, sizeof(addr)) &amp;lt; 0)
+    {
+      fprintf (stderr, &amp;quot;failed to bind NETLINK_ROUTE socket for %s - %s(%d)&amp;quot;,
+                 nic, strerror (errno), errno);
+      close (sock);
+      return -1;
+    }
+
+  return sock;
+}
+
+static int
+ip_changed (int         sock,
+            const char *nic)
+{
+  struct nlmsghdr   *nlh;
+  char               buffer[4096];
+  int                len;
+  int                idx;
+  int                found;
+
+  len = recv (sock, buffer, sizeof (buffer), 0);
+  if (len &amp;lt;= 0)
+    {
+      fprintf (stderr, &amp;quot;NETLINK_ROUTE socket recv() failedn&amp;quot;);
+      return -1;
+    }
+
+  found = 0;
+  idx = if_nametoindex (nic);
+
+  for (nlh = (struct nlmsghdr *)buffer;
+       NLMSG_OK (nlh, len);
+       nlh = NLMSG_NEXT (nlh, len))
+    {
+      if (nlh-&amp;gt;nlmsg_type == NLMSG_DONE)
+        break;
+      if (nlh-&amp;gt;nlmsg_type == NLMSG_ERROR)
+        continue;
+      if (!(NLMSG_OK (nlh, len)))
+        continue;
+
+      switch (nlh-&amp;gt;nlmsg_type)
+        {
+        case RTM_NEWADDR:
+          {
+            struct ifaddrmsg *ifa = (struct ifaddrmsg *)NLMSG_DATA (nlh);
+
+            if (ifa-&amp;gt;ifa_index == idx)
+              found = 1;
+          }
+          break;
+        case RTM_NEWLINK:
+          {
+            struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA (nlh);
+
+            if (ifi-&amp;gt;ifi_index == idx)
+              found = 1;
+          }
+          break;
+        default:
+          break;
+        }
+    }
+
+  return found;
+}
+
+static int
+get_nic_addr (const char     *nic,
+              struct ifaddrs *ifaddr,
+              int             wanted_family,
+              char           *host,
+              int             host_len,
+              int            *active)
+{
+  struct ifaddrs *ifa;
+
+  for (ifa = ifaddr; ifa != NULL; ifa = ifa-&amp;gt;ifa_next)
+    {
+      int family;
+      int s;
+
+      if (ifa-&amp;gt;ifa_addr == NULL)
+        continue;
+
+      if (strcmp (ifa-&amp;gt;ifa_name, nic))
+        continue;
+
+      /* Skip unwanted families. */
+      family = ifa-&amp;gt;ifa_addr-&amp;gt;sa_family;
+      if (family != wanted_family)
+        continue;
+
+      *active = (ifa-&amp;gt;ifa_flags &amp;amp; IFF_RUNNING) ? 1 : 0;
+
+      s = getnameinfo (ifa-&amp;gt;ifa_addr,
+                       family == AF_INET ? sizeof (struct sockaddr_in) :
+                                           sizeof (struct sockaddr_in6),
+                       host,
+                       host_len,
+                       NULL,
+                       0,
+                       NI_NUMERICHOST);
+      if (s != 0)
+        {
+          fprintf (stderr, &amp;quot;failed to getnameinfo() for &#39;%s - %s(%d)&amp;quot;,
+                   ifa-&amp;gt;ifa_name, strerror (errno), errno);
+          continue;
+        }
+
+      /* Get the address of only the first network interface card. */
+      return 1;
+    }
+
+  return 0;
+}
+
+static void
+print_ip (const char *nic)
+{
+  struct ifaddrs *ifaddr;
+  char            addr[NI_MAXHOST];
+  int             active;
+
+  if (getifaddrs (&amp;amp;ifaddr) == -1)
+    {
+      fprintf (stderr, &amp;quot;failed to getifaddrs() - %s(%d)&amp;quot;, strerror (errno), errno);
+      return;
+    }
+
+  if (!get_nic_addr (nic, ifaddr, AF_INET, addr, sizeof (addr), &amp;amp;active))
+    if (!get_nic_addr (nic, ifaddr, AF_INET6, addr, sizeof (addr), &amp;amp;active))
+      {
+        strcpy (addr, &amp;quot;127.0.0.1&amp;quot;);
+        active = 0;
+      }
+
+  freeifaddrs (ifaddr);
+
+  fprintf (stdout, &amp;quot;%s is %s (link %s)n&amp;quot;,
+           nic, addr, active ? &amp;quot;active&amp;quot; : &amp;quot;inactive&amp;quot;);
+}
+
+int
+main (void)
+{
+  char *nic = &amp;quot;eth0&amp;quot;;
+  int   sock;
+
+  print_ip (nic);
+
+  sock = create_sock (nic);
+  if (sock &amp;lt; 0)
+    return -1;
+
+  while (1)
+    {
+      int ret;
+
+      ret = ip_changed (sock, nic);
+      if (ret &amp;lt; 0)
+        return -1;
+
+      if (ret)
+        print_ip (nic);
+    }
+
+  close (sock);
+
+  return 0;
+}
+
+/*
+  Local Variables:
+   mode:c
+   c-file-style:&amp;quot;gnu&amp;quot;
+   indent-tabs-mode:nil
+  End:
+  vim:autoindent:filetype=c:expandtab:shiftwidth=2:softtabstop=2:tabstop=8
+*/
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고로 위 소스에서 네트웍 인터페이스 설정 변경을 감지하기 위해 사용한 소켓 파일 디스크립터(socket file descriptor)는 &lt;code&gt;select()&lt;/code&gt; / &lt;code&gt;poll()&lt;/code&gt; 등을 이용해 비동기적으로 감시하는 것도 가능합니다. 당연하지만, 
+&lt;a href=&#34;/2009/09/21/using-glib-mainloop/&#34;&gt;GLib 메인루프&lt;/a&gt;
+의 &lt;code&gt;g_io_add_watch()&lt;/code&gt; 등을 이용해도 됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE 2012-03-21]&lt;/strong&gt; &lt;code&gt;rtnetlink(7)&lt;/code&gt; 프로토콜의 기반이 되는 &lt;code&gt;netlink(7)&lt;/code&gt; 프로토콜에 대해 더 자세히 알고 싶다면 
+&lt;a href=&#34;http://www.infradead.org/~tgr/libnl/doc/core.html#core_netlink_fundamentals&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Netlink 라이브러리의 Netlink 프로토콜 기초 문서&lt;/a&gt;
+를 참고하기 바랍니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>모니터 없이 X 서버 실행 후 나중에 모니터 연결해도 화면이 안보인다면</title>
+      <link>/2012/01/29/2012-01-29-setup-new-connected-monitors-automatically-after-starting-x-server-without-connected-monitors/</link>
+      <pubDate>Sun, 29 Jan 2012 00:00:00 +0000</pubDate>
+      <guid>/2012/01/29/2012-01-29-setup-new-connected-monitors-automatically-after-starting-x-server-without-connected-monitors/</guid>
+      <description>&lt;p&gt;제목이 조금 길지만, 이 글의 내용은 제목 그대로입니다. (참고로, 이 글은 최근 인텔 그래픽 칩셋을 대상으로 작성되었습니다. 즉, 다른 그래픽 칩셋 드라이버는 어떻게 동작하는지 확인을 안 해 보았다는 의미입니다)&lt;/p&gt;
+&lt;p&gt;요즘 X 서버는 연결된 모니터가 없고, &lt;code&gt;/etc/X11/xorg.conf&lt;/code&gt; 파일에 수직/수평 주파수가 정의되어 있지 않다고 하더라도 일단 정상적으로 실행됩니다. 다만, 초기 해상도가 320x200 처럼 매우 작을 수 있습니다. 그런데 나중에 필요에 의해 모니터를 연결했는데 화면이 보이지 않는 경우가 발생합니다. 이 경우, 네트웍으로 접속해서 다음 명령어를 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ export DISPLAY=:0.0
+$ xrandr --auto
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그러면 X 서버가 알아서 연결되어 있는 모니터를 출력으로 재설정하고 가장 선호하는(preferred) 해상도와 주파수를 선택합니다. 그런데 이를 자동으로 동작하게 하려면 udev 데몬의 도움을 받아야 합니다. 그래서 &lt;code&gt;/etc/udev/rules.d&lt;/code&gt; 디렉토리에 확장자가 &lt;code&gt;&#39;.rules&#39;&lt;/code&gt;인 파일을 생성하고 다음과 같이 내용을 채웁니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;ACTION==&amp;quot;change&amp;quot;, SUBSYSTEM==&amp;quot;drm&amp;quot;, KERNEL==&amp;quot;card*&amp;quot;, RUN+=&amp;quot;/usr/bin/auto-xrandr.sh&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 &lt;code&gt;/usr/bin/auto-xrandr.sh&lt;/code&gt; 파일을 아래와 같이 작성한뒤 실행권한을 줍니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#!/bin/sh
+[ &amp;quot;$DISPLAY&amp;quot; = &amp;quot;&amp;quot; ] &amp;amp;&amp;amp; export DISPLAY=:0.0
+xrandr --auto
+xrandr --dpi 96
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그러면 이제부터 모니터 연결시 자동으로 연결을 재설정하게 됩니다.&lt;/p&gt;
+&lt;p&gt;그런데, 만일 네트웍으로 접속했거나, udev 데몬에 의해 실행되는 경우 X 서버 인증이 안된 계정이라며 &lt;code&gt;xrandr&lt;/code&gt; 명령이 실행이 거부됩니다. 이를 제대로 처리하려면 복잡한 인증 과정이 필요한데, 이를 쉽게 처리하려면 그냥 X 서버 시작할때 자동으로 실행되는 초기화 스크립트에 &lt;code&gt;&#39;xhost +&#39;&lt;/code&gt; 명령어를 주면 인증을 무시하게 됩니다. 물론 보안상 좋은 방법은 아니지만, 폐쇠된 환경이라면 별로 문제가 없을 겁니다.&lt;/p&gt;
+&lt;p&gt;각각의 명령어에 대해 더 궁금하신 분은 관련 명령어 매뉴얼 페이지를 확인해 보시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;참고로 조금만 더 설명하면, 노트북 외부 모니터 단자에 빔 프로젝트나 외부 모니터를 연결했을 경우도 xrandr 명령을 직접 사용하거나 지금까지 설명한 방법을 조금 다르게 응용할 수 있습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>eventfd 소개</title>
+      <link>/2011/07/07/2011-07-07-eventfd/</link>
+      <pubDate>Thu, 07 Jul 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/07/07/2011-07-07-eventfd/</guid>
+      <description>&lt;p&gt;리눅스에서 비단 부모 자식 프로세스간 통신 뿐 아니라, 쓰레드간 메시지 전달에도 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/pipe.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;pipe()&lt;/a&gt;
+를 자주 이용합니다. 읽거나 쓸때 별도로 뮤텍스로 보호해줄 필요가 없기 때문이기도 하지만, 무엇보다도 poll(), select(), epoll() 등과 함께 사용할 수 있기 때문입니다. 예를 들어 예전에 적었던 
+&lt;a href=&#34;/2008/08/06/glib-thread-programming/&#34;&gt;GLib 쓰레드 프로그래밍&lt;/a&gt;
+에서 쓰레드간 통신에 g_async_queue()를 이용하는데, 이 방법의 단점은 쓰레드가 오직 이 메시지가 도착했을때만 깨어난다는 점입니다. 만일 이 쓰레드가 네트웍 소켓 작업이나 파일 읽기 쓰기 작업을 비동기적으로 계속 처리해야 한다면 타임아웃을 주어 처리하거나 반대로 다시 주기적으로 메시지큐를 검사하는 방법밖에 없습니다. 하지만, 리눅스에서 모든 소켓 작업, 파일 작업은 디스크립터(descriptor)로 단일화되어 있기 때문에 pipe()로 생성된 디스크립터와 실제 작업 디스크립터를 한꺼번에 epoll() 등을 이용해 처리하면 불필요한 오버헤드 없이 정확하게 작업을 처리해야할 시점에 깨어나 필요한 작업을 처리하게 됩니다. 즉, 메시지큐에 실제 메시지를 넣고 파이프의 쓰기 디스크립터에 더미 데이터를 쓰면, 작업 쓰레드에서는 파이프 읽기 디스크립터에 내용이 있을 경우 poll() 등이 감지하기 때문에 자동으로 깨어나 처리하는 방식입니다. 심지어, 파이프 전송시 더미 데이터가 아닌 메시지 내용 혹은 주소(pointer)를 쓰고, 읽는 쓰레드에서 이를 읽어 처리하면 별도의 메시지큐도 불필요하게 됩니다.&lt;/p&gt;
+&lt;p&gt;이 글에서 소개하려는 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/eventfd.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;eventfd()&lt;/a&gt;
+는 파이프 역할을 어느 정도 대체하기 위해 최근(?) 리눅스 커널에 추가된 API입니다. 읽고 쓰기에 각각 다른 두 개의 파일 디스크립터를 사용하는 파이프와 달리 eventfd는 한 개의 파일 디스크립터를 가지고 동시에 읽고 쓰기 작업을 처리합니다. 또한 별도 커널 버퍼와 복사 과정이 필요한 파이프와 달리 정수 값을 더하고(쓰고) 읽는 작업만 처리하기 때문에 성능도 훨씬 좋다고 합니다. 물론 파일 디스크립터이기 때문에 poll() 등과 함께 사용할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;동작 방식을 간단하게 설명하면, write() 호출시 64비트 정수값을 쓰면 내부 버퍼 값에 더하면서, read() 호출시 내부 버퍼 값이 0일 경우 기다리다가, 값이 바뀌면 그 값을 읽어오고 0으로 초기화합니다.(세마포어 방식일 경우 1을 읽어오고 그 값에서 1을 감소합니다) 즉, 읽기 작업에 대한 poll() 호출은 내부 버퍼 값이 0일 경우 입력이 없는 것으로, 1 이상의 값일 경우 입력이 있는 것으로 간주하고 디스크립터를 감지하게 됩니다. (예제 코드는 매뉴얼 페이지에 포함된 코드를 확인하시길&amp;hellip; 물론 예제 코드는 쓰레드간 통신에도 잘 동작합니다)&lt;/p&gt;
+&lt;p&gt;매뉴얼에 의하면 리눅스 커널 2.6.22, glibc 2.8 버전부터 eventfd() 함수를 지원합니다. 대부분의 요즘 리눅스 데스크탑 / 서버 배포판에서는 당연히 사용할 수 있지만 임베디드 시스템에서는 버전을 확인해야할 필요가 있습니다. 물론, eventfd가 메시지 내용 자체를 전송할 수 없다는 단점도 있지만, 이와 함께 리눅스 커널이 제공하는 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/signalfd.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;signalfd()&lt;/a&gt;
+, 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/timerfd_create.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;timerfd()&lt;/a&gt;
+, 
+&lt;a href=&#34;http://linux.die.net/man/4/epoll&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;epoll()&lt;/a&gt;
+ 등을 함께 사용하면 고전 유닉스 프로그래밍의 한계에서 벗어나 마음껏 이벤트 기반 코드를 만들 수 있습니다.&lt;/p&gt;
+&lt;p&gt;물론 이미 잘 만들어진 
+&lt;a href=&#34;/2009/09/21/using-glib-mainloop/&#34;&gt;GLib 메인루프&lt;/a&gt;
+나 
+&lt;a href=&#34;http://bebop.emstone.com/2011/05/18/libevent/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libevent&lt;/a&gt;
+ 등과 같은 라이브러리를 사용하는 것도 좋지만&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>PCD - Process Control Daemon</title>
+      <link>/2011/05/30/2011-05-30-pcd-process-control-daemon/</link>
+      <pubDate>Mon, 30 May 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/05/30/2011-05-30-pcd-process-control-daemon/</guid>
+      <description>&lt;p&gt;아치리눅스를 비롯한 몇몇 리눅스 배포판은 여전히 시스템 부팅 초기화에 필요한 작업, 예를 들어 로컬 파일 시스템을 마운트하거나 웹서버, X서버 같은 시스템 프로그램을 자동으로 실행하기 위해 전통적인 유닉스의 SysV 시스템 구동 스크립트 방식(런레벨, rc.d 스크립트 등) 혹은 비슷한 방식을 이용하고 있습니다. 하지만 오래된 이 방식은 셸 스크립트 기반이라 전반적인 실행 속도가 느릴 뿐 아니라 프로세스간 의존성, 프로세스 종료시 예외처리(예: 자동 재실행) 등과 같은 기능을 지원하지 않아 많은 시스템 관리자 및 개발자의 불만을 산 것도 사실입니다. 특히 최근 몇 년동안 이슈가 되었던 리눅스 부팅 속도 단축을 위해 제일 먼저 처리되어야 하는 걸림돌로 여겨지기도 했습니다. 이런 이유로, 우분투(Ubuntu)는 오래전부터 자체적으로 개발한 
+&lt;a href=&#34;http://upstart.ubuntu.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Upstart&lt;/a&gt;
+ 프로그램으로 이를 교체했고, 페도라(Fedora) 역시 Fedora 15부터 
+&lt;a href=&#34;http://www.freedesktop.org/wiki/Software/systemd&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Systemd&lt;/a&gt;
+ 프로그램을 이용해 구동 과정을 관리합니다. 즉, 요즘 리눅스 서버 / 데스크탑 시스템에서 시스템 초기 부팅 작업을 위한 솔루션은, 가히 춘추전국시대라고 할 수 있을만큼, 각각을 리눅스 표준으로 정착하려고 노력하는 이들이 있는가 하면, 그냥 옛것이 좋은 것이라고 고수하는 이도 있고, 더 단순하고 본인 입맛에 맞는 시스템을 직접 개발해서 사용하는 이도 있을만큼 다양합니다.&lt;/p&gt;
+&lt;p&gt;그런데 여담이지만, 아치리눅스 부팅 과정 커스터마이징과 속도를 경험해봐서 그런 건지, 범용 배포판은 어쩔 수 없이 모든 사용자가 만족할 수 있도록 가능한 많은 서비스 프로그램을 기본적으로 설치하고 이를 모두 시작하기 때문에 느려질 수 밖에 없는 건데, 부팅 속도 향상을 위해 시작 프로세스 관리 데몬의 성능과 기능을 개선하는 방향으로만 접근하고 있는 게 아닌가 하는 생각도 듭니다. 물론 다른 고급 기능을 제공한다고 하지만, 어차피 대부분의 기능은 배포판 개발자들만 사용하는 거고&amp;hellip; :) 참고로, 이 
+&lt;a href=&#34;http://free-electrons.com/blog/boot-time-genivi-2011/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;발표자료&lt;/a&gt;
+만 봐도 부팅 속도와 초기화 프로그램의 능력은 무관한 것 같습니다.&lt;/p&gt;
+&lt;p&gt;아무튼, 지금까지 설명한 배경이 최근 
+&lt;a href=&#34;http://free-electrons.com/blog/elc-2011-videos/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;임베디드 리눅스 컨퍼런스 2011 발표 슬라이드&lt;/a&gt;
+를 읽다가 
+&lt;a href=&#34;http://elinux.org/images/b/ba/Elc2011_shalom.odp&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PCD(Process Control Daemon)라는 프로세스 관리 데몬을 소개하는 내용&lt;/a&gt;
+을 보고 흥미를 가질 수 밖에 없었던 이유입니다. 위에 소개한 최신 프로그램들이 제공하는 기본 기능을 충실히 구현한 것은 물론, 임베디드 시스템을 우선 대상으로 개발했기 때문에 실행파일 크기가 매우 작고 빠르다는 점이 가장 매력적인 장점인 것 같습니다. (자세한 기능은 직접 확인해 보시길&amp;hellip; :)&lt;/p&gt;
+&lt;p&gt;Systemd / Upstart 프로그램은 기능은 강력하지만 임베디드 시스템에 적용하기에는 너무 덩치가 크고 라이브러리 의존성도 무시하지 못할만큼 무겁습니다. 또한 임베디드 시스템은 개발자가 시스템의 모든 프로세스를 통제하고 완벽하게 관리해야 하기 때문에, 시스템에 대해 배포판 개발자와 동등하거나 더 많은 이해를 필요로 하므로 이러한 도구를 이용하면 작업이 수월해질 수 있습니다. 더 나아가, 이 프로그램을 조금 더 응용하면 데스크탑 / 서버용 시스템에서 여러 프로세스로 동작하는 시스템을 개발할 때도 유용하지 않을까 하는 생각도 듭니다.&lt;/p&gt;
+&lt;p&gt;물론 임베디드 리눅스 개발시 하나의 셸 스크립트 안에서 부팅 과정에 필요한 모든 작업을 처리하는 방식이 무조건 나쁜 건 아닙니다. 다만 복잡도가 더 높은 시스템을 설계할 때는 반드시 이런 프로세스 / 세션 관리 / 예외 처리 프로그램을 사용하거나 알아두면 나중에 참고하는 데 도움이 되지 않을까 생각해 봅니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>libmicrohttpd 내장 웹서버 라이브러리</title>
+      <link>/2011/05/02/2011-05-02-libmicrohttpd-embedded-web-server-library/</link>
+      <pubDate>Mon, 02 May 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/05/02/2011-05-02-libmicrohttpd-embedded-web-server-library/</guid>
+      <description>&lt;p&gt;최근 프로젝트에서 내장 웹서버를 운영하기 위해 
+&lt;a href=&#34;http://www.gnu.org/software/libmicrohttpd/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libmicrohttpd&lt;/a&gt;
+ 라이브러리를 적용해 보았습니다. 물론, 임베디드 시스템에서 많이 사용하는 
+&lt;a href=&#34;http://www.goahead.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GoAhead&lt;/a&gt;
+ 등과 같은 상용 라이브러리를 사용하거나, 
+&lt;a href=&#34;http://www.busybox.net/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;BusyBox&lt;/a&gt;
+ 내장 웹서버, 또는 다른 많은 오픈소스 라이브러리를 사용할 수도 있지만, 라이센스도(LGPL 또는 eCos) 괜찮고, 성능과 API 구성이 단순하고 명쾌한 것 같아서 시도해 보았습니다. (물론 아직도 주변에는 라이센스 무시하고 상용 라이브러리 몰래 사용하는 곳이 많긴 하지만&amp;hellip; :-) 참고로, 이 라이브러리는 
+&lt;a href=&#34;http://xbmc.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;XBMC&lt;/a&gt;
+ 프로젝트를 들여다보다가 내부에서 사용하는 걸 우연하게 발견했습니다.&lt;/p&gt;
+&lt;p&gt;내장 웹서버 라이브러리를 사용하면 얻을 수 있는 가장 좋은 장점은 MJPEG, RTSP-over-HTTP 등과 같은 웹기반 스트리밍 서버를 만들때 매우 편리하다는 점입니다. 한 프로세스 안에서 웹서버 + 스트리밍 생성 루틴이 함께 동작하므로 메모리 복사 오버헤드가 줄어들고 프로그래밍 복잡도 역시 감소합니다. 또한 CGI 프로세스가 따로 동작할 필요가 없으므로 웹을 통해 설정을 변경해도 별도의 프로세스간 통신이 불필요합니다.&lt;/p&gt;
+&lt;p&gt;물론, 내장 웹서버 방식이 장점만 있는 건 아닙니다. 기존 스탠드얼론 웹서버가 알아서 자동으로 해주던 부분, 예를 들어 디렉토리 인덱스 파일 생성, 동시 접속 클라이언트 수 관리, 클라이언트 캐시를 위한 수정 시각 고려 등을 프로그래머가 직접 작성해야 합니다. 특히 libmicrohttpd 라이브리는 GoAhead 등과 같은 상용 라이브러리에 비하면 자동화 부분이 조금 부족합니다. 예를 들어 파일 시스템의 일반 파일에 대한 웹서비스 처리도 직접 만들어야 합니다. 물론, 대부분 필요한 기능은 예제 소스를 참고하면 어렵지 않게 구현할 수 있습니다. 하지만 제 생각에는, 웹서버 라이브러리가 너무 많은 기능을 자동화하지 않는게 오히려 더 맞다고 생각하는데, 왜냐하면 대부분 응용 프로그램에서 웹서버를 내장하는 경우는 특수한 용도(RESTful / SOAP)이거나 필요한 기능만 구현하기 위해서이기 때문에 나머지는 모두 개발자가 제어하는게 라이브러리의 제 역할이 아닌가 생각합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>도메인 메일 호스트(MX) 주소 얻기</title>
+      <link>/2011/04/05/2011-04-05-get-domain-mx-host-name/</link>
+      <pubDate>Tue, 05 Apr 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/04/05/2011-04-05-get-domain-mx-host-name/</guid>
+      <description>&lt;p&gt;예를 들어 &lt;a href=&#34;mailto:nobody@hades.net&#34;&gt;nobody@hades.net&lt;/a&gt;이라는 메일 주소의 서버는 hades.net인 것 같지만 실제로 메일을 호스팅하는 서버는 해당 도메인 서버에 질의해서 MX 레코드에 기록된 호스트를 찾아야 합니다. 그리고 이 작업을 위해 DNS 관련 프로토콜을 직접 구현하거나. 
+&lt;a href=&#34;http://cr.yp.to/djbdns.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;djbdns&lt;/a&gt;
+ 등과 같은 라이브러리를 이용합니다.&lt;/p&gt;
+&lt;p&gt;그런데, 요즘 기존 코드를 리팩토링하면서 가능한 오래된(?) 라이브러리에 대한 의존성을 없애고 있는데 위에서 설명한 작업을 하는 함수가 리눅스 기본 glibc 라이브러리가 &lt;em&gt;당연히&lt;/em&gt; 제공하는 걸 알게 되어 잠시 허탈했습니다.&lt;/p&gt;
+&lt;p&gt;다음은 도메인 이름을 인수로 주면 해당 도메인의 MX 레코드, 즉 메일서버 호스트를 glibc API를 이용해 작성한 코드입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;netinet/in.h&amp;gt;
+#include &amp;lt;arpa/nameser.h&amp;gt;
+#include &amp;lt;resolv.h&amp;gt;
+
+static char *
+lookup_mx (const char *name)
+{
+  unsigned char response[NS_PACKETSZ];  /* big enough, right? */
+  ns_msg        handle;
+  int           ns_index;
+  int           len;
+
+  len = res_search (name, C_IN, T_MX, response, sizeof (response));
+  if (len &amp;lt; 0)
+    {
+      /* failed to search MX records */
+      return strdup (name);
+    }
+  if (ns_initparse (response, len, &amp;amp;handle) &amp;lt; 0)
+    {
+      /* failed to parse MX records for &#39;%s&#39;&amp;quot;, name); */
+      return strdup (name);
+    }
+  len = ns_msg_count (handle, ns_s_an);
+  if (len &amp;lt;= 0)
+    {
+      /* no mx records */
+      return strdup (name);
+    }
+  for (ns_index = 0; ns_index &amp;lt; len; ns_index++)
+    {
+      ns_rr rr;
+      char  dispbuf[4096];
+
+      if (ns_parserr (&amp;amp;handle, ns_s_an, ns_index, &amp;amp;rr))
+        {
+          /* WARN: ns_parserr failed */
+          continue;
+        }
+      ns_sprintrr (&amp;amp;handle, &amp;amp;rr, NULL, NULL, dispbuf, sizeof (dispbuf));
+      if (ns_rr_class (rr) == ns_c_in &amp;amp;&amp;amp; ns_rr_type (rr) == ns_t_mx)
+        {
+          char mxname[MAXDNAME];
+
+          dn_expand (ns_msg_base (handle),
+                     ns_msg_base (handle) + ns_msg_size (handle),
+                     ns_rr_rdata(rr) + NS_INT16SZ,
+                     mxname,
+                     sizeof (mxname));
+          return strdup (mxname);
+        }
+    }
+  return strdup (name);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;관련 자료는 
+&lt;a href=&#34;http://stackoverflow.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Stack Overflow&lt;/a&gt;
+에서 본 것 같기도 하고&amp;hellip; 아무튼, 명색이 전문 리눅스 C 프로그래머로서 15년 넘게 버티고 있으면서도 아직까지도 기본 C 라이브러리가 제공하는 함수도 제대로 알지 못하는 스스로를 돌아보게 됩니다. :(&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GUDev 사용하기</title>
+      <link>/2011/03/07/2011-03-07-using-gudev/</link>
+      <pubDate>Mon, 07 Mar 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/03/07/2011-03-07-using-gudev/</guid>
+      <description>&lt;p&gt;이제는 리눅스 데스크탑 뿐 아니라 임베디드 시스템에서도 당연하게 사용하는 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Udev&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;udev&lt;/a&gt;
+ 시스템은 단순히 장치 파일을 자동으로 생성해 주는 역할 뿐 아니라 여러 핫플러그(hot-plug) 방식 장치를 감지하는데도 유용하게 사용됩니다. 비단 키보드, 마우스 같은 입력 장치 뿐 아니라 USB 플래시, SATA / IDE / SCSI 하드디스크, CD-RW 등과 같은 저장장치가 삽입되었거나 제거되었을 경우 쉽게 감지할 수 있게 도와줍니다.&lt;/p&gt;
+&lt;p&gt;이러한 udev 서브 시스템의 혜택을 개발자가 얻기 위해 많은 방법이 존재하지만, 이 글에서는 GLib 메인루프 기반으로 동작하는 
+&lt;a href=&#34;http://www.kernel.org/pub/linux/utils/kernel/hotplug/gudev/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GUDev&lt;/a&gt;
+ 라이브러리를 이용하는 법을 설명합니다. GLib 라이브러리를 사용하지 않을 경우 직접 
+&lt;a href=&#34;http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libudev&lt;/a&gt;
+ 라이브러리를 사용해도 되지만, 기본 개념만 파악하면 쉽게 어떤 라이브러리를 사용해도 상관없기 때문에 인터페이스가 더 편하고 직관적인 GUDev 라이브러리를 사용합니다. 참고로, 이 글은 &amp;ldquo;
+&lt;a href=&#34;http://www.signal11.us/oss/udev/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libudev and Sysfs Tutorial&lt;/a&gt;
+﻿&amp;rdquo; 글과 &amp;ldquo;
+&lt;a href=&#34;http://www.piware.de/2010/06/gudev-vala-bindings/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gudev Vala bindings&lt;/a&gt;
+&amp;rdquo; 글을 참고했습니다.&lt;/p&gt;
+&lt;p&gt;먼저 라이브러리를 설치하려면 우분투에서는 &lt;code&gt;libgudev-1.0-dev&lt;/code&gt; 패키지, 아치리눅스에서는 &lt;code&gt;udev&lt;/code&gt; 패키지를 설치하면 됩니다. (여담이지만, 아치리눅스는 개발에 필요한 헤더파일과 라이브러리가 별도 패키지로 분리되어 있는 경우가 별로 없는 것 같습니다)&lt;/p&gt;
+&lt;p&gt;다음 소스 코드는 현재 시스템에 장착된 모든 블럭 장치(block)를 보여주고, 이후 USB 플래시가 삽입되거나 제거되었을때 이를 감지하여 표시하도록 한 소스 코드입니다.(&lt;code&gt;gudev.c&lt;/code&gt;)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;gudev/gudev.h&amp;gt;
+
+static void
+print_device (GUdevDevice *device)
+{
+  const gchar * const *symlinks;
+
+  g_print (&amp;quot;  subsystem       : %sn&amp;quot;
+           &amp;quot;  devtype         : %sn&amp;quot;
+           &amp;quot;  name            : %sn&amp;quot;
+           &amp;quot;  number          : %sn&amp;quot;
+           &amp;quot;  sysfs_path      : %sn&amp;quot;
+           &amp;quot;  driver          : %sn&amp;quot;
+           &amp;quot;  action          : %sn&amp;quot;
+           &amp;quot;  seqnum          : %lldn&amp;quot;
+           &amp;quot;  device_type     : %dn&amp;quot;
+           &amp;quot;  device_number   : %dn&amp;quot;
+           &amp;quot;  device_file     : %sn&amp;quot;
+           &amp;quot;n&amp;quot;,
+           g_udev_device_get_subsystem (device),
+           g_udev_device_get_devtype (device),
+           g_udev_device_get_name (device),
+           g_udev_device_get_number (device),
+           g_udev_device_get_sysfs_path (device),
+           g_udev_device_get_driver (device),
+           g_udev_device_get_action (device),
+           g_udev_device_get_seqnum (device),
+           g_udev_device_get_device_type (device),
+           g_udev_device_get_device_number (device),
+           g_udev_device_get_device_file (device));
+}
+
+static void
+uevented (GUdevClient *client,
+          gchar       *action,
+          GUdevDevice *device,
+          gpointer     user_data)
+{
+  g_print (&amp;quot;[action:%s]n&amp;quot;, action);
+  print_device (device);
+}
+
+static void
+print_block_device (gpointer data,
+                    gpointer user_data)
+{
+  GUdevDevice *device = data;
+
+  print_device (device);
+  g_object_unref (device);
+}
+
+static void
+print_block_devices (GUdevClient *client)
+{
+  GList *devices;
+
+  devices = g_udev_client_query_by_subsystem (client, &amp;quot;block&amp;quot;);
+  if (devices)
+  {
+    g_print (&amp;quot;[block devices]n&amp;quot;);
+    g_list_foreach (devices, print_block_device, NULL);
+    g_list_free (devices);
+  }
+}
+
+int
+main (int    argc,
+      char **argv)
+{
+  const gchar *subsystems[4] =
+    { &amp;quot;usb/usb_interface&amp;quot;, &amp;quot;scsi/scsi_device&amp;quot;, &amp;quot;block&amp;quot;, NULL };
+  GUdevClient *client;
+  GMainLoop   *main_loop;
+
+  g_type_init ();
+  main_loop = g_main_loop_new (NULL, FALSE);
+
+  client = g_udev_client_new (subsystems);
+  g_signal_connect (client, &amp;quot;uevent&amp;quot;, G_CALLBACK (uevented), NULL);
+
+  print_block_devices (client);
+
+  g_main_loop_run (main_loop);
+  g_object_unref (client);
+
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;컴파일 하려면 다음과 같이 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ gcc -o gudev gudev.c `pkg-config --cflags --libs gudev-1.0`
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;소스 코드를 간단하게 설명하면, 제일 먼저 &lt;code&gt;g_udev_client_new()&lt;/code&gt; 함수를 이용해 &lt;code&gt;GUdevClient&lt;/code&gt; 객체를 생성합니다. 이때 넘겨주는 인수는 변화를 감지하고 싶은 서브 시스템 목록인데, 여기서는 모든 블럭 장치와 USB, SCSI 서브 시스템을 지정했습니다.(SCSI는 실제로 모든 종류의 하드디스크를 의미하기도 합니다) 만일 &lt;code&gt;NULL&lt;/code&gt;을 지정하면 변화 감지 기능을 사용하지 않고 그냥 질의(query) 계열 API만 사용할 수 있으며, 비어있는 목록을 넘겨주면 시스템의 모든 서브시스템의 장치 변화를 감지해서 시그널로 알려줍니다. 참고로 매뉴얼에는 클라이언트를 생성한 쓰레드의 메인루프를 사용하여 감지 루틴이 실행된다고 하니, 만일 별도 쓰레드에서 이 감지 작업을 수행하려면 쓰레드를 먼저 만들고 그 쓰레드 안에서 생성해야 합니다. 이 예제에서는 테스트를 위해 기본 메인 루프를 사용하고 있습니다.&lt;/p&gt;
+&lt;p&gt;직접 장치 목록을 질의(query)하거나 시그널이 발생했을 경우 넘겨받는 &lt;code&gt;GUdevDevice&lt;/code&gt; 객체와 &lt;code&gt;g_udev_device_get_*()&lt;/code&gt; 계열 API를 이용하면 장치의 세부 정보를 얻을 수 있습니다. 위 예제에서는 udev / sysfs 관련 속성 등은 출력하지 않고 있지만, 필요하다면 더 자세한 정보를 얻을 수 있습니다.&lt;/p&gt;
+&lt;p&gt;실행하면 대략 다음과 같이 출력됩니다. (당연히 실행 환경에 따라 결과가 다릅니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ ./gudev
+[block devices]
+  subsystem       : block
+  devtype         : disk
+  name            : sda
+  number          : (null)
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda
+  driver          : (null)
+  action          : (null)
+  seqnum          : 0
+  device_type     : 98
+  device_number   : 2048
+  device_file     : /dev/sda
+
+  subsystem       : block
+  devtype         : partition
+  name            : sda1
+  number          : 1
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda/sda1
+  driver          : (null)
+  action          : (null)
+  seqnum          : 0
+  device_type     : 98
+  device_number   : 2049
+  device_file     : /dev/sda1
+
+  subsystem       : block
+  devtype         : disk
+  name            : sr0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1f.2/host5/target5:0:0/5:0:0:0/block/sr0
+  driver          : (null)
+  action          : (null)
+  seqnum          : 0
+  device_type     : 98
+  device_number   : 2816
+  device_file     : /dev/sr0
+
+위 출력에서는 일반 디스크 장치(`/dev/sda`)와 디스크 파티션(`/dev/sda1`), DVD-RW 장치(`/dev/sr0`)가 있음을 보여줍니다. 여기서 만일 일반 USB 플래시 메모리를 삽입하면 다음과 같은 결과가 출력됩니다.
+
+[action:add]
+  subsystem       : usb
+  devtype         : usb_interface
+  name            : 2-3:1.0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0
+  driver          : usb-storage
+  action          : add
+  seqnum          : 1934
+  device_type     : 0
+  device_number   : 0
+  device_file     : (null)
+
+[action:add]
+  subsystem       : scsi
+  devtype         : scsi_device
+  name            : 17:0:0:0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host17/target17:0:0/17:0:0:0
+  driver          : sd
+  action          : add
+  seqnum          : 1938
+  device_type     : 0
+  device_number   : 0
+  device_file     : (null)
+
+[action:change]
+  subsystem       : scsi
+  devtype         : scsi_device
+  name            : 17:0:0:0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host17/target17:0:0/17:0:0:0
+  driver          : sd
+  action          : change
+  seqnum          : 1944
+  device_type     : 0
+  device_number   : 0
+  device_file     : (null)
+
+[action:add]
+  subsystem       : block
+  devtype         : disk
+  name            : sdc
+  number          : (null)
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host17/target17:0:0/17:0:0:0/block/sdc
+  driver          : (null)
+  action          : add
+  seqnum          : 1945
+  device_type     : 98
+  device_number   : 2080
+  device_file     : /dev/sdc
+
+[action:add]
+  subsystem       : block
+  devtype         : partition
+  name            : sdc1
+  number          : 1
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host17/target17:0:0/17:0:0:0/block/sdc/sdc1
+  driver          : (null)
+  action          : add
+  seqnum          : 1946
+  device_type     : 98
+  device_number   : 2081
+  device_file     : /dev/sdc1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 예제 소스 코드에서 감시하기 위해 지정한 서브 시스템 모두의 변화를 보여주다보니 복잡해 보이지만, 결국 USB 플래시 메모리가 USB / SCSI / BLOCK 서브시스템에 모두 정상적으로 감지되는 걸 확인할 수 있습니다. 다시 장치를 제거하면 다음과 같이 출력됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;[action:remove]
+  subsystem       : block
+  devtype         : disk
+  name            : sdc
+  number          : (null)
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host16/target16:0:0/16:0:0:0/block/sdc
+  driver          : (null)
+  action          : remove
+  seqnum          : 1926
+  device_type     : 0
+  device_number   : 2080
+  device_file     : /dev/sdc
+
+[action:remove]
+  subsystem       : scsi
+  devtype         : scsi_device
+  name            : 16:0:0:0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0/host16/target16:0:0/16:0:0:0
+  driver          : (null)
+  action          : remove
+  seqnum          : 1927
+  device_type     : 0
+  device_number   : 0
+  device_file     : (null)
+
+[action:remove]
+  subsystem       : usb
+  devtype         : usb_interface
+  name            : 2-3:1.0
+  number          : 0
+  sysfs_path      : /sys/devices/pci0000:00/0000:00:1d.7/usb2/2-3/2-3:1.0
+  driver          : (null)
+  action          : remove
+  seqnum          : 1931
+  device_type     : 0
+  device_number   : 0
+  device_file     : (null)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 정보를 실제로 어떻게 활용할지는 이제 어플리케이션에게 달린 몫입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>사진 파일 이름 변경하기</title>
+      <link>/2011/02/22/2011-02-22-renaming-photo-files/</link>
+      <pubDate>Tue, 22 Feb 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/02/22/2011-02-22-renaming-photo-files/</guid>
+      <description>&lt;p&gt;요즘 디지털 카메라나 휴대폰으로 촬영한 JPEG 파일에는 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/EXIF&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;EXIF&lt;/a&gt;
+ 정보가 삽입되어 있어서 나름 유용할 때가 많습니다. 카메라에 대한 자세한 사양(?) 정보에는 관심이 없지만, 촬영한 시각이라든지 카메라를 세워서 촬영했는지 여부는 물론, 카메라 GPS 옵션을 켜면 기록되는 촬영 장소의 정확한 좌표는 가끔 두려울 때도 있습니다.&lt;/p&gt;
+&lt;p&gt;아무튼 요즘은 윈도우나 맥 부럽지 않은 리눅스 사진 관리 프로그램들이 많이 있어서 편하긴 한데, 이런 프로그램들이 존재하기 전부터, EXIF 정보가 포함되지도 않았던 시절부터 디렉토리별로 관리해오던 습관을 버리지 못하는 게 문제입니다. 예를 들어 폴더는 알아보기 쉽게 &lt;code&gt;YYYYMMDD-장소또는이벤트이름&lt;/code&gt; 식으로 이름짓고, 안에 들어있는 JPEG 파일은 &lt;code&gt;YYYYMMDD-hhmmss-photo.jpg&lt;/code&gt;, 동영상 파일은 &lt;code&gt;YYYYMMDD-hhmmss-movie.mp4&lt;/code&gt; 식으로 이름을 지어 줍니다.&lt;/p&gt;
+&lt;p&gt;물론, 이런 작업을 모두 수작업으로 하지는 않습니다. EXIF 정보에 문외한이던 시절에는 
+&lt;a href=&#34;http://live.gnome.org/gthumb&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gthumb&lt;/a&gt;
+ 같은 프로그램의 이름일괄변경(&lt;code&gt;Rename...&lt;/code&gt;) 기능을 이용해 자동으로 날짜 뒤에 일련번호를 붙이기도 했습니다.&lt;/p&gt;
+&lt;p&gt;하지만 요즘은 그것도 귀찮아서 &lt;code&gt;exiv2&lt;/code&gt; / &lt;code&gt;rename&lt;/code&gt; 명령어를 이용해 한꺼번에 변경해 버립니다. 
+&lt;a href=&#34;http://www.exiv2.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;exiv2&lt;/code&gt;&lt;/a&gt;
+ 프로그램을 이용해 EXIF 정보에 들어있는 촬영 시각을 기준으로 사진 파일 이름을 변경하고,  &lt;code&gt;rename&lt;/code&gt; 명령어를 이용해 대문자로 된 &lt;code&gt;.JPG&lt;/code&gt; 확장자를 소문자 &lt;code&gt;.jpg&lt;/code&gt; 확장자로 한번에 변경합니다. 예를 들어 위에서 설명한 예처럼 파일 이름을 변경하려면 사진 파일이 들어 있는 디렉토리에서 다음과 같이 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ rename .JPG .jpg *.JPG
+$ exiv2 -r &#39;%Y%m%d-%H%M%S-photo&#39; -k rename *.jpg
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;rename&lt;/code&gt; 명령어는 대부분 배포판에 기본으로 설치되어 있으나 &lt;code&gt;exiv2&lt;/code&gt; 프로그램은 수동으로 패키지를 설치해야 할 수도 있습니다. 게다가, 우분투의 &lt;code&gt;rename&lt;/code&gt; 명령어는 perl 패키지에 포함되어 있는 버전인데 아치 리눅스는 util-linux 패키지에 포함되어 있는 거라 사용법이 조금 다릅니다. 참고로 위 예제는 아치 리눅스 버전입니다. 하지만 &lt;code&gt;exiv2&lt;/code&gt;, &lt;code&gt;rename&lt;/code&gt; 명령어 모두 매뉴얼 페이지를 보면 자세한 사용 예제가 있으므로 쉽게 사용할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;그리고 이 글은 사실, 나이가 들수록 자꾸만 옵션을 잊어버려 다시 찾기 귀찮아서 기록하고 있습니다&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>아치 리눅스(Arch Linux)로 갈아타다</title>
+      <link>/2011/02/21/2011-02-21-migrated-to-arch-linux/</link>
+      <pubDate>Mon, 21 Feb 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/02/21/2011-02-21-migrated-to-arch-linux/</guid>
+      <description>&lt;p&gt;1996년부터 리눅스를 사용하면서 
+&lt;a href=&#34;http://slackware.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;슬랙웨어&lt;/a&gt;
+, 
+&lt;a href=&#34;http://www.redhat.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;레드햇&lt;/a&gt;
+, 
+&lt;a href=&#34;http://www.debian.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;데비안&lt;/a&gt;
+을 거쳐 
+&lt;a href=&#34;http://www.ubuntu.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;우분투&lt;/a&gt;
+ 배포판을 사용해 오다가 최근 
+&lt;a href=&#34;http://www.archlinux.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;아치 리눅스&lt;/a&gt;
+로 갈아 탔습니다. 우분투가 여러 이유로 편하긴 하지만, 어느 순간부터 점점 무거워지다가(mono, python 기반 기본 프로그램 때문?), 별로 사용하지 않고 원하지도 않는 기능들이 추가되는가 싶더니만(Ubuntu One 등) 급기야 2011.4 버전부터 그놈 3(GNOME 3) 프로젝트의 공식 셸(GNOME Shell) 대신 자체 유나이티(Unity) 셸을 채택한다고 하는 순간, 아 이제 우분투와 이별의 순간이 다가왔구나 깨달았습니다. 그놈 셸이 유나이티보다 UX 측면에서 완성도가 더 높다고 생각하고 있었고, 개인적으로 더 선호하는 스타일이었기 때문이기도 하지만, 역시 상업 회사가 이끄는 배포판은 장점도 많지만 이런 단점도 있을 수 있다는 걸 다시 한 번 깨달았기 때문이기도 합니다. 물론 지금까지 우분투에 불만이 없었던 건 아니지만, 대부분 다른 장점에 의해 묻혀버렸는데, 이번 일을 계기로 쌓였던 불만이 한꺼번에 노출된 것 같기도 합니다.&lt;/p&gt;
+&lt;p&gt;그렇다고 데비안이나 페도라, 젠투 배포판으로 가기에는 별로 재미가 없을 것 같아서 여기 저기 확인해보다가 아치 리눅스를 선택하게 되었습니다. 여러가지 이유가 있지만, 32비트 버전의 경우 패키지 바이너리가 i686에 최적화되어 있고, 패키지 시스템이 의외로 빠르고 단순명료하게 동작하면서, 6개월마다 시스템을 갈아 엎을 일 없이 계속 조금씩 업그레이드 되어(rolling release) 최신 소프트웨어를 항상 바로 사용할 수 있다는 점이 맘에 들었습니다. 더 이상 우분투 개발 버전을 사용하면서 X가 실행되지 않는다든지, 부팅이 안된다든지, 잘 돌던 소프트웨어가 동작하지 않는다든지 걱정할 필요가 없어진 셈입니다. 게다가 아치 사용자 저장소(Arch User Repository; AUR)와 yaourt 프로그램을 사용하니 기존에 별도로 설치했던 dropbox, android-sdk, eclipse, openproj 등도 쉽게 패키지로 설치할 수 있어 더 편했습니다. 물론 GUI 방식 패키지 관리자가 없고 패키지 설치만으로 모든 설정이 자동으로 되는게 아니라 어느 정도 리눅스 경험자가 아니면 불편한 점도 많지만, 오히려 중급 사용자 이상일 경우 원리를 하나씩 알아가면서 설치하는 재미도 쏠쏠합니다. 게다가 별도 문서가 불필요할 정도로 아치리눅스 위키 페이지 정리가 잘 되어 있어 굳이 다른 구글링도 필요없는 것 같습니다. 물론, 한글 글꼴 패키지의 부족이나 부족한 그놈 테마 패키지 등 못마땅한 점이 없는 건 아니지만, 어차피 단점 없는 배포판은 없는 법, 나름 오랜만에 커스터마이징에 즐거운 시간을 보낸 것 같습니다.&lt;/p&gt;
+&lt;p&gt;인증 스크린샷이라도 하나 올리려다가, 별로 다른게 없어서 그만 두었습니다. 사용하는 배포판이 무엇이든, 어차피 설치 이후에는 결국 동일한 리눅스일 뿐이기 때문입니다. 여담이지만, 오래된 저사양 노트북에서도 동일한 그놈 환경인데 우분투보다 더 빨리 실행되는 듯한 느낌을 받고 있습니다. 물론 정신적인 영향이 더 큰 것 같기도 하지만&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>perf top 사용하기</title>
+      <link>/2011/01/16/2011-01-16-using-perf-top/</link>
+      <pubDate>Sun, 16 Jan 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/01/16/2011-01-16-using-perf-top/</guid>
+      <description>&lt;p&gt;리눅스에서 병목 현상 디버깅이나 현재 실행중인 프로세스 중에서 가장 CPU 리소스를 많이 소모하는 녀석을 찾아야 할 경우가 있습니다. 이런 경우 가장 전통적이고 간단한 방법은 &lt;code&gt;top&lt;/code&gt; 명령어를 실행해서 키보드 단축키 &amp;lsquo;1&amp;rsquo; / &amp;lsquo;H&#39;를 눌러 CPU / 쓰레드별 사용량을 확인하는 것입니다. 또한 이와 관련된 전통적인 유닉스 명령어도 많지만, 리눅스에서 실행 루틴 수준에서 더 정밀하게 분석하고 싶다면 
+&lt;a href=&#34;http://www.google.co.kr/search?q=OProfile&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;OProfile&lt;/a&gt;
+, 
+&lt;a href=&#34;http://www.google.co.kr/search?q=Valgrind&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Valgrind&lt;/a&gt;
+, 
+&lt;a href=&#34;/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/&#34;&gt;Google Performance Tools&lt;/a&gt;
+ 등과 같은 도구를 사용해도 됩니다.&lt;/p&gt;
+&lt;p&gt;그런데, 최근 리눅스 커널과 배포판에는 
+&lt;a href=&#34;https://perf.wiki.kernel.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;perf&lt;/a&gt;
+ 추적(trace) 도구가 포함되어 있습니다. 그리고 이를 기반으로 한 여러 명령어 중에서, 이 글에서 소개하는 &lt;code&gt;perf top&lt;/code&gt; 명령어를 사용하면 쉽게 현재 실행중인 커널 / 사용자 프로세스의 CPU 사용 내역을 확인할 수 있습니다. 이 명령어는 기본적으로 &lt;code&gt;top&lt;/code&gt; 명령어와 비슷하게 동작하지만, OProfile 같은 도구처럼 별도의 복잡한 설정 과정이 필요없다는 장점이 있습니다. 게다가 그 원리를 조금만 이해하면 다양한 응용이 가능하고, 최근 리눅스 커널에 추가된 많은 추적 도구 중에서 가장 활발하게 개발되고 있는 프레임워크이기 때문에 익숙해지는 것도 나쁘지 않을 것 같습니다.&lt;/p&gt;
+&lt;p&gt;우분투 리눅스에서 perf 도구를 사용하려면 제일 먼저 다음과 같이 해당 패키지를 설치해야 합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo apt-get install linux-tools
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;실행하기 위해서 반드시 perf 이벤트 접근 권한이 있어야 하므로 루트 계정 또는 &lt;code&gt;sudo&lt;/code&gt; 명령을 이용해 다음과 같이 무작정 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo perf top
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/perf-top-screenshot.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;위 출력 화면을 간단하게 설명하면, 마지막 갱신 주기 동안 &lt;code&gt;AES_encrypt&lt;/code&gt; 함수가 가장 많이 실행되었습니다. 목록은 위에서 아래로 더 많이 실행된 순서로 정렬되어 있는데, 각 열(column)을 설명하면, 맨 앞의 샘플(samples)과 퍼센트(pcnt)는 총 성능 카운터 샘플링 중에서 차지한 회수와 비율을 나타내고 함수(function)과 동적 공유 객체(DSO)는 샘플링된 위치를 보여줍니다. 따라서 가장 많이 샘플링된 함수가 갱신 주기 동안 가장 많이 실행된 부분이라고 해석하면 됩니다.&lt;/p&gt;
+&lt;p&gt;예를 들어 위 실행 결과는, &lt;code&gt;git pull&lt;/code&gt; 명령으로 ssh 방식 네트웍 서버로부터 데이터를 받아오는 작업을 처리하는 과정을 분석한 것입니다. ssh 연결이므로 암호화 관련 라이브러리 호출이 가장 많이 보이고, 커널에서 사용자 공간으로 복사하는 함수, e1000 이더넷 드라이버 인터럽트 핸들러 등이 눈에 띕니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;man perf top&lt;/code&gt; 또는 &lt;code&gt;perf top help&lt;/code&gt; 명령으로 더 자세한 사용법을 얻을 수 있습니다. 많은 옵션이 있지만 그 중에서 자주 사용하는 옵션 몇 가지만 설명하면, &lt;code&gt;-v&lt;/code&gt; 옵션은 함수 내에서 더 장확한 샘플링 위치를 보여주면서 상세한 메시지를 출력합니다. 그리고, &lt;code&gt;-s&lt;/code&gt; 옵션은 지정한 함수만 어셈블리 단계에서 샘플링한 결과를 자세히 보여줍니다.&lt;/p&gt;
+&lt;p&gt;참고로, 데비안 / 우부툰에서 개발하는 분이라면 패키지로 설치한 라이브러리의 디버깅 심볼 포함 패키지를 함께 설치해 두면, 예를 들어 libc6 라이브러리는 libc6-dbg 패키지(끝에 &amp;lsquo;-dbg&#39;가 더 붙음), 많은 개발 / 분석 도구에서 더 자세한 정보를 얻을 수 있습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>파일 공간 미리 할당하기</title>
+      <link>/2011/01/12/2011-01-12-allocate-file-space-in-advance/</link>
+      <pubDate>Wed, 12 Jan 2011 00:00:00 +0000</pubDate>
+      <guid>/2011/01/12/2011-01-12-allocate-file-space-in-advance/</guid>
+      <description>&lt;p&gt;비단 비트토런트(BitTorrent)나 어뮬(aMule) 같은 P2P 응용 프로그램이 아니라도 파일 크기를 (대략이라도) 미리 알고 있을 경우, 디스크 공간을 미리 할당해서 단편화(fragmentation)를 줄이는 것은 물론 용량 부족으로 인한 쓰기 오류를 미리 막는 기법은 종종 필요합니다.&lt;/p&gt;
+&lt;p&gt;예전에는 이를 위해 파일을 생성한뒤 원하는 크기의 0으로 채워진 파일을 미리 만들어 두는 무식한 방법을 사용하거나, &lt;code&gt;lseek()&lt;/code&gt; 함수를 이용해 원하는 크기만큼 뒤로 이동한 뒤 더미 1바이트르 쓰는 기법 등을 사용했습니다. 물론 이 기법은 지금도 유용합니다.&lt;/p&gt;
+&lt;p&gt;그런데 요즘 리눅스 커널에서 주로 사용하는 파일시스템이 이런 기능을 근본적으로 지원하게 되면서 쉽게 사용할 수 있는 API가 추가되었는데, 다름아닌 &lt;code&gt;fallocate()&lt;/code&gt; / &lt;code&gt;posix_fallocate()&lt;/code&gt; 함수입니다. 매뉴얼에 의하면 리눅스 커널 2.6.23 버전, glibc 2.10 버전 이후부터 btrfs, ext4, ocfs2, xfs 파일시스템에서 지원한다고 하는데, 해당 파일시스템이 직접 지원하지 않을 경우 커널이 알아서 비효율적인 방법으로 처리해 주는 것 같습니다.&lt;/p&gt;
+&lt;p&gt;터미널이나 콘솔에서 직접 지정한 크기의 파일을 만들 수 있는 &lt;code&gt;fallocate&lt;/code&gt; 명령어도 요즘 리눅스 배포판에는 기본적으로 포함되어 있습니다. 사용해 보면 알겠지만, 아무리 큰 파일도 매우 빨리 만들어 줍니다. 그리고, 매뉴얼에는 명시되어 있지 않지만, 큰 파일을 지원하기 위한 &lt;code&gt;fallocate64()&lt;/code&gt; / &lt;code&gt;posix_fallocate64()&lt;/code&gt; 함수도 사용할 수 있습니다. 자세한 함수와 명령어 사용법은 매뉴얼(man) 페이지를 참고하면 쉽게 알 수 있기 때문에 자세한 사용법은 생략합니다.&lt;/p&gt;
+&lt;p&gt;참고로, 멀티플랫폼 비트토런트 클라이언트인 
+&lt;a href=&#34;https://trac.transmissionbt.com/browser/trunk/libtransmission/fdlimit.c#L106&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Transmission 소스&lt;/a&gt;
+를 보면 다양한 플랫폼에서 동일한 기능을 어떻게 사용하는지 알 수 있습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 데스크탑 반응속도 향상 패치 테스트</title>
+      <link>/2010/11/20/2010-11-20-test-a-patch-to-improve-responsiveness-in-linux-desktop/</link>
+      <pubDate>Sat, 20 Nov 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/11/20/2010-11-20-test-a-patch-to-improve-responsiveness-in-linux-desktop/</guid>
+      <description>&lt;p&gt;며칠전부터 리눅스 커뮤니티와 관련 뉴스 사이트에서 리눅스 데스크탑 반응속도(reponsiveness)를 획기적으로 향상시킨다는 
+&lt;a href=&#34;http://marc.info/?l=linux-kernel&amp;amp;m=128978361700898&amp;amp;w=2&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;233라인짜리 패치&lt;/a&gt;
+에 대한 
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=article&amp;amp;item=linux_2637_video&amp;amp;num=1&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;소식&lt;/a&gt;
+이 끊임없이 흘러다니고 있습니다. 리누스 토발즈가 극찬을 해서 더 유명해진 것 같기도 한데, 아마도 원래 아이디어를 본인이 제안해서 그런게 아닌가 싶기도 하고, 커널 컴파일과 동시에 웹브라우징, 동영상 재생을 하는 것처럼 극단적인 환경과 멀티코어 시스템에만 적용될 뿐이라고 
+&lt;a href=&#34;http://psankar.blogspot.com/2010/11/cpu-or-io-what-matters-most.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그리 대단하게 않게 보는 사람&lt;/a&gt;
+들도 있는 것 같습니다. 게다가 한 터미널(tty)에서 파생한 프로세스를 모두 하나의 태스크 그룹으로 묶어 다른 태스크 그룹과 공평한 스케줄링이 되도록 한다는 아이디어가 근본적으로 cgroup 파일시스템을 이용하기 때문에 특별한 커널 패치 없이 
+&lt;a href=&#34;http://blog.glock.co.za/cgroup-user-space-speed-patch&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;cgroup 데몬과 스크립트를 이용해 동일한 효과를 얻는 기법&lt;/a&gt;
+도 등장했습니다.&lt;/p&gt;
+&lt;p&gt;직접 느껴보려고 일단 회사 개발 장비에 적용해 보았는데, 사양이 너무 좋아서인지 별로 차이점을 느끼지 못했습니다. 그래서 오래된 노트북 PC와 상대적으로 낮은 사양의 데스크탑 장비에도 적용해봤습니다. 하지만, 아이디어 자체가 터미널 작업과 다른 작업을 다른 그룹으로 나누는 것 뿐이라서 그런지, 터미널을 열어 다른 작업을 안했더니 별로 반응속도가 달라지는 건 느끼지 못하고 있습니다.&lt;/p&gt;
+&lt;p&gt;그럼에도 불구하고, 스케줄링 정책만으로 데스크탑 반응성을 향상할 수 있다는 아이디어를 조금만 더 확장하면 더 좋은 아이디어만 알고리즘이 나오지 않을까 기대해 봅니다. 아니나 다를까, 
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=news_item&amp;amp;px=ODc5OQ&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;페도라 15에서 시작 데몬으로 탑재할 SystemD 데몬에서 이미 사용자 세션, 서비스별로 각각의 태스크 그룹을 분리하도록 적용&lt;/a&gt;
+하는 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[업데이트-2010.11.22]&lt;/strong&gt; 예를 들어 제 경우, 구형 노트북에서 조금이라도 그래픽 성능 향상을 얻을 수 있을까 해서 ﻿&lt;code&gt;/etc/gdm/Init/Default&lt;/code&gt; 파일 마지막 라인 &amp;lsquo;&lt;code&gt;exit 0&lt;/code&gt;&amp;rsquo; 전에 다음과 같은 항목을 추가해서 체감 속도 변화를 느껴보려고 노력 중입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#chrt -rr -p 10 $(pidof X)
+mkdir -m 0700 -p /mnt/cgroups/cpu/Xorg
+echo $(pidof X) &amp;gt; /mnt/cgroups/cpu/Xorg/tasks
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>안드로이드 운영체제에서 실시간 시스템</title>
+      <link>/2010/11/19/2010-11-19-real-time-on-android-os/</link>
+      <pubDate>Fri, 19 Nov 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/11/19/2010-11-19-real-time-on-android-os/</guid>
+      <description>&lt;p&gt;실시간 시스템의 핵심 요구사항 중 하나는 빠른 대기시간(latency)이 아니라 가장 느린 대기시간을 미리 가늠할 수 있어야(predictability) 한다는 점입니다. 즉, 아무리 짧은 응답시간을 제공하더라도 시스템 부하(load)나 입출력(I/O), 태스크 동기화(synchronization) 등에 의해 느려지거나 최대 응답시간을 예측할 수 없다면 실시간 운영체제가 아닙니다. 물론 응답시간이 가능한 짧으면서 편차가 크지 않으면 더 바랄게 없겠지만, 그렇지 못할 경우라도 운영체제가 대기시간을 어느 정도까지 보장할 수 있느냐가 더 중요합니다. 참고로 여기서 언급하는 대기시간(latency)은 인터럽트, 태스크 스케줄링, I/O 스케줄링 등 여러 문맥에서 다른 의미를 가집니다.&lt;/p&gt;
+&lt;p&gt;실시간 시스템의 또 하나의 중요한 특징은 실시간 태스크의 스케줄링을 보장하는 일입니다. 즉, 시스템에 어떤 상황이 발생하더라도 미리 지정한 실시간 태스크가 마감시간(deadline)을 지킬 수 있어야 합니다. 이를 위해 전통적인 실시간 운영체제들은 마감시간 스케줄러(deadline scheduler), 스포래딕 서버(sporadic server) 등을 이용해 이를 보장합니다.&lt;/p&gt;
+&lt;p&gt;최근 리눅스 커널과 관련된 이슈를 살펴보면 위에서 설명한 두 가지 조건을 만족하기 위한 작업이 한창이지만, 이 글에서는 안드로이드(Android) 운영체제가 스마트폰 뿐 아니라 여러 내장 시스템(embedded system)에 도입되기 위한 필수조건을 일단 정리했습니다.&lt;/p&gt;
+&lt;p&gt;일반적으로 기능적 오류가 아닌 시간적 오류, 즉 안드로이드가 실시간 시스템 설계 명세에서 제한한 마감시간(deadline)을 얼마나 잘 지원하는지를 실험한 결과를 보면[1], 측정을 크게 둘로 나뉘어, 첫번째는 하드웨어 인터럽트 이벤트가 커널 내부의 이벤트 처리 모듈에게 전달되는데까지 소요되는 대기시간(latency)을 측정한 것이고, 두번째는 커널 이벤트 처리 모듈이 이벤트를 안드로이드 달빅(Dalvik) 가상머신 위에서 동작하는 어플리케이션에게 전달하기까지 걸리는 시간을 측정합니다. 더불어 대기시간의 변동량(variation)을 관찰해 실시간 시스템에 적합한 지 여부도 확인해 봅니다. 안드로이드 하부는 리눅스 커널이므로, 이 실험은 결국 안드로이드 플랫폼에 사용되는 리눅스 커널에 대한 실험이기도 합니다.&lt;/p&gt;
+&lt;p&gt;실험 결과는 흥미로운데, 정상적인 부하가 걸릴때보다(under normal load) 아무 부하도 없을때(under no load) 대기시간이 더 들쑥날쑥 합니다. 그 원인은 아무 작업도 없을 경우 저전력모드(low power mode)로 있다가 인터럽트가 발생하면 그때서야 정상적인 상태로 돌아와 이벤트를 처리하기 때문입니다. 하지만 타이머 인터럽트 주기를 100밀리초에서 1밀리초로 변경하면, 거의 제 시간에 처리하지 못하는 결과가 발생하는 모습을 보여줍니다.&lt;/p&gt;
+&lt;p&gt;안드로이드 자바 어플리케이션의 각 쓰레드는 리눅스 pthread에 일대일로 대응합니다. 안드로이드에서 자바 쓰레드 우선순위는 10단계로 조정할 수 있는데, 이 값은 리눅스 쓰레드의 nice값으로 변환됩니다. 즉, 리눅스 커널 스케줄링 클래스 중에서 SCHED_OTHER 클래스만 사용하고 실시간 우선순위를 사용하는 SCHED_FIFO, SCHED_RR 클래스는 사용하지 않습니다.[2] 달빅(Dalvik) 가상머신은 고전적인 자바 가상머신이 실시간 시스템에서 고생하는 원인 중 하나로 지목되는 가비지 컬렉션(garbage collection)으로 인한 예측불가능한 프로세스 멈춤(freeze) 현상을 여전히 가지고 있습니다. 자체적으로 구현한 C 라이브러리(bionic)는 SystemV IPC 등과 같은 기존 프로세스간 동기화 메카니즘을 없애고 Binder라는 고유 IPC 메카니즘을 제공하는데,  태스크간 우선순위 역전(priority inversion)을 막기 위한 우선순위 상속(priority inheritance),  우선순위 한계(priority ceiling) 같은 프로토콜을 아직 제공하지 않습니다.&lt;/p&gt;
+&lt;p&gt;안드로이드는 인터럽트 핸들러가 우선순위가 더 높은 실시간 태스크를 선점하거나 지연하지 않기 위해 반드시 해결되어야 하는 리눅스 커널 인터럽트 처리 방식의 구조적 한계도 그대로 가지고 있습니다. 이를 해결하려면, 사용하는 모든 드라이버의 인터럽트 핸들러를 리눅스 2.6.30 버전부터 추가된 쓰레드 방식으로 바꾸거나 PREEMPT_RT 패치를 적용해야 합니다.&lt;/p&gt;
+&lt;p&gt;그래서 결론은, 역시 아직 안드로이드 운영체제는 실시간 시스템에 적합하지 않지만, 이를 보완하기 위한 많은 작업과 연구가 더 필요합니다.&lt;/p&gt;
+&lt;p&gt;[1]﻿ 
+&lt;a href=&#34;http://www.ece.gatech.edu/~vkm/Android_Real_Time.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Bhupinder S. Mongia, Vijay K. Madisetti, ﻿Reliable Real-Time Applications on Android OS&lt;/a&gt;
+
+[2] 
+&lt;a href=&#34;http://www.cister.isep.ipp.pt/docs/evaluating&amp;#43;android&amp;#43;os&amp;#43;for&amp;#43;embedded&amp;#43;real-time&amp;#43;systems/569/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Claudio Mia, Luis Nogueira, Evaluating Android OS for Embedded Real-Time Systems&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 스케줄링 영역과 클래스</title>
+      <link>/2010/10/06/2010-10-06-linux-kernel-scheduling-domains-and-classes/</link>
+      <pubDate>Wed, 06 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/10/06/2010-10-06-linux-kernel-scheduling-domains-and-classes/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;스케줄링 영역 (Scheduling Domain)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;멀티 프로세서 시스템에서 스케줄러의 중요한 역할 중 하나는 모든 CPU의 부하를 균등하게 맞추는 일입니다. 이를 위해 스케줄러는 한 CPU에서 동작하던 태스크를 다른 CPU로 이동해야 하는 경우, 각 아키텍쳐의 특성을 고려해야 합니다.  왜냐하면, 한 CPU에서 동작하던 태스크를 다른 CPU로 옮기면(migration) 캐시 불일치 등으로 인한 오버헤드가 발생하는 것은 물론 아키텍쳐에 따라 심각한 성능 저하를 일으킬 수도 있기 때문입니다.[1]&lt;/p&gt;
+&lt;p&gt;예를 들어, 하이퍼 쓰레드 프로세서는 하나의 프로세서 안에 논리적인 CPU가 여러 개 포함된 구조이기 때문에 여러 논리 CPU는 모두 캐시와 메모리를 모두 공유합니다. 따라서 이 논리 CPU간에는 태스크를 이동하는데 오버헤드가 없습니다. SMP(Symmectric Multi Processor) 시스템이나 멀티 코어(Multi Core) 프로세서에는 하나의 물리 CPU 안에 한 개 이상의 CPU 코어가 장착되어 있습니다. 이 CPU 코어는 각각 캐시(cache)를 가지고 있지만, 메모리는 모두 공유합니다. 따라서 프로세서간 태스크 이동(migration)이 가능한 적을수록 좋은 성능을 얻을 수 있습니다. NUMA 아키텍쳐는 여러 노드로 구성되는데, 한 노드는 하나의 CPU와 메모리, 캐시로 구성됩니다. 그리고 한 CPU가 같은 노드의 메모리를 접근할 때는 속도가 다른 노드의 메모리를 접근할 때보다 훨씬 빠릅니다. 그러므로 CPU간 태스크 이동은 정책적으로 반드시 필요한 경우에만 일어나야 합니다. 최근 출시되는 프로세서는 대부분 멀티 코어이면서 각 프로세서 코어가 다시 하이퍼 쓰레드를 통해 논리 CPU를 지원하고, NUMA 아키텍쳐에서 한 노드의 프로세서가 하이퍼 쓰레드를 지원하기도 합니다.&lt;/p&gt;
+&lt;p&gt;이처럼 다양한 구조의 시스템을 효율적으로 지원하기 위해 리눅스 커널 2.6 버전부터 스케줄링 영역(scheduling domains) 기능이 추가되었습니다. 스케줄링 영역은 스케줄링 그룹 자료구조와 함께 구성되며 계층적인 방식으로 전체 시스템의 영역을 구성합니다. 스케줄링 영역(&lt;code&gt;struct sched_domain&lt;/code&gt;)은 속성(properties)과 정책(policies)을 공유하는 CPU 집합이기 때문에, 해당 CPU 간에 부하가 균등하게 조절됩니다. 스케줄링 그룹(&lt;code&gt;struct sched_group&lt;/code&gt;)은 CPU별로 할당되면서 동시에 영역의 여러 CPU를 묶어서 구성되기도 합니다. 스케줄링 영역은 스케줄링 그룹을 한 개 이상 포함하기 때문에 스케줄러가 한 영역 내에서 균형을 유지하려할 때 그룹 안에서 발생하는 상황을 걱정하지 않고 그룹의 부하(load)를 다른 그룹으로 이동합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;스케줄링 클래스 (Scheduling Class)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;리눅스 커널 2.6.23 버전에서 기존 O(1) 스케줄러를 대체한 CFS(Completely Fair Scheduler) 스케줄러를 구현하면서 함께 도입된 스케줄링 클래스(Scheduling Class)는 리눅스 커널의 다양한 스케줄링 정책을 캡슐화해서 기본 스케줄러를 확장하기 쉽도록 도와줍니다. 하지만 스케줄러 메인 코드가 모듈 방식으로 구현된 건 아니기 때문에 새 스케줄러를 일반 커널 모듈처럼 쉽게 넣거나 뺄 수 있는 건 아닙니다. 다만 POSIX 표준에서 요구하는 &lt;code&gt;SCHED_RR&lt;/code&gt;, &lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_NORMAL&lt;/code&gt;, &lt;code&gt;SCHED_BATCH&lt;/code&gt;, &lt;code&gt;SCHED_IDLE&lt;/code&gt; 등과 같은 정책을 분리해서 구현하기 위해 도입된 구조입니다.[2] 하지만, 새 스케줄러 모듈을 추가하는 작업이 예전에 비해 쉬어진 것은 사실입니다.&lt;/p&gt;
+&lt;p&gt;스케줄링 클래스는 코어 스케줄러를 돕는 여러 모듈을 연결해 놓은 고리처럼 볼 수 있습니다. 가장 앞에 있는 스케줄러 모듈이 먼저 실행되고, 실행할 태스크가 없으면 다음 스케줄러 모듈을 실행하는 방식으로 동작합니다. 실제로, 스케줄링 클래스에는 실시간 스케줄러(&lt;code&gt;sched_rt.c&lt;/code&gt;), CFS 스케줄러(&lt;code&gt;sched_fair.c&lt;/code&gt;), 유휴 스케줄러(&lt;code&gt;sched_idletask.c&lt;/code&gt;) 순으로 단일 연결 목록에 등록되어 있어 순서대로 스케줄러 모듈을 실행합니다.&lt;/p&gt;
+&lt;p&gt;각 스케줄러 모듈은 스케줄링 클래스 구조체(&lt;code&gt;struct sched_class&lt;/code&gt;)가 제안하는 기능을 콜백 함수처럼 구현합니다. 다음은 리눅스 커널 2.6.23 버전에서 정의된 스케줄링 클래스 구조입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;struct sched_class { /* Defined in 2.6.23:/usr/include/linux/sched.h */
+  struct sched_class *next;
+  void (*enqueue_task) (struct rq *rq, struct task_struct *p, int wakeup);
+  void (*dequeue_task) (struct rq *rq, struct task_struct *p, int sleep);
+  void (*yield_task) (struct rq *rq, struct task_struct *p);
+  void (*check_preempt_curr) (struct rq *rq, struct task_struct *p);
+  struct task_struct * (*pick_next_task) (struct rq *rq);
+  void (*put_prev_task) (struct rq *rq, struct task_struct *p);
+  unsigned long (*load_balance) (struct rq *this_rq, int this_cpu,
+                 struct rq *busiest,
+                 unsigned long max_nr_move, unsigned long max_load_move,
+                 struct sched_domain *sd, enum cpu_idle_type idle,
+                 int *all_pinned, int *this_best_prio);
+  void (*set_curr_task) (struct rq *rq);
+  void (*task_tick) (struct rq *rq, struct task_struct *p);
+  void (*task_new) (struct rq *rq, struct task_struct *p);
+};
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 구조체에서 중요한 함수를 살펴보면 다음과 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;enqueue_task()&lt;/code&gt; : 태스크가 실행 가능한 상태로 진입할 때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dequeue_task()&lt;/code&gt; : 태스크가 더 이상 실행 가능한 상태가 아닐때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;yield_task()&lt;/code&gt; : 태스크가 스스로 &lt;code&gt;yield()&lt;/code&gt; 시스템콜을 실행했을 때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;check_preempt_curr()&lt;/code&gt; : 현재 실행 중인 태스크를 선점(preempt)할 수 있는지 검사합니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;pick_next_task()&lt;/code&gt; : 실행할 다음 태스크를 선택합니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;put_prev_task()&lt;/code&gt; : 실행중인 태스크를 다시 내부 자료구조에 넣을때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;load_balance()&lt;/code&gt; : 코어 스케줄러가 태스크 부하를 분산하고자 할때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;set_curr_task()&lt;/code&gt; : 태스크의 스케줄링 클래스나 태스크 그룹을 바꿀때 호출됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;task_tick()&lt;/code&gt; : 타이머 틱 함수가 호출합니다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;task_new()&lt;/code&gt; : 새 태스크가 생성되었을때 그룹 스케줄링을 위해 호출됩니다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;스케줄링 클래스 구조는 기본 CFS 스케줄러에서 사용하는 내부 자료구조와 밀접하게 연관되어 있습니다. 예를 들어 각 CPU별로 유지하면서 콜백 함수의 인수로 넘겨지는 실행 큐(&lt;code&gt;struct rq&lt;/code&gt;)는 CFS 스케줄러를 위해 채택한 레드-블랙 트리(red-black tree) 자료구조를 사용하기  때문에 새 스케줄러 모듈을 구현하려면 반드시 기존 CFS 스케줄러 동작 방식과 구조를 어느정도 자세히 알고 있어야 합니다.[3]&lt;/p&gt;
+&lt;p&gt;[1] 
+&lt;a href=&#34;http://lwn.net/Articles/80911/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Jonathan Corbet, &amp;ldquo;Scheduling domains&amp;rdquo;, LWN.net, 2004
+&lt;/a&gt;
+[2] 
+&lt;a href=&#34;http://www.ibm.com/developerworks/linux/library/l-cfs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Avinesh Kumar, Multiprocessing with the Completely Fair Scheduler, IBM developerWorks, 2008
+&lt;/a&gt;
+[3] 
+&lt;a href=&#34;http://www.ibm.com/developerworks/linux/library/l-completely-fair-scheduler/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;M. Tim Jones, Inside the Linux 2.6 Completely Fair Scheduler, IBM developerWorks, 2009&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 I/O 스케줄링 우선순위</title>
+      <link>/2010/10/05/2010-10-05-linux-kernel-io-scheduler-priority/</link>
+      <pubDate>Tue, 05 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/10/05/2010-10-05-linux-kernel-io-scheduler-priority/</guid>
+      <description>&lt;p&gt;리눅스 커널 CPU 스케줄링과 마찬가지로 I/O 스케줄링에 적용되는 스케줄링 클래스와 우선순위도 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/ioprio_set.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ioprio_set()&lt;/code&gt;&lt;/a&gt;
+ 시스템콜을 이용해 사용자가 제어할 수 있습니다. 하지만 리눅스 커널이 제공하는 여러가지 I/O 스케줄러 중에서 CFQ(Completely Fair Queuing) 스케줄러에서만 사용할 수 있습니다. 물론 리눅스 커널은 블럭 장치마다 다른 I/O 스케줄러를 사용할 수 있도록 허용하므로 필요한 경우 적절하게 시스템을 구성하는 것도 가능합니다.[1]&lt;/p&gt;
+&lt;p&gt;I/O 스케줄링 클래스는 CPU 스케줄링과 비슷하게 나누어집니다. 첫번재 &lt;code&gt;IOPRIO_CLASS_RT(1)&lt;/code&gt; 클래스는 실시간(real-time) I/O 클래스로서, 이 클래스에 속한 태스크는 다른 클래스에 속한 태스크보다 항상 디스크에 먼저 접근합니다. 클래스 내부 우선순위는 가장 높은 0부터 가장 낮은 7까지 지정할 수 있습니다. 두번째 &lt;code&gt;IOPRIO_CLASS_BE(2)&lt;/code&gt; 클래스는 최선노력(best-effort) I/O 클래스로서, 특별히 I/O 우선순위를 지정하지 않은 대부분의 태스크가 이 클래스에 속합니다. 첫번째 클래스와 마찬가지로 0부터 7까지 내부 우선순위를 지정할 수 있으며, 이 우선순위에 따라 얼마나 많은 I/O 대역폭을 할당할지 결정합니다. 마지막 &lt;code&gt;IOPRIO_CLASS_IDLE(3)&lt;/code&gt; 클래스에 속한 태스크는 위의 두 클래스에 속한 어떤 태스크도 해야할 I/O 작업이 없을때만 I/O 작업을 수행하고, 내부 우선순위는 무시됩니다.&lt;/p&gt;
+&lt;p&gt;I/O 스케줄링 클래스와 우선순위는 읽기 작업과 동기화 쓰기 작업(&lt;code&gt;O_DIRECT&lt;/code&gt;, &lt;code&gt;O_SYNC&lt;/code&gt;)에만 반영됩니다. 즉, 일반적인 비동기 쓰기 작업에는 적용되지 않습니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ioprio_set()&lt;/code&gt;, &lt;code&gt;ioprio_get()&lt;/code&gt; 시스템콜은 리눅스 표준 C 라이브러리에 대응하는 함수가 없기 때문에 다음과 같이 직접 &lt;code&gt;syscall()&lt;/code&gt; 함수를 이용해 호출해야 합니다.[2]&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define _GNU_SOURCE      /* or _BSD_SOURCE or _SVID_SOURCE */
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/syscall.h&amp;gt; /* For SYS_xxx definitions */
+
+static inline int ioprio_set (int which, int who, int ioprio)
+{
+  return syscall (__NR_ioprio_set, which, who, ioprio);
+}
+
+static inline int ioprio_get (int which, int who)
+{
+  return syscall (__NR_ioprio_get, which, who);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위와 같이 프로그램 소스 코드를 수정하지 않아도 
+&lt;a href=&#34;http://linux.die.net/man/1/ionice&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ionice&lt;/code&gt;&lt;/a&gt;
+ 프로그램을 이용하면 셸(shell)이나 스크립트에서 직접 다른 태스크의 I/O 스케줄링 클래스와 우선순위를  변경할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;이와 더불어 리눅스 커널 cgroups 시스템의 blkio 서브시스템을 이용하면 태스크 / 디스크별 대역폭(bandwidth)을 할당하거나 그룹별로 더 다양한 I/O 정책을 세밀하게 적용할 수 있습니다.[3]&lt;/p&gt;
+&lt;p&gt;[1] 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/ioprio_set.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ioprio_set(), Linux Programmer&amp;rsquo;s Manual&lt;/a&gt;
+
+[2] 
+&lt;a href=&#34;http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=Documentation/block/ioprio.txt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Block IO Priorities, Linux Kernel Source Documentation&lt;/a&gt;
+
+[3] 
+&lt;a href=&#34;http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=Documentation/cgroups/blkio-controller.txt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Block IO Controller, Linux Kernel Source Documentation&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 실시간 스케줄링 우선순위</title>
+      <link>/2010/09/30/2010-09-30-linux-kernel-realtime-scheduling-priority/</link>
+      <pubDate>Thu, 30 Sep 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/09/30/2010-09-30-linux-kernel-realtime-scheduling-priority/</guid>
+      <description>&lt;p&gt;&lt;code&gt;SCHED_OTHER&lt;/code&gt;, &lt;code&gt;SCHED_IDLE&lt;/code&gt;, &lt;code&gt;SCHED_BATCH&lt;/code&gt; 스케줄링 정책(policy)에 속하는 일반 태스크는 스케줄링 우선순위(priority)는 항상 0입니다. 하지만 &lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_RR&lt;/code&gt; 등과 같은 실시간 스케줄링 정책에 속하는 태스크는 가장 낮은 1부터 가장 높은 99까지의 우선순위가 부여됩니다.&lt;/p&gt;
+&lt;p&gt;리눅스 커널 스케줄러는 태스크 우선순위별로 실행 가능한 태스크 목록을 유지하고,  가장 높은 우선순위부터 차례대로 각 우선순위별 태스크 목록이 비어있는지 검사해서 태스크가 있을 경우 목록의 첫번째 태스크를 다음에 실행할 태스크로 선택합니다. 따라서, 항상 가장 높은 우선순위가 부여된 실시간 태스크가 실행되고, 결과적으로 일반 태스크는 항상 실시간 태스크보다 나중에 스케줄링됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_RR&lt;/code&gt; 정책은 우선순위가 같을 경우 태스크를 목록 어디에 삽입할 지를 결정하는데 사용합니다. &lt;code&gt;SCHED_FIFO&lt;/code&gt; 정책에 속하는 태스크는 실행 가능 상태가 되면 우선순위 태스크 목록의 마지막에 삽입됩니다. 이 태스크는 I/O 요청을 기다리거나, 우선순위가 더 높은 태스크에 의해 선점(preempted)되는 경우, 직접 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/sched_yield.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;sched_yield(2)&lt;/code&gt;&lt;/a&gt;
+ 시스템콜을 호출하는 경우가 아니면 계속 실행됩니다. 반면에 &lt;code&gt;SCHED_RR&lt;/code&gt; 정책은 &lt;code&gt;SCHED_FIFO&lt;/code&gt; 정책과 비슷하지만 각 태스크에게 할당된 최대 실행 시간(maximum time quantum)이 지나면 자동으로 우선순위 태스크 목록 마지막으로 이동됩니다.[1]&lt;/p&gt;
+&lt;p&gt;만일 프로세스(process)가 아닌 쓰레드(thread)의 스케줄링 속성을 변경하려면, &lt;code&gt;gettid()&lt;/code&gt; 시스템콜을 호출해서 얻은 tid 값을 프로세스 pid 대신 넘겨주면 됩니다. 하지만 &lt;code&gt;gettid()&lt;/code&gt; 시스템콜은 C 라이브러리에 대응하는 함수가 없기 때문에 다음과 같이 직접 &lt;code&gt;syscall()&lt;/code&gt; 함수를 이용해 호출해야 합니다.[2]&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define _GNU_SOURCE      /* or _BSD_SOURCE or _SVID_SOURCE */
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/syscall.h&amp;gt; /* For SYS_xxx definitions */
+#include &amp;lt;sys/types.h&amp;gt;   /* For pid_t */
+
+static inline pid_t gettid (void)
+{
+  return (pid_t) syscall (SYS_gettid); /* or __NR_gettid */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위와 같이 직접 프로그래밍하지 않아도 
+&lt;a href=&#34;http://linux.die.net/man/1/chrt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;chrt&lt;/code&gt;&lt;/a&gt;
+ 유틸리티를 사용하면 셸(shell)이나 스크립트에서 직접 다른 태스크의 실시간 스케줄링 속성을 변경할 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;하지만 리눅스 커널은 실시간 태스크 스케줄링에 필수적인 스케쥴링 지연시간(scheduling latency), 인터럽트 지연시간(interrupt latency)을 보장하지(guarantee) 않기 때문에 이를 개선하기 위해서는 별도의 패치를 적용한 커널을 사용해야 합니다.[3][4]&lt;/p&gt;
+&lt;p&gt;[1] 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/sched_setscheduler.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;sched_setscheduler(), Linux Programmer&amp;rsquo;s Manual&lt;/a&gt;
+
+[2] 
+&lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/gettid.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;gettid(), Linux man-pages&lt;/a&gt;
+
+[3] 
+&lt;a href=&#34;https://rt.wiki.kernel.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Real-time Linux Wiki&lt;/a&gt;
+
+[4] 
+&lt;a href=&#34;https://www.osadl.org/Realtime-Linux.projects-realtime-linux.0.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;OSADL Project: Real-time Linux&lt;/a&gt;
+&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>2010년 1학기에 작성한 프로그램</title>
+      <link>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</link>
+      <pubDate>Tue, 28 Sep 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</guid>
+      <description>&lt;p&gt;뭐, 전혀 관심 없는 분이 대부분이겠지만, 제 하드 디스크에서 묵히는 것보다 누군가에게 도움이 되는 편이 좋을 것 같아, 별로 품질이 좋은 소스는 아니지만, 오픈 소스만 사용해도 무난하게 과제 수행에 문제가 없음을 보여주기 위해, 지난 학기 수업 과제물로 제출했던 과제물의 문서와 프로그램 소스를 공개합니다.&lt;/p&gt;
+&lt;p&gt;참고로, 앞의 두 프로그램은 GTK+ 라이브러리를 이용해서 리눅스에서 개발했지만, 과제 시연을 위해 윈도우에서도 문제없이 컴파일되고 실행되도록 만들었습니다. 그리고, 안드로이드 뷰어는 라이브 보기만 구현된 소스입니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. Image Histogram Viewer&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;﻿﻿이 프로그램은 JPEG 이미지 파일을 읽어들여 화면에 표시하고 파일의 이름, 생성일시, 수정일시 등과 같은 속성을 보여주고, 이미지의 히스토그램을 분석하여 그래프로 표시합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2. Photo Mosaic Builder&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;이 프로그램은 원본 사진을 동일한 크기의 작은 영역으로 쪼갠뒤 복수의 다른 사진으로 다시 구성하여 최종 모자이크 사진을 생성합니다. 복수의 사진은 작은 썸네일(thumbnail) 사진으로 변환되며 각 영역의 색 속성과 가장 유사한 썸네일 사진으로 채워집니다. 이 과정에 복수의 사진을 한번만 사용할 지 여부를 선택할 수 있으 며, 최종 사진을 파일로 다시 저장할 수도 있습니다. 이 모든 과정을 처리하는데 걸리는 시간을 측정하여, OpenMP 라이브러리를 이용한 성능 최적화 정도를 확인할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3. 안드로이드 IP 카메라 뷰어 설계 및 구현&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;안드로이드 IP 카메라 뷰어는 휴대폰 같은 안드로이드(Android) 장비에서 네트워크에 연결된 IP 카메라에 접속하여 라이브 영상과 음성을 재생하고 카메라 동작을 제어합니다. 또한 사용자에게 친숙한 안드로이드폰의 다른 기능과 유기적으로 연동하여 언제 어디서나 쉽고 빠르게 긴급상황에 대처할 수 있도록 도와줍니다. 이를 위해 원격에서 비디오 스트리밍 데이터를 수신하여 디코딩한 후 색상 공간(color space) 변환까지 마친 후 화면에 표시하는 작업에 안드로이드 NDK(Native Development Kit) 방식 C/C++ 코드를 활용합니다. 또한 네이티브 C 모듈과 자바 언어와의 통신 오버헤드를 줄이기 위해 메모리 공유 기법을 이용하여 제한된 하드웨어의 성능을 최대화합니다.&lt;/p&gt;
+&lt;p&gt;P.S. 새 학기가 시작되었는데, 오히려 지난 첫 학기보다 더 험난한 시절을 보내고 있습니다. 요즘은 술 사준다고 연락하는 사람도 점점 뜸해지고&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 로그 버퍼 읽기</title>
+      <link>/2010/07/28/2010-07-28-reading-linux-kernel-log-buffer/</link>
+      <pubDate>Wed, 28 Jul 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/07/28/2010-07-28-reading-linux-kernel-log-buffer/</guid>
+      <description>&lt;p&gt;우분투 최신 버전을 설치하면 
+&lt;a href=&#34;http://packages.ubuntu.com/lucid/kerneloops-daemon&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;kerneloops-daemon&lt;/a&gt;
+ 패키지가 자동으로 설치됩니다. 이 프로그램은 커널 로그 메시지를 주기적으로(10초 간격으로) 가져와서 파싱(parsing)한 뒤 커널 패닉(OOPS) 메시지를 추출해 이를 
+&lt;a href=&#34;http://www.freedesktop.org/wiki/Software/dbus&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;D-Bus&lt;/a&gt;
+를 통해 전달하는 역할을 하는데. 
+&lt;a href=&#34;http://packages.ubuntu.com/lucid/kerneloops-applet&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;kerneloops-applet&lt;/a&gt;
+ 패키지를 설치하면 로그인시 자동으로 애플릿 하나가 실행되면서 D-Bus에서 메시지를 받아 사용자 확인을 거쳐 
+&lt;a href=&#34;http://kerneloops.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;kerneloops.org&lt;/a&gt;
+ 사이트 등으로 보고서를 자동으로 전송합니다. 참고로, 우분투에서 데몬을 동작하게 하려면 &lt;code&gt;/etc/default/kerneloops&lt;/code&gt; 파일 안에서 &lt;code&gt;enabled&lt;/code&gt; 항목을 1로 변경해야 하고, 세부 동작 옵션은 &lt;code&gt;/etc/kerneloops.conf&lt;/code&gt; 설정 파일을 수정하면 됩니다.&lt;/p&gt;
+&lt;p&gt;그런데 이 kernelooops 소스를 검토하던 중 커널 로그 버퍼(보통 dmesg 명령 결과)를 가져오기 위해 다음과 같은 시스템콜을 직접 호출하는 것을 발견했습니다. (kerneloops 패키지 소스 안에 &lt;code&gt;dmesg.c:423&lt;/code&gt;)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;syscall(__NR_syslog, 3, buffer, getpagesize());
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 시스템 콜 사용법이 궁금해서 dmesg 소스를 확인해 보니 여기서는 다음과 같은 C 라이브러리 함수를 사용합니다. (util-linux 패키지 소스 안에 &lt;code&gt;sys-utils/dmesg.c:120&lt;/code&gt;)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;n = klogctl(3, buf, sz); /* read only */
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그래서 매뉴얼을 찾아보니(&lt;code&gt;man klogctl&lt;/code&gt;) 둘 모두 같은 동작을 하는 것은 물론, 지금껏 모르고 있었던 몇가지 기능도 알 수 있었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/man-klogctl.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;예를 들어, 매뉴얼에도 나와 있듯이, 지금까지는 syslogd 데몬과 통신하는 syslog(3) 함수만 알고 있었는데,  이 함수는 커널 syslog 시스템콜과 아무 관계가 없다는 점 등입니다. 참고로, 리눅스 커널 소스는 &lt;code&gt;kernel/printk.c&lt;/code&gt; 파일에 있는 &lt;code&gt;do_syslog()&lt;/code&gt; 함수가 실제로 syslog 시스템콜을 처리하고 있습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투 10.10 기본 파일시스템 - Btrfs</title>
+      <link>/2010/05/16/2010-05-16-btrfs-as-the-default-filesystem-in-ubuntu-10-10/</link>
+      <pubDate>Sun, 16 May 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/05/16/2010-05-16-btrfs-as-the-default-filesystem-in-ubuntu-10-10/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;/2010/01/25/btrfs-for-a-while/&#34;&gt;Btrfs 사용기&lt;/a&gt;
+를 포스팅한 지 얼마 되지도 않았는데, 우분투 배포판 10.10 버전 기본 파일시스템으로 
+&lt;a href=&#34;http://www.netsplit.com/2010/05/14/btrfs-by-default-in-maverick/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Btrfs를 사용할지도 모른다는 소식&lt;/a&gt;
+이 들려옵니다. 인텔(Intel) 모블린(Moblin)과 노키아(Nokia) 마에모(Maemo) 플랫폼이 통합된 
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=news_item&amp;amp;px=ODIzOA&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;미고(MeeGo) 플랫폼에서도 Btrfs 파일시스템을 채택&lt;/a&gt;
+하더니 바로 우분투 다음 버전도 채택할 지 모른다는 얘기입니다.&lt;/p&gt;
+&lt;p&gt;세부 일정은, Btrfs 파일시스템 안정성과 성능은 일단 2010년 10월 릴리스에 사용하는 리눅스 커널 2.6.35 버전에서 어느 정도 완성된다는 가정하에, GRUB2 부트로더를 지원하고 알파(alpha) 릴리스부터 사용자 피드백을 받아 파일시스템 개발자와 충분한 피드백을 주고 받아 안정화 하는 방식으로 진행할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;아무튼, 이렇게 되면 Btrfs 파일시스템을 설치 옵션으로 제공함으로써 패키지 업데이트 전후 스냅샷 복구 기능을 Btrfs를 이용해 지원하는 페도라(Fedora) 배포판처럼, 사용자가 직접 느낄 수 있는 기능이 우분투에도 추가되면 재미있고 유용해 질 수 있을 것 같습니다. 게다가, SSD 디스크에 최적화되어 있다는 마운트 옵션도 궁금하고, 요즘 관심을 가지고 있는 Ceph 분산 파일 시스템도 테스트해 볼 수 있을테고&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.33 릴리스</title>
+      <link>/2010/03/14/2010-03-14-linux-kernel-2-6-33-release/</link>
+      <pubDate>Sun, 14 Mar 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/03/14/2010-03-14-linux-kernel-2-6-33-release/</guid>
+      <description>&lt;p&gt;리눅스 커널 2.6.33 버전이 릴리스(2010-02-24)된지도 한참 지났는데, 이제서야 변경사항을 정리하게 되었습니다. 그 사이에 제 개인적으로는 다시 학생이면서 직장인 신분이 되었고, 그로 인해 사는게 두 배는 바빠졌습니다. 다행인지 불행인지, 릴리스 이후 조금 시간이 지나니 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_33&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널 뉴비&lt;/a&gt;
+ 뿐 아니라 제가 관심 있는 부분만 따로 정리한 기사도 나타나길래, 이 포스트는 아예 그 기사들을 참고했습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;LZO 압축 알고리즘 추가&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;커널 이미지와 initramfs 파일시스템 압축에 LZO 알고리즘을 사용할 수 있게 되었습니다. 기존 LZMA, BZIP2 알고리즘과의 차이라면 압축 해제 속도입니다. 비록 압축된 크기는 10~15% 정도 크지만, 압축 해제 속도가 더 빠르기 때문에 임베디드 시스템 뿐 아니라 일반 데스크탑에서도 부팅 속도 향상을 꾀할 수 있게 되었습니다. 참고로, ARM 플랫폼에서는 기본 옵션이 될 것이라고 합니다. (한동안은 줄이는 게 유행이더니, 이제는 부팅 속도 개선을 위한 기능이 유행이군요)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Compcache 지원&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://code.google.com/p/compcache/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Compcache&lt;/a&gt;
+는 메모리를 디스크에 스왑핑(swapping)할때 압축을 해서 넣고 빼는 기능입니다. 메모리 사용이 제한된  임베디드 시스템, 서버 가상화 환경 뿐 아니라 CPU 성능은 좋지만 상대적으로 메모리가 부족할 수 있는 넷북 플랫폼에서도 유용한 기능입니다. 이미 Edubuntu 배포판에서는 채용하고 있을 정도로 유용성이 증명되고 있는 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;perftool 기능 개선&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;커널 2.6.31 버전부터 추가된 perftool 시리즈에 &amp;lsquo;perf probe&#39;라는 기능이 새로 추가되었는데, 솔라리스의 DTrace를 모방한 SystemTap과 비슷한 기능을 합니다. 하지만 SystemTap은 사용하기에 조금 불편한데, 매번 새로운 probe를 추가하거나 수정할때마다 커널 모듈을 만들어 넣어야 하고, 이를 위해 커널 빌드 환경이 구축되어 있어야 합니다. 그래서 정작 임베디드 시스템에서는 사용하기 어려웠습니다. 그런데 &amp;lsquo;perf probe&amp;rsquo; 기능은 sysfs 인터페이스를 이용하기 때문에 커맨드라인에서 직접 실행 중에 probe를 추가 / 편집할 수 있습니다.  더 자세한 내용은 ftrace와 kprobe를 설명한 
+&lt;a href=&#34;http://lwn.net/Articles/343766/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN 기사&lt;/a&gt;
+를 참고하시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;그외 펄(perl) 스크립트를 이용해 perf 도구를 프로그래밍할 수 있는 기능도 추가되는 등, 처음에는 성능 카운터(performance counter)로 출발한 이 도구가 향후 리눅스 커널 디버깅 도구의 주연으로 등장할 것 같은 예감이 들기도 합니다.&lt;/p&gt;
+&lt;p&gt;**블럭 디바이스 기능 개선
+**&lt;/p&gt;
+&lt;p&gt;오랫동안 서버용 시스템에서 좋은 성능을 보여왔다고 평가되어 왔던 Anticipatory I/O 스케쥴러가 제거되었습니다.  이제는 CFQ I/O 스케쥴러가 모든 응용에 적합할만큼 충분히 성숙했다고 판단한 모양입니다. 이제 남은 것은 CFQ(Completely Fair Queue) I/O 스케쥴러와 Deadline, Noop 등인데 향후 이들도 하나의 스케쥴러만 남기거나 통합할 예정이라고 합니다.&lt;/p&gt;
+&lt;p&gt;이와 더불어 CFQ I/O 스케쥴러에 블럭 I/O 컨트롤러 기능이 추가되었는데, 이를 이용하면 네트워크 대역폭을 QOS를 이용해 제어하듯이 특정 프로세스나 프로세스 그룹에서 디스크 I/O 대역폭을 할당하거나 제한할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;기타&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;이제는 커널 컴파일 옵션에서 ext4 파일시스템 하나만 설정해도 이를 이용해 ext2 / ext3 파일시스템도 마운트할 수 있게 되었고, 안드로이드 커널이 공식 커널 트리에서 빠지게 되었으며(
+&lt;a href=&#34;http://www.kroah.com/log/linux/android-kernel-problems.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;참고&lt;/a&gt;
+), NVidia 그래픽카드 오픈소스 드라이버인 Nouveau 드라이버가 대폭 성능과 기능이 개선되어 공식적으로 포함되었습니다. 언제나 그렇듯이 많은 디바이스 드라이버가 추가, 변경되었고 API도 몇 개 바뀐게 보이고&amp;hellip; 대략 한 번 커널 뉴비 내용을 훑어보는 것도 나쁘지는 않을 것 같습니다.&lt;/p&gt;
+&lt;p&gt;참고한 기사는 다음과 같습니다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Kernel Newbies - Linux 2.6.33 : &lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_33&#34;&gt;http://kernelnewbies.org/Linux_2_6_33&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Linux 2.6.33 features for embedded systems : &lt;a href=&#34;http://free-electrons.com/blog/linux-2-6-33/&#34;&gt;http://free-electrons.com/blog/linux-2-6-33/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;2.6.33 is Out! Say Good Bye to the Anticipatory Scheduler : &lt;a href=&#34;http://www.linux-mag.com/id/7724&#34;&gt;http://www.linux-mag.com/id/7724&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>아주 잠시 Btrfs 파일시스템을 사용해보고</title>
+      <link>/2010/01/25/2010-01-25-btrfs-for-a-while/</link>
+      <pubDate>Mon, 25 Jan 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/01/25/2010-01-25-btrfs-for-a-while/</guid>
+      <description>&lt;p&gt;요즘 여기
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=article&amp;amp;item=ext4_btrfs_2633&amp;amp;num=1&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;저기&lt;/a&gt;
+서 Btrfs 파일시스템 얘기가 많아서, 한번 써봐야겠다 싶어 우분투 개발버전(lucid, linux kernel 2.6.32) 저장소를 확인해보니 패키지 하나만(btrfs-tools) 설치하면 되길래 홈디렉토리를 btrfs 파일시스템으로 교체해 보았습니다. 그리고 스트레스 테스트를 위해 회사에서 유지하는 모든 프로젝트의 Git 저장소를 내려받고(clone) 동시에 컴파일을 해봤습니다.&lt;/p&gt;
+&lt;p&gt;그리고 지금, 다시 Ext4 파일시스템으로 되돌린 상태에서 동일하게 Git 저장소를 내려받으며 이 글을 적고 있습니다. 체감 속도가 느린 것은 물론, 오랜만에 마우스 움직임이 끊기는 현상까지 경험했습니다. CPU 리소스 점유율은 또 얼마나 높은지&amp;hellip;(압축 옵션을 사용하지 않았음에도 불구하고) 적어도 읽기 성능은 좋다고 하던데, 여러 프로세스가 동시에 접근할 때는 형편없이 저하되는 걸 목격했습니다.&lt;/p&gt;
+&lt;p&gt;뭐, 물론 아직도 활발하게 개발중이고, 좋은 기능도 많이  있는 것 같지만(그래서 그만큼의 리소스가 더 필요한 걸지도&amp;hellip;), 경험적 결론은, 아직 서버나 제품에 사용하기에는 시기상조라는 겁니다.&lt;/p&gt;
+&lt;p&gt;기회가 되면  SSD 디스크에서도 테스트해보고 싶은데, 가난한 개발자라서&amp;hellip; (술값만 줄여도 되려나&amp;hellip;?)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GCC 미리 정의된 매크로 얻기</title>
+      <link>/2010/01/09/2010-01-09-getting-predefined-macros-in-gcc/</link>
+      <pubDate>Sat, 09 Jan 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/01/09/2010-01-09-getting-predefined-macros-in-gcc/</guid>
+      <description>&lt;p&gt;멀티플랫폼에서 동작하는 C/C++ 코드를 gcc를 이용해 컴파일할때 플랫폼이나 운영체제를 확인하는 방법 중 하나는 gcc 툴체인이 만들어질때 정의되는 매크로를 사용하는 것입니다. 그런데 이번에 MacOS X / iPhone 플랫폼에 기존 코드를 포팅하면서 이 방법을 이용하려 하는데, 너무 오래 전에 했던 작업이라 (역시나) 명령어를 기억할 수 없었습니다. 그래서 겨우 구글링해서 다시 알게된 내용을 기록해 둡니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ gcc -E -dM -x c /dev/null
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 이 방법을 이용해 사용한 최종 코드는 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#if defined(_WIN32)
+#include &amp;quot;lib-win32/config.h&amp;quot;
+#elif defined(_WIN64)
+#include &amp;quot;lib-win64/config.h&amp;quot;
+#elif defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__)
+#include &amp;quot;lib-iphone/config.h&amp;quot;
+#elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) /* or __APPLE__ */
+#include &amp;quot;lib-macosx/config.h&amp;quot;
+#else /* linux */
+#include &amp;quot;config.h&amp;quot;
+#endif
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;사실은, 더 깔끔한 다른 방법이 있을지 궁금하기도 합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 / 맥오에스에서 CPU 갯수 얻기</title>
+      <link>/2009/12/27/2009-12-27-get-number-of-cpu-on-linux-and-macosx/</link>
+      <pubDate>Sun, 27 Dec 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/12/27/2009-12-27-get-number-of-cpu-on-linux-and-macosx/</guid>
+      <description>&lt;p&gt;Linux / MacOS X 플랫폼에서 CPU 갯수를 얻어오는 함수입니다. 잊어버릴까봐 기록해 둡니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#ifdef __linux__
+#include &amp;lt;sys/sysinfo.h&amp;gt;
+#else
+#ifdef __APPLE__
+#include &amp;lt;sys/param.h&amp;gt;
+#include &amp;lt;sys/sysctl.h&amp;gt;
+#else
+#error &amp;quot;Only Linux or OSX is supported!&amp;quot;
+#endif /* __APPLE__ */
+#endif /* __linux__ */
+
+static int
+get_cpu_nr (void)
+{
+#ifdef __linux__
+  return get_nprocs ();
+#endif
+#ifdef __APPLE__
+  int i = 0;
+  size_t s = sizeof (i);
+  if (sysctlbyname (&amp;quot;hw.ncpu&amp;quot;, &amp;amp;i, &amp;amp;s, NULL, 0))
+    return 1;
+  return i;
+#endif
+}
+
+int
+main (int argc, char **argv)
+{
+  printf (&amp;quot;cpu_nr:%dn&amp;quot;, get_cpu_nr ());
+
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;출처는 
+&lt;a href=&#34;http://github.com/chergert/dukes_of_hazard/raw/master/main.c&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이 소스&lt;/a&gt;
+입니다. 참고로 리눅스의 &lt;code&gt;/usr/include/sys/sysinfo.h&lt;/code&gt; 파일을 들여다보면 램 크기 / 스왑 크기 / 물리 페이지 크기 등과 같은 시스템 관련 정보를 얻을 수 있는 함수가 여럿 보이는군요. &lt;code&gt;/proc&lt;/code&gt; 정보를 파싱하는 것보다 더 편리할 것 같습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.32 릴리스</title>
+      <link>/2009/12/18/2009-12-18-linux-kernel-2-6-32-release/</link>
+      <pubDate>Fri, 18 Dec 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/12/18/2009-12-18-linux-kernel-2-6-32-release/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://lwn.net/Articles/364927/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.32 릴리스 소식&lt;/a&gt;
+을 들은지 한참 지난 지금에서야 정리해 봅니다. 모든 일이 그렇지만, 언제 이 버전의 커널을 프로젝트에 사용할지 모르는 일이므로 게으름부리지 말아야겠다는 생각이 다시 들고 있는 요즘입니다.&lt;/p&gt;
+&lt;p&gt;언제나 그렇듯이 제가 관심있는 내용만 정리합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CFQ IO 스케쥴러 새 기능&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;리눅스 커널의 기본 IO 스케쥴러인 CFQ 스케쥴러에 새 기능이 추가되었습니다. 백그라운드 IO 작업이 다른 작업에 영향을 덜 끼치도록 하여 데스크탑 관련 프로세스나 미디어 재생 프로그램의 상호작용성(interactiveness)을 향상시키는 기능인데, 반대로 IO 처리율(throughput) 성능을 떨어뜨릴 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;따라서 IO 성능이 더 중요한 시스템, 예를 들어 서버나 GUI 기능이 필요없는 시스템이라면 다음처럼 이 기능을 꺼야 합니다. (/dev/sda 장치의 경우)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ echo 0 &amp;gt; /sys/class/block/sda/queue/iosched/low_latency
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아마도 배포판의 경우 서버 / 데스크탑별로 자체 튜닝을 하지 않을까 싶습니다. 더 자세한 내용은 
+&lt;a href=&#34;http://lwn.net/Articles/355904/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN.net 페이지&lt;/a&gt;
+를 참고하시기 바랍니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;KVM 성능 향상&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;가상화 관련되어서는 KSM(kernel shared memory) 기술이 도입되어 KVM과 같은 가상환경의 메모리 사용량을 더 줄였습니다. 예를 들어 여러 가상머신을 실행하고 있을때 이들이 동일한 소프트웨어 라이브러리나 프로그램을 사용할 경우 이를 하나의 메모리에 공유해서 사용하도록 하여 실제 메모리 사용량을 줄이는 기술입니다. 사용하려면 명시적으로 다음과 같이 실행해야 합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ echo 1 &amp;gt; /sys/kernel/mm/ksm/run
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Devtmpfs 파일시스템&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;/dev 디렉토리를 메모리파일시스템(tmpfs)을 이용해 처리할 수 있도록 devtmpfs 파일시스템이 추가되었습니다. &amp;lsquo;devfs 2.0&#39;이라고도 불릴수 있는데, 커널 자신이 부팅하면서 램디스크를 만들어 마운트하고 장치 파일을 만들기 때문에 부팅시간을 줄일 수 있을 뿐 아니라 udev 등을 사용하지 않아도 되고, 이를 위한 initrd 파일시스템 없이 부팅할 수 있도록 도와줍니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;X86 플랫폼 지원 향상&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;인텔 무어스타운(Moorestown) 플랫폼을 공식적으로 추가되고 아톰(Atom)이 하나의 프로세서로 분리되면서 더 최적화된 지원을 하게 되었습니다. 더불어 인텔의 
+&lt;a href=&#34;http://simplefirmware.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SFI(Simple Firmware Interface)&lt;/a&gt;
+를 지원한다고 하는데, ACPI를 대체하기 위해 인텔이 만든 것이라고 합니다. 무어스타운 플랫폼 자체가 스마트폰, MID(Mobile Internet Device) 등과 같은 임베디드 환경을 목표로 하므로 향후 이 플랫폼을 활용하려면 어쩔 수 없이 이 버전 이후 커널을 사용해야 할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;ACPI 4.0 지원이 추가된 것은 물론 최신 메인 보드의 I/O 장치가 제공하는 실행중 전원 절약 기능을 충분히 사용하도록 개선되면서 전원 관리 기능도 대폭 향상되었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;성능 분석 도구 추가&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;성능 카운터(Performance Counters)가 성능 이벤트(Performance Events)로 이름이 바뀌면서 매우 많은 기능이 추가되었습니다. 프로세스 스케쥴러를 분석하는 작업을 쉽게 해주는 &amp;ldquo;
+&lt;a href=&#34;http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff;h=0a02ad9331dd4db56c29c60db2e99c4daaad8a48&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;perf sched&lt;/a&gt;
+&amp;rdquo; 도구라든지, &amp;ldquo;perf record&amp;quot;를 이용해 기록한 내용을 SVG 그래픽파일로 변환해주는 &amp;ldquo;
+&lt;a href=&#34;http://blog.fenrus.org/?p=5&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Timechart&lt;/a&gt;
+&amp;rdquo; 도구 등이 그것입니다. Timechart는 bootchart와도 비슷하지만, 커널 레벨에서 수집하는 정보를 사용하기 때문에 부팅 시간 단축을 위한 측정에도 유용할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CFS 스케쥴러 성능 개선&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;안드로이드(Android)를 비롯한 리눅스 커널을 사용하는 몇몇 프로젝트에서는 이미 반영하고 있어 요즘 이슈가 되고 있는 
+&lt;a href=&#34;http://ck.kolivas.org/patches/bfs/sched-BFS.txt&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;BFS&lt;/a&gt;
+ 스케쥴러와 관련된 패치도 있군요. 오픈소스 H.264 인코더 라이브러리 X264 개발자가 
+&lt;a href=&#34;http://x264dev.multimedia.cx/?p=185&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;블로그&lt;/a&gt;
+에서 밝힌 것처럼, 멀티코어 시스템에서 x264 인코딩을 실행하면 BFS 스케쥴러를 사용하는 경우가 리눅스 기본 CFS 스케쥴러보다 80% 정도 성능 향상이 있다는 내용을 리눅스 커널 메일링 리스트에 올리자마자 커널 개발자들이 이를 흔쾌히 받아들여 기존 CFS 스케쥴러의 버그를 수정했다고 하는데, 이번 커널 릴리스에 반영되었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&amp;lsquo;localmodconfig&amp;rsquo; 설정 옵션 추가&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;커널 빌드를 위해 설정할때 &amp;lsquo;make localmodconfig&amp;rsquo; 명령을 실행하면, 현재 실행중인 커널과 실제로 로드된 커널 모듈 목록만을 가지로 자동으로 최적화된 커널 설정 파일을 만들어주는 기능입니다. 자주 커널을 테스트하는 사람에게 매우 유용한 옵션일 것 같습니다. 비슷하지만 모든 모듈을 컴파일하여 커널에 내장시키도록 해주는 &amp;lsquo;make localyesconfig&amp;rsquo; 명령도 추가되었습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;그외&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;btrfs 파일시스템을 많이 개선했고, 블럭 레이어 확장성(scalability)을 위한 개선 작업이 이루어졌습니다. 하지만 아직 사용하고 있지 않아 별로 감흥은&amp;hellip;&lt;/p&gt;
+&lt;p&gt;AMD/ATI 2000,300,4000 라데온 그래픽카드에 대한 커널모드스위치(KMS)와 3D그래픽 지원이 추가되었습니다. 인텔 칩셋은 항상 가장 먼저 지원되므로, 이제 메이저 칩셋 중에서는 NVIDIA 쪽만 남은 것 같기도 하고&amp;hellip; 인텔 드라이버는 프레임버퍼 압축 기능을 지원하여 Idle 상태에서 전원을 0.5W 정도 절약한다고 합니다.&lt;/p&gt;
+&lt;p&gt;VMware 설치시에 빌드하던 vmxnet3 기상 이더넷 드라이버가 커널에 공식적으로 포함되었습니다. 하지만 요즘은 VirtualBox를 사용하고 있어서 그다지&amp;hellip;&lt;/p&gt;
+&lt;p&gt;아무튼 ALSA 오디오 드라이버 / 비디오 / 이더넷 / 스토리지 등 많은 드라이버가 업데이트되었다고 하니, 더 자세한 내용이 궁금하신 분은 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_32&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널뉴비 페이지&lt;/a&gt;
+를 참고하시기 바랍니다. 커널뉴비 페이지가 너무 길다면 &amp;lsquo;
+&lt;a href=&#34;http://www.h-online.com/open/features/What-s-new-in-Linux-2-6-32-872271.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;What&amp;rsquo;s new in Linux 2.6.32&lt;/a&gt;
+&amp;rsquo; 기사를 보셔도 될 것 같습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>tcpdump를 이용한 네트워크 사용량 측정하기</title>
+      <link>/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/</link>
+      <pubDate>Tue, 15 Dec 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/</guid>
+      <description>&lt;p&gt;업무상 실제 패킷 사용량을 측정할 필요때문에 여러가지 도구를 찾던 중 마땅한 걸 찾지 못해 직접 측정한 방식을 정리해 봅니다. 물론 이보다 더 좋은 방법들이 당연히 있을테지만, tcpdump 프로그램만 겨우 사용할 수 있는 환경에서 측정하는 법을 정리한 문서를 찾지 못해 남겨둡니다.&lt;/p&gt;
+&lt;p&gt;우선 어떤 방식으로든 해당 장비에 tcpdump 프로그램을 설치합니다.&lt;/p&gt;
+&lt;p&gt;그리고 측정하려는 과정이나 단계가 시작하는 동시에 다음과 같이 tcpdump 프로그램을 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ tcpdump -qvtttt dst xxx.xxx.xxx.xxx &amp;gt; packet-dump.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 &lt;code&gt;xxx.xxx.xxx.xxx&lt;/code&gt;는 측정에 사용할 대상 장비입니다. 즉, 위 예제는 특정 IP로 전송하는 패킷량만 캡쳐하여 &lt;code&gt;packet-dump.txt&lt;/code&gt; 파일에 저장합니다. 중요한 점은 앞의 옵션인데, 이 옵셥을 사용해야 아래에서 사용하는 스크립트가 분석할 수 있는 형태의 결과물로 저장됩니다. 그리고, 필요하다면, 저장한 파일을 리눅스 또는 맥 장비로 복사합니다.&lt;/p&gt;
+&lt;p&gt;저장한 파일을 &lt;code&gt;conv2csv.sh&lt;/code&gt; 스크립트를 이용해 엑셀이나 오픈오피스에서 읽어들일 수 있는 CSV 파일 형태로 변환합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ./conv2csv.sh packet-dump.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;변환된 &lt;code&gt;packet-dump.csv&lt;/code&gt; 파일은 한 행에 &amp;lsquo;&lt;strong&gt;TIMESTAMP BYTES Kbps&lt;/strong&gt;&amp;rsquo; 형태로 각 초당 데이터가 저장되어 있습니다. 따라서 이 파일을 액셀이나 오픈오피스에서 공백(space)을 구분자로 해서 읽어들인 후 3번째 컬럼을 사용하면 됩니다. 참고로 여기서 측정한 크기는 IP/TCP/UDP 헤더까지 포함한 크기입니다.&lt;/p&gt;
+&lt;p&gt;다음은 이렇게 변환한 데이터를 구글 스프레드시트를 이용해 만든 차트입니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/packet-traffic-analysis.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;위에서 언급한 &lt;code&gt;conv2csv.sh&lt;/code&gt; 스크립트는 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+
+CSVFILE=&amp;quot;$(dirname $1)/$(basename $1 .txt).csv&amp;quot;
+
+awk &#39;{ print $2, $18 }&#39; $1 | 
+  tr &#39;.)&#39; &#39;  &#39; | 
+  awk &#39;BEGIN { last = &amp;quot;&amp;quot;; sum = 0; } 
+       { if (last == $1) 
+           { sum += $3 } 
+         else 
+           { print last, sum, sum * 8 / 1000; 
+             last = $1; 
+             sum = $3; } 
+       }&#39; &amp;gt; $CSVFILE
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;;)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>MacOS X의 한글 이름 파일을 리눅스에 복사하면 깨지는 현상 고치기</title>
+      <link>/2009/10/06/2009-10-06-fix-broken-hangul-filename-from-mac-os-x-in-linux/</link>
+      <pubDate>Tue, 06 Oct 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/10/06/2009-10-06-fix-broken-hangul-filename-from-mac-os-x-in-linux/</guid>
+      <description>&lt;p&gt;요즘 맥북과 리눅스를 같이 사용하면서 여러가지 방법으로 파일을 공유하고 있는데, SSH 등으로 직접 복사할때 파일 이름에 한글이 포함되어 있으면 깨지는 현상이 발생합니다. 리눅스에서 맥으로 복사할때는 문제가 없는데, 다시 맥에서 리눅스로 복사하면 파일 이름의 한글이 요상하게 보입니다. 동일한 UTF-8 환경이라 문제가 없을 줄 알았는데, 이 때문에 Unison 같은 프로그램도 오동작을 합니다.&lt;/p&gt;
+&lt;p&gt;대략 검색해보니 UTF-8을 인코딩할때 리눅스 계열의 운영체제는 NFC(normalization form C) 방식을 사용하는데 맥의 다윈 커널에서는  NFD(normalization form D) 방식을 사용하기 때문이랍니다. 아무튼, 해결하는 방법은 convmv 프로그램을 이용하면 됩니다.&lt;/p&gt;
+&lt;p&gt;우선 다음과 같이 convmv 프로그램을 설치합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install convmv
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;한글이 깨진 파일이나 디렉토리에서 다음 명령을 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ convmv -f utf8 -t utf8 -r --nfc --notest *
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;더 자세한 사용법은 `&lt;code&gt;man convmv&lt;/code&gt;&#39;를 입력하시길~&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.31 릴리스</title>
+      <link>/2009/09/14/2009-09-14-linux-kernel-2-6-31-release/</link>
+      <pubDate>Mon, 14 Sep 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/09/14/2009-09-14-linux-kernel-2-6-31-release/</guid>
+      <description>&lt;p&gt;어김없이 
+&lt;a href=&#34;http://lwn.net/Articles/351782/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.31 버전이 릴리스&lt;/a&gt;
+되었습니다. 그리고, 갈수록 내용이 부실해지고 있지만, 역시 제가 관심있는 변경 사항만 간추려 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;사용자 공간 문자 장치 (CUSE, Character Devices in User Space)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;FUSE가 사용자 공간에서 구현할 수 있는 파일시스템 드라이버를 제공한다면, 사용자 공간 문자 장치(?)는 문자 장치를 사용자 공간에서 구현할 수 있도록 도와줍니다. 특히 이를 이용해 ALSA가 대체한 OSS 장치에 대한 프록시 디바이스를 구현하고 있는데, 예를 들어 OSS 장치인 것처럼 보이지만 사용자 공간 드라이버이기 때문에 ALSA 라이브러리를 직접 호출해 구현할 수도 있고, 다른 네트워크 장치로 전달할 수도 있습니다. 더 나아가 PulseAudio 라이브러리를 이용할 수도 있고 다채널 믹싱 기능도 구현할 수도 있습니다. 이를 통해 커널의 ALSA OSS 에뮬레이션 모듈을 대체하면서 OSS 오디오 장치를 사용하는 많은 유닉스 어플리케이션이 리눅스에서 더 쉽게 동작할 수 있도록 도와줍니다.&lt;/p&gt;
+&lt;p&gt;아무튼 처음 시작은 OSS 프록시 장치를 구현하려고 포함된 기능이지만, 활용 방도는 FUSE처럼 무궁무진할 것으로 보입니다. 위와 같은 예가 오디오 장치에만 국한되는 건 아니니까요. 예를 들어 비디오 캡쳐 라이브러리가 바이너리 형태로만 제공되는 하드웨어를 사용하고 싶은데, 기존 어플리케이션이 V4L2 인터페이스 기반으로 만들어져 있다면, 캡쳐 카드용 V4L2 장치 파일을 CUSE 기반으로 만든 다음 V4L2 API 호출을 라이브러리 호출로 변환해도 되겠지요.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;성능 카운터 (Performance Counters)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;성능 카운터는 일종의 프로파일 도구입니다. 최근 CPU들이 기본적으로 지원하는 하드웨어 카운터 레지스터를 이용하기 때문에 커널이나 어플리케이션의 성능 저하를 야기하지 않습니다. 사용한 CPU 싸이클 수, 캐시 참조 회수, 캐시 미스 회수, 페이지 폴트 등과 같은 정보를 확인할 수 있는데, 현재  X86, PPC 플랫폼을 완전히 지원하고 S390, FRV 등은 부분적으로 지원하는 것 같습니다.&lt;/p&gt;
+&lt;p&gt;성능 정보를 추출하거나 확인하려면 커널 소스에 포함된 perf 라는 커맨드라인 도구를 이용합니다. 커널 뉴비의 예제를 보면 특정 프로그램과 라이브러리를 지정하면서 디버깅 정보를 전달하면 함수 단위로 실행 정보를 보여주는 기능도 있습니다. top 명령어처럼 실시간으로 상태를 보는 기능도 있는 것 같고&amp;hellip; 어플리케이션 성능 디버깅을 위해 OProfile을 사용하기가 부담될때 사용하면 좋을 것 같은 기능입니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Btrfs 파일 시스템 개선&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Ext4 파일시스템을 대체할 차세대 파일시스템으로 각광받고 있는 Btrfs는 리누스 토발즈가 자신의 노트북 루트 파일 시스템으로 사용하고 있다고 해서 더 유명하죠. 솔라리스 ZFS 파일시스템과 비교도 많이 되고&amp;hellip; 아무튼 이번 버전에서 많이 안정화가 되었다고 하는데, 다음이나 다다음 릴리스 즈음엔 (1~2년 뒤?) 일반 배포판에서도 공식적으로 지원할 수 있을 정도의 상태인 것 같습니다. 더 자세한 기술적인 내용이 
+&lt;a href=&#34;http://lwn.net/Articles/342892/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN에 포스팅&lt;/a&gt;
+되어 있는데,  언제 여유가 되면 따로 정리해봐야 할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;기타&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;OProfile 기능이 인텔 아톰과 코어 i7 칩셋도 지원하게 되었군요. (지금까지 아톰칩에서 안되고 있었단 말인가&amp;hellip;) 아직 시장에 제품도 안나온 USB 3.0 지원이 포함되고, 커널 메모리 디버깅 관련 몇 가지 기능(Kmemcheck / Kmemleak)이 추가되었습니다. 데스크탑 반응성을 향상시키는 미리읽기(readahead)와  메모리 관리 관련 변경이 있었으며,  inotify / dnotify 등이 FSNotify 기반으로 다시 구현되었다고 합니다. 인텔 칩셋에 이어 ATI 라데온 칩셋의 커널 모드 셋팅 지원도 추가되었고, GCC 커버리지 기능(gcov)도 포함되었습니다. 물론 그외 많은 드라이버가 새로 추가되었고 버그도 많이 고쳐졌다고 합니다.&lt;/p&gt;
+&lt;p&gt;더 자세한 내용에 관심있는 분은 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_31&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널뉴비&lt;/a&gt;
+를 방문하시기 바랍니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터와 GTK</title>
+      <link>/2009/09/08/2009-09-08-clutter-and-gtk/</link>
+      <pubDate>Tue, 08 Sep 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/09/08/2009-09-08-clutter-and-gtk/</guid>
+      <description>&lt;p&gt;`
+&lt;a href=&#34;http://blog.didrocks.fr/index.php/post/Design-experience-and-demos-in-GTK-Clutter&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Design experience and demos in GTK and Clutter&lt;/a&gt;
+&amp;rsquo; 라는 포스트가 얼마 전에 올라왔는데 이제야 리뷰를 해봅니다. 이 포스트를 클릭해서 들어가 보시면 데모 동영상이 여러개 있는데, 클러터 안에 GTK 노트북 위젯을 넣어 여러가지 효과를 보여주고 있습니다. 이 포스트는 &lt;span style=&#34;background-color:#ffffff;&#34;&gt;`
+&lt;a href=&#34;http://dannipenguin.livejournal.com/280866.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;animating GTK+, Clutter-Gtk, client-side-windows and demos&lt;/a&gt;
+&amp;rsquo; 포스트에서 설명한 방식을 더 확장하고 실용적인 예제를 보여주고 있는 셈인데, GTK Client Side Window + ClutterGtk를 이용하고 있습니다.&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;클러터를 이용해 사용자 인터페이스를 만들때 불편한 점 중 하나는 버튼, 입력상자, 라디오 버튼 등과 같은 위젯 툴킷이 없기 때문에 모두 직접 만들어야 한다는 점입니다. 물론 모블린 프로젝트에서 사용하고 있는 클러터 기반 툴킷 라이브러리도 있고 클러터 예제 디렉토리에 여러가지 참고할 만한 샘플이 있긴 하지만, QT나 GTK 같은 라이브러리처럼 풍부한 기능은 제공하지 않습니다. 이 데모가 유용한 이유는, GTK 위젯을 그대로 클러터 안에 포함할 수 있는 것은 물론, 기존 GTK 위젯의 동작을 확장하여 자연스러운 애니메이션 효과를 마음대로 추가할 수 있다는 점을 보여주고 있기 때문입니다.&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;물론, 단순히 예쁘고 화려한 인터페이스 효과를 추가하는게 목적이 아니라, 이를 통해 사용자가 더 쉽게 이해하고 사용하기 편한 인터페이스를 제공할 수 있다는 점이 더 중요한 것 같습니다.&lt;/span&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투에서 이더넷 장치 변경시 장치번호 초기화</title>
+      <link>/2009/08/14/2009-08-14-init-eth-dev-number-when-lan-card-changes-in-ubuntu/</link>
+      <pubDate>Fri, 14 Aug 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/08/14/2009-08-14-init-eth-dev-number-when-lan-card-changes-in-ubuntu/</guid>
+      <description>&lt;p&gt;이더넷 랜카드를 교체하거나, 온보드 이더넷을 CMOS에서 비활성화하고 랜카드만 사용하고 싶거나 또는 그 반대인 경우, 우분투에서 사용하는 udev 데몬은 자동으로 새로 인식한 이더넷 장치에게는 기존 이더넷 장치와 충돌하지 않도록 새로운 이더넷 번호를 할당하고 기억합니다. 예를 들면, eth0 장치가 없는데도, eth0 대신 eth1 장치로 인식하게 됩니다.&lt;/p&gt;
+&lt;p&gt;이는 장치마다 다른 설정을 장비 구성이 달라지더라도 고유하게 계속 유지할 수 있도록 하기 위함인데, 때로는 거슬리기도 하고, 당연히 eth0 장치가 있다고 가정하고 동작하는 프로그램이 있는 경우 골치 아파집니다.&lt;/p&gt;
+&lt;p&gt;이럴 때 쉽게 해결하는 방법은, 다음과 같이 이 정보를 기억하고 있는 파일을 지우고 재부팅하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo rm /etc/udev/rules.d/70-persistent-net.rules
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고로 CDROM 관련 설정도 있는데, 타이핑이 귀찮을 경우 다음과 같이 해도 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo rm /etc/udev/rules.d/*
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;왜냐하면 건드리면 피곤해지는 udev 기본 설정 파일은 &lt;code&gt;/lib/udev/rules.d/&lt;/code&gt; 디렉토리에 따로 저장되기 때문입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>실행 안되는 crontab 작업 디버깅하기</title>
+      <link>/2009/07/17/2009-07-17-debugging-crontab-job-not-running/</link>
+      <pubDate>Fri, 17 Jul 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/07/17/2009-07-17-debugging-crontab-job-not-running/</guid>
+      <description>&lt;p&gt;리눅스를 비롯한 유닉스 방식 운영체제에서 주기적인 작업을 수행하기 위해 cron 데몬을 많이 사용합니다. 루트 권한으로 시스템 관리에 필요한 작업을 예약할 수도 있지만, 일반 사용자 계정도 &amp;lsquo;&lt;code&gt;crontab -e&lt;/code&gt;&amp;rsquo; 명령으로 작업 예약이 가능합니다. 현재 활발하게 개발 중인 프로젝트의 일일 빌드(daily build)를 위해 crontab 작업을 다음과 같이 예약했는데, 문제는 동일한 설정이 한 장비에서만 동작을 안한다는 점입니다. (dooly 계정으로 작업한다고 가정합니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# m h  dom mon dow   command
+0 23 * * * /home/dooly/build-cms.sh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;빌드 스크립트(&lt;code&gt;/home/dooly/build-cms.sh&lt;/code&gt;) 내용은 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+cd /home/dooly/svn/dooly
+svn update &amp;amp;&amp;amp; 
+sudo make install-depends &amp;amp;&amp;amp; 
+make clean &amp;amp;&amp;amp; 
+make &amp;amp;&amp;amp; 
+make packages &amp;amp;&amp;amp; 
+make upload
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;인터넷을 찾아보니 다음과 같이 수정하여 로그 파일을 분석하라고 해서 따라해 보았습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# m h  dom mon dow   command
+* * * * * /home/dooly/build-cms.sh &amp;gt;&amp;gt; /home/dooly/cron.log 2&amp;gt;&amp;amp;1
+* * * * * env &amp;gt; /home/dooly/env.log 2&amp;gt;&amp;amp;1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;로그 파일을 분석하니, 환경 변수 LANG이 ko_KR.UTF-8 로 설정되지 않아서 서브버전 갱신(update) 도중 에러가 발생하고 있었습니다. 그래서 스크립트를 다음과 같이 수정해서 일단 문제는 해결했습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+export LANG=ko_KR.UTF-8
+cd /home/dooly/svn/dooly
+svn update &amp;amp;&amp;amp; 
+sudo make install-depends &amp;amp;&amp;amp; 
+make clean &amp;amp;&amp;amp; 
+make &amp;amp;&amp;amp; 
+make packages &amp;amp;&amp;amp; 
+make upload
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;하지만 향후 문제 발생시 디버깅을 위해 다음과 같이 crontab 항목도 아예 변경해 두었습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# m h  dom mon dow   command
+0 23 * * * /home/dooly/build-cms.sh &amp;gt; /home/dooly/cron.log 2&amp;gt;&amp;amp;1
+#* * * * * env &amp;gt; /home/dooly/env.log 2&amp;gt;&amp;amp;1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;물론, 자동으로 메일을 전송하도록 하거나 하는 다른 추가 기능도 가능하겠지만, 일단 이 정도 수준에서 만족하고 현재는 잘 동작하고 있습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>X 윈도우 비디오 가속(VA) API</title>
+      <link>/2009/07/13/2009-07-13-x-window-video-acceleration-api-overview/</link>
+      <pubDate>Mon, 13 Jul 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/07/13/2009-07-13-x-window-video-acceleration-api-overview/</guid>
+      <description>&lt;p&gt;기존 X 윈도우 프로그래밍에서 하드웨어 가속 기능을 이용하여  YUV 형식의 비디오를 재생하거나 MPEG2 코덱을 디코딩하려면  
+&lt;a href=&#34;http://en.wikipedia.org/wiki/X_video_extension&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Xv (X Video)&lt;/a&gt;
+와 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/X-Video_Motion_Compensation&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;XvMC (X Video Motion Compensation)&lt;/a&gt;
+ 확장(extension) API를 사용해야 합니다. 하지만 몇년 전부터 이러한 X 윈도우 확장 API의 한계를 벗어나기 위해 업체별로 각각 별도의 API 라이브러리를 제공하고 있는데, 인텔의 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Video_Acceleration_API&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;VA (Video Acceleration) API&lt;/a&gt;
+, NVIDIA의  
+&lt;a href=&#34;http://en.wikipedia.org/wiki/VDPAU&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;VDPAU (Video Decode and Presentation API for Unix)&lt;/a&gt;
+, ATI의 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/X-Video_Bitstream_Acceleration&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;XvBA (X-Video Bitstream Acceleration)&lt;/a&gt;
+ API 등이 그 예입니다. (물론 이를 지원하는 최신 그래픽카드 칩셋이 장착되어 있어야 하는데, 인텔의 경우 G45 칩셋부터 가능하다고 합니다) 참고로 CPU 점유율 66.3 ~ 98.4% 정도를 사용하는 고해상도 H.264 / VC1 비디오 재생이 하드웨어 가속 기능을 이용하면 0.6% 이하로 낮아진다는 
+&lt;a href=&#34;http://gwenole.beauchesne.info/en/blog/2009/06/22/video_decode_acceleration_benchmarks&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;벤치마킹 결과&lt;/a&gt;
+도 있습니다.&lt;/p&gt;
+&lt;p&gt;이러한 여러 업체의 독자적인 API가, 
+&lt;a href=&#34;http://lwn.net/Articles/339349/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN 기사&lt;/a&gt;
+에서 정리한 것처럼, 이제는 인텔 API로 통합되어 가고 있습니다.  VDPAU / XvBA 기능이 VA API의 백엔드(backend)로 구현하는 작업이 진행되고 있어 VA API만 지원해도 응용 프로그램은 쉽게 다른 업체의 하드웨어 가속 기능을 사용할 수 있게 되는 것입니다. 물론 MPlayer, FFmpeg, VLC 같은 대표적인 비디오 관련 응용 프로그램은 VA API를 이미 지원하거나 지원하기 위해 준비하고 있습니다.&lt;/p&gt;
+&lt;p&gt;VA API는 비디오 디코딩 뿐 아니라 기존 Xv 확장 API에서 처리하던 색상 공간 변환 (color space conversion), 감마 교정 (gamma correction), 확대 (scaling) 외에 기타 비디오 작업을 처리합니다. 게다가 앞으로는 인텔에서 제공하는 하드웨어 가속 인코딩 기능까지 지원할 예정인 것 같습니다. (2009년 하반기에 발표할 예정인 인텔 Moorestown 모바일 플랫폼에서 지원하는 것 같습니다) 더 나아가 클러터(Clutter) 같은 툴킷 라이브러리에서 직접 사용할 수 있도록 OpenGL 텍스쳐(texture)에 직접 렌더링하는 기능도 지원할 예정이라는군요.&lt;/p&gt;
+&lt;p&gt;그래픽 하드웨어 칩셋의 인코더 / 디코더 기능을 이용하는 기능은 얼핏 리눅스 커널 V4L2 기반의 하드웨어 인코더 / 디코더 API와 중복된다는 느낌도 있지만, VA API는 디코딩한 데이터가 바로 그래픽 카드 프레임 버퍼에 저장되어 표시되기 때문에 별도의 디스플레이 과정이 불필요하다는 점이 다릅니다. 또한 인코더 / 디코더 보드는 대부분 다채널 동시 인코딩 / 디코딩을 지원하지만, VA API는 한 번에 하나의 비디오만 처리할 수 있다는 점도 다릅니다.&lt;/p&gt;
+&lt;p&gt;아직은 모두 오픈소스가 아닌 업체가 제공하는 바이너리 X 윈도우 드라이버에서만 동작하는 것 같지만, 나중에 분명 필요하게 될 때가 있을 것 같으니, VA API 사용법도 한 번 둘러봐야 할 것 같습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.30 릴리스</title>
+      <link>/2009/06/12/2009-06-12-linux-kernel-2-6-30-release/</link>
+      <pubDate>Fri, 12 Jun 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/06/12/2009-06-12-linux-kernel-2-6-30-release/</guid>
+      <description>&lt;p&gt;어김없이 
+&lt;a href=&#34;http://lwn.net/Articles/336506/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.30 버전&lt;/a&gt;
+이 나왔습니다. 에휴&amp;hellip;&lt;/p&gt;
+&lt;p&gt;20대에는 릴리스마다 변경된 커널 코드를 읽어 보기도 했는데, 30대 초반 들어서는 기술 분석 문서를 읽는 것도 벅차더니, 30대 중반을 달리고 있는 요즘은 어디 잘 요약해 놓은데 없나 찾아 다니기만 하는 것 같습니다. 물론 갈수록 게을러지는 게 가장 큰 원인이겠지만, 매 릴리스마다 변경되는 기술의 폭이 커지는 것도 하나의 변명이 될 수 있지 않을까 생각합니다. 게다가 요즘은 초창기와 다르게 릴리스 전에 많은 전문가들이 먼저 시험해 보고 잘 정리해 놓으니까, 직접 API를 사용해 보거나 코드를 확인하는 건 정말 업무에 사용하게될 때 뿐인 것 같습니다. 어찌되었든, 중요한 변경 사항은 놓치지 않고 확인해놔야 먹고 사는데 지장이 없을 것 같아 제가 관심 있는 부분만 정리해 봅니다. 물론 더 자세한 내용은 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_30&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널 뉴비 사이트&lt;/a&gt;
+를 보시면 지나치게 잘 정리되어 있으니 놓치지 마시길!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;파일시스템 잔치 : NILFS2, POHMELFS, DST, EXOFS, EXT4, EXT3, &amp;hellip;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;일본 NTT Lab에서 개발한 NILFS2 파일시스템이 정식으로 커널에 포함되었습니다. 아직 개선이 조금 더 필요하지만 SSD 저장장치에서 엄청난 성능을 뿜어낸다고 하는군요. 아주 오래전부터 공식 커널 밖에서 개발되던 로그-구조(Log-structured) 방식 파일시스템이 드디어 실생활에 사용될 수 있을지 조금 기대가 됩니다. 참고로 로그-구조란, 로그 파일에 로그 메시지가 계속 추가되듯이, 기존 내용을 덮어쓰지 않고 추가 / 수정된 부분만 계속 새로운 공간에 배치하기 때문에 공간이 허락하는 한 무한대 롤백 / 스냅샷이 가능합니다. 그리고 이러한 특성 때문에 쓰기 제한이 있는 SSD 매체에 적합한 파일시스템이라는 얘기도 가능합니다.&lt;/p&gt;
+&lt;p&gt;오랫동안 
+&lt;a href=&#34;http://planet.kernel.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널 플래닛&lt;/a&gt;
+에서 개발 과정을 지켜봤던 POHMELFS 파일시스템도 포함되었습니다. 지금까지 존재하는 어떤 네트웍 파일시스템보다 성능이 더 좋다고 하는데, 써 볼 기회가 없는게 아쉽네요. 또한 NFS / AFS 등의 성능 개선을 이끌어낸 FS-Cache 캐싱 파일시스템도 추가되었다고 합니다. DST, EXOS 파일시스템은 잘 모르는 거라서&amp;hellip;&lt;/p&gt;
+&lt;p&gt;EXT3 / EXT4 파일시스템에서 fsync() 호출에 대한 반응속도(latency)도 많은 논의 끝에(?) 개선되었고, EXT3 파일시스템에서 relatime 옵션이 기본으로 켜지게 되었습니다. 더불어 EXT4 파일시스템도 많이 안정화된 것처럼 보입니다.&lt;/p&gt;
+&lt;p&gt;아무튼, 요즘 리눅스 커널은 BTRFS, EXT4, UnionFS 등을 포함한 차세대 파일시스템들이 EXT3 다음 자리를 놓고 치열하게 경쟁하는 덕분에, 개발자들 공부 많이 하게 해 주는군요&amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;쓰레드 방식 인터럽트 핸들러 지원&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;솔라리스나 실시간 커널에서는 이미 몇십년 전부터 사용하고 있는 방식이지만, 여러 정치적인 이유로 실시간 커널 브랜치에만 있던 
+&lt;a href=&#34;http://lwn.net/Articles/302043/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;쓰레드 방식 인터럽트 핸들러 기능&lt;/a&gt;
+이 이제서야 메인 커널에 추가되었습니다. 물론 인터럽트 핸들러가 실행이 길어질수록 시스템의 다른 부분이 아무 일도 할 수 없기 때문에 리눅스 커널은 아주 오래전부터 상단/하단 부분(top/bottom half)이나 태스크릿(tasklet)을 비롯해 많은 메카니즘을 제공함으로써 커널 레이턴시(latency)를 훌륭하게 보장하고 있지만, 아무래도 실시간 시스템 하는 사람들에겐 부족했던 모양입니다.&lt;/p&gt;
+&lt;p&gt;기존 방식으로 동작하려면 지금과 동일하게 request_irq() 함수를 사용하면 되고, 각각의 핸들러가 별도 커널 쓰레드로 동작하게 하려면 request_threaded_irq() 함수를 이용해 등록하면 됩니다. 두번째 방식은 핸들러 함수(quick_check_handler)가 하나 더 있는데, 인터럽트가 발생하면 이 핸들러가 먼저 실행된 후 인터럽트가 자신의 것이 맞는지 여부와, 그렇다면 그에 따라 인터럽트 핸들러 쓰레드를 깨울지, 직접 인터럽트 문맥에서 실행할 지 등을 결정하는 리턴값을 돌려주면 그에 따라 인터럽트 핸들러 쓰레드가 동작하는 방식입니다. 따라서 이로 인해 기존 태스크릿(tasklet)은 사라질 수도 있다고 합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;기타&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;커널 부팅 속도를 빠르게 하기 위해 한번에 하나씩 장치를 스캔하지 않고, 한꺼번에 장치 스캔 요청을 보낸 뒤 나중에 
+&lt;a href=&#34;http://lwn.net/Articles/314808/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;비동기(async)로 응답을 받아 처리할 수 있는 API&lt;/a&gt;
+도 추가되었습니다.&lt;/p&gt;
+&lt;p&gt;메모리 관리자는 또 개선되어, 커널 메모리 추적자(kmemtrace)라는 녀석도 추가되어 kmalloc(), kfree(), kmem_cache_alloc() 등과 같은 메모리 관련 API 추적 정보를 사용자 영역 프로세스에게 전달해 분석에 사용할 수 있게 되었습니다. 더불어 
+&lt;a href=&#34;http://lwn.net/Articles/308237/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;DMA API 디버깅을 위한 기능&lt;/a&gt;
+도 추가되었습니다.&lt;/p&gt;
+&lt;p&gt;X86_32 아키텍쳐에서 커널 스택 보호 기능도 추가되고, 이제 더 이상 zImage 형식은 지원하지 않게 되었고, /sys 밑에 새로운 항목들이 추가되고, 수많은 디바이스 드라이버가 업데이트되고 추가되었고&amp;hellip;&lt;/p&gt;
+&lt;p&gt;아무튼, 오늘은 여기까지!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투 9.04 릴리스, 하지만...</title>
+      <link>/2009/04/23/2009-04-23-ubuntu-904-release-however/</link>
+      <pubDate>Thu, 23 Apr 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/04/23/2009-04-23-ubuntu-904-release-however/</guid>
+      <description>&lt;p&gt;우분투 9.04 버전이 릴리스 되었지만 안정화되려면 업데이트를 조금 더 기다려야 할 것 같습니다. 
+&lt;a href=&#34;http://www.ubuntu.com/getubuntu/releasenotes/904&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;릴리스 노트&lt;/a&gt;
+를 보면 인텔 드라이버 성능 저하와 디스플레이 멈춤(freeze), EXT4 파일 시스템 불안정, 945보드에서 디스크 인식 문제 등 많은 문제가 언급되어 있군요. 한글 글꼴 설정도 조금 문제가 있어 수정이 필요한 것 같고&amp;hellip;&lt;/p&gt;
+&lt;p&gt;6개월 간격으로 정식 릴리스를 무조건 해야 하니 발생하는 어쩔 수 없는 일이긴 하지만, 이번 릴리스는 X서버와 비디오 드라이버, 커널과 드라이버가 모두 급격하게 신기술로 이전되어 아직 충분히 안정화가 안 된 상황과 배포판 릴리스 시기가 맞물려 더욱 심한 것 같습니다.&lt;/p&gt;
+&lt;p&gt;물론, 인텔 그래픽 카드 사용 안하면 됩니다. EXT4 파일시스템 대신 그대로 안정적인 EXT3 파일 시스템을 사용하면 됩니다. 몇가지 부족한 부분은 튜닝하면 되겠지요. 하지만, 하드웨어를 교체할 수 없거나 제품에 사용하려고 계획 중이라면 아쉬운 기분으로 조금 더 기다려야 할 것 같습니다. 대부분의 문제가 굳이 우분투 배포판만의 문제는 아니니까요&amp;hellip;&lt;/p&gt;
+&lt;p&gt;그나저나, 
+&lt;a href=&#34;http://www.linux-mag.com/id/7308/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Btrfs 파일시스템 벤치마크 기사&lt;/a&gt;
+가 나올 정도로 안정화가 눈에 띄게 좋아진 것 같군요. 과연 성능과 기능 두 마리 토끼를 모두 잡을 수 있을 지 정말 기대됩니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.29 릴리스</title>
+      <link>/2009/03/26/2009-03-26-linux-kernel-2629-release/</link>
+      <pubDate>Thu, 26 Mar 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/03/26/2009-03-26-linux-kernel-2629-release/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://lwn.net/Articles/325047/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.29 버전이 릴리스&lt;/a&gt;
+되었군요. 이번에도 역시 제가 관심있는 부분만 우리말로 다시 요약해 보았습니다. 물론, 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_29&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널뉴비&lt;/a&gt;
+에서 더 자세한 내용을 확인할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;커널 모드 셋팅 (Kernel Modesetting)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;커널이 그래픽 모드 설정을 직접 제어하는 이 기능은 오랫동안 기다렸지만, 아직은 인텔 그래픽 카드만 지원하기 때문에 다른 비디오 카드 사용자는 더 기다려야 합니다. 하지만, 윈도우, 맥 같은 다른 데스크탑 운영체제처럼 드디어 리눅스도 그래픽컬한 운영체제로 변신하기 시작했다는 이정표는 분명히 될 것 같습니다. 개발자와 사용자 모두에게 많은 장점이 있지만, 이미 많은 사이트에서 이미 잘 설명하고 있으므로 자세한 내용은 생략합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Btrfs / Squashfs / Ext4 파일시스템&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;썬과 애플의 ZFS에 견줄만한 유일한 파일시스템이 드디어 메인 커널에 추가되었습니다. 오라클의 지원하에 EXT4를 대체할 파일시스템 자리를 노리며 활발하게 개발되고 있지만, 아직은 테스트용으로만 추천하고 있습니다. 하물며 안정화되었다는 EXT4 파일시스템도 우분투 9.04에 포함되기 위해 일반 사용자 테스트를 받는 도중 데이터 손실이라는 심각한 버그로 인해 고생하고 있는 상황에서&amp;hellip; :)&lt;/p&gt;
+&lt;p&gt;임베디드 시스템이나 라이브CD 환경에서 사용하기 적합한 읽기 전용 파일시스템 Squashfs도 드디어 메인 커널에 들어왔습니다. 높은 압축률 때문에 기존 읽기 전용 파일시스템을 대체하기에 적합합니다.&lt;/p&gt;
+&lt;p&gt;Ext4 파일시스템에는 저널링 없이 사용하는 기능이 추가되었는데 Ext2 파일시스템과 견줄만큼은 아니지만 (당연한 얘기지만) 조금 더 성능이 좋다고 합니다. 어떤 용도에 사용될 지 아직 이해할 수는 없지만.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;파일시스템 얼리기 (Filesystem freeze)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;파일시스템을 백업해야 하는데 백업 시점에서 모든 파일 쓰기 작업을 잠시 멈추게 해야할 필요가 있는데 이 경우에 유용하게 사용할 수 있습니다. 예를 들어, 이벤트 로그를 특정 시점까지만 백업하려고 해도 동작을 멈추면 안되는 서버가 이벤트 로그를 계속 발생하고 있다면 파일시스템을 갱신하는 모든 작업을 잠시 지연시키고(얼려버리고) 백업이 끝난다음 자연스럽게 다시 처리되도록 하면 됩니다. 물론 이 기능은 대기모드(suspend)로 들어갔다가 나오는 경우에도 활용됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;빨리 부팅하기&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;한때 큰 이슈가 된 
+&lt;a href=&#34;http://lwn.net/Articles/299483/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;5초 안에 리눅스 부팅하기&lt;/a&gt;
+ 프로젝트에서 구현한 기능 중 일부(scsi / libata 검사 비동기 실행하기)가 포함되었습니다. 하지만 기본값은 사용하지 않도록 되어 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;속도 향상?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=article&amp;amp;item=linux_2629_benchmarks&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;2.6.24 ~ 2.6.29 버전별 성능을 벤치마킹&lt;/a&gt;
+한 걸 보면, 2.6.29 버전에서는 멀티 쓰레드 관련 성능이 개선되어 OpenMP를 이용하는 어플리케이션은 물론 멀티쓰레드를 활용한 많은 어플리케이션의 성능이 좋아졌다고 합니다.&lt;/p&gt;
+&lt;p&gt;또한 2.6.26 ~ 2.6.28 버전에 있었던 SQLite 성능 저하 문제가 고쳐져서 이를 이용하는 파이어폭스 등과 같은 데스크탑 어플리케이션의 체감 속도도 나아질 것 같습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스에서 위치 인식 소프트웨어</title>
+      <link>/2009/02/03/2009-02-03-location-aware-softwares-in-linux/</link>
+      <pubDate>Tue, 03 Feb 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/02/03/2009-02-03-location-aware-softwares-in-linux/</guid>
+      <description>&lt;p&gt;&amp;lsquo;
+&lt;a href=&#34;http://arstechnica.com/open-source/news/2009/01/location-awareness-comes-to-the-linux-platform.ars&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Location-aware software comes to the Linux platform&lt;/a&gt;
+&amp;rsquo; 글에서 모바일 위치 정보와 지도 렌더링을 오픈소스 리눅스 플랫폼에서 처리하는 방법을 정리해 놓았는데, 나중을 위해 간략하게 정리해 보았습니다.&lt;/p&gt;
+&lt;p&gt;가장 먼저 소개하는 프레임웍은 
+&lt;a href=&#34;http://www.freedesktop.org/wiki/Software/GeoClue&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GeoClue&lt;/a&gt;
+입니다. GeoClue는 로컬에 장착된 GPS 장치 뿐 아니라 GSMLoc 등과 같은 여러가지 위치 정보를 일종의 표준화된 형식으로 D-Bus를 통해 알려줍니다. (GSMLoc은 이 글을 통해 처음 알게된 건데 GSM 방식 휴대폰의 무선기지국 위치를 측정해 현재 휴대폰의 위치를 판단하는 기법이라고 합니다) GeoClue는 이미 Glib 기반 C API도 제공하고 있기 때문에 이를 이용한 위치 정보 어플리케이션을 개발하면 여러가지 GPS 장치 뿐 아니라 GeoClue 방식을 따르는 다양한 위치 정보를 이용할 수 있다는 장점이 있습니다.&lt;/p&gt;
+&lt;p&gt;이렇게 얻어진 위치 정보를 표시하기 위해 가장 관심받고 있는 라이브러리는 
+&lt;a href=&#34;http://blog.pierlux.com/projects/libchamplain/en/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libchamplain&lt;/a&gt;
+입니다. OpenStreetMap이나 OpenAerialMap 같은 인터넷 지도 서버를 이용하면서, 렌더링에는 
+&lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter&lt;/a&gt;
+라이브러리를 사용하지만 GTK+ 위젯 기반이기 때문에 쉽게 그놈 / GTK+ 어플리케이션에도 사용이 가능합니다. 이미 그놈 프로젝트의 기본 이미지 보기 프로그램인 EOG에도 플러그인이 추가되었고, 인스턴트 메신저에도 적용되고 있습니다. (예를 들어 iPhone이나 최신 디지털 카메라는 촬영시 GPS 정보를 이미지에 저장하는데, 이를 읽어들여 이미지를 볼때 이미지를 촬영한 장소의 지도 이미지를 함께 보여줍니다. 또한 메신저 친구 목록에서 친구를 클릭하면 현재 친구가 위치한 장소가 어디인지 알려주고 지도에 표시해 주기도 하는 거죠. 허락없이 무단링크한 다음 스크린샷을 확인해 보시길&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/eog-champlain.png&#34; alt=&#34;&#34; title=&#34;EOG에서 champlain 플러그인 사용 화면&#34;&gt;&lt;/p&gt;
+&lt;p&gt;참고로, 이 소프트웨어들은 일반 데스크탑이나 서버 뿐 아니라 휴대폰, PDA 등과 같은 모바일 장치에서도 사용할 수 있습니다. 따라서 앞으로는 웹서비스 뿐 아니라 일반 어플리케이션도 위치 정보와 지도 서비스를 활용해 계속 진화하지 않을까 예측해 봅니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스에서 VMware 방향키 문제 해결하기</title>
+      <link>/2009/01/21/2009-01-21-vmware-arrow-keys-in-linux-host/</link>
+      <pubDate>Wed, 21 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/21/2009-01-21-vmware-arrow-keys-in-linux-host/</guid>
+      <description>&lt;p&gt;리눅스에서 VMware 사용시 방향키를 제대로 인식하지 못하고 오동작한다면 다음과 같이 처리하면 됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;~/.vmware/config&lt;/code&gt; 파일이나 &lt;code&gt;/etc/vmware/config&lt;/code&gt; 파일에 다음 내용을 추가합니다. (파일이 없다면 새 파일을 만듭니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;xkeymap.noKeycodeMap = &amp;quot;TRUE&amp;quot;
+xkeymap.keycode.93 = 0x076
+xkeymap.keycode.97 = 0x073
+xkeymap.keycode.98 = 0x078
+xkeymap.keycode.99 = 0x077
+xkeymap.keycode.100 = 0x079
+xkeymap.keycode.101 = 0x070
+xkeymap.keycode.102 = 0x07b
+xkeymap.keycode.103 = 0x05c
+xkeymap.keycode.104 = 0x11c
+xkeymap.keycode.105 = 0x11d
+xkeymap.keycode.106 = 0x135
+xkeymap.keycode.107 = 0x137
+xkeymap.keycode.108 = 0x138
+xkeymap.keycode.109 = 0x000
+xkeymap.keycode.110 = 0x147
+xkeymap.keycode.111 = 0x148
+xkeymap.keycode.112 = 0x149
+xkeymap.keycode.113 = 0x14b
+xkeymap.keycode.114 = 0x14d
+xkeymap.keycode.115 = 0x14f
+xkeymap.keycode.116 = 0x150
+xkeymap.keycode.117 = 0x151
+xkeymap.keycode.118 = 0x152
+xkeymap.keycode.119 = 0x153
+xkeymap.keycode.120 = 0x16f
+xkeymap.keycode.121 = 0x120
+xkeymap.keycode.122 = 0x12e
+xkeymap.keycode.123 = 0x130
+xkeymap.keycode.124 = 0x15e
+xkeymap.keycode.125 = 0x059
+xkeymap.keycode.126 = 0x14e
+xkeymap.keycode.127 = 0x100
+xkeymap.keycode.128 = 0x000
+xkeymap.keycode.129 = 0x07e
+xkeymap.keycode.130 = 0x000
+xkeymap.keycode.131 = 0x000
+xkeymap.keycode.132 = 0x07d
+xkeymap.keycode.133 = 0x15b
+xkeymap.keycode.134 = 0x15c
+xkeymap.keycode.135 = 0x15d
+xkeymap.keycode.136 = 0x168
+xkeymap.keycode.146 = 0x131
+xkeymap.keycode.148 = 0x121
+xkeymap.keycode.150 = 0x15f
+xkeymap.keycode.151 = 0x163
+xkeymap.keycode.160 = 0x10a
+xkeymap.keycode.163 = 0x16c
+xkeymap.keycode.164 = 0x166
+xkeymap.keycode.165 = 0x16b
+xkeymap.keycode.166 = 0x16a
+xkeymap.keycode.167 = 0x169
+xkeymap.keycode.171 = 0x119
+xkeymap.keycode.172 = 0x122
+xkeymap.keycode.173 = 0x110
+xkeymap.keycode.174 = 0x124
+xkeymap.keycode.180 = 0x132
+xkeymap.keycode.181 = 0x167
+xkeymap.keycode.191 = 0x05d
+xkeymap.keycode.192 = 0x05e
+xkeymap.keycode.193 = 0x05f
+xkeymap.keycode.199 = 0x133
+xkeymap.keycode.220 = 0x10b
+xkeymap.keycode.225 = 0x165
+xkeymap.keycode.234 = 0x16d
+xkeymap.keycode.244 = 0x109
+xkeymap.keycode.246 = 0x157
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고한 문서는 다음과 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://kb.vmware.com/selfservice/microsites/search.do?cmd=displayKC&amp;amp;docType=kc&amp;amp;externalId=1007439&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Linux Hosts That Use the evdev Driver for Keyboards Do Not Map Keys Correctly in Any Guest&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.vmware.com/support/ws55/doc/ws_devices_keymap_linux.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Keyboard Mapping on a Linux Host&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>VBinDiff - 바이너리 차이점 확인하기(binary diff)</title>
+      <link>/2009/01/14/2009-01-14-vbindiff-binary-diff/</link>
+      <pubDate>Wed, 14 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/14/2009-01-14-vbindiff-binary-diff/</guid>
+      <description>&lt;p&gt;텍스트나 소스 파일의 차이점을 확인하는데 사용하는 도구는 diff를 비롯해 많지만, 의외로 바이너리 파일간 차이점을 확인하는데 사용하는 쓸만한 도구가 없어 찾아보니 vbindiff 패키지가 있군요. 우분투 리눅스에서는 &amp;lsquo;vbindiff&amp;rsquo; 패키지를 설치하면 됩니다. 사용법도 간단해서 두 파일을 인수로 주면 되고, 텍스트 그래픽(curse) 기반이라 콘솔이나 터미널에서 사용 가능합니다. 더 설명할 필요없이 스크린샷 한 장!&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/avi-header-fps-change.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 병합 마운트(union mount)</title>
+      <link>/2009/01/09/2009-01-09-linux-union-mount/</link>
+      <pubDate>Fri, 09 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/09/2009-01-09-linux-union-mount/</guid>
+      <description>&lt;p&gt;리눅스 커널에서 파일 시스템 병합(union) 기능은 이미 존재하는 
+&lt;a href=&#34;http://lwn.net/Articles/217084/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Unionfs&lt;/a&gt;
+ 파일시스템을 이용하면 사용할 수 있습니다. 그런데 이를 별도 파일 시스템이 아닌 리눅스 VFS 레이어에서 직접 지원하기 위한 작업이 진행중입니다. 
+&lt;a href=&#34;http://lwn.net/Articles/308920/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;병합 마운트(union mount)&lt;/a&gt;
+ 기능인데,  예를 들어 마운트할때 &amp;lsquo;&amp;ndash;union&amp;rsquo; 옵션을 주면 파일 시스템을 병합해서 마운트합니다.&lt;/p&gt;
+&lt;p&gt;파일 시스템 병합에 대해 간략하게 설명하면, 일반적으로 리눅스에서는 디렉토리 하나에 하나의 파일 시스템만 마운트하는게 대부분입니다. 만일 동일한 디렉토리에 둘 이상의 파일 시스템을 마운트하면 항상 마지막에 마운트한 파일 시스템 내용만 보이고 이전에 마운트한 파일 시스템의 내용은 접근이 불가능합니다. 병합 마운트란 하나의 디렉토리에 여러 파일 시스템을 마운트하면 여러 파일 시스템 내용이 합쳐지는 것을 의미합니다. 먼저 마운트한 파일 시스템의 디렉토리 구조는 나중에 마운트한 파일 시스템의 디렉토리 구조와 합쳐집니다. 동일한 파일 이름을 가지고 있다면 나중에 마운트한 파일 시스템 내용을 우선적으로 보여주고, 나중에 마운트한 파일 시스템이 읽기 쓰기가 가능할 경우 파일을 지웠다면 그 정보도 유지되는 방식입니다.&lt;/p&gt;
+&lt;p&gt;이러한 개념을 적용한 Unionfs를 가장 많이 사용하는 경우는 라이브 CD/DVD 배포판입니다. 기본 루트 파일 시스템은 읽기 전용으로 CD에서 마운트하고, 사용자가 업데이트한 패키지나 작성한 문서 등을 저장하기 위해 읽기-쓰기 가능한 파일시스템을 그 위해 다시 마운트합니다. 물론 읽기-쓰기 파일시스템은 방식에 따라 사용자가 사용하는 주 운영체제 안의 파일 하나일 수도 있고, USB 플래시일 수도 있습니다.&lt;/p&gt;
+&lt;p&gt;병합 마운트 기능은 아직 읽기 전용에 최상위 디렉토리 병합 기능만 제공하지만, 한창 개발 중이고 Unionfs 파일 시스템과 서로 장단점이 있기 때문에, 실무에 적용하려면 조금은 더 기다려야 할 것 같습니다. 예제를 포함한 더 자세한 내용은 
+&lt;a href=&#34;http://lwn.net/Articles/312641/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN.net 페이지&lt;/a&gt;
+를 참고하면 됩니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>sudo 비밀번호 안물어보게 하기</title>
+      <link>/2009/01/07/2009-01-07-skip-sudo-password-prompt/</link>
+      <pubDate>Wed, 07 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/07/2009-01-07-skip-sudo-password-prompt/</guid>
+      <description>&lt;p&gt;sudo를 이용해 루트 권한으로 프로그램을 실행하거나, 패키지 관리자처럼 루트 권한이 필요한 GUI 프로그램을 실행할때마다 비밀번호 물어보는게 귀찮다면 다음과 같이 안물어보게 할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;먼저 /etc/sudoers 파일을 편집하게 위해 visudo 명령을 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo visudo
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;맨 밑으로 가면 기본적으로 admin 그룹에 대한 설정이 있는데, 이 행을 고치거나 자신의 계정에 관한 설정을 새로 추가하면서 &amp;lsquo;NOPASSWD:&amp;rsquo; 항목을 명시하고 편집을 끝냅니다.  (여기서 계정은 lethean)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;%admin ALL=(ALL) ALL
+lethean ALL=(ALL) NOPASSWD: ALL
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이후 모든 sudo 명령 실행시 더 이상 비밀번호를 물어보지 않습니다.&lt;/p&gt;
+&lt;p&gt;물론, 자리를 비웠을때 누군가 내 계정으로 루트 권한 작업을 마음대로 할 수 있는 보안상의 위험을 상관할 필요가 없을 경우에만 사용하시기 바랍니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 2.6.28 릴리스</title>
+      <link>/2008/12/26/2008-12-26-linux-kernel-2628-release/</link>
+      <pubDate>Fri, 26 Dec 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/12/26/2008-12-26-linux-kernel-2628-release/</guid>
+      <description>&lt;p&gt;리누스 토발즈가 크리스마스 선물로 2.6.28 버전 커널을 내놓았군요. 늘 그랬듯이 변동사항 중에서 관심있는 사항에 대해서만 정리해 보았습니다. 자세한 내용은 물론 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_28&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널 뉴비&lt;/a&gt;
+에서 확인이 가능합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Ext4 파일시스템 공식 지원&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Ext3 파일시스템과 하위 호환성을 유지하면서 대안을 각광받고 있는 
+&lt;a href=&#34;http://kernelnewbies.org/Ext4&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Ext4&lt;/a&gt;
+ 파일시스템이 드디어 실험(experimental) 딱지를 떼고 안정 버전으로 바뀌었습니다. 더 큰 용량 지원, 더 좋아진 성능과 안정성을 기반으로 리눅스의 주 파일 시스템으로 사용될 것 같습니다.&lt;/p&gt;
+&lt;p&gt;조금 더 자세히 살펴보면, Ext3는 최대 16TB, 파일 크기는 2TB까지 지원했지만, Ext4는 1EB, 파일 크기는 16TB까지 지원합니다.(1EB = 1024PB, 1PB = 1024TB, 1TB=1024GB) Ext3는 한 디렉토리에 32000개 항목만 지원하지만, Ext4는 무한대의 항목이 가능합니다. 또한 Ext4는 전통적인 Unix 파일시스템의 간적 블럭 맵핑 방식 대신 최신 파일시스템에서 사용하는 익스텐트(extents) 기법을 적용하여 큰 파일을 처리하는데 성능을 개선했습니다. 블럭 할당 알고리즘도 개선하고, 악명놓은 
+&lt;a href=&#34;http://kerneltrap.org/Linux/Improving_fsck_Speeds_in_Ext4&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;fsck 실행 시간도 개선&lt;/a&gt;
+했고, 그외 많은 부분에서 분명 Ext3 파일시스템의 한계를 극복했습니다.&lt;/p&gt;
+&lt;p&gt;하지만 아직 대부분의 배포판에서 사용하는 GRUB 부트매니저가 지원하지 않고(우분투나 데비안에서는 grub-pc 패키지를 설치하면 됨) 있지만 대부분 배포판의 다음 배포판에서는 다음 릴리스부터 공식적으로 지원할 것 같습니다.(다른 편법은 /boot 디렉토리만 ext3 파일시스템을 사용하면 됩니다) 물론 기본 Ext3 파일 시스템을 Ext4 파일시스템으로 마운트해서 사용할 수도 있고, Ext3 -&amp;gt; Ext4 변환도 가능합니다.&lt;/p&gt;
+&lt;p&gt;차세대 리눅스 파일시스템으로 각광받고 있는 
+&lt;a href=&#34;http://btrfs.wiki.kernel.org/index.php/Main_Page&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Btrfs&lt;/a&gt;
+ 파일시스템이 안정화될 때까지 사용하기 위한 임시 방편이라는 말도 있지만, 향후 2~3년 정도는 Ext3의 자리를 물려받아 대세가 될 파일시스템임은 분명할 것 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;GPU 메모리 관리자 GEM 추가&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;리눅스 커널이 윈도우 커널과 비교될때 가장 취약적으로 지적받던 그래픽 카드 관련 기능은 많은 이슈와 논란을 거쳤지만 결국 리눅스 커널은 프레임버퍼(FB)나 3D 가속을 위한 인터페이스 정도(DRI)만 지원했습니다. 그러던 것이 이제서야 드디어 본격적으로 커널에서 X 서버와 유기적으로 동작하기 위한 기능이 추가되기 시작했는데, 기존 X서버에서 처리하던 GPU 메모리 관리 기능이 리눅스 커널이 처리하게 된 것입니다. (비디오 모드 설정기능은 2.6.29에서 공식 지원할 듯)&lt;/p&gt;
+&lt;p&gt;아직 i915 드라이버 기반 최신 인텔 그래픽 칩셋만 지원하지만, 페도라 10 배포판은 이미 이 기능을 이용하여 부팅부터 GDM 로그인까지 화면 깜박임없는 부팅을 지원하고 있습니다. (물론 이를 위해 사용하는 최신 X서버가 NVidia 같은 바이너리 드라이버가 제대로 동작하지 않아 말도 많았지만) 시간은 걸리겠지만 다른 그래픽 드라이버도 모두 이 방식을 지원하게 될 것이고, 리눅스 기반 그래픽 환경도 성능과 안정성에서 다른 운영체제와 차이점이 더 줄어들 것으로 생각됩니다. 물론 드라이버 개발자는 더 골치 아파지겠지만&amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;디스크 충격 방지 기능&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;노트북에서 많이 사용하는 충격 방지 기능은 디스크를 사용하지 않을때 헤드를 언로드해서 충격이 발생해도 디스크 표면에 영향을 안끼치는 방식입니다. 이번 릴리스부터 리눅스 커널은 /sys/block/*/device/unload_heads 파일에 밀리초 단위의 정수형을 쓰면 그 시간동안 헤드를 언로드하고, 시간이 지나면 다시 원래대로 되돌리는 기능을 지원합니다. 하지만 모든 디스크를 지원하는 것도 아니고, 어떤 디스크는 오동작을 일으킬 수도 있기 때문에 정확히 지원하는 모델인지 확인하고 사용해야 합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;기타&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;그외에도 VM 메모리 관리자를 다시 작성해 많은 메모리 장착시 성능 개선, 커널 부팅 최적화를 도와주는 CONFIG_BOOT_TRACER 옵션 추가,  Atheros L2(atl2) 드라이버 공식 지원, Ultra Wide Band / Wireless USB 지원, SSD(solid-state drive) 디스크 지원 강화, ALSA 드라이버 1.0.18 탑재 등 역시나 이번에도 많은 변화가 있었으니 더 관심있는 분은 
+&lt;a href=&#34;http://www.heise-online.co.uk/open/Kernel-Log-Higher-and-Further-The-innovations-of-Linux-2-6-28--/features/112299/0&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이 기사&lt;/a&gt;
+도 읽어보시길&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Wireshark &amp; tcpdump</title>
+      <link>/2008/11/19/2008-11-19-wireshark-tcpdump/</link>
+      <pubDate>Wed, 19 Nov 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/11/19/2008-11-19-wireshark-tcpdump/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.wireshark.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Wireshark&lt;/a&gt;
+ 프로그램을 이용할때, 문제의 현상이 발생하는 패턴을 모르는 경우 무작정 발생할때까지 패킷을 캡쳐해야 하는 경우가 있습니다. 이때 Wireshark 프로그램으로 무조건 캡쳐를 하면 금방 메모리가 부족해서 프로그램이 죽어버리게 됩니다. 이런 경우 tcpdump 프로그램을 이용하여 패킷을 캡쳐하여 파일에 저장하고, 현상이 발생했을때 멈추고 난뒤 캡쳐한 파일을 다시 Wireshark 프로그램에서 볼 수 있는 방법이 있습니다.&lt;/p&gt;
+&lt;p&gt;먼저 tcpdump를 설치합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install tcpdump
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 다음과 같이 패킷 캡쳐를 시작합니다. (물론 모두 한 줄에 적어도 됩니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo tcpdump 
+  -i eth0 
+  -s 1500 
+  -C 5 
+  -W 3 
+  -w capture.pcap 
+  &#39;host 192.168.0.100&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 &amp;lsquo;-i&amp;rsquo; 옵션은 네트웍 장치 이름, &amp;lsquo;-s&amp;rsquo; 옵션은 패킷 크기, &amp;lsquo;-C&amp;rsquo; 옵션은  캡쳐할 파일을 구분할 크기(MB), &amp;lsquo;-W&amp;rsquo; 옵션은 순환할 파일 갯수,  &amp;lsquo;-w&amp;rsquo; 옵션은 파일 이름 앞부분, 마지막 필터 조건에서 &amp;lsquo;host&#39;는 캡쳐할 캡쳐의 IP 주소를 의미합니다.&lt;/p&gt;
+&lt;p&gt;이렇게 실행하면 &amp;lsquo;capture.pcap0&amp;rsquo;, &amp;lsquo;capture.pcap1&amp;rsquo;, &amp;lsquo;capture.pcap2&amp;rsquo; 식으로 5MB 단위로 캡쳐 파일을 생성합니다. 그리고 항상 마지막 3개 파일만 남깁니다. 캡쳐 도중 현상이 발생했다면 CTRL-C 키를 눌러 캡쳐를 멈추고, 마지막 파일을 Wireshark 프로그램 메뉴에서 &amp;lsquo;File&amp;rsquo; -&amp;gt; &amp;lsquo;Open&amp;hellip;&amp;rsquo; 기능을 이용해 읽어오면 됩니다.&lt;/p&gt;
+&lt;p&gt;더 자세한 내용은 
+&lt;a href=&#34;http://www.wireshark.org/docs/wsug_html_chunked/AppToolstcpdump.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Wireshark 매뉴얼&lt;/a&gt;
+과 &amp;lsquo;man tcpdump&#39;를 참고하시길&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Wireshark Bad Checksum</title>
+      <link>/2008/11/17/2008-11-17-wireshark-bad-checksum/</link>
+      <pubDate>Mon, 17 Nov 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/11/17/2008-11-17-wireshark-bad-checksum/</guid>
+      <description>&lt;p&gt;네트웍 패킷을 검사하기 위해 자주 사용하는 
+&lt;a href=&#34;http://www.wireshark.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Wireshark&lt;/a&gt;
+ 프로그램을 리눅스에서 실행할때 이더넷 장치에 따라 &amp;lsquo;Bad Checksum&#39;을 표시하며 패킷이 붉은 색으로 표시되어 눈에 거슬리는 경우가 종종 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/wireshark-bad-checksum.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이는 패킷 전송시 이더넷 하드웨어가 패킷 체크섬을 계산하도록 하는 기능이 자동으로 켜져있는데, 이 부분에 오류가 있는 경우입니다. 대부분의 경우 문제를 야기하지 않지만, 때로는 IP가 제대로 할당되었는데 실제 동작을 안하는 원인이 되기도 합니다. 따라서 이 기능을 끄고 싶을 경우가 발생하는데, 다음과 같은 명령어만 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo ethtool -K eth0 tx off
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 &amp;lsquo;eth0&#39;는 장치 이름입니다. 더 궁금하시면 &amp;lsquo;man ethtool&#39;을 통해 확인하시기 바랍니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>이클립스(Eclipse) &#43; 원격 SSH 서버 작업하기</title>
+      <link>/2008/08/11/2008-08-11-eclipse-with-remote-ssh-server/</link>
+      <pubDate>Mon, 11 Aug 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/08/11/2008-08-11-eclipse-with-remote-ssh-server/</guid>
+      <description>&lt;p&gt;프로젝트를 빌드할때마다 매번 ssh 프로그램으로 로그인해서 emacs / vi 등의 에디터로 컴파일해서 다시 이를 타겟 장비에 scp 명령어로 복사하고&amp;hellip; 조금 복잡하고 번거롭죠. 또한 개발환경으로 터미널 에디터 밖에 사용이 불가능합니다. 이 글은 이러한 개발 환경을 조금 탈피해서, 실제 소스 파일은 빌드 호스트에 두고 빌드 작업도 빌드 호스트에서 실행하면서, 이클립스(Eclipse) 개발 환경을 이용해 개발하는 방법을 간단하게 설명합니다.&lt;/p&gt;
+&lt;p&gt;이 글은 개인 장비에 우분투 리눅스 + Eclipse 개발 환경(3.4 Ganymede 기준)이 구축되어 있다는 가정하에 설명합니다. 원격 빌드 호스트 장비(build-dvr24)는 SSH 서버가 설치되어 있고 개인 계정도 이미 만들어져 있다고 가정합니다.(여기서는 lethean)&lt;/p&gt;
+&lt;h3 id=&#34;ssh-로그인-비밀번호-안물어보게-하기&#34;&gt;SSH 로그인 비밀번호 안물어보게 하기&lt;/h3&gt;
+&lt;p&gt;SSH 로그인시 비밀번호 확인 과정을 넘어가기 위해 개인공개키를 빌드 호스트에 복사합니다. 그러면 이후 모든 SSH 작업시 비밀번호를 물어보지 않게 되어 편리합니다. 만일 개인공개키가 만들어져 있지 않다면 다음과 같이 생성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ssh-keygen -t dsa
+Enter file in which to save the key (/home/lethean/.ssh/id_dsa): [Enter]
+Enter passphrase (empty for no passphrase): [Enter]
+Enter same passphrase again: [Enter]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 경우 개인 공개키 파일은 &lt;code&gt;~/.ssh/id_dsa.pub&lt;/code&gt; 파일입니다. 이 파일을 원격 빌드 호스트 계정의 인증키 목록에 다음과 깉이 추가합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ssh-copy-id -i ~/.ssh/id_dsa.pub lethean@build-dvr24
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 &amp;lsquo;lethean@build-dvr24&amp;rsquo; 부분은 &amp;lsquo;접속계정@호스트이름&amp;rsquo; 형식입니다.&lt;/p&gt;
+&lt;h3 id=&#34;원격-파일시스템-연결하기&#34;&gt;원격 파일시스템 연결하기&lt;/h3&gt;
+&lt;p&gt;제일 먼저 마운트할 디렉토리를 미리 생성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ mkdir -p ~/build-dvr24
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;터미널에서 다음과 같이 &amp;lsquo;sshfs&amp;rsquo; 프로그램을 설치합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo apt-get install sshfs
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;프로그램을 설치한 뒤 sshfs / fusermount 명령어를 이용해 원격 SSH 서버의 디렉토리를 로컬 파일 시스템에 연결하거나 해제할 수 있습니다. 예를 들어 연결(mount)하려는 원격 디렉토리가 &amp;lsquo;/home/lethean&#39;이고, 로컬 홈 디렉토리 밑의 &amp;lsquo;build-dvr24&amp;rsquo; 디렉토리에 연결할 경우 다음과 같이 실행합니다. (원격 디렉토리는 절대경로 방식으로 지정해야 하며 반드시 홈디렉토리일 필요는 없습니다)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sshfs lethean@build-dvr24:/home/lethean ~/build-dvr24
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;사용이 다 끝났으면 다음과 같이 연결을 해제할 수 있습니다&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ fusermount -u ~/build-dvr24
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이를 부팅시 자동으로 연결하는 방법은 여러가지 방법이 있지만, 쉬운 방법 중 하나는 &amp;lsquo;/etc/rc.local&amp;rsquo; 파일에 다음과 같은 내용을 마지막 &amp;lsquo;exit 0&amp;rsquo; 전에 추가하는 것입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;su lethean -c &#39;sshfs lethean@build-dvr24:/home/lethean ~/build-dvr24&#39;
+exit 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기까지 하면 원격 파일 시스템을 마치 로컬 파일 시스템처럼 사용이 가능하므로 이클립스 뿐 아니라 VI, Emacs 등의 에디터를 이용해 쉽게 편집이 가능합니다.&lt;/p&gt;
+&lt;p&gt;(
+&lt;a href=&#34;http://fuse.sourceforge.net/wiki/index.php/SshfsFaq#Exporting_via_NFS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;/etc/fstab 파일을 수정하는 방법&lt;/a&gt;
+도 있는데 조금 복잡하군요. 관심이 있으시다면 직접 해보시기 바랍니다)&lt;/p&gt;
+&lt;h3 id=&#34;이클립스에서-빌드-명령어-실행하기&#34;&gt;이클립스에서 빌드 명령어 실행하기&lt;/h3&gt;
+&lt;p&gt;먼저 연결(mount)한 소스를 기반으로 새로운 프로젝트를 생성해야 합니다. C 언어 기반 프로젝트일 경우를 가정할때 순서는 다음과 같습니다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&amp;lsquo;File -&amp;gt; New -&amp;gt; C Project&amp;hellip;&amp;lsquo;를 선택하여 새로운 프로젝트를 시작합니다.&lt;/li&gt;
+&lt;li&gt;프로젝트 이름(Project name)을 입력합니다.&lt;/li&gt;
+&lt;li&gt;&amp;lsquo;기본 위치 사용(Use default location)&amp;rsquo; 선택을 해제한 뒤,&lt;/li&gt;
+&lt;li&gt;위치(Location)를 직접 선택하여(Browse&amp;hellip;) &amp;lsquo;~/build-dvr24&amp;rsquo; 디렉토리 밑의 해당 소스 디렉토리를 지정합니다.&lt;/li&gt;
+&lt;li&gt;프로젝트 종류(Project types)는 &amp;lsquo;Makefile project&amp;rsquo; / &amp;lsquo;Linux GCC&#39;를 선택합니다.&lt;/li&gt;
+&lt;li&gt;그리고 언어 설정 등을 선택한 뒤 마침(Finish) 버튼을 눌러 새로운 프로젝트를 생성합니다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;이제 프로젝트 탐색기(Project Explorer)에서 생성한 프로젝트를 선택하고, 마우스 오른쪽 버튼을 눌러 &amp;lsquo;Properties&amp;rsquo; 메뉴 항목을 선택합니다. 이제 다음 순서대로 빌드 명령어를 변경합니다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&amp;lsquo;C/C++ Build&amp;rsquo; 항목을 선택합니다.&lt;/li&gt;
+&lt;li&gt;&amp;lsquo;기본 빌드 명령어 사용(Use default build command)&amp;rsquo; 선택을 해제한 뒤,&lt;/li&gt;
+&lt;li&gt;빌드 명령어(Build command)를 다음과 같이 입력합니다.
+&lt;code&gt;ssh lethean@build-dvr24 &#39;make -C project-dir&#39;&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;여기서 &amp;lsquo;project-dir&#39;은 홈디렉토리 기준 원격 디렉토리를 의미합니다. 파일 시스템이 연결된 로컬 파일 시스템과는 상관없이 ssh 로 직접 연결해서 해당 디렉토리를 빌드하도록 하는게 이 방법의 핵심입니다. 물론 이 방법은 이클립스 뿐 아니라 다른 개발 환경에서도 응용이 가능합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>X 윈도우 자동 로그인하기</title>
+      <link>/2008/07/21/2008-07-21-x-window-auto-login/</link>
+      <pubDate>Mon, 21 Jul 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/07/21/2008-07-21-x-window-auto-login/</guid>
+      <description>&lt;p&gt;GDM 등과 같이 덩치가 큰 디스플레이 관리자를 사용하지 않고, 시스템 부팅후 자동으로 X 서버를 실행하고 특정 계정으로 로그인한뒤 자동으로 특정 프로그램을 실행하는 기능은 의외로 많이 사용합니다. 이 글에서는 여러가지 방법 중에 제가 알고 있는 몇가지 방법을 정리해 보았습니다. 적용 가능한 배포판은 데비안(Debian) 혹은 우분투(Ubuntu) 리눅스 기반입니다.&lt;/p&gt;
+&lt;h3 id=&#34;첫번째-방법---init-데몬-이용하기&#34;&gt;첫번째 방법 - init 데몬 이용하기&lt;/h3&gt;
+&lt;p&gt;&amp;ldquo;
+&lt;a href=&#34;http://www.enricozini.org/2008/tips/lightweight-autologin.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;How to autologin X without a display manager&lt;/a&gt;
+&amp;rdquo; 글에서 설명하는 방법입니다.&lt;/p&gt;
+&lt;p&gt;먼저 init 데몬이 자동으로 실행할 수 있도록 &lt;code&gt;/etc/inittab&lt;/code&gt; 파일에 다음 항목을 추가합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;6:23:respawn:/sbin/getty -L -n -l /usr/local/sbin/autologin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 항목은 시스템 시작시 자동으로 &lt;code&gt;/usr/local/sbin/autologin&lt;/code&gt; 프로그램을 실행합니다. 또한 프로그램이 종료해도 다시 자동으로 재시작합니다. 이제 사용자 로그인 과정을 자동으로 수행하도록 하려면 &lt;code&gt;/usr/local/sbin/autologin&lt;/code&gt; 프로그램을 다음과 같이 작성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+/bin/login -f root
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 &lt;code&gt;-f&lt;/code&gt; 뒤에 로그인할 계정을 적어줍니다. 이제 계정 홈 디렉토리에 있는 셸 스크립트 시작 파일(&lt;code&gt;~/.bash_profile&lt;/code&gt;)을 수정해서 마지막에 다음 항목을 넣어줍니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;startx
+logout
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 스크립트는 X 서버를 시작하고 종료시 자동으로 로그아웃을 합니다. 마지막으로 X 서버가 실행하면서 자동으로 수행될 스크립트를 만들어야 합니다. 계정 홈 디렉토리에 있는 X 서버 시작 파일(&lt;code&gt;~/.xsession&lt;/code&gt; 또는 &lt;code&gt;~/.xinitrc&lt;/code&gt;)을 다음과 같이 작성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+my-window-manager &amp;amp;
+
+# If the touch screen is not calibrated, run the calibration
+while [ ! -f /etc/touchscreen-calibration ]
+do
+  calibrate-touchscreen
+done
+
+# Run the main application: if it ends, the session ends
+main-application
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;제일 먼저 창 관리자(여기서는 &amp;lsquo;my-window-manager&amp;rsquo;)를 백그라운드로 실행합니다. 그리고 필요한 선행작업(여기서는 &amp;lsquo;calibrate-touchscreen&amp;rsquo;)을 처리한 뒤 실제 어플리케이션(main-application)을 실행합니다.&lt;/p&gt;
+&lt;h3 id=&#34;두번째-방법---upstart-데몬-이용하기&#34;&gt;두번째 방법 - upstart 데몬 이용하기&lt;/h3&gt;
+&lt;p&gt;우분투 리눅스는 init 데몬 대신 
+&lt;a href=&#34;http://upstart.ubuntu.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Upstart&lt;/a&gt;
+ 데몬을 이용하여 시스템 초기화 작업을 처리합니다. 따라서 첫번째 방법에서 &lt;code&gt;/etc/inittab&lt;/code&gt; 파일을 수정하는 대신 &lt;code&gt;/etc/event.d/&lt;/code&gt; 디렉토리에 시작 파일을 등록해야 합니다. 예를 들면 &lt;code&gt;/etc/event.d/autostart&lt;/code&gt; 파일을 다음과 같이 작성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on runlevel 2
+start on runlevel 6
+respawn
+exec /sbin/getty -L -n -l /usr/local/sbin/autologin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 내용은 런레벨 2,6 에서 해당 프로그램을 실행하고 종료시 자동으로 재시작하도록 합니다. 나머지는 첫번째 방법과 동일합니다.&lt;/p&gt;
+&lt;h3 id=&#34;세번째-방법---런레벨run-level-이용하기&#34;&gt;세번째 방법 - 런레벨(run-level) 이용하기&lt;/h3&gt;
+&lt;p&gt;init 데몬이든 Upstart 데몬이든 상관없이 동작하는 방법입니다. 먼저 다음과 같은 스크립트를 &lt;code&gt;/etc/init.d/autologin&lt;/code&gt; 파일로 만들어 줍니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+/usr/local/sbin/my-startx &amp;amp;
+exit 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 런레벨 2로 동작한다는 가정하에 스크립트가 자동 실행할 수 있도록 다음 명령을 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# chmod +x /etc/init.d/autologin
+# update-rc.d autologin defaults 05
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 마지막 &amp;lsquo;05&#39;는 런레벨에서 다른 데몬보다 먼저 실행하도록 결정해주는 우선순위입니다. 이제 &lt;code&gt;/usr/local/sbin/my-startx&lt;/code&gt; 스크립트를 작성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+while true; do
+  sleep 1
+  echo &amp;quot;xinit /root/.xinitrc -- /etc/X11/xinit/xserverrc&amp;quot; 
+  | su - root
+done
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 스크립트는 루트(root) 계정으로 X를 시작하면서 /root/.xinitrc 파일을 시작 스크립트 파일로 지정합니다. 따라서, 이 방법은 위 두가지와 다르게 사용자 셸(bash)을 거치지 않고 직접 X 서버를 실행합니다. 그리고, 다른 방법과 마찬가지로 종료시 자동으로 X를 재시작합니다.  X 실행 이후 시작하는 스크립트는 다른 방법과 동일합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널 메모리 검사 기능</title>
+      <link>/2008/07/16/2008-07-16-linux-2626-memory-test-function/</link>
+      <pubDate>Wed, 16 Jul 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/07/16/2008-07-16-linux-2626-memory-test-function/</guid>
+      <description>&lt;p&gt;리눅스 커널 2.6.26 릴리스에는 메모리 검사 기능이 추가되었습니다. 기존에 많이 사용하는, 우분투 리눅스의 경우 grub 부트 메뉴에서 선택해서 실행할 수 있는 
+&lt;a href=&#34;http://www.memtest.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Memtest86+&lt;/a&gt;
+ 프로그램처럼 많은 기능이 있는 건 아니지만, 가끔 간단한 메모리 검사가 필요한 경우 요긴하게 사용할 수 있을 것 같습니다.&lt;/p&gt;
+&lt;p&gt;아직 X86 플랫폼만 지원하며, 사용하려면 커널 컴파일시 CONFIG_MEMTEST_BOOTPARAM 설정을 선택해야 하고, 부팅시 &amp;lsquo;memtest&amp;rsquo; 인수를 넘겨주면 동작합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>ThinkPad X40 &#43; Ubuntu &#43; Power Saving</title>
+      <link>/2007/09/21/2007-09-21-thinkpad-x40-ubuntu-power-saving/</link>
+      <pubDate>Fri, 21 Sep 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/09/21/2007-09-21-thinkpad-x40-ubuntu-power-saving/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.linuxpowertop.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PowerTop&lt;/a&gt;
+ 유틸리티를 실행하면 전원을 절약할 수 있는 여러가지 방법도 친절하게 설명해주는데, 이 정보를 바탕으로 ThinkPad X40 노트북에 맞게 켤때마다 자동으로 설정하는 스크립트를 만들어봤다. Ubuntu Gutsy 배포판에서 사용하면 약간 과장해서 50% 이상 배터리 수명이 연장되는 걸 체감할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+#
+# Power Save Tunings for ThinkPad X40
+#
+
+# enable wireless power saving mode
+iwpriv eth1 set_power 5
+
+# enable AC97 powersave mode
+echo 1 &amp;gt; /sys/module/snd_ac97_codec/parameters/power_save
+
+# enable USB autosuspend
+echo 1 &amp;gt; /sys/module/usbcore/parameters/autosuspend
+for dev in /sys/bus/usb/devices/*; do
+  file=$dev/power/autosuspend
+  [ -f $file ] &amp;amp;&amp;amp; echo 1 &amp;gt; $file
+done
+
+# increase the VM dirty writeback time from 5.00 to 15 seconds
+echo 1500 &amp;gt; /proc/sys/vm/dirty_writeback_centisecs
+
+# enable laptop-mode
+echo 5 &amp;gt; /proc/sys/vm/laptop_mode
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 스크립트를 자동으로 실행하게 하는 방법은 다음과 같다. 먼저 다음과 같이 에디터를 열어 위 내용을 입력한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# sudo gedit /etc/init.d/thinkpad-x40-powersave
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;실행권한을 준다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# sudo chmod +x /etc/init.d/thinkpad-x40-powersave
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;부팅시 자동으로 실행하도록 한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# sudo update-rc.d thinkpad-x40-powersave defaults
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;바로 적용하려면 &lt;code&gt;sudo /etc/init.d/thinkpad-x40-powersave&lt;/code&gt;와 같이 직접 실행해도 된다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투에서 루트 파일시스템 마운트 옵션 변경하기</title>
+      <link>/2007/08/09/2007-08-09-root-filesystem-mount-options-in-ubuntu/</link>
+      <pubDate>Thu, 09 Aug 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/08/09/2007-08-09-root-filesystem-mount-options-in-ubuntu/</guid>
+      <description>&lt;p&gt;커널트랩에 올라온 
+&lt;a href=&#34;http://kerneltrap.org/node/14148&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;마운트 옵션을 이용한 성능 최적화&lt;/a&gt;
+ 글을 보고 우분투 리눅스에도 적용시켜보기로 했다. 다른 파티션은 모두 &lt;code&gt;/etc/fstab&lt;/code&gt; 파일에서 직접 &amp;lsquo;noatime,data=writeback&amp;rsquo; 옵션만 추가하면 되는데 루트 파일 시스템은 조금 손질이 더 갔다.&lt;/p&gt;
+&lt;p&gt;데비안 기반 시스템은 처음에는 루트 파일 시스템을 읽기전용(read-only)으로 마운트한 뒤 initrd 기반 초기화 과정을 수행하고, 나중에 다시 &lt;code&gt;/etc/fstab&lt;/code&gt; 정보를 기반으로 루트파일 시스템을 다시 정상적인 쓰기 가능하도록 마운트한다.(remount) 그런데 이때 &amp;lsquo;noatime&amp;rsquo; 등과 같은 옵션은 정상적으로 동작하지만 &amp;lsquo;data=writeback&amp;rsquo; 등과 같은 옵션은 재마운트시 불가능하다는 메시지를 내면서 마운트에 실패하고 읽기전용 상태로 남아버린다.&lt;/p&gt;
+&lt;p&gt;이 문제의 해결 방법은 여러가지가 있겠지만, 내가 선택한 방법은 먼저 &lt;code&gt;/etc/fstab&lt;/code&gt; 에는 &amp;lsquo;noatime&amp;rsquo; 옵션만 추가하고, &lt;code&gt;/boot/grub/menu.lst&lt;/code&gt; 파일에서 defoptions 항목에 &amp;lsquo;rootflags=data=writeback&amp;rsquo; 을 추가하고, &lt;code&gt;update-grub&lt;/code&gt; 명령을 실행하고 재부팅하면 적용된다.&lt;/p&gt;
+&lt;p&gt;성능이 좋은 PC의 경우 이 옵션이 있을 때와 없을 경우 차이점을 별로 못 느끼지만 X40 노트북에서는 어느 정도 체감 속도가 향상된 것을 느낄 수 있다. 더욱이
+&lt;a href=&#34;http://tracker-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;tracker&lt;/a&gt;
+ 데몬 때문에 디스크가 혹사당하기 시작한 다음부터는 더욱더&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>DBus or Upstart</title>
+      <link>/2007/07/25/2007-07-25-dbus-or-upstart/</link>
+      <pubDate>Wed, 25 Jul 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/07/25/2007-07-25-dbus-or-upstart/</guid>
+      <description>&lt;p&gt;Dbus를 이용해 이제는 시스템 데몬과 같은 프로그램까지 실행할 수 있게 될 것 같다.(
+&lt;a href=&#34;http://hughsient.livejournal.com/31169.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Dbus System Activation is upstream&lt;/a&gt;
+ 참고) 디자인 문서를 보니, 다음과 같이 서비스 파일을 정의하면 해당 메시지가 발생했을때 해당 서버가 동작하는 방식이다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[D-BUS Service]
+Name=org.me.test
+Exec=/usr/sbin/dbus-test-server.py
+User=ftp
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다음과 같이 직접 실행할 수도 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;dbus-send --system --print-reply 
+ --dest=org.freedesktop.DBus 
+ /org/freedesktop/DBus 
+ org.freedesktop.DBus.StartServiceByName 
+ string:org.freedesktop.Hal uint32:0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이렇게 되면 현재 Ubuntu 시스템의 기반이 되는 upstart나 기존의 sysvinit 등과 같은 시스템 초기화 시스템도 불필요해질 수있다고 하는데, 단순히 메시지 기반 병렬 실행 기능만으로는 서비스간 의존성이나 초기화 과정의 많은 예외처리까지는 어렵지 않을까 싶다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>VMWare rtc: lost some interrupts</title>
+      <link>/2007/06/11/2007-06-11-vmware-rtc-lost-some-interrupts/</link>
+      <pubDate>Mon, 11 Jun 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/06/11/2007-06-11-vmware-rtc-lost-some-interrupts/</guid>
+      <description>&lt;p&gt;64비트 장비에 우분투 서버를 설치하고 VMware를 가동하면 다음과 같은 에러가 발생한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[16825.988196] printk: 246 messages suppressed.
+[16825.988201] rtc: lost some interrupts at 2048Hz.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;구글링을 통해 알게된 
+&lt;a href=&#34;http://chxo.com/be2/20060821_3333.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;사이트&lt;/a&gt;
+에서 &lt;code&gt;/etc/vmware/config&lt;/code&gt; 파일에 &lt;code&gt;host.useFastClock = FALSE&lt;/code&gt; 항목을 추가하면 된다는 걸 알았는데, 문제는 시각 동기화가 잘 안되어 VMware로 실행하는 이미지 내부에서 ntp 데몬 등을 이용하여 시각동기화를 해주어야 한다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Linux Kernel 2.6.21 Release</title>
+      <link>/2007/04/26/2007-04-26-linux-kernel-2621-release/</link>
+      <pubDate>Thu, 26 Apr 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/04/26/2007-04-26-linux-kernel-2621-release/</guid>
+      <description>&lt;p&gt;어김없이 또 
+&lt;a href=&#34;http://lkml.org/lkml/2007/4/25/561&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.21 버전이 릴리스&lt;/a&gt;
+되었다.&lt;/p&gt;
+&lt;p&gt;개인적으로 관심있는 부분만 정리하면 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;font-size:100%;&#34;&gt;Dynticks과 클럭이벤트&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;리누스 말로는 타이머 부분이 가장 많이 바뀌었다고 하는데, 멀티태스킹 시분할 시스템(time-sharing system)의 기본 원리라고 할 수 있는 타이머 인터럽트의 오버헤드를 최소화하기 위해, 필요한 경우에만 사용하겠다는(tickless) 아이디어 자체가 신선하다. 전원 관리에도 효과가 있고, 시스템 성능에도 미미하지만 영향을 끼칠 수 있을 뿐 아니라 고해상도 타이머 구현도 더 효율적으로 구현되었다고 한다. 이번 릴리스에서는 X86-32만 지원하지만 다른 아키텍쳐도 곧 지원된다고 한다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;ASoC (ALSA 시스템온칩) 레이어&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;ASoc는 오디오 시스템을 다음과 같이 세가지로 구성한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;코덱 드라이버 : 플랫폼 독립, 오디오 제어, 코덱 IO 등&lt;/li&gt;
+&lt;li&gt;플랫폼 드라이버 : DMA, 인터페이스 드라이버(I2S, AC97, PCM)&lt;/li&gt;
+&lt;li&gt;머신 드라이버 : 장치 관련 제어나 오디오 이벤트 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이를 통해 임베디드 시스템처럼 직접 연결된 오디오칩에 대한 드라이버 개발을 더 쉽게 해준다. 더불어 동적 전원 관리 시스템이 더 적은 전원을 사용하도록 도와준다. 예를 들어 실제로 캡쳐나 재생 작업이 있을 경우에만 알아서 전원 스위치를 제어한다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;GPIO API&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;임베디드 시스템 CPU에서 거의 대부분 사용하는 GPIO 관련 API가 공식적으로 추가되었다. 이렇게 단순한 것도 API가 될 수 있구나 하면서도, 왜 이제야 정리되었을까 하는 생각도 든다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;utrace&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;ptrace() 시스템콜의 기능을 넘어 dtrace 기능을 준비하기 위한 기본 API로 보인다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;ARM11 oprofile 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;가끔 유용하게 사용하는 oprofile이 ARM11 플랫폼도 지원한다.&lt;/p&gt;
+&lt;p&gt;그외 가상화 관련 VMI, KVM 도 많이 개선되었다고 하는데, 사실 아직은 별로 관심이 없다. 더 자세한 변경사항은 
+&lt;a href=&#34;http://kernelnewbies.org/LinuxChanges&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;커널뉴비 페이지&lt;/a&gt;
+에서 확인할 수 있다. API 변경 사항은 
+&lt;a href=&#34;http://lwn.net/Articles/2.6-kernel-api/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN 페이지&lt;/a&gt;
+에서 확인이 가능하다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 7.04 (feisty) 느린 SSH 접속</title>
+      <link>/2007/04/19/2007-04-19-ubuntu-704-feisty-slow-ssh/</link>
+      <pubDate>Thu, 19 Apr 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/04/19/2007-04-19-ubuntu-704-feisty-slow-ssh/</guid>
+      <description>&lt;p&gt;Ubuntu 7.04에서 ssh 접속 등을 시도할때 다른 시스템보다 초기 접속이 느린 이유가 
+&lt;a href=&#34;https://bugs.launchpad.net/ubuntu/&amp;#43;source/avahi/&amp;#43;bug/94940&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;avahi-daemon 관련 설정 때문&lt;/a&gt;
+이라고 한다. 그래서 /etc/nsswitch.conf 파일에서 &amp;lsquo;hosts:&amp;rsquo; 부분을 다음과 같이 수정해보았더니, 역시 빨리 접속된다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;hosts:          files dns
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;정식 릴리스에 반영되기에는 시간이 촉박한 것 같다&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Linux Kernel 2.6.20 Release</title>
+      <link>/2007/02/05/2007-02-05-linux-kernel-2620-release/</link>
+      <pubDate>Mon, 05 Feb 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/02/05/2007-02-05-linux-kernel-2620-release/</guid>
+      <description>&lt;p&gt;리눅스 커널 2.6.20 버전이 릴리스되었다. 관심있는 사항만 요약하면 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;소니 플레이스테이션3(PS3) 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;아직 그래픽 장치처럼 모든 주변장치를 지원하는 것은 아니고 일반적인 PS3에서 부팅이 가능한 것도 아니지만, 소니 엔지니어에 의해 공식적으로 PS3가 지원되기 시작했다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;KVM을 이용한 가상화(Virtualization) 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;나처럼 구식(?) PC를 사용하는 사람들한테는 그림의 떡이지만, 최신 인텔과 AMD CPU에서 지원하는 가상화 기능(Intel VT / AMD-V)을 이용해 VMWare처럼 가상의 머신을 실행시킬 수 있도록 도와주는 KVM이 공식적으로 지원된다. 물론 
+&lt;a href=&#34;http://fan4326.blogspot.com/2007/01/qemu.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;QEMU&lt;/a&gt;
+와 함께 동작하며 아직 윈도우 운영체제는 APIC 문제로 잘 동작하지 않는 문제이지만, 조만간 모두 해결될 것으로 보인다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;i386에서 병렬가상화(Paravirtualization) 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;KVM이 하드웨어의 도움을 받는 가상화솔루션이라면 이 기능은 이미 존재하는 가상화 솔루션에서 이용할 수 있는 공통 모듈이다. 게스트 운영체제에 대한 제어 기능이 커널에서 공식적으로 지원하게 됨에 따라 VMWare, Xen 등의 커널 모듈도 이 기능을 이용하도록 변경될 것으로 생각된다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;X86에서 재배치가능(relocatable)한 커널 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;런타임 오버헤드없이 컴파일시 커널 주소 공간을 지정할 수 있도록 한다. 일반 사용자에게는 별로 중요하지 않지만 kexec 등을 이용해 커널 크래쉬 상태를 덤프하고 다시 로드할때 커널 주소 공간을 다르게 함으로서 유용하게 사용할 수 있다고 한다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;결함 주입 (Fault Injection)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;실시간 시스템의 결함 허용 중 하나인 결함 주입 기능은 일부러 에러를 일으키는 값이나 환경을 만들어 커널이 이를 얼마나 잘 견디고 처리하는지를 확인하는 것으로 쉽게 찾을 수 없는 에러를 디버깅하는데 유용하다. 구체적으로 이 기능은 메모리 할당 오류와 디스크 I/O 실패를 고의로 발생시키는데, 파일시스템 개발자들은 이에 대한 예외처리를 얼마나 잘 하는지 테스트 가능하다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;상대적 atime 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;마운트시 &amp;lsquo;noatime&amp;rsquo; 옵션을 주면 파일을 읽을때마다 접근 시간(access time)을 갱신하지 않게 되어 실제적으로 매우 많은 디스크 성능 향상을 체험하게 된다. 실제로 kernel.org 사이트도 이 옵션 하나만으로 평균 부하량이 반으로 줄었다고 하며, 현재 우리 회사에서 개발한 DVR 시스템에도 이 옵션이 적용되어 있다. 그런데 이 기능은 무조건 갱신하는 것이 아니라 생성시간(ctime)이나 수정시간(mtime)보다 접근시간(atime)이 더 오래되었을 경우에만 갱신하도록 한다. 이를 통해 정확하면서도 &amp;lsquo;noatime&amp;rsquo; 옵션과 비슷한 성능향상을 얻을 수 있다고 한다. 아직은 OCFS2 파일시스템에서만 지원된다고 하며 mount(8) 에도 &amp;lsquo;reltime&amp;rsquo; 옵션으로 적용되어 있다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;X86-32에서 &amp;lsquo;regparm&amp;rsquo; 사용&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;GCC 확장 기능을 이용하여 함수 인수 전달시 인수 갯수가 3개 이하일 경우 레지스터를 이용하여 전달하도록 하는 방식(&#39;-mregparm=3&amp;rsquo; )을 사용한다. 그런데 내가 알기로는 레드햇 커널에서는 이미 예전부터 기본적으로 사용하고 있는데&amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;워크큐(Workqueue) 구조 변경&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;워크큐(struct work_struct) 구조가 변경되어 이를 사용하고 있는 외부 드라이버나 모듈이 있다면 
+&lt;a href=&#34;http://lwn.net/Articles/211279/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이 페이지&lt;/a&gt;
+를 참고하여 수정하는 것이 좋다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;GCC 버전 변경&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;이제 커널 2.6.20 버전 이상을 컴파일하려면 최소 gcc 3.2 버전 이상이 필요하다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;i386에서 300Hz 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;25FPS를 사용하는 PAL 방식과 달리 29.99FPS를 사용하는 NTSC 방식 비디오 프레임 처리에 유용하도록 300Hz 클럭을 지원한다. 이 클럭을 사용하면 25 / 30 FPS 모두를 처리하는데 유용하며 성능은 250Hz와 비슷하다고 한다.&lt;/p&gt;
+&lt;p&gt;물론 더 자세한 내용은 이미 잘 정리된 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_20&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;KernelNewbies 2.6.20 변경사항&lt;/a&gt;
+ 페이지를 참고하면 된다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>빠르고 포터블한 동적 변환기, QEMU</title>
+      <link>/2007/01/03/2007-01-03-qemu-fast-portable-dynamic-translator/</link>
+      <pubDate>Wed, 03 Jan 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/01/03/2007-01-03-qemu-fast-portable-dynamic-translator/</guid>
+      <description>&lt;p&gt;요즘 리눅스 2.6.20부터 추가된 가상화 기술 
+&lt;a href=&#34;http://kvm.sourceforge.net/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;KVM&lt;/a&gt;
+과 더불어 이슈가 되고 있는 
+&lt;a href=&#34;http://fabrice.bellard.free.fr/qemu/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;QEMU&lt;/a&gt;
+ 에뮬레이터의 내부 구현 원리를 밝힌 
+&lt;a href=&#34;http://www.usenix.org/publications/library/proceedings/usenix05/tech/freenix/bellard.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;기사&lt;/a&gt;
+를 보면 흥미로운 기법을 소개하고 있다. 제목 그대로 빠르고 포터블한 동작 변환기(a fast and portable dynamic translator)를 말하는데, 이 기법의 동작 원리는 다음과 같다.&lt;/p&gt;
+&lt;p&gt;QEMU 는 인터프리터 방식처럼 하나씩 번역해서 가상 상태 머신을 동작시키는 대신, 변환기(translator)가 실행중에 대상 CPU 명령어를 호스트 CPU 명령어로 바꾸어 실행한다. 호스트 명령어로 변환하기 전에, 대상 명령어는 일종의 중간코드인 마이크로작업(micro operations)으로 변환된다. 이 마이크로 작업 각각이 실제 호스트 CPU 명령어로 대치되어 실행된다.&lt;/p&gt;
+&lt;p&gt;그런데 이 마이크로 작업에 대한 호스트 CPU 명령어 코드는 어셈블리로 작성된 것이 아니라, 하나의 마이크로 작업에 대해 하나의 C 함수로 구현되어 있다. 그리고, 이를 GCC 컴파일러가 생성한 바이너리를 가져다 그대로 이용한다. 물론 GCC 옵션을 조율해 불필요한 함수 앞/뒤 부분 파싱이나 최적화를 수행한다. 따라서 이론적으로는 GCC가 지원하는 모든 CPU를 쉽게 지원할 수가 있다.&lt;/p&gt;
+&lt;p&gt;당연한 얘기지만 플랫폼마다 다른 여러 특성을 모두 구현해야 하기 때문에 새로운 CPU나 플랫폼을 지원하는 일이 그리 쉽지는 않다. 하지만 이미 Linux, Windows, MacOS X 등의 호스트 운영체제를 지원하고 있으며 X86, PowerPC, ARM, Sparc 등의 CPU를 에뮬레이트하고, x86, PowerPC, ARM, Sparc, Alpha, MIPS 등의 실행 호스트 CPU를 지원한다.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://ffmpeg.mplayerhq.hu/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;FFMpeg&lt;/a&gt;
+ 부터 알게된 
+&lt;a href=&#34;http://fabrice.bellard.free.fr/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Fabrice Bellard&lt;/a&gt;
+라는 프랑스 사람(?)의 프로그래밍 + 성능 최적화 능력은 항상 내게 존경심을 불러일으키는 동시에, 자괴감에 빠지게 한다&amp;hellip;&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://linux.inet.hr/finally-user-friendly-virtualization-for-linux.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Finally user-friendly virtualization for Linux&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://kvm.sourceforge.net/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;KVM: Kernel-based Virtual Machine for Linux&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://fabrice.bellard.free.fr/qemu/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;QEMU: open source processor emulator&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.usenix.org/publications/library/proceedings/usenix05/tech/freenix/bellard.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;QEMU, a Fast and Portable Dynamic Translator&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 멀티쓰레드(futex) 호출 디버깅</title>
+      <link>/2006/12/21/2006-12-21-linux-multithread-futex-call-debugging/</link>
+      <pubDate>Thu, 21 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/21/2006-12-21-linux-multithread-futex-call-debugging/</guid>
+      <description>&lt;p&gt;리눅스 커널 2.6 이후, 즉 최신 리눅스 환경에서 어플리케이션을 개발할때 멀티쓰레드인 경우 데드락이나 블럭킹 현상을 디버깅하려면 매우 골치가 아프다. strace나 gdb 백트레이스를 추적하다보면 결국 &lt;code&gt;futex()&lt;/code&gt; 시스템콜을 호출하고, 여기서 멈춰있는 경우가 대부분이다. 이 경우 대부분 이 시스템콜은 pthread 라이브러리가 호출하는 것이다. 이 경우 정확히 어떤 공유 라이브러리와 연관이 있는지 확인하기 힘든데 
+&lt;a href=&#34;http://galathilion.livejournal.com/91051.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;여기&lt;/a&gt;
+ 블로그에 달린 댓글을 보면 다음 2가지 방법을 권하고 있다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;export LD_ASSUME_KERNEL=2.4.1&lt;/code&gt;식으로 커널 버전을 명시하여 glibc가 NPTL 대신 futex() 를 사용하지 않는 이전 LinuxThread 방식을 사용하도록 하여 디버깅하기&lt;/li&gt;
+&lt;li&gt;ltrace 프로그램을 이용하여 라이브러리 호출 감시하기&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;하지만, 뭐 그런다고 쉽게 풀리지는 않는게 멀티쓰레드 프로그래밍인지라&amp;hellip;&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://galathilion.livejournal.com/91051.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Jeremy Kolb: futex headaches&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Upstart 0.3</title>
+      <link>/2006/12/19/2006-12-19-upstart-03/</link>
+      <pubDate>Tue, 19 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/19/2006-12-19-upstart-03/</guid>
+      <description>&lt;p&gt;어느샌가 Upstart가 0.3 버전으로 올라가더니(우분투 개발버전 feisty), 공식적인 Upstart 홈페이지도 생겼다.(아래 링크 참고) 개발자가 0.3 버전에서 새로 추가된 사항을 정리해 놨으니 나도 한 번 다시 정리해 본다.&lt;/p&gt;
+&lt;span style=&#34;font-weight:bold;&#34;&gt;
+ 작업 만들기(Writing Jobs)&lt;/span&gt;
+&lt;p&gt;업스타트(Upstart)는 데몬(daemon)의 시작 / 중지 / 감시 작업을 스스로 한다. &lt;code&gt;start-stop-daemon&lt;/code&gt; 등을 이용하여 개발자가 스스로 관리해야 하는 것과 다르게 프로그램 경로와 인수만 주면 된다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;exec /usr/bin/dbus-daemon
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;물론 셸스크립트도 사용할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;script   echo /usr/share/apport/apport &amp;gt; /proc/sys/kernel/crashdump-helperend script
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;데몬이 시작(start)되기 전/후(pre/post)와 중지(stop)되기 전/후(pre/post)에 원하는 작업도 할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;pre-start script   mkdir -p /var/run/dbus   chown messagebus:messagebus /var/run/dbusend script
+
+post-start script   # wait for listen on port 80   while ! nc -q0 localhost 80 /dev/null 2&amp;gt;&amp;amp;1; do       sleep 1;   doneend script
+
+post-stop script   rm -f /var/run/dbus/pid
+
+pre-stop script   # disable the queue, wait for it to become empty   fooctl disable   while fooq &amp;gt;/dev/null; do        sleep 1   doneend script
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 &lt;code&gt;script&lt;/code&gt; 대신 &lt;code&gt;exec&lt;/code&gt;를 사용하면 스크립트(script) 대신 바이너리를 실행할 수도 있다.&lt;/p&gt;
+&lt;span style=&#34;font-weight:bold;&#34;&gt;
+ 이벤트(Events)&lt;/span&gt;
+&lt;p&gt;0.3 버전에서 이벤트는 더 정교해졌다고 하는데, 단순히 시스템이 보내는 이벤트 이름 뿐 아니라 인수(arguments)와 환경변수도 전달할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;initctl emit network-interface-up eth0 -DIFADDR=00:11:D8:98:1B:37
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이 명령은 이벤트와 모든 결과를 출력하고 이벤트가 완전히 처리될때까지 끝나지 않게 한다. 이와 같이 전달된 인수는 다음처럼 스크립트에서 사용할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on network-interface-upscript   [ $1 = lo ] &amp;amp;&amp;amp; exit 0   grep -q $IFADDR /etc/network/blacklist &amp;amp;&amp;amp; exit 0   # etc.end script
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아니면 다음과 같이 &lt;code&gt;start on&lt;/code&gt; 과 &lt;code&gt;stop on&lt;/code&gt; 구문에서 직접 일치하는지 검사할 수도 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on block-device-added sda*
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;작업의 상태 변화로 인한 이벤트도 변경되었다. 이전에는 작업이나 이벤트 모두 같은 이름공간(namespace)를 공유했는데, 혼동을 일으킬 뿐 아니라 실제로 작업 이름을 이용하는 이벤트 이름은 문제를 일으키기도 한다.&lt;/p&gt;
+&lt;p&gt;이렇게 발생한 두개의 주요 이벤트는 간단하게 &lt;code&gt;started&lt;/code&gt; 와 &lt;code&gt;stopped&lt;/code&gt; 로 칭한다. 이를 통해 작업이 완전하게 로드되어 실행되고 있거나, 반대로 완전히 종료됨을 알 수 있다. 작업 이름은 이 이벤트의 인수로 받게 된다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on started dbus
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;started&lt;/code&gt; 이벤트는 &lt;code&gt;post-start&lt;/code&gt; 작업이 끝나기 전에는 발생하지 않는다. 따라서 &lt;code&gt;post-start&lt;/code&gt; 작업은 데몬에 아직 연결할 수 없는 다른 작업들이 시작하는 것을 지연할 수 있다.&lt;/p&gt;
+&lt;p&gt;같은 식으로 &lt;code&gt;stopped&lt;/code&gt; 이벤트는 &lt;code&gt;post-stop&lt;/code&gt; 작업이 끝날때까지 발생하지 않는다.&lt;/p&gt;
+&lt;p&gt;작업이 발생시키는 다른 두개의 이벤트는 약간 특별하다. &lt;code&gt;starting&lt;/code&gt;과 &lt;code&gt;stopping&lt;/code&gt;이 그것인데, 이 이벤트가 처리될때까지는 작업이 시작하거나 중지하지 못하게 한다. 즉, 데이터베이스 서버가 멈추었을때 해야할 작업이 있는데, 그러나 실제로 종료되기 전에 처리해야 한다면 다음과 같이 사용할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on stopping mysqlexec /usr/bin/backup-db.py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;MySQL이 백업이 끝나기 전까지 종료되지 않을 것이다.&lt;/p&gt;
+&lt;p&gt;이 런 경우는 특히 다른 데몬에 의존하는 데몬일 경우 유용하다. 예를 들어 HAL은 DBUS를 필요로 하는데, DBUS가 실행되기 전에는 시작하면 안되고 DBUS는 HAL이 끝나기 전에 멈추면 안된다. 따라서 HAL 작업은 다음과 같다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on started dbusstop on stopping dbus
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;같은 식으로 Tomcat이 설치되어 있다면 Apache는 Tomcat이 실행되기 전에는 시작하면 안되고, Tomcat는 Apache가 종료될때까지 멈추면 안된다. 따라서 Tomcat 작업은 다음과 같다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on starting apachestop on stopped apache
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;실패(Failure)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;항 상 모든게 부드럽게 흘러가는 게 아니므로 가끔 작업이 수행이 태스크가 실패할 수도 있고 데몬이 죽을 수도 있다. upstart는 죽은(crashed) 데몬을 자동으로 재시작하게 할 수도 있고, 다른 작업에게 이를 알려줄 수도 있다. stopping 과 stopped 이벤트에 추가되는 failed 인수가 그것이다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on stopped typo failedscript  echo &amp;quot;typo failed again :-(&amp;quot; | mail -s &amp;quot;type failed&amp;quot; rootend script
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이벤트 실패로 인해 어떤 작업이 시작되거나 멈추었다면, 이벤트 자체가 실패했다는 것을 발견할 수도 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start on network-interface-up/failed
+&lt;/code&gt;&lt;/pre&gt;
+&lt;span style=&#34;font-weight:bold;&#34;&gt;
+ 상태(States)&lt;/span&gt;
+&lt;p&gt;네트웍 인터페이스를 구성하거나 블럭 장치를 검사하고 마운트하는 작업은 대개 이벤트의 결과로서 동작하는 반면, 서비스는 조금 더 복잡하다.&lt;/p&gt;
+&lt;p&gt;서비스는 특정 이벤트가 발생했을때가 아니라 대개 시스템이 어떤 상태에 있을 경우 동작해야 한다. 따라서 upstart는 변화를 정의하는 이벤트를 참조하여 복잡한 시스템 상태를 설명할 수 있도록 한다.&lt;/p&gt;
+&lt;p&gt;예를 들어 많은 서비스가 파일시스템이 마운트되어 있을 경우에만 동작해야 하고, 최소 하나의 네트웍 디바이스가 올라와 있어야 한다. 이러한 시기가 시작되고 끝나는 것을 가리키는 이벤트를 이용해 조합하면 다음과 같이 사용할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from fhs-filesystem-mounted until fhs-filesystem-unmountedand from network-up until network-down
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;until&lt;/code&gt; 연산자는 두 이벤트 사이트의 기간을 정의하고, &lt;code&gt;and&lt;/code&gt; 연산자는 두 기간을 동시에 적용하도록 한다.&lt;/p&gt;
+&lt;p&gt;디스플레이 매니저가 실행되고 있는 경우에만 동작하려면 다음과 같이 기술할 수 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from started gdm until stopping gdmor from started kdm until stopping kdm
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;네트웍 인터페이스가 올라온뒤 bind9이 시작하기 전에 실행하고 싶다면 다음과 같이 기술하면 된다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;on network-interface-up and from startup until started bind9
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이처럼 &amp;ldquo;복합 이벤트 구성&amp;quot;은 어느 작업 파일에나 올 수 있다. 그리고 어느 작업 파일이나 다른 작업에 대한 리퍼런스로 동작할 수 있다. 다른 작업과 동시에 시작하고 멈출 수도 있다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;with apache
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;exec&lt;/code&gt;나 &lt;code&gt;script&lt;/code&gt; 절을 생략하면, 다른 작업이 리퍼런스로 사용할 수 있도록 상태만 정의한다. 그런 식으로 &lt;code&gt;multiuser&lt;/code&gt; 상태 역시 단순히 상태를 정의하는 작업 파일이다.&lt;/p&gt;
+&lt;p&gt;보너스로 덧붙이자면, 이러한 상태들도 &lt;code&gt;pre-start&lt;/code&gt;, &lt;code&gt;post-stop&lt;/code&gt; 등을 응용할 수 있다.&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://upstart.ubuntu.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Upstart 공식 홈페이지&lt;/a&gt;
+ - 언제 생겼지?&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.netsplit.com/blog/articles/2006/12/14/upstart-0-3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Upstart 0.3&lt;/a&gt;
+ - 개발자 블로그&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 사용자공간 커널 드라이버 - UIO</title>
+      <link>/2006/12/19/2006-12-19-uio-linux-userspace-kernel-driver/</link>
+      <pubDate>Tue, 19 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/19/2006-12-19-uio-linux-userspace-kernel-driver/</guid>
+      <description>&lt;p&gt;리눅스에서 디바이스 드라이버는 대개 동적으로 로딩 가능한 커널 모듈 방식이나 커널 자체에 포함시키는 방식으로 구성된다. 사용자공간(userspace)에서 일반 어플리케이션처럼 동작하는 디바이스 드라이버 구조는 X서버, Cupsys 프린터 드라이버 등에서 이미 사용되고 있듯이 새로운 개념은 아니다. 하지만 그 용도가 제한되어 있고, 인터럽트 처리와 성능에 대한 한계로 인해 아직도 대부분의 리눅스용 디바이스 드라이버는 커널 모듈로 작성되는 것이 일반적이다.&lt;/p&gt;
+&lt;p&gt;예전에 리눅스용 사용자공간 드라이버 개발 프레임워크가 제안된 적이 있다가 많은 관심과 비판을 함께 받고 사라진 듯 싶더니 이번에 다시 -mm 커널 트리에 UIO 코어라는 이름으로 다시 포함이 된 것 같다. 정식 커널에 포함될지는 아직 잘 모르지만 그 구조가 흥미로울 것 같아 한번 들여다 보았다.&lt;/p&gt;
+&lt;p&gt;UIO 코어는 하드웨어가 발생하는 인터럽트를 처리하기 위한 최소한의 커널 드라이버만 작성하고, 나머지 모든 작업은 사용자공간 프로그램으로 작성하도록 한다. 이를 통해 다양한 라이브러리와 개발도구를 사용할 수 있기 때문에 유지보수와 디버깅이 훨씬 쉬워진다. 드라이버 개발자가 느끼는 리눅스 커널의 가장 큰 장점이자 단점인 커널이 변경되어도 드라이버는 거의 변경할 필요도 없어진다. 또한 라이센스 문제도 피해갈 수 있다.&lt;/p&gt;
+&lt;p&gt;UIO가 동작하는 방식은 다음과 같다.&lt;/p&gt;
+&lt;p&gt;각각의 UIO 장치는 하나의 디바이스 파일과 sysfs 속성 파일을 통해 접근한다. 디바이스 파일 이름은 &lt;code&gt;/dev/uio0&lt;/code&gt;, &lt;code&gt;/dev/uio1&lt;/code&gt; 식이다. 이 디바이스 파일은 mmap()을 이용해 장치의 특정한 레지스터나 램 영역을 주소 공간처럼 접근하는데 이용한다. 인터럽트는 디바이스 파일을 읽는 작업을 통해 이루어진다. read() 시스템콜을 호출하면 블럭킹 상태에 있다가 인터럽트가 발생하면 깨어나 총 인터럽트 발생 횟수를 돌려준다. 이렇게 돌려받은 총 인터럽트 발생 횟수를 이용해 놓친 인터럽트에 대한 처리도 가능하다.&lt;/p&gt;
+&lt;p&gt;인터럽트를 제대로 처리하기 위해 드라이버만의 고유한 커널 모듈 인터럽트 핸들러를 구현할 경우라도 내부 핸들러가 자동으로 호출해 준다. 인터럽트를 발생하지 않고 폴링 방식으로 동작하는 장치일 경우 타이머를 이용해 주기적으로 강제로 인터럽트 핸들러를 호출하게 할 수도 있다.&lt;/p&gt;
+&lt;p&gt;드라이버는 sysfs를 통해 추가적인 접근 가능한 속성을 제공할 수도 있는데 다음은 UIO가 제공하는 기본 속성으로, &lt;code&gt;/sys/class/uio/uioX&lt;/code&gt; 디렉토리에서 볼 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;name : 장치 이름&lt;/li&gt;
+&lt;li&gt;addr : 맵핑 가능 영역 시작 주소&lt;/li&gt;
+&lt;li&gt;size : 맵핑 가능 영역 크기&lt;/li&gt;
+&lt;li&gt;version : 드라이버 버전 정보&lt;/li&gt;
+&lt;li&gt;event: 마지막으로 장치를 읽은 이후 드라이버가 처리한 인터럽트 총 갯수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;커널 모듈에서 동작하는 인터럽트 핸들러를 작성하려면 &lt;code&gt;struct uio_info&lt;/code&gt; 구조체에 정보를 채워 &lt;code&gt;uio_register_device()&lt;/code&gt;를 이용해 등록하면 된다. 이 정보에는 인터럽트 핸들러 방식, 메모리 맵핑 정보 등을 담고 있다.&lt;/p&gt;
+&lt;p&gt;많 은 하드웨어들이 인터럽트 발생후 드라이버 ACK 작업을 해주어야하는데, 사용자공간 프로그램은 동작하지 않을 수도 있고, 어떠한 원인으로 종료할 수도 있으므로 이런 작업은 직접 작성한 인터럽트 핸들러에서 처리하도록 하고 있다. 또한 인터럽트 발생할때마다 데이터를 하드웨어에서 읽어 커널 내부 버퍼에 저장하고 사용자공간 프로그램에게 전달할 수도 있다.&lt;/p&gt;
+&lt;p&gt;모노리식 커널의 한계일지도 모르지만 약간 조잡하다는 느낌을 지울 수 없다. 조금 더 편하게 커널 API를 통해 인터럽트 이벤트를 처리할 수 있으면 좋을 것 같다. 또한 커널 내부의 PCI, USB 등의 서브시스템과의 연동은 어떻게 할 것인가? 물론 PCI나 USB 정보 사용자공간에서 접근이 가능하긴 하지만, 아직은 이론적으로 이상적인 프레임웍으로만 보인다. 그렇다면 마이크로커널 기반에서 디바이스 드라이버는 어떤 식으로 인터럽트를 처리할까? 음&amp;hellip;&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.kroah.com/log/2006/12/13#uio&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Userspace I/O kernel drivers for Linux&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.kernel.org/pub/linux/kernel/people/gregkh/gregkh-2.6/gregkh-01-driver/uio-documentation.patch&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;UIO Documentation&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Process Memory in Linux</title>
+      <link>/2006/12/18/2006-12-18-process-memory-in-linux/</link>
+      <pubDate>Mon, 18 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/18/2006-12-18-process-memory-in-linux/</guid>
+      <description>&lt;p&gt;리눅스에서 일반적으로 &lt;code&gt;top&lt;/code&gt;, &lt;code&gt;ps&lt;/code&gt; 명령어를 통해 얻을 수 있는 프로세스의 메모리 정보는 다음과 같이 요약할 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;SIZE(VSZ, VIRT)&lt;/span&gt; : 프로세스의 주소 공간 크기. 즉, 프로세스가 맵핑한 메모리의 전체 크기를 나타낸다.&lt;/li&gt;
+&lt;li&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;RSS(RES, Resident Set Size)&lt;/span&gt; : 실제 메모리에 올라와 있는 메모리 크기. 물론 스왑(swapped out)된 메모리는 제외된다. RSS는 프로세스에게 유일한 메모리 공간과 다른 프로세스와 공유된 공간도 포함한다. 리눅스 환경에서는 대부분 공유 라이브러리가 차지한다. libc 라이브러리가 대표적이다.&lt;/li&gt;
+&lt;li&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;SHARE(SHR)&lt;/span&gt; : RSS에서 다른 프로세스가 공유된 메모리 크기.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;따라서 어플리케이션이 실제 사용하고 있는 메모리는 RSS에서 SHARE를 뺀 크기다. 물론 공유 라이브러리를 하나의 프로세스가 사용하고 있다면 그 크기도 실제 사용량에 포함되겠지만.&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://bmaurer.blogspot.com/2006/03/memory-usage-with-smaps.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Memory Usage with smaps&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://mail.gnome.org/archives/gnome-list/1999-September/msg00036.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Re: Can anything be done to reduce memory usage?&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Linux Kernel 2.6.19 Release</title>
+      <link>/2006/11/30/2006-11-30-linux-kernel-2619-release/</link>
+      <pubDate>Thu, 30 Nov 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/11/30/2006-11-30-linux-kernel-2619-release/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://kerneltrap.org/node/7440&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;리눅스 커널 2.6.19 릴리스 소식&lt;/a&gt;
+을 접하게 되었다. 역시나 또 많은 새로운 기능이 추가되고, 변경되고 사라졌다. 이 중에서 관심있는 것만 간추려보면 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;GFS / ECRYPTFS / EXT4 파일 시스템 지원&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;GFS 는 레드햇이 주도해서 만드는 클러스터링 파일 시스템, ECRYTPFS는 파일단위별로 암호화가 가능한 파일 시스템이다. EXT4는 EXT3의 다음 버전으로 16테라바이트 이상 크기 지원(64비트), 32000 개 하위디렉토리 제한 없애기, 나노초 단위 파일 시간 정보 저장, mke2fs/e2fsck 속도 향상 등이 주요 이슈이다. 아직 안정화되려면 시간이 더 걸린다고 한다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;Libata PATA (Parallel ATA) 추가&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;병 렬 ATA(Parallel ATA) 장치는 직렬 ATA(Serial ATA) 장치가 이전에 존재하던, 다시 말해 현재 대부분의 데스크탑에서 사용하는 저장 장치 인터페이스이다. 현재 잘 동작하고 있으나 구조적인 문제로 해결이 어려운 몇몇 문제를 안고 있는 드라이버를 SATA 드라이버의 기반이 되는 libata를 기반으로 다시 작성한 PATA 드라이버가 추가되었다. 아직 모든 IDE를 지원하는 것은 아니며 기존 IDE 드라이버와 공존해서 존재한다. 하지만 PATA 드라이버가 안정화되면 점차 기존 IDE 드라이버는 모두 지워질 것이라고 한다. 또한 장치 이름도 더 이상 &lt;code&gt;/dev/hda&lt;/code&gt; 식이 아닌 &lt;code&gt;/dev/sda&lt;/code&gt;, &lt;code&gt;/dev/sr0&lt;/code&gt; 식으로 바뀐다. 즉, 다른 모든 저장장치와 동일한 방식으로 관리된다. 앨런 콕스(Alan Cox)가 주도하는 이 작업은 오랫동안 리눅스 커널에 있던 IDE 드라이버가 이제서야 구조적으로 업그레이드 되는 셈이다. (또 얼마나 많은 리눅스 커널 관련 서적이 Obsolete로 변하게 될지&amp;hellip; 하긴 그래야 새로운 개정판을 구입하겠지만&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;ALSA가 지원하는 OSS 드라이버 제거&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;ALSA가 리눅스 커널 2.6의 공식 오디오 드라이버로 지정된 이후로 이제서야 OSS 드라이버가 없어지기 시작했다. 물론 ALSA는 OSS 호환 레이어를 제공하기 때문에 기존 OSS 기반 어플리케이션은 아무 문제가 없다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;IRQ 핸들러 구조 변경&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;모든 인터럽트 핸들러는 CPU 레지스터 상태를 나타내는 &lt;code&gt;&amp;quot;struct pt_regs *&amp;quot;&lt;/code&gt;를 인수로 받았는데, CPU별 전역 변수를 두는 대신 인터럽트 핸들러 인수에서 사라졌다. 아키텍쳐에 따라서는 오버헤드 감소로 인한 성능 향상을 기대할 수도 있다. 공식 커널에 포함된 약 1800개의 인터럽트 핸들러가 모두 수정되었다고 한다. (물론 디바이스 드라이버를 별도로 개발하는 사람들에겐 별로 기쁜 소식이 아닐지도&amp;hellip;)&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;FAT 파일 시스템에 &amp;lsquo;flush&amp;rsquo; 옵션 추가&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;USB 플래시와 같이 제거 가능한 미디어 장치를 FAT로 마운트할때 &lt;code&gt;&amp;quot;-o flush&amp;quot;&lt;/code&gt; 옵션을 주면 가능한 빨리 디스크에 내용을 반영한다. &lt;code&gt;&amp;quot;-o sync&amp;quot;&lt;/code&gt;와 비슷하지만 훨씬 더 빠르다고 한다.&lt;/p&gt;
+&lt;p&gt;더 자세한 변경사항은 이미 잘 정리된 
+&lt;a href=&#34;http://kernelnewbies.org/Linux_2_6_19&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;lsquo;Kernel Newbies - 리눅스 2.6.19&amp;rsquo;&lt;/a&gt;
+를 참고하면 된다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Subversion 서버 응답이 느린 문제</title>
+      <link>/2006/10/20/2006-10-20-slow-subversion-server-response/</link>
+      <pubDate>Fri, 20 Oct 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/10/20/2006-10-20-slow-subversion-server-response/</guid>
+      <description>&lt;p&gt;업무에 서브버전(Subversion)을 사용한지 오래 되었지만 가끔씩 서버(svnserve)가 늦게 응답을 주는 경우가 종종 있었다. 가끔씩 벌어지는 현상이고, 서버 데몬을 재시작하면 해결되는 문제라 무시하고 있다가 문득 구글링을 해보고 원인을 알았다.&lt;/p&gt;
+&lt;p&gt;서브버전은 사용자 인증을 위해 리눅스에서 &lt;code&gt;/dev/random&lt;/code&gt; 난수 생성 장치를 이용하는데, 엔트로피가 부족할 경우 채워질때까지 대기하기 때문에 발생하는 현상이다. 서버 장비는 키보드도 거의 사용안하고, IDE 디스크도 없기 때문에 난수 엔트로피를 채워줄 정보가 부족해서 발생하는 경우이다.&lt;/p&gt;
+&lt;p&gt;검색을 해보면 설정 옵션을 변경해서 다시 컴파일하라는 둥, 데비안 패키지에 길들여진 내게 무리한 방법만 제시하길래 그냥 다음과 같이 무식하고 단순하며 보안에 위험하다는 방법으로 해결했다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# mv /dev/random /dev/random.orig
+# ln -sf /dev/urandom /dev/random
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;즉, &lt;code&gt;/dev/random&lt;/code&gt; 장치 대신 &lt;code&gt;/dev/urandom&lt;/code&gt; 장치를 무조건 사용하게 한뒤, 서브버전 데몬을 재시작하면 된다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>SSH 포트 포워딩(port forwarding) &#43; 내부 네트웍 서버 접근하기</title>
+      <link>/2006/09/14/2006-09-14-ssh-port-forwarding-to-access-intranet-servers/</link>
+      <pubDate>Thu, 14 Sep 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/09/14/2006-09-14-ssh-port-forwarding-to-access-intranet-servers/</guid>
+      <description>&lt;p&gt;외부에서 접속할 수 있는 서버가 master.emstone.com 이고, 접근하려고 하는 내부 네트웍 서버가 svn.emstone.com(192.168.0.143), 서비스가 Subversion 이라고 하면 다음과 같은 작업을 통해 외부에서 직접 접근이 가능하다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;우선 master.emstone.com 서버에 SSH 접속이 가능한 계정이 있어야 한다. (여기서는 lethean)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;현재 컴퓨터의 /etc/hosts 파일을 다음 내용을 추가한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;127.0.0.1 svn svn.emstone.com
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;내부 네트웍 서버 IP가 192.168.0.143 일 경우 다음과 같은 옵션으로 master.emstone.com 서버에 접속한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ssh lethean@master.emstone.com 
+    -L 3690:192.168.0.143:3690
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Subversion 작업을 하면 동작한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;원리는 이렇다. SSH 접속시 &amp;lsquo;-L&amp;rsquo; 옵션은, 로컬 장비(localhost:3690)의 특정 포트에 대한 연결을 접속한 서버(master.emstone.com)에서 접근 가능한 특정 IP 포트(192.168.0.143:3690)로 무조건 송신하고 그 결과를 다시 돌려받는다. 따라서 실제로는 로컬호스트에 대해 작업을 하는 것처럼 보이지만 SSH 연결을 통해 원격으로 동작하는 셈이다.&lt;/p&gt;
+&lt;p&gt;SSH 연결을 끊으면 당연히 더이상 동작하지 않게 된다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Upstart in Universe of Ubuntu Edgy</title>
+      <link>/2006/09/08/2006-09-08-upstart-in-universe-of-ubuntu-edgy/</link>
+      <pubDate>Fri, 08 Sep 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/09/08/2006-09-08-upstart-in-universe-of-ubuntu-edgy/</guid>
+      <description>&lt;p&gt;(&lt;a href=&#34;http://www.netsplit.com/blog/work/canonical/upstart.html&#34;&gt;http://www.netsplit.com/blog/work/canonical/upstart.html&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;caps&#34;&gt;UNIX&lt;/span&gt; System V부터 현재 대부분의 리눅스 배포판에 지금까지 사용하는 sysvinit 시스템이 Ubuntu Edgy 버전에서 upstart라는 이벤트-작업(job) 기반 시스템으로 교체되고 있다. 현존하는 initng, launchd, SMF 등과 같은 sysvinit의 다른 대안을 선택하지 않고 우분투 팀에서 새로 만들어가고 있는 것 같다.&lt;/p&gt;
+&lt;p&gt;아마도 가장 큰 변화는 USB 메모리나 USB 네트웍 장치처럼 실행 중에 추가되고 삭제되는 환경을 고려한다는 점이고, 이벤트 기반으로 시스템 초기화 스크립트(/etc/rcS.d)가 재작성되고, 결국에는 모든 패키지의 데몬이 upstart 방식으로 변경될 것 같다.&lt;/p&gt;
+&lt;p&gt;과연 upstart 방식이 우분투 리눅스에서만 사용하게 될 것인가, 다른 배포판에도 영향을 끼칠 것인가는 아직 미지수다. 하지만 지금까지 대부분 Unix / Linux 사용자와 관리자에게 너무나 당연하게 여겨졌던 /etc/rc?.d 데몬 방식이 변경되면, 새로 공부할게 한 가지 더 늘어나게 되겠군..&lt;/p&gt;
+&lt;p&gt;dbus, udev, hal, &amp;hellip; 리눅스도 이제 충분히 (개발자에게는) 복잡한 시스템이 되어가고 있다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 커널에서 devfs 제거</title>
+      <link>/2006/07/03/2006-07-03-devfs-removed-from-linux-kernel/</link>
+      <pubDate>Mon, 03 Jul 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/07/03/2006-07-03-devfs-removed-from-linux-kernel/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://kerneltrap.org/node/6744&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Linux: The Case For Removing devfs&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;그렇게 많은 논란이 있어왔던 devfs 파일시스템이 드디어 공식적으로 리눅스 커널 소스에서 제거되었다. 정확히는 위 기사에 언급된 패치가 리누스 토발즈의 커널 트리에 6월 29일 날짜로 
+&lt;a href=&#34;http://www.kernel.org/git/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=602cada851b28c5792339786efe872fbdc1f5d41&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;반영&lt;/a&gt;
+되었다. 따라서 2.6.18 릴리스부터는 공식적으로 적용될 것 같다. 물론 그 전부터 몇몇 드라이버는 이미 devfs 지원을 제거해오기 시작하고, 위 패치가 적용된 이후에도 몇몇 누락된 드라이버들도 계속해서 관련 코드를 제거하는 것 같다.&lt;/p&gt;
+&lt;p&gt;우분투를 사용하게 되면서 직접 커널을 컴파일해서 사용하는 경우가 거의 사라진 지금의 내게 있어 사실 devfs 지원이 사라지는 것은 별로 의미가 없다. 왜냐하면 현재 회사 제품에 사용하는 대부분의 임베디드 리눅스 시스템에서는 devfs / udev 모두 사용하지 않고 /dev 디렉토리를 직접 만들어 사용하는 방식을 이용하고 있기 때문이다. 다만 커널 바이너리 크기가 조금 더 작아진다니 그런 혜택이라도 받을 수 있으려나 모르겠다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>CELF 2006 컨퍼런스</title>
+      <link>/2006/05/09/2006-05-09-celf-2006-conference/</link>
+      <pubDate>Tue, 09 May 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/05/09/2006-05-09-celf-2006-conference/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://linuxdevices.com/articles/AT8247255296.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CELF 2006&lt;/a&gt;
+ 컨퍼런스에서 공개된 여러 
+&lt;a href=&#34;http://free-electrons.com/community/videos/conferences/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;슬라이드 자료&lt;/a&gt;
+에서 관심있는 몇 가지를 요약해 본다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;Visualizing Resource Usage During Initialization of Embedded Systems&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Bootchart를 임베디드 시스템에 적용하여 임베디드 리눅스 부팅 속도 측정 및 지연 부분을 찾아내는 과정을 보여준다. 더불어 기존 Bootchart의 처리 방식이 저성능 CPU에서는 비효율적이라서 리소스를 적게 차지하도록 새로 개선하는 방법도 소개한다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;Graphics Subsystem in an Embedded World - Integrating DirectFB into a UHAPI platform&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;스트리밍 장비 표준 미들웨어 API인 
+&lt;a href=&#34;http://www.uhapi.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;UHAPI&lt;/a&gt;
+를 
+&lt;a href=&#34;http://directfb.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;DirectFB&lt;/a&gt;
+에서 지원하기 위한 기본 지식과 그 과정을 보여준다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;Low Disturbance Embedded System Tracing with Linux Trace Toolkit Next Generation&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://www.opersys.com/LTT/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LTTng&lt;/a&gt;
+를 이용하여 인터럽트 응답시간을 저해하는 요소를 찾아내는 과정을 설명한다&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;Analysis of User Level Device Driver usability in embedded application&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;임베디드 시스템은 일반적인 서버나 PC와 달리 항상 새로운 디바이스를 사용하는 경우가 대부분이고 일반적인 용도라기보다 하나의 전용 어플리케이션에 맞추어 동작하는 경우가 대부분이다. 이 글에서는 사용자 레벨 디바이스 드라이버, 즉 일반 어플리케이션 방식으로 드라이버를 제작하는 방식을 제시하고 있다. 새로운 개념이라기보다는 이미 존재하는 mmap(), fasync() 등을 이용하여 DMA, IO 영역, 인터럽트 처리 방법을 보여주고 여러가지 커널 설정에서 성능을 비교해주고 있다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;Embedded Linux Optimizations - Size, RAM, speed, power, cost&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://free-electrons.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Free Electrons&lt;/a&gt;
+의 강의 시리즈 중에 하나로 보이는 이 자료는, 임베디드 리눅스의 부팅 속도, 메모리 사용크기, 속도, 전원 절약 등 실제 업무에 활용가능한 여러가지 기법을 잘 정리하고 있다. 최신 기술은 물론 고전적인 방식까지 일목요연하게 잘 정리된 것 같다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Porting Linux applications to 64-bit systems</title>
+      <link>/2006/05/08/2006-05-08-porting-linux-applications-to-64-bit-systems/</link>
+      <pubDate>Mon, 08 May 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/05/08/2006-05-08-porting-linux-applications-to-64-bit-systems/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www-128.ibm.com/developerworks/linux/library/l-port64.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Porting Linux applications to 64-bit systems&lt;/a&gt;
+ 를 보면 64비트 환경에서 기존 리눅스 어플리케이션을 동작시키기 위해 C/C++ 프로그래머가 알아야 할 내용을 정리해주고 있다. 다음은 그 중에서 일부분을 정리한 내용이다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;64비트 표준&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;리눅스는 &lt;span style=&#34;font-weight:bold;&#34;&gt;LP64&lt;/span&gt; 표준을 따른다. &lt;span style=&#34;font-style:italic;&#34;&gt;LP64&lt;/span&gt;는 long / long long / pointer 형만 64비트이고 나머지는 32비트 환경과 동일한다. 참고로 &lt;span style=&#34;font-style:italic;&#34;&gt;LLP64&lt;/span&gt;는 long long / pointer 형만 64비트, &lt;span style=&#34;font-style:italic;&#34;&gt;ILP64&lt;/span&gt;는 int / long / long long / pointer 가 모두 64비트인 환경을 의미한다. 따라서 기존 32비트 프로그램을 포팅할때 가장 유의할 점은 long 형으로 선언된 자료구조에 대한 처리이다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;자료구조 정렬(align) 방식&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;64비트형(long / double / pointer 등)은 항상 64비트 경계에 정렬된다. 나머지 공간은 모두 패딩된다. 따라서 자료구조 정의시 64비트형일 경우 적절하게 배치하는 것이 좋다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;변수/상수 정의&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;32/64비트 환경에서 32비트 크기를 원하면 int 형을 사용한다. 32비트 환경에서는 32비트, 64비트 환경에서는 64비트로 동작하는 크기를 원하면 long 형을 사용한다. 숫자를 다룰때 바이트를 아끼기 위해 char, short 등을 성능에 그리 좋지 않다.&lt;/p&gt;
+&lt;p&gt;32비트 환경에서 모든 비트를 켜기 위해 대개 0xFFFFFFFFL 상수가 사용된다. 하지만 64비트 시스템에서 이 값은 하위 32비트만 켜진 0x00000000FFFFFFFF 값을 의미한다. 따라서 이식성이 좋게 만드려면 다음과 같이 사용하는 것이 좋다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;long x = -1L;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;또다른 예로 들 수 있는 것은, 최상위 비트를 켤때 많이 사용하는 0x80000000 값이다. 이 값은 다음과 같이 사용하는 것이 좋다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;1L &amp;lt;&amp;lt; ((sizeof(long) * 8) - 1);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;쉬프트(shift) 연산에서 &amp;lsquo;L&#39;을 붙여주지 않으면 기본 int(32비트) 형으로 인식하여 원하는 결과를 얻을 수 없음에 주의해야 한다.&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;타입 정의&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;가능한 표준 C 라이브러리에 정의된 이식성있는 형을 사용하는 경우가 좋다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ptrdiff_t : 두 포인터의 차이를 저장할 수 있는 부호있는 정수형이다.&lt;/li&gt;
+&lt;li&gt;size_t : 부호없는 정수형으로 sizeof 연산자의 결과 뿐 아니라 많은 표준 C 라이브러리가 크기를 표현하는데 사용한다.&lt;/li&gt;
+&lt;li&gt;int32_t, uint32_t, &amp;hellip; : 정확한 크기의 정수형을 정의하는데 사용한다.&lt;/li&gt;
+&lt;li&gt;intptr_t, uintptr_t : 정수형으로 변환해도 위험하지 않은 포인터를 담기위한 정수형이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;span style=&#34;font-weight:bold;&#34;&gt;포맷팅하기&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;32비트 시스템에서 printf() 함수의 &amp;ldquo;%d&amp;quot;는 int / long 형 모두 적절하게 동작하지만, 64비트 시스템에서 long을 인수로 넘기면 하위 32비트만 출력된다. 따라서 long 형을 출력할 경우 정확하게 &amp;ldquo;%ld&amp;rdquo; 라고 적어주는 것이 좋다. 비슷하게 포인터를 출력하기 위해 많이 사용하는 &amp;ldquo;%x&amp;rdquo; 대신 &amp;ldquo;%p&amp;rdquo; 를 사용하면 더 정확한 포인터 값을 출력할 수 있다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>glibc 메모리 할당 방식 튜닝</title>
+      <link>/2006/03/17/2006-03-17-glibc-memory-allocation-tune/</link>
+      <pubDate>Fri, 17 Mar 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/03/17/2006-03-17-glibc-memory-allocation-tune/</guid>
+      <description>&lt;p&gt;&amp;lsquo;Malloc 연구 : 과도한 마이너 폴트 사례 (
+&lt;a href=&#34;http://www.usenix.org/publications/library/proceedings/als01/ezolt.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;A Study in Malloc: A Case of Excessive Minor Faults&lt;/a&gt;
+&amp;lsquo;라는 논문은 개발자가 흔히 부딪힐 수 있는 문제에 대하여 원인 추적 및 해결 과정을 흥미롭게 보여준다. 더불어 리눅스에서 GNU libc의 메모리 관리자를 튜닝하는 방법을 이용해 코드 재작성 없이 어플리케이션 성능을 향상시키는 방법에 대해 논하고 있다.&lt;/p&gt;
+&lt;p&gt;컴팩(Compaq)의 CXML이라는 확장 수학 라이브러리를 이용해 어플리케이션을 개발하는 사용자로부터 다음과 같은 문의가 들어왔다. 똑같은 코드와 똑같은 사양의 하드웨어를 기반으로 할때 기존 유닉스(Tru64 UNIX) 환경보다 리눅스(Linux/Alpha)에서 어플리케이션 실행 시간이 너무 많이 차이가 난다는 것이다.&lt;/p&gt;
+&lt;p&gt;이 글의 저자는 여러가지 도구를 이용하여 원인이 리눅스 커널의 메모리 관리와 연관이 있다는 것을 밝혀낸다. 그리고, 더 나아가 커널의 메모리 관리가 아닌 GNU libc의 &lt;code&gt;malloc()&lt;/code&gt;/&lt;code&gt;free()&lt;/code&gt; 구현이 기존 유닉스나 FreeBSD 등과도 다르다는 점을 밝혀낸다.&lt;/p&gt;
+&lt;p&gt;일반적으로 &lt;code&gt;brk()&lt;/code&gt; 시스템콜을 이용해 힙(heap) 영역을 확장하는 다른 유닉스 시스템과 달리 리눅스가 사용하는 glibc는 일정 크기 이상의 메모리 영역은 &lt;code&gt;mmap()&lt;/code&gt;을 이용해 할당한다. 이렇게 할당한 메모리는 사용자가 해제했을때 바로 시스템으로 돌아가고, 전체적으로 시스템은 효율적으로 메모리를 사용할 수 있다는 장점이 있지만, &lt;code&gt;mmap()&lt;/code&gt; 시스템콜 자체가 커널 영역 페이지 폴트 메카니즘을 사용하기 때문에 이 부분에서 많은 성능 저하가 발생하게 된다.&lt;/p&gt;
+&lt;p&gt;이 논문의 제목인 마이너 폴트(minor faults)란, 아예 할당할 메모리가 없어 스왑(swap)이 필요한 경우가 아닌(major faults), COW(copy-on-write) 기법이나 일반적인 디바이스 메모리 맵핑 등과 같이 물리적인 메모리를 가상 메모리에 맵핑할때 발생하는 페이지 폴트를 의미한다.&lt;/p&gt;
+&lt;p&gt;저자는 매우 자세하고 친절하게 몇가지 증상에서 원인을 찾아가는 과정을 설명하고 있다. 여기서 든 예제의 경우 128K 이상의 메모리를 할당하고 해제하는 과정을 반복할 경우 발생하는 이러한 마이너폴트를 줄이기 위해 결론적으로 다음과 같은 방법을 제시하고 있다.&lt;/p&gt;
+&lt;p&gt;첫번째 방법은 소스 코드를 수정해 &lt;code&gt;mmap()&lt;/code&gt;을 쓰지 않도록 GNU libc의 메모리 관리자에게 알려주는 것이다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mallopt (M_MMAP_MAX, 0);
+mallopt (M_TRIM_THRESHOLD, -1);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;두번째 방법은 어플리케이션을 실행하기 전에 환경변수에 이 값을 설정하는 방법이다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;export MALLOC_MMAP_MAX_=0
+export MALLOC_TRIM_THRESHOLD_=-1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;더 자세한 내용은 
+&lt;a href=&#34;http://www.gnu.org/software/libc/manual/html_node/Malloc-Tunable-Parameters.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;mallopt()&lt;/a&gt;
+ 함수를 참고하면 된다.&lt;/p&gt;
+&lt;p&gt;그런데, 요즘 커널과 요즘 glibc에도 그대로 적용이 가능한지는 확인해봐야 할 것 같다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>linux-gate.so.1</title>
+      <link>/2006/01/17/2006-01-17-linux-gateso1/</link>
+      <pubDate>Tue, 17 Jan 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/01/17/2006-01-17-linux-gateso1/</guid>
+      <description>&lt;p&gt;데비안 패키지 glibc-2.3.5 이후부터 &lt;code&gt;ldd&lt;/code&gt; 명령의 결과에 예전에 없던 &amp;lsquo;linux-gate.so.1&amp;rsquo; 공유 라이브러리가 포함되어 있어 궁금했다. 다음 예에서 첫번째 줄이다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# ldd /bin/sh
+linux-gate.so.1 =&amp;gt;  (0xffffe000)
+libdl.so.2 =&amp;gt; /lib/libdl.so.2 (0xb7fb2000)
+libc.so.6 =&amp;gt; /lib/libc.so.6 (0xb7e7c000)
+/lib/ld-linux.so.2 (0xb7fba000)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Google에서 찾아본 결과 &amp;ldquo;
+&lt;a href=&#34;http://www.trilithium.com/johan/2005/08/linux-gate/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;What is linux-gate.so.1?&lt;/a&gt;
+&amp;rdquo; 문서가 가장 잘 설명해주고 있었다. 2.5 커널부터 시스템콜 호출을 전통적인 &lt;code&gt;&#39;int 0x80&#39;&lt;/code&gt;이 아닌 인텔 펜티엄 II 이후에 추가된 &lt;code&gt;sysenter&lt;/code&gt; 인스트럭션을 이용하여 오버헤드를 줄이고, 64비트 머신과의 일관성을 유지하기 위해 고안된 방법이었다. 이 공유라이브러리는 커널이 마치 DSO처럼 제공하는 시스템콜 라이브러리인 셈이다. 그래서 파일시스템에는 실제 이 파일이 없다. &amp;lsquo;&lt;em&gt;linux-gate&lt;/em&gt;&amp;rsquo; 라는 이름은 커널과 사용자 프로세스간의 통로라는 뜻에서 그렇게 붙인 것 같다.&lt;/p&gt;
+&lt;p&gt;몇년 동안 2.6 커널을 사용해왔는데 왜 모르고 있었을까. 이유를 조금 더 조사해 보니, 다음에 보는 것처럼 glibc 버전과 상관없이 커널은 이미 지원하고 있었다. 다음은 glibc-2.3.5가 아니고 커널만 2.6인 시스템에서 출력한 결과다. 여기서 가장 마지막의 &amp;lsquo;&lt;code&gt;[vdso]&lt;/code&gt;&amp;rsquo; 부분이 바로 그것이다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;[lethean@lethean ~]$ cat /proc/self/maps
+08048000-0804c000 r-xp 00000000 03:01 758909     /bin/cat
+0804c000-0804d000 rw-p 00003000 03:01 758909     /bin/cat
+0804d000-0806e000 rw-p 0804d000 00:00 0          [heap]
+...
+b7f23000-b7f38000 r-xp 00000000 03:01 734436     /lib/ld-2.3.6.so
+b7f38000-b7f39000 rw-p 00014000 03:01 734436     /lib/ld-2.3.6.so
+bf923000-bf938000 rw-p bf923000 00:00 0          [stack]
+ffffe000-fffff000 ---p 00000000 00:00 0          [vdso]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;단지 glibc-2.3.5 버전에 포함된 &lt;code&gt;ldd&lt;/code&gt;가 이를 &amp;lsquo;linux-gate.so.1&amp;rsquo; 이라는 표시하기 시작한 것이다.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

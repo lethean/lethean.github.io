@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>WordPress | 대체로 무해함</title>
+    <link>/tags/wordpress/</link>
+      <atom:link href="/tags/wordpress/index.xml" rel="self" type="application/rss+xml" />
+    <description>WordPress</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Wed, 06 Aug 2008 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>WordPress</title>
+      <link>/tags/wordpress/</link>
+    </image>
+    
+    <item>
+      <title>카테고리 RSS 링크 추가</title>
+      <link>/2008/08/06/2008-08-06-adding-category-rss-link/</link>
+      <pubDate>Wed, 06 Aug 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/08/06/2008-08-06-adding-category-rss-link/</guid>
+      <description>&lt;p&gt;워드프레스로 블로그를 옮기면서 다짐했던 것 중 하나가 가능한 소스를 건드리지 않고 일반 사용자처럼 사용하자였는데&amp;hellip; 카테고리별 RSS 피드를 왜 설정에서 쉽게 변경하지 못하고, 테마나 위젯 소스를 건드려야만 하도록 했을까, 결국 위젯 코드를 수정해서 원하는 기능을 얻었습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public_html/wp-includes/widgets.php 2008-07-22 12:09:23
+@@ -745,6 +745,8 @@
+  &amp;lt;ul&amp;gt;
+  &amp;lt;?php
+    $cat_args[&#39;title_li&#39;] = &#39;&#39;;
++   $cat_args[&#39;feed&#39;] = &#39;rss&#39;;
++   $cat_args[&#39;feed_image&#39;] = &#39;rssfeed.jpg&#39;;
+    wp_list_categories($cat_args);
+  ?&amp;gt;
+  &amp;lt;/ul&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;더이상 코드를 수정할 일 없기만을 바랄 뿐&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>워드프레스(WordPress)로 옮김</title>
+      <link>/2008/07/12/2008-07-12-moved-to-wordpress/</link>
+      <pubDate>Sat, 12 Jul 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/07/12/2008-07-12-moved-to-wordpress/</guid>
+      <description>&lt;p&gt;꽤 오랫동안 마음의 여유가 없었습니다.&lt;/p&gt;
+&lt;p&gt;그러다가 이런 저런 이유로 블로그를 다시 시작하게 되었는데, 몇몇 블로그 호스팅 서비스를 이용하던 과거와 달리 이번에는 
+&lt;a href=&#34;http://ko.wordpress.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;워드프레스(WordPress)&lt;/a&gt;
+를 이용해 직접 서버를 운영하기로 했습니다. 원래 강력한 기능으로 유명한 블로그 소프트웨어이기도 하지만, 다른 곳에서 작성한 블로그 자료를 쉽게 가져올 수 있는 기능이 무엇보다도 워드프레스를 선택하게 된 원인이 된 것 같습니다. 어쨌든 이번에는 조금 끈덕지게 운영을 해 볼 생각입니다.&lt;/p&gt;
+&lt;p&gt;사실 블로그를 다시 작성하는 첫번째 이유는 회사 개발팀에서 사용할 문서 관리 시스템과 개인 블로그를 효율적으로 연동할 수 있는 방법을 실험하기 위해서입니다. 외부에 공개할 수 없는 문서와 공식적인 문서를 제외한 대부분의 문서를 팀블로그나 플래닛 방식으로 운영할 수 있을 것도 같은데, 구체적인 방안이 떠오르지 않아 하나씩 직접 해볼 예정입니다.&lt;/p&gt;
+&lt;p&gt;게시판과 위키, 플론(Plone) 등을 거쳐 이제 웹 2.0 기술을 지식 / 문서 관리에 이용하려는 제 욕심이 지나치지 않기만을 바랄 뿐입니다&amp;hellip; :)&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

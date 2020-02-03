@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Cairo | 대체로 무해함</title>
+    <link>/tags/cairo/</link>
+      <atom:link href="/tags/cairo/index.xml" rel="self" type="application/rss+xml" />
+    <description>Cairo</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Fri, 06 Mar 2015 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Cairo</title>
+      <link>/tags/cairo/</link>
+    </image>
+    
+    <item>
+      <title>Cairo 라이브러리를 이용해 Font Awesome 아이콘 그리기</title>
+      <link>/2015/03/06/2015-03-06-draw-font-awesome-icons-with-cairo/</link>
+      <pubDate>Fri, 06 Mar 2015 00:00:00 +0000</pubDate>
+      <guid>/2015/03/06/2015-03-06-draw-font-awesome-icons-with-cairo/</guid>
+      <description>&lt;p&gt;요즘 웹에는 글꼴 아이콘(font icon)을 많이 사용합니다. 벡터 그래픽 방식이라
+확대해도 좋은 품질을 보여주고, 자주 사용되는 다양한 모양도 많이 제공됩니다.
+덕분에 작은 규모의 팀에서 간단한 웹 사이트나 웹앱을 개발할 때, 디자이너의
+도움(?)이 없어도 되기 때문에, 시간과 노력을 많이 절약하게 됩니다. 특히
+라이센스도 자유로우면서 다양한 아이콘을 제공하는 글꼴 아이콘도 많은데,
+대표적으로 
+&lt;a href=&#34;http://fortawesome.github.io/Font-Awesome/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Font Awesome&lt;/a&gt;
+, 
+&lt;a href=&#34;http://www.webhostinghub.com/glyphs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;WebHostingHub Glyphs&lt;/a&gt;
+ 등이 있습니다.
+물론 
+&lt;a href=&#34;https://www.google.co.kr/search?q=font&amp;#43;icon&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;구글 검색을 해보면&lt;/a&gt;
+ 유료제품도 있고, 직접 만들어주는 도구까지 있습니다.&lt;/p&gt;
+&lt;p&gt;그런데 글꼴 아이콘은 HTML과 CSS를 이용하는 웹 페이지에서는 쉽게 이용할 수
+있지만, 데스크톱 / 임베디드 프로그램에서 사용하려면 약간 다른 방법을 사용해야
+합니다. 이 글은 여러 방법 중에서 GTK+, Clutter 라이브러리에서 이용하는
+
+&lt;a href=&#34;http://cairographics.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Cairo&lt;/a&gt;
+ 라이브러리를 이용해 Font Awesome 아이콘을 그리는 방법을 설명합니다.&lt;/p&gt;
+&lt;p&gt;생각해 보면 간단할 것 같은데, 막상 Cairo API를 뒤져보면 글꼴 파일을 직접
+지정하는 방법이 없습니다. 막강한 기능을 제공하는 
+&lt;a href=&#34;http://www.pango.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Pango&lt;/a&gt;
+ 라이브러리 역시 글꼴
+파일을 지정하는 함수는 없습니다. 모두 
+&lt;a href=&#34;http://www.freedesktop.org/wiki/Software/fontconfig/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Fontconfig&lt;/a&gt;
+를 이용해 아이콘 글꼴 파일을
+지정해야 합니다. 하지만 프로그램과 함께 배포해야 하는 아이콘 글꼴 파일을 시스템
+글꼴 디렉터리나 사용자 글꼴 디렉터리에 복사하는 방식은 번거롭기도 하고 불가능한
+경우도 있어서 가능하다면 글꼴 파일을 직접 사용하는 방법을 찾아보았습니다.&lt;/p&gt;
+&lt;p&gt;(&lt;em&gt;2015-05-06 업데이트&lt;/em&gt;: Pango 개발자가 더 자세히 설명한
+
+&lt;a href=&#34;http://mces.blogspot.kr/2015/05/how-to-use-custom-application-fonts.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Pango를 이용한 사용자 폰트 사용하기&lt;/a&gt;
+ 문서를 참고해도 됩니다)&lt;/p&gt;
+&lt;p&gt;그래서 찾은 방법은 다음과 같습니다.&lt;/p&gt;
+&lt;p&gt;먼저 
+&lt;a href=&#34;http://freetype.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;FreeType&lt;/a&gt;
+ 라이브러리를 이용해 글꼴 파일을 읽은 후
+
+&lt;a href=&#34;http://cairographics.org/manual/cairo-FreeType-Fonts.html#cairo-ft-font-face-create-for-ft-face&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;cairo_ft_font_face_create_for_ft_face()&lt;/code&gt;&lt;/a&gt;
+
+함수를 이용해 Cairo 글꼴을 만듭니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;static cairo_font_face_t *
+get_font_face (void)
+{
+  static cairo_font_face_t *font_face = NULL;
+
+  if (!font_face)
+    {
+      FT_Library ft_library;
+      FT_Face ft_face;
+      FT_Error ft_error;
+
+      ft_error = FT_Init_FreeType (&amp;amp;ft_library);
+      if (ft_error)
+        {
+          g_warning (&amp;quot;FT_Init_FreeType() failure: %d&amp;quot;, ft_error);
+          return NULL;
+        }
+      ft_error = FT_New_Face (ft_library, &amp;quot;FontAwesome.otf&amp;quot;, 0, &amp;amp;ft_face);
+      if (ft_error)
+        {
+          g_warning (&amp;quot;FT_New_Face() failure: %d&amp;quot;, ft_error);
+          FT_Done_FreeType (ft_library);
+          return NULL;
+        }
+
+      font_face = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
+    }
+
+  return font_face;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 Cairo 글꼴 함수를 이용해 아이콘을 그리면 됩니다. 참고로, 아래 코드에서는
+
+&lt;a href=&#34;https://developer.gnome.org/clutter/stable/clutter-Colors.html#ClutterColor&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ClutterColor&lt;/code&gt;&lt;/a&gt;
+ 구조체를 이용해 아이콘 색상과 그림자 색상을
+지정합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;static void
+draw_font_icon (cairo_t            *cr,
+                double              x,
+                double              y,
+                int                 centering,
+                const char         *code,
+                double              size,
+                const ClutterColor *color,
+                const ClutterColor *shadow_color,
+                double              shadow_offset)
+{
+  cairo_font_options_t *options;
+
+  cairo_save (cr);
+
+  options = cairo_font_options_create ();
+  cairo_font_options_set_antialias (options, CAIRO_ANTIALIAS_GRAY);
+  cairo_font_options_set_hint_style (options, CAIRO_HINT_STYLE_FULL);
+  cairo_set_font_options (cr, options);
+  cairo_font_options_destroy (options);
+
+  cairo_set_font_face (cr, get_font_face ());
+  cairo_set_font_size (cr, size);
+
+  {
+    cairo_text_extents_t extents;
+
+    cairo_text_extents (cr, code, &amp;amp;extents);
+    if (!centering)
+      {
+        x -= extents.x_bearing;
+        y -= extents.y_bearing;
+      }
+    else
+      {
+        x += (extents.x_bearing -extents.width * 0.5);
+        y += (-extents.y_bearing -extents.height * 0.5);
+      }
+  }
+
+  if (shadow_color &amp;amp;&amp;amp; shadow_color-&amp;gt;alpha &amp;gt; 0 &amp;amp;&amp;amp; shadow_offset != 0.0)
+    {
+      cairo_save (cr);
+      cairo_move_to (cr, x + shadow_offset, y + shadow_offset);
+      clutter_cairo_set_source_color (cr, shadow_color);
+      cairo_show_text (cr, code);
+      cairo_restore (cr);
+    }
+
+  clutter_cairo_set_source_color (cr, color);
+  cairo_move_to (cr, x, y);
+  cairo_show_text (cr, code);
+
+  cairo_restore (cr);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;아이콘을 회전하려면 다음과 같이 미리 캔버스를 돌린 후에 아이콘을 그리면 됩니다.
+예를 들어, 
+&lt;a href=&#34;https://developer.gnome.org/clutter/stable/ClutterCanvas.html#ClutterCanvas-draw&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ClutterCanvas::draw&lt;/code&gt;&lt;/a&gt;
+ 시그널 핸들러는 다음과
+같이 작성합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;static gboolean
+draw_icon_content (ClutterCanvas *canvas,
+                   cairo_t       *cr,
+                   gint           width,
+                   gint           height,
+                   gpointer       user_data)
+{
+  const double rotate_degree = 180.0;
+
+  /* Clear the contents of the canvas. */
+  cairo_save (cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_paint (cr);
+  cairo_restore (cr);
+
+  if (rotate_degree &amp;gt; 0.0)
+    {
+      cairo_translate (cr, width / 2, height / 2);
+      cairo_rotate (cr, rotate_degree * (G_PI / 180.0));
+      cairo_translate (cr, - width / 2, - height / 2);
+    }
+  draw_font_icon (cr, ...);
+
+  return TRUE;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그런데
+
+&lt;a href=&#34;http://fortawesome.github.io/Font-Awesome/icons/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Font Awesome 아이콘 목록&lt;/a&gt;
+에서 원하는 아이콘은 찾았는데, 아이콘 이름에 해당하는
+실제 글꼴의 문자 코드(code)는 어떻게 알 수 있을까요? 웹 페이지를 무식하게
+파싱해서 C 언어 헤더 파일을 자동으로 생성하는 
+&lt;a href=&#34;https://gist.github.com/lethean/bdd5a657f103b6cb0c23&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Node.js 스크립트&lt;/a&gt;
+를 이용하면
+다음과 같은 결과를 얻을 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define FA_ICON_ADJUST &amp;quot;\xef\x81\x82&amp;quot; /* &amp;amp;#xf042; */
+#define FA_ICON_ADN &amp;quot;\xef\x85\xb0&amp;quot; /* &amp;amp;#xf170; */
+#define FA_ICON_ALIGN_CENTER &amp;quot;\xef\x80\xb7&amp;quot; /* &amp;amp;#xf037; */
+#define FA_ICON_ALIGN_JUSTIFY &amp;quot;\xef\x80\xb9&amp;quot; /* &amp;amp;#xf039; */
+#define FA_ICON_ALIGN_LEFT &amp;quot;\xef\x80\xb6&amp;quot; /* &amp;amp;#xf036; */
+#define FA_ICON_ALIGN_RIGHT &amp;quot;\xef\x80\xb8&amp;quot; /* &amp;amp;#xf038; */
+#define FA_ICON_AMBULANCE &amp;quot;\xef\x83\xb9&amp;quot; /* &amp;amp;#xf0f9; */
+#define FA_ICON_ANCHOR &amp;quot;\xef\x84\xbd&amp;quot; /* &amp;amp;#xf13d; */
+#define FA_ICON_ANDROID &amp;quot;\xef\x85\xbb&amp;quot; /* &amp;amp;#xf17b; */
+#define FA_ICON_ANGELLIST &amp;quot;\xef\x88\x89&amp;quot; /* &amp;amp;#xf209; */
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;:)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>글꼴마다 다른 힌팅 사용하기</title>
+      <link>/2010/07/19/2010-07-19-hinting-for-different-fonts/</link>
+      <pubDate>Mon, 19 Jul 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/07/19/2010-07-19-hinting-for-different-fonts/</guid>
+      <description>&lt;p&gt;구글 리더를 읽다가 어떤 분이 
+&lt;a href=&#34;http://blog.digital-scurf.org/2010/07/13#dev-fonts&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;터미널 글꼴로 &amp;lsquo;Droid Sans Mono&amp;rsquo; 사용한 포스트&lt;/a&gt;
+를 보고 따라해 보았습니다. 그런데, 이상하게도 글꼴이 예쁘지 않아서 확인해 보니 폰트 설정에서 힌팅(hinting)을 살짝(slight)만 사용하도록 설정해야 했습니다. 사실, 대부분의 영문 폰트는 힌팅을 살짝 주어야 원래 의도대로 멋지게 표시되는 경우가 많습니다. (아래 그림에서 폰트 설정 화면 참조)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/gnome-font-properties.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;그런데 문제는, 이 설정을 이용하면 나눔글꼴과 같은 일부 한글 글꼴이 오히려 안 이쁘게 표시됩니다. 특히 나눔고딕은 힌팅을 중간(hintmedium)이나 충분히(hintfull) 사용해야 합니다. 그런데 위 그림을 보면 나눔고딕 역시 정상적으로 표시되고 있습니다. 이 포스트는 그 과정을 정리한 것입니다. 사용환경은 우분투 10.04 배포판이고, 
+&lt;a href=&#34;http://packages.debian.org/sid/ttf-nanum&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;나눔글꼴&lt;/a&gt;
+과 
+&lt;a href=&#34;http://packages.debian.org/sid/ttf-nanum-coding&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;나눔고딕코딩&lt;/a&gt;
+ 글꼴은 데비안 패키지를 직접 내려받아 설치했습니다. 우분투 저장소에도 조만간 반영되겠지요.&lt;/p&gt;
+&lt;p&gt;먼저 폰트별로 다른 힌팅 스타일을 사용하기 위해 폰트 설정에서, 나눔글꼴 계열 힌팅 스타일을 충분히(hintfull)로 변경합니다. &lt;code&gt;~/.fonts.conf&lt;/code&gt; 파일을 편집해도 되지만, 제 경우 그냥 ﻿﻿&lt;code&gt;﻿/etc/fonts/conf.avail/69-language-selector-ko-kr.conf&lt;/code&gt; 파일에 다음 내용을 추가했습니다. 그래야 루트 사용자를 포함한 모든 사용자가 사용할 수 있고, 다른 설정 항목도 모두 거기 있어서 나중에 다시 설치할때 파일 하나만 복사해서 사용하기 때문입니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;match target=&amp;quot;font&amp;quot;&amp;gt;
+  &amp;lt;test name=&amp;quot;family&amp;quot;&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumGothic&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔명조&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumMyeongjo&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;나눔고딕코딩&amp;lt;/string&amp;gt;
+    &amp;lt;string&amp;gt;NanumGothicCoding&amp;lt;/string&amp;gt;
+  &amp;lt;/test&amp;gt;
+  &amp;lt;edit name=&amp;quot;hintstyle&amp;quot; mode=&amp;quot;assign&amp;quot;&amp;gt;
+    &amp;lt;const&amp;gt;hintfull&amp;lt;/const&amp;gt;
+  &amp;lt;/edit&amp;gt;
+&amp;lt;/match&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그런데 문제는, 이 설정이 먹혀들지 않는다는 점입니다. 이상하게도 파이어폭스나 크롬브라우저, KDE 등에서는 잘 적용되는데, 정작 그놈 터미널이나 모든 그놈 프로그램에서는 적용이 되지 않았습니다. 검색해보니, GTK+ 툴킷을 포함한 대부분 그놈 프로그램이 사용하는 카이로(cairo) 라이브러리에 
+&lt;a href=&#34;http://bugs.freedesktop.org/show_bug.cgi?id=11838&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;관련 버그&lt;/a&gt;
+가 이미 보고되어 있는데 아직 패키가 반영되지 않은 상태였습니다. 카이로 라이브러리가 힌팅의 경우 FontConfig 설정을 따르지 않고 무조건 그놈 글꼴 설정, 더 정확히 말하면 X 리소스의 Xft.hintstyle 값만 사용하기 때문이었습니다.&lt;/p&gt;
+&lt;p&gt;그래서 다음과 같은 과정을 거쳐 직접 빌드한 패키지를 설치해서 사용하고 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ apt-get source libcairo2 # 패키지 소스 내려받기
+$ sudo apt-get build-dep libcairo2 # 빌드를 위한 패키지 내려받기
+$ cd cairo-*
+$ vi src/cairo-ft-font.c # 위 버그질라에 등록된 패치 적용
+$ vi debian/changelog # 패키지 버전 올림
+$ dpkg-buildpackage -rfakeroot # 패키지 생성
+$ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;패키지 생성 방법을 익힌게 거의 10년 전 쯤 데비안 사용 시절이라 요즘은 어떻게 만드는지 잘 모르겠지만, 다행히도 위 방식도 제대로 동작하는 것 같아 그냥 사용하고 있습니다. 요즘은 우분투 PPA도 활성화되었고, 빌드 방식도 더 간단해진 것 같긴 한데, 게을러서&amp;hellip; :)&lt;/p&gt;
+&lt;p&gt;결론은, Droid Sans Mono 글꼴을 터미널 글꼴로 잘 사용하고 있습니다. 참, 이 글꼴 역시 다음과 같이 쉽게 설치할 수 있습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo apt-get install ttf-droid
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그런데, 위 패치가 아직까지도 최근 cairo 소스에는 반영되지 않은 것 같아 약간 아쉽군요.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

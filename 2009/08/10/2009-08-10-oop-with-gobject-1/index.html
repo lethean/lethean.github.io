@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="GTK&#43;, Clutter 등과 같은 라이브러리는 C 언어로 구현되었지만 객체 지향 개념을 충실히 따르고 있는데, 그 중심에는 GLib 라이브러리의 GObject가 있습니다. 따라서 이러한">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2009/08/10/2009-08-10-oop-with-gobject-1/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2009/08/10/2009-08-10-oop-with-gobject-1/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2009/08/10/2009-08-10-oop-with-gobject-1/">
+  <meta property="og:title" content="GObject 객체 지향 프로그래밍 (1) | 대체로 무해함">
+  <meta property="og:description" content="GTK&#43;, Clutter 등과 같은 라이브러리는 C 언어로 구현되었지만 객체 지향 개념을 충실히 따르고 있는데, 그 중심에는 GLib 라이브러리의 GObject가 있습니다. 따라서 이러한"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2009-08-10T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T19:56:33&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2009/08/10/2009-08-10-oop-with-gobject-1/"
+  },
+  "headline": "GObject 객체 지향 프로그래밍 (1)",
+  
+  "datePublished": "2009-08-10T00:00:00Z",
+  "dateModified": "2020-02-03T19:56:33+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "GTK+, Clutter 등과 같은 라이브러리는 C 언어로 구현되었지만 객체 지향 개념을 충실히 따르고 있는데, 그 중심에는 GLib 라이브러리의 GObject가 있습니다. 따라서 이러한"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>GObject 객체 지향 프로그래밍 (1) | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>GObject 객체 지향 프로그래밍 (1)</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>GTK+, Clutter 등과 같은 라이브러리는 C 언어로 구현되었지만 객체 지향 개념을 충실히 따르고 있는데, 그 중심에는 GLib 라이브러리의 GObject가 있습니다. 따라서 이러한 라이브러리를 제대로 이해하고 사용하려면 필수적으로 GObject 개념을 잘 이해하고 있어야 합니다. 그런데, 생각보다 GObject 개념은 이해하기 어렵습니다. 이해하더라도 이를 응용하려면 그만큼 시간이 또 필요합니다.</p>
+<p>그래서 이번 글을 시작으로 GObject 라이브러리를 이용한 C 언어에서 객체 지향 프로그래밍이라는 거창한 주제를 예제 형식을 이용해 다루어 보려고 합니다. 바로 새 GTK+ 위젯을 구현하거나 클러터 객체를 분석하는 방식이 아니라 왜 GObject가 이런 방식으로 설계되었는지 그 철학을 따라가 보려고 합니다. 그리고, 가능한 기존 GObject 튜토리얼의 어려운 설명이 아니라 실제 사용하는 코드를 중심으로 설명할 예정이니, 그래도 무슨 말인지 모르겠거나 더 풀어서 설명을 하는 게 좋을 것 같을 경우 의견 주시기 바랍니다.</p>
+<p>여기서 예제로 사용할 개념은 네트워크 카메라 호스트와 호스트 목록입니다. (하는 일이 이쪽 분야라서&hellip; :)</p>
+<p>네트워크 카메라 호스트는 이름(name), 주소(address), 포트번호(port), 사용자(user), 비밀번호(password) 등과 같은 항목을 포함합니다. 필요한 함수로는 새 객체를 만들거나 해제, 그리고 각 필드값을 얻어오거나 변경하는 정도입니다. (아마도 나중에는 값이 변경되면 자동으로 호출되는 콜백 함수도 추가할 겁니다)</p>
+<p>모든 코드는 GLib API를 이용하여 작성합니다.</p>
+<p>**객체 (Objects) + 참조 카운터 (Reference Counter)
+**</p>
+<p>소프트웨어 공학자들이 객체라고 부르기 전부터 C 언어에는 구조체(struct)가 있었습니다. GObject 시스템 역시 기본 바탕은 구조체입니다. 그러면 GObject 프로그래밍을 하기 전에, 일반 C 언어 구조체를 이용해 네트워크 카메라 호스트를 정의하면, 다음과 같은 코드가 나오지 않을까요?</p>
+<pre><code>typedef struct _EdcHost EdcHost;
+struct _EdcHost
+{
+  gchar *name;
+  gchar *address;
+  gint   port;
+  gchar *user;
+  gchar *password;
+};
+</code></pre>
+<p>만일 상속이나 함수 오버로딩(overloading)을 전혀 사용하지 않는다면, 굳이 새로운 함수를 추가할 필요를 못 느끼는 분들이 많을 겁니다. 왜냐하면, 직접 구조체 크기만큼 메모리를 할당한 뒤 해제하고, 직접 모든 필드를 접근하면 되니까요. 하지만, 할당하고 해제하는 코드가 여러 곳에 분산되어 있다면 디버깅도 힘들고 유지 보수도 힘드니까 최소한 객체를 생성하고 해제하는 함수만이라도 만들어 봅시다.</p>
+<pre><code>EdcHost *
+edc_host_new (void)
+{
+  EdcHost *host;
+
+  host = g_new0 (EdcHost, 1);
+
+  return host;
+}
+
+void
+edc_host_destroy (EdcHost *host)
+{
+  g_return_if_fail (host != NULL);
+
+  g_free (host-&gt;name);
+  g_free (host-&gt;address);
+  g_free (host-&gt;user);
+  g_free (host-&gt;password);
+  g_free (host);
+}
+</code></pre>
+<p>간단한 코드라서 설명할 필요는 없을 것 같습니다. 참고로 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Memory-Allocation.html#g-free" target="_blank" rel="noopener"><code>g_free()</code></a>
+ 함수는 인수가 NULL일 경우 무시하므로 NULL 검사 코드는 필요없습니다.</p>
+<p>그런데, 이 객체는 단순히 목록 관리 뿐 아니라 여러 다른 모듈에서도 사용할 예정입니다. 여기서 갑자기, 모든 모듈이 하나의 객체를 공유하고 싶은 욕망이 꿈틀대기 시작합니다. 모듈 간에 객체를 전달할때 복사할 필요도 없고, 모듈 별로 객체를 따로 만들어 정보를 보관하는 것보다 메모리를 절약할 수 있으며, 필드 하나가 변경되었을 경우 그 정보를 모든 관련 객체에 반영할 수고도 덜 수 있기 때문입니다. 그렇다고 무턱대고 모든 모듈에서 객체 주소(pointer)만 참조하게 하면 객체를 어느 시점에 할당하고 해제해야 하는지 매우 까다로워집니다. 특히 동적으로 임시 객체를 생성해 다른 모듈에게 넘겨주는 경우라면, 객체를 어느 시점에서 해제해야 하는지도 실수하기 딱 좋습니다. 더 나아가 멀티 쓰레드 환경까지 고려한다면, 단순히 포인터만 가리키는 방식은, 아마추어나 사용하는 옛날 UML 클래스 빌더가 자동으로 생성해주는 코드만으로는, 힘들 수 밖에 없습니다.</p>
+<p>이런 경우 자주 사용하는 방식이 참조 카운터(reference counter) 기법입니다. 짧게 설명하자면, 모든 모듈에서 몇 가지 원칙만 지키면 됩니다. 첫번째 원칙은, 객체(메모리)를 할당한 모듈에서 반드시 해제하기입니다. 두번째는, 모듈 관점에서 내가 필요한 시점부터 객체의 참조 카운터를 증가하고, 더이상 사용하지 않으면 객체의 참조 카운터를 감소합니다. 새로 생성된 객체는 참조 카운터 값이 1이고, 참조 카운터가 감소되어 0이 되면 객체는 자동으로 해제됩니다. 참고로, 참조 카운터 기법은 멀티미디어 프레임 버퍼, 네트워크 패킷 등과 같은 버퍼 관리에도 널리 사용하는 것은 물론, 오브젝티브-C 언어(Objective-C)의 NSObject 객체가 기본적으로 제공하는 기능이기도 합니다.</p>
+<p>자 이제, 호스트 객체를 참조 카운터 기법을 적용해 수정해 보면 다음과 같습니다.</p>
+<p><strong>edc-host.h</strong></p>
+<pre><code>#ifndef __EDC_HOST_H__
+#define __EDC_HOST_H__
+
+#include &lt;glib.h&gt;
+
+#ifdef __cplusplus
+extern &quot;C&quot; {
+#endif
+
+typedef struct _EdcHost EdcHost;
+struct _EdcHost
+{
+  gchar *name;
+  gchar *address;
+  gint   port;
+  gchar *user;
+  gchar *password;
+
+  gint   ref_count;
+};
+
+EdcHost *edc_host_new   (void);
+EdcHost *edc_host_ref   (EdcHost *host);
+void     edc_host_unref (EdcHost *host);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __EDC_HOST_H__ */
+</code></pre>
+<p><strong>edc-host.c</strong></p>
+<pre><code>#include &quot;edc-host.h&quot;
+
+EdcHost *
+edc_host_new (void)
+{
+  EdcHost *host;
+
+  host = g_new0 (EdcHost, 1);
+  if (!host)
+    return NULL;
+
+  host-&gt;ref_count = 1;
+
+  return host;
+}
+
+static void
+edc_host_destroy (EdcHost *host)
+{
+  g_return_if_fail (host != NULL);
+
+  g_free (host-&gt;name);
+  g_free (host-&gt;address);
+  g_free (host-&gt;user);
+  g_free (host-&gt;password);
+  g_free (host);
+}
+
+EdcHost *
+edc_host_ref (EdcHost *host)
+{
+  g_return_val_if_fail (host != NULL, NULL);
+
+  g_atomic_int_inc (&amp;host-&gt;ref_count);
+
+  return host;
+}
+
+void
+edc_host_unref (EdcHost *host)
+{
+  g_return_if_fail (host != NULL);
+
+  if (g_atomic_int_dec_and_test (&amp;host-&gt;ref_count))
+    edc_host_destroy (host);
+}
+</code></pre>
+<p>제일 먼저 설명할 부분은 역시 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Atomic-Operations.html#g-atomic-int-inc" target="_blank" rel="noopener"><code>g_atomic_int_inc()</code></a>
+ / 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Atomic-Operations.html#g-atomic-int-dec-and-test" target="_blank" rel="noopener"><code>g_atomic_int_dec_and_test()</code></a>
+ 함수입니다. 멀티 쓰레드에서 안전하게 카운터 변수를 증가하고 감소할 수 있게 도와주는 GLib API입니다. 이를 이용해 위에서 설명한 참조 카운터 개념을 구현하고 있습니다. 공개했던 <code>edc_host_destroy()</code> 함수는 모듈 내부에서만 접근할 수 있도록 <code>static</code> 키워드를 붙였습니다. 또한 C++ 소스에서 포함(include)할때 문제를 일으키지 않도록 헤더파일에 &lsquo;<code>extern &quot;c&quot; {}</code>&rsquo; 키워드도 추가했습니다.</p>
+<p>그런데 참조 카운터가 필요한 객체마다 이렇게 구현하면 비슷한 작업을 하는 코드가 중복될 수 밖에 없습니다. 이를 일반적인 API로 분리해 다시 구현하면 재활용이 가능할테니, 다음과 같이 수정해 보겠습니다.</p>
+<p><strong>edc-object.h</strong></p>
+<pre><code>#ifndef __EDC_OBJECT_H__
+#define __EDC_OBJECT_H__
+
+#include &lt;glib.h&gt;
+
+#ifdef __cplusplus
+extern &quot;C&quot; {
+#endif
+
+typedef struct _EdcObject EdcObject;
+struct _EdcObject
+{
+  gint           ref_count;
+  GDestroyNotify finalize;
+};
+
+static inline gpointer
+edc_object_alloc (GDestroyNotify finalize,
+                  gint           obj_size)
+{
+  EdcObject *obj;
+
+  obj = g_malloc (obj_size);
+  if (!obj)
+    return NULL;
+
+  obj-&gt;ref_count = 1;
+  obj-&gt;finalize = finalize;
+
+  return obj;
+}
+
+static inline gpointer
+edc_object_ref (gpointer obj)
+{
+  EdcObject *object = obj;
+
+  if (object)
+    g_atomic_int_inc (&amp;object-&gt;ref_count);
+
+  return object;
+}
+
+static inline void
+edc_object_unref (gpointer obj)
+{
+  EdcObject *object = obj;
+
+  if (!obj)
+    return;
+
+  if (g_atomic_int_dec_and_test (&amp;object-&gt;ref_count))
+    {
+      if (object-&gt;finalize)
+        object-&gt;finalize (object);
+      g_free (object);
+    }
+}
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __EDC_OBJECT_H__ */
+</code></pre>
+<p><strong>edc-host.h</strong></p>
+<pre><code>#ifndef __EDC_HOST_H__
+#define __EDC_HOST_H__
+
+#include &quot;edc-object.h&quot;
+
+#ifdef __cplusplus
+extern &quot;C&quot; {
+#endif
+
+typedef struct _EdcHost EdcHost;
+struct _EdcHost
+{
+  EdcObject parent;
+
+  gchar *name;
+  gchar *address;
+  gint   port;
+  gchar *user;
+  gchar *password;
+};
+
+EdcHost *edc_host_new (void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __EDC_HOST_H__ */
+</code></pre>
+<p><strong>edc-host.c</strong></p>
+<pre><code>#include &quot;edc-host.h&quot;
+
+static void
+edc_host_finalize (gpointer obj)
+{
+  EdcHost *host = obj;
+
+  g_free (host-&gt;name);
+  g_free (host-&gt;address);
+  g_free (host-&gt;user);
+  g_free (host-&gt;password);
+}
+
+EdcHost *
+edc_host_new (void)
+{
+  EdcHost *host;
+
+  host = edc_object_alloc (edc_host_finalize,
+                           sizeof (EdcHost));
+  if (!host)
+    return NULL;
+
+  host-&gt;name = NULL;
+  host-&gt;address = NULL;
+  host-&gt;user = NULL;
+  host-&gt;password = NULL;
+
+  return host;
+}
+</code></pre>
+<p>객체 지향 상속(또는 파생 객체)을 C 언어로 구현하는 가장 쉬운 방법은 위 코드에서 보는 것처럼 부모(또는 원본 객체)를 구조체 맨 앞에 두는 겁니다. 그러면 부모와 자식 API 모두 사용할 수 있게 되죠. 위 코드의 경우 개념상으로 보면 EdcObject 객체를 상속 받아 EdcHost 객체를 구현한 셈이 되죠. 따라서 다음과 같이 사용할 수 있습니다.</p>
+<pre><code>void
+func_a (EdcHost *host)
+{
+  edc_object_ref (host);
+  // do some stuff for long time...
+  edc_object_unref (host);
+}
+
+{
+  EdcHost *host;
+
+  host = edc_host_new ();
+  ...
+  func_a (host);
+  ...
+  edc_object_unref (host); /* destroy */
+}
+</code></pre>
+<p>참고로 C 언어에서 `<code>void *</code>&rsquo; 형은 어떤 포인터와도 양방향 대입(assignment)을 할 수 있으므로 컴파일 경고를 피하기 위해 불필요한 형변환을 할 필요가 없습니다. (
+<a href="http://library.gnome.org/devel/glib/stable/glib-Basic-Types.html#gpointer" target="_blank" rel="noopener"><code>gpointer</code></a>
+ / 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Datasets.html#GDestroyNotify" target="_blank" rel="noopener"><code>GDestroyNotify</code></a>
+ API도 설명도 확인해 보시기 바랍니다)</p>
+<p>이제 지금까지 구현한 부분을 GObject 객체 기반으로 옮겨 봅니다. 자세히 보시면, 지금까지 프로그래밍한 내용과 거의 비슷한 점을 알아챌 수 있을 겁니다.</p>
+<p><strong>edc-host.h</strong></p>
+<pre><code>#ifndef __EDC_HOST_H__
+#define __EDC_HOST_H__
+
+#include &lt;glib-object.h&gt;
+
+G_BEGIN_DECLS
+
+#define EDC_TYPE_HOST 
+ (edc_host_get_type ())
+#define EDC_HOST(obj) 
+ (G_TYPE_CHECK_INSTANCE_CAST ((obj), EDC_TYPE_HOST, EdcHost))
+#define EDC_HOST_CLASS(obj) 
+ (G_TYPE_CHECK_CLASS_CAST ((obj), EDC_TYPE_HOST, EdcHostClass))
+#define EDC_IS_HOST(obj) 
+ (G_TYPE_CHECK_INSTANCE_TYPE ((obj), EDC_TYPE_HOST))
+#define EDC_IS_HOST_CLASS(obj) 
+ (G_TYPE_CHECK_CLASS_TYPE ((obj), EDC_TYPE_HOST))
+#define EDC_GET_HOST_CLASS(obj) 
+ (G_TYPE_INSTANCE_GET_CLASS ((obj), EDC_TYPE_HOST, EdcHostClass))
+
+typedef struct _EdcHostClass EdcHostClass;
+typedef struct _EdcHost      EdcHost;
+
+struct _EdcHost
+{
+ GObject parent;
+
+ gchar  *name;
+ gchar  *address;
+ gint    port;
+ gchar  *user;
+ gchar  *password;
+};
+
+struct _EdcHostClass
+{
+ GObjectClass parent_class;
+};
+
+GType    edc_host_get_type (void) G_GNUC_CONST;
+EdcHost *edc_host_new      (void);
+
+G_END_DECLS
+
+#endif /* __EDC_HOST_H__ */
+</code></pre>
+<p><strong>edc-host.c</strong></p>
+<pre><code>#include &quot;edc-host.h&quot;
+
+G_DEFINE_TYPE (EdcHost, edc_host, G_TYPE_OBJECT);
+
+EdcHost *
+edc_host_new (void)
+{
+ return EDC_HOST (g_object_new (EDC_TYPE_HOST, NULL));
+}
+
+/* object initializer */
+static void
+edc_host_init (EdcHost *host)
+{
+ host-&gt;name = NULL;
+ host-&gt;address = NULL;
+ host-&gt;port = 0;
+ host-&gt;user = NULL;
+ host-&gt;password = NULL;
+}
+
+/* object finalizer */
+static void
+edc_host_finalize (GObject *self)
+{
+ EdcHost *host = EDC_HOST (self);
+
+ g_free (host-&gt;name);
+ g_free (host-&gt;address);
+ g_free (host-&gt;user);
+ g_free (host-&gt;password);
+
+ /* call our parent method (always do this!) */
+ G_OBJECT_CLASS (edc_host_parent_class)-&gt;finalize (self);
+}
+
+/* class initializer */
+static void
+edc_host_class_init (EdcHostClass *klass)
+{
+ GObjectClass *gobject_class;
+
+ gobject_class = G_OBJECT_CLASS (klass);
+ gobject_class-&gt;finalize = edc_host_finalize;
+}
+</code></pre>
+<p>갑자기 코드량이 증가했다고 놀랄 필요는 없습니다. 뭐든지 다 그렇지만, 알고 보면 별 거 아닙니다.</p>
+<p>먼저 헤더 파일을 설명하면,  GObject 객체를 사용하기 위해 glib-object.h 파일을 포함했습니다. 이는 EdcHost 객체가 GObject 객체만 사용하기 때문에, 더 정확히는 GObject의 파생 객체(derived objects), 다른 말로는 GObject 객체만 상속(inheritance)하기 때문에 그렇습니다. 만일 다른 객체에서 파생한다면 그 객체를 정의하는 헤더 파일을 포함해야 합니다. &lsquo;<code>extern &quot;c&quot; {}</code>&rsquo; 키워드는 GLib의 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Miscellaneous-Macros.html#G-BEGIN-DECLS--CAPS" target="_blank" rel="noopener"><code>G_BEGIN_DECLS</code></a>
+ / 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Miscellaneous-Macros.html#G-END-DECLS--CAPS" target="_blank" rel="noopener"><code>G_END_DECLS</code></a>
+ API로 대체했습니다.</p>
+<p>EdcHost 인스턴스와 EdcHostClass 클래스를 정의하고 있는 부분을 설명하면, 클래스 객체는 전역으로 하나만 존재하고 그냥 객체는 인스턴스(instance) 역할을 합니다. 또한 여기서는 인스턴스 객체의 모든 필드가 공개되어 있지만, 물론 외부에 공개하지 않는(private) 필드를 정의할 수도 있습니다. (이는 다른 글에서 따로 설명하겠습니다)</p>
+<p>복잡해 보이는 몇몇 매크로는 자주 사용하는 긴 API를 간편화한 것입니다. 런타임 중에 인스턴스가 유효하고 EdcHost 객체로 형변환까지 해주거나[<code>EDC_HOST(obj)</code>], 인스턴스가 EdcHost 객체인지 확인하거나[<code>EDC_IS_HOST(obj)</code>], 인스턴스의 클래스 객체를 얻어오거나[<code>EDC_GET_HOST_CLASS(obj)</code>] 하는 등 일종의 
+<a href="http://en.wikipedia.org/wiki/Run-time_type_information" target="_blank" rel="noopener">RTTI</a>
+ 관련 매크로입니다. 아마 제일 많이 사용하는 매크로는 `<code>EDC_HOST(obj)</code>'일 겁니다.</p>
+<p>소스를 살펴 보면, 제일 먼저 나오는게 `
+<a href="http://library.gnome.org/devel/gobject/stable/gobject-Type-Information.html#G-DEFINE-TYPE--CAPS" target="_blank" rel="noopener"><code>G_DEFINE_TYPE(TN, t_n, T_P)</code></a>
+&rsquo; 입니다. 여담이지만, 이 매크로가 추가되기 전에 작성한 GObject 기반 코드는 귀찮은 작업을 많이 해야 했는데, 이 매크로가 자동으로 해주는 기능이 많아서 불필요하게 중복되는 코드가 많이 줄어들었습니다. 그래서 GTK+ 소스 코드 중에도 가끔 그렇게 작성한 코드도 있고, GObject 관련 초기 문서를 보면 이 매크로를 사용하지 않고 구현되어 있는 경우도 있습니다.</p>
+<p>이 매크로가 하는 일은 다음과 같습니다. 지정한 `<code>t_n</code>` 이름으로 시작하는 클래스 초기화 함수[<code>*_class_init()</code>] / 인스턴스 초기화 함수[<code>*_init()</code>] 모두 구현되어 있다고 가정하고 `<code>*_get_type()</code>&rsquo; 함수를 자동으로 삽입해 줍니다. 더불어 부모 클래스 객체를 가리키는 `<code>*_parent_class</code>&rsquo; 전역 변수도 만들어 줍니다. 따라서 프로그래머는 최소한 함수 두 개만 구현해 주면 되는 셈입니다. [<code>edc_host_init()</code> / <code>edc_host_class_init()</code>]</p>
+<p>하지만 위 예제에서는 클래스 초기화 함수에서 인스턴스 객체가 해제될때 호출되는 finalize 함수를 교체하고 있습니다. 이를 통해 객체가 해제될때 사용하던 리소스를 해제해 줍니다. 그리고, 반드시 상위 클래스의 finalize 함수를 호출해 주어야 정상적으로 부모 객체의 해제 함수가 차례대로 호출될 수 있습니다.</p>
+<p>자 이제 GObject의 핵심 기능 중 하나인 객체 참조 카운터(object reference counter) 기능을 쉽게 이용할 수 있습니다. 이렇게 작성한 객체는 
+<a href="http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-ref" target="_blank" rel="noopener"><code>g_object_ref()</code></a>
+ / 
+<a href="http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-unref" target="_blank" rel="noopener"><code>g_object_unref()</code></a>
+ 함수 등을 이용해 참조 카운터를 제어할 수 있습니다. GObject 소스 코드를 확인해 보시면 알겠지만, 실제 객체 참조 카운터 기능은 거의 비슷하게 구현되어 있습니다. 더 많은 경우의 수를 고려하고 더 많은 기능을 제공하다보니 코드가 더 복잡한 것 뿐입니다.</p>
+<p>더 중요한 점은 모든 GObject 기반 객체, 예를 들어 GTK+ 위젯이나 클러터 객체 모두 GObject 기반이기 때문에 객체간 연결(부모-자식, 컨테이너-아이템 등)시 객체에 대한 포인터를 유지하면서 동시에 참조 카운터를 유지하여 메모리를 관리한다는 점입니다. 이 부분에 대한 더 자세한 설명은 
+<a href="/2008/12/28/gtk-memory-management/">GTK+ 메모리 관리</a>
+ 글에서 확인하시기 바랍니다.</p>
+<p>오늘은 일단 여기까지만&hellip; ;)</p>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/agile/">Agile</a>
+  
+  <a class="badge badge-light" href="/tags/coding/">Coding</a>
+  
+  <a class="badge badge-light" href="/tags/glib/">GLib</a>
+  
+  <a class="badge badge-light" href="/tags/gtk&#43;/">GTK&#43;</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2009/08/10/2009-08-10-oop-with-gobject-1/&amp;text=GObject%20%ea%b0%9d%ec%b2%b4%20%ec%a7%80%ed%96%a5%20%ed%94%84%eb%a1%9c%ea%b7%b8%eb%9e%98%eb%b0%8d%20%281%29" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2009/08/10/2009-08-10-oop-with-gobject-1/&amp;t=GObject%20%ea%b0%9d%ec%b2%b4%20%ec%a7%80%ed%96%a5%20%ed%94%84%eb%a1%9c%ea%b7%b8%eb%9e%98%eb%b0%8d%20%281%29" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=GObject%20%ea%b0%9d%ec%b2%b4%20%ec%a7%80%ed%96%a5%20%ed%94%84%eb%a1%9c%ea%b7%b8%eb%9e%98%eb%b0%8d%20%281%29&amp;body=/2009/08/10/2009-08-10-oop-with-gobject-1/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2009/08/10/2009-08-10-oop-with-gobject-1/&amp;title=GObject%20%ea%b0%9d%ec%b2%b4%20%ec%a7%80%ed%96%a5%20%ed%94%84%eb%a1%9c%ea%b7%b8%eb%9e%98%eb%b0%8d%20%281%29" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=GObject%20%ea%b0%9d%ec%b2%b4%20%ec%a7%80%ed%96%a5%20%ed%94%84%eb%a1%9c%ea%b7%b8%eb%9e%98%eb%b0%8d%20%281%29%20/2009/08/10/2009-08-10-oop-with-gobject-1/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2009/08/10/2009-08-10-oop-with-gobject-1/&amp;title=GObject%20%ea%b0%9d%ec%b2%b4%20%ec%a7%80%ed%96%a5%20%ed%94%84%eb%a1%9c%ea%b7%b8%eb%9e%98%eb%b0%8d%20%281%29" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2008/08/06/2008-08-06-glib-thread-programming/">GLib 쓰레드 프로그래밍</a></li>
+      
+      <li><a href="/2009/07/06/2009-07-06-how-to-code-well/">코딩 잘하는 방법?</a></li>
+      
+      <li><a href="/2009/04/20/2009-04-20-gobject-property-binding-required/">GObject Property Binding 기능이 필요함</a></li>
+      
+      <li><a href="/2008/12/28/2008-12-28-gtk-memory-management/">GTK&#43; 메모리 관리</a></li>
+      
+      <li><a href="/2008/12/23/2008-12-23-reduce-accesing-overhead-for-gobject-private-data/">GObject Private 데이터 접근 오버헤드 줄이기</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

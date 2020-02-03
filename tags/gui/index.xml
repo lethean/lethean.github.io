@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>GUI | 대체로 무해함</title>
+    <link>/tags/gui/</link>
+      <atom:link href="/tags/gui/index.xml" rel="self" type="application/rss+xml" />
+    <description>GUI</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Mon, 02 Jul 2012 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>GUI</title>
+      <link>/tags/gui/</link>
+    </image>
+    
+    <item>
+      <title>Evolus Pencil 프로토타이핑 도구</title>
+      <link>/2012/07/02/2012-07-02-evolus-pencil-gui-prototyping-tool/</link>
+      <pubDate>Mon, 02 Jul 2012 00:00:00 +0000</pubDate>
+      <guid>/2012/07/02/2012-07-02-evolus-pencil-gui-prototyping-tool/</guid>
+      <description>&lt;p&gt;GUI 설계 단계에서 사용하는 프로토타이핑(prototyping) 도구는 매우 많습니다. 그냥 김프(Gimp)나 포토샵, 잉크스케이프(Inkscape) 등과 같은 일반적인 그래픽 도구에 익숙한 사람에게는 더 이상의 도구가 필요없겠지만, 저처럼 디자인에 문외한인 프로그래머에게는 더 쉽고 자동화된 도구가 필요할 수 밖에 없습니다. 그래서, 그냥 오픈오피스나 파워포인트, 워드 등과 같은 오피스 슈트를 이용해서 그린 적도 있었고, 조금 더 특화된 비지오(Visio), 다이아(Dia) 등을 이용하기도 하다가 최근까지는 
+&lt;a href=&#34;http://www.balsamiq.com/products/mockups&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;발사믹 목업(Balsamiq Mockups)&lt;/a&gt;
+ 등과 같은 도구를 이용했습니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/20120701-112205-photo.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;리눅스를 기본 데스크탑으로 사용하면서 업무상 어쩔 수 없이 가끔 맥 / 윈도우를 사용하다보니 유료 소프트웨어를 사용하면 웬지 돈이 아깝다는 생각이 들 때가 있습니다. 리눅스에서는 필요한 소프트웨어를 대부분 그때 그때 패키지를 검색해서 설치하고, 배포판 패키지가 없으면 소스 가져다 컴파일 해서 사용하는 습관이 오랫동안 길들여져 있기도 하지만, 리눅스용 소프트웨어는 대부분 오픈 소스일 거라는 편견(!) 때문에, 가능하면 기능이 조금 부족하더라도, 어차피 제가 전문적으로 사용하지 않는다면, 유료 소프트웨어에 대한 오픈 소스 / 무료 소프트웨어 대안이 있으면 이를 사용하는 편입니다. (소프트웨어 개발로 밥먹는 프로그래머의 마인드가 이러면 안된다는 걸 알기에, 적어도 최소한의 양심으로, 불법복제 만큼은 피하고 있습니다)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/evolus-pencil-screenshot.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://pencil.evolus.vn/en-US/Home.aspx&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;에볼루스 펜슬(Evolus Pencil)&lt;/a&gt;
+은 이러한 개인적인 취향에 딱 맞는 도구입니다. 
+&lt;a href=&#34;http://mhall119.com/2012/06/my-app-developer-showdown-entry/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;한 블로그 글&lt;/a&gt;
+에서 처음 접하게 되었는데, 알고 보니 꽤 유명한 도구입니다. 오픈 소스이면서 무료인 것은 물론, 리눅스 / 윈도우 / 맥 플랫폼을 모두 지원합니다. 또한 독립 어플리케이션처럼 실행할 수도 있고 파이어폭스 확장 기능으로 사용할 수도 있습니다. 작업한 내용을 HTML, PNG, PDF, ODT, SVG 형식으로 저장할 수도 있습니다. 그리고, 유료 도구인 
+&lt;a href=&#34;http://www.balsamiq.com/products/mockups&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;발사믹 목업(Balsamiq Mockups)&lt;/a&gt;
+만큼 다양하지는 않지만 다운로드해서 쉽게 추가할 수 있는 
+&lt;a href=&#34;http://pencil.evolus.vn/en-US/Downloads/Stencils.aspx&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;스텐실(stencil)&lt;/a&gt;
+과 
+&lt;a href=&#34;http://pencil.evolus.vn/en-US/Downloads/Templates.aspx&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;템플릿(template)&lt;/a&gt;
+도 몇몇 제공합니다. 참고로, 공식 스텐실 다운로드 페이지에는 없는 다른 스텐실, 예를 들어 이전 버전 안드로이드나 iOS 스텐실은 
+&lt;a href=&#34;http://code.google.com/p/evoluspencil/downloads/list&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;다운로드 목록&lt;/a&gt;
+을 잘 찾아보면 발견할 수 있습니다. 아마도 버전이 올라가면서 이전 버전용 스텐실이 잘 호환되지 않아서 링크가 사라진 것 같습니다.&lt;/p&gt;
+&lt;p&gt;우리말로 이미 잘 소개된 
+&lt;a href=&#34;http://opentutorials.org/course/221/1416&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;동영상 튜토리얼&lt;/a&gt;
+이 있기 때문에 더 자세한 설명은 생략합니다. 도움 되시길~&lt;/p&gt;
+&lt;p&gt;참고로, 위의 폭포 사진은 엊그제 다녀온 강원도 철원 삼부연 폭포 전경입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>2010년 1학기에 작성한 프로그램</title>
+      <link>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</link>
+      <pubDate>Tue, 28 Sep 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</guid>
+      <description>&lt;p&gt;뭐, 전혀 관심 없는 분이 대부분이겠지만, 제 하드 디스크에서 묵히는 것보다 누군가에게 도움이 되는 편이 좋을 것 같아, 별로 품질이 좋은 소스는 아니지만, 오픈 소스만 사용해도 무난하게 과제 수행에 문제가 없음을 보여주기 위해, 지난 학기 수업 과제물로 제출했던 과제물의 문서와 프로그램 소스를 공개합니다.&lt;/p&gt;
+&lt;p&gt;참고로, 앞의 두 프로그램은 GTK+ 라이브러리를 이용해서 리눅스에서 개발했지만, 과제 시연을 위해 윈도우에서도 문제없이 컴파일되고 실행되도록 만들었습니다. 그리고, 안드로이드 뷰어는 라이브 보기만 구현된 소스입니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. Image Histogram Viewer&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;﻿﻿이 프로그램은 JPEG 이미지 파일을 읽어들여 화면에 표시하고 파일의 이름, 생성일시, 수정일시 등과 같은 속성을 보여주고, 이미지의 히스토그램을 분석하여 그래프로 표시합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2. Photo Mosaic Builder&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;이 프로그램은 원본 사진을 동일한 크기의 작은 영역으로 쪼갠뒤 복수의 다른 사진으로 다시 구성하여 최종 모자이크 사진을 생성합니다. 복수의 사진은 작은 썸네일(thumbnail) 사진으로 변환되며 각 영역의 색 속성과 가장 유사한 썸네일 사진으로 채워집니다. 이 과정에 복수의 사진을 한번만 사용할 지 여부를 선택할 수 있으 며, 최종 사진을 파일로 다시 저장할 수도 있습니다. 이 모든 과정을 처리하는데 걸리는 시간을 측정하여, OpenMP 라이브러리를 이용한 성능 최적화 정도를 확인할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3. 안드로이드 IP 카메라 뷰어 설계 및 구현&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;안드로이드 IP 카메라 뷰어는 휴대폰 같은 안드로이드(Android) 장비에서 네트워크에 연결된 IP 카메라에 접속하여 라이브 영상과 음성을 재생하고 카메라 동작을 제어합니다. 또한 사용자에게 친숙한 안드로이드폰의 다른 기능과 유기적으로 연동하여 언제 어디서나 쉽고 빠르게 긴급상황에 대처할 수 있도록 도와줍니다. 이를 위해 원격에서 비디오 스트리밍 데이터를 수신하여 디코딩한 후 색상 공간(color space) 변환까지 마친 후 화면에 표시하는 작업에 안드로이드 NDK(Native Development Kit) 방식 C/C++ 코드를 활용합니다. 또한 네이티브 C 모듈과 자바 언어와의 통신 오버헤드를 줄이기 위해 메모리 공유 기법을 이용하여 제한된 하드웨어의 성능을 최대화합니다.&lt;/p&gt;
+&lt;p&gt;P.S. 새 학기가 시작되었는데, 오히려 지난 첫 학기보다 더 험난한 시절을 보내고 있습니다. 요즘은 술 사준다고 연락하는 사람도 점점 뜸해지고&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>여러 개의 마우스 동시에 사용하기</title>
+      <link>/2010/01/20/2010-01-20-using-multiple-mouses-with-xor/</link>
+      <pubDate>Wed, 20 Jan 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/01/20/2010-01-20-using-multiple-mouses-with-xor/</guid>
+      <description>&lt;p&gt;구글 리더에서 오늘치 내용을 읽다가 &amp;lsquo;가
+&lt;a href=&#34;http://ao2.it/en/blog/2010/01/19/poor-mans-multi-touch-using-multiple-mice-xorg&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;난한 사람의 멀티 터치: Xorg에서 여러 개의 마우스 사용하기&lt;/a&gt;
+&amp;rsquo; 블로그를 보고 따라해 보았더니 바로 되는 걸 확인하고 기록으로 남겨둡니다. (참고로, 제가 사용하는 배포판은 우분투 개발 버전(lucid)입니다)&lt;/p&gt;
+&lt;p&gt;두 개의 마우스를 장착했을때 두 개의 포인터가 생성되고, 각각 따로 동작하는 것은 물론 마우스 별로 커서를 지정할 수도 있습니다. 하지만 아직 GTK+를 비롯한 많은 어플리케이션이 멀티 마우스를 고려하지 않아 창 이동이나 포커스 등과 같은 문제가 원하는 대로 동작하지는 않지만, 언제나 그렇듯이 시간이 지나면 조금씩 나아지리라 생각됩니다.&lt;/p&gt;
+&lt;p&gt;저자는 자신이 GIMP 작업을 할 때 하나는 도구나 색상을 고르고, 다른 하나는 그리기 작업에 사용함으로 실제 도움이 많이 되고 있다고 하는데, 단순히 하나의 컴퓨터 화면을 여러 사람이 동시에 사용할 수 있다는 점보다, 사용자 인터페이스 관점에서 멀티 터치를 비롯한 많은 아이디어가 X 어플리케이션에 적용할 수 있는 기반이 될 것으로 여겨집니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>클러터와 GTK</title>
+      <link>/2009/09/08/2009-09-08-clutter-and-gtk/</link>
+      <pubDate>Tue, 08 Sep 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/09/08/2009-09-08-clutter-and-gtk/</guid>
+      <description>&lt;p&gt;`
+&lt;a href=&#34;http://blog.didrocks.fr/index.php/post/Design-experience-and-demos-in-GTK-Clutter&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Design experience and demos in GTK and Clutter&lt;/a&gt;
+&amp;rsquo; 라는 포스트가 얼마 전에 올라왔는데 이제야 리뷰를 해봅니다. 이 포스트를 클릭해서 들어가 보시면 데모 동영상이 여러개 있는데, 클러터 안에 GTK 노트북 위젯을 넣어 여러가지 효과를 보여주고 있습니다. 이 포스트는 &lt;span style=&#34;background-color:#ffffff;&#34;&gt;`
+&lt;a href=&#34;http://dannipenguin.livejournal.com/280866.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;animating GTK+, Clutter-Gtk, client-side-windows and demos&lt;/a&gt;
+&amp;rsquo; 포스트에서 설명한 방식을 더 확장하고 실용적인 예제를 보여주고 있는 셈인데, GTK Client Side Window + ClutterGtk를 이용하고 있습니다.&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;클러터를 이용해 사용자 인터페이스를 만들때 불편한 점 중 하나는 버튼, 입력상자, 라디오 버튼 등과 같은 위젯 툴킷이 없기 때문에 모두 직접 만들어야 한다는 점입니다. 물론 모블린 프로젝트에서 사용하고 있는 클러터 기반 툴킷 라이브러리도 있고 클러터 예제 디렉토리에 여러가지 참고할 만한 샘플이 있긴 하지만, QT나 GTK 같은 라이브러리처럼 풍부한 기능은 제공하지 않습니다. 이 데모가 유용한 이유는, GTK 위젯을 그대로 클러터 안에 포함할 수 있는 것은 물론, 기존 GTK 위젯의 동작을 확장하여 자연스러운 애니메이션 효과를 마음대로 추가할 수 있다는 점을 보여주고 있기 때문입니다.&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;물론, 단순히 예쁘고 화려한 인터페이스 효과를 추가하는게 목적이 아니라, 이를 통해 사용자가 더 쉽게 이해하고 사용하기 편한 인터페이스를 제공할 수 있다는 점이 더 중요한 것 같습니다.&lt;/span&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>사용자 인터페이스 실수 줄이기</title>
+      <link>/2009/08/03/2009-08-03-avoid-common-user-interface-bloopers/</link>
+      <pubDate>Mon, 03 Aug 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/08/03/2009-08-03-avoid-common-user-interface-bloopers/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.grancanariadesktopsummit.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;2009 GCDS / GUADEC&lt;/a&gt;
+ 발표 슬라이드가 
+&lt;a href=&#34;http://mces.blogspot.com/2009/07/gcds-guadec-slides-and-videos.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;공개&lt;/a&gt;
+되었는데, 그 중에서 관심이 가는 발표 자료 두 개를 정리해 보았습니다. 하지만, 발표자료인만큼 가능하면 직접 보시는게 더 효과적일 것 같습니다. 두 발표 모두 캐노니컬(Canonical) 소속 
+&lt;a href=&#34;http://mpt.net.nz/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Matthew Paul Thomas&lt;/a&gt;
+의 발표자료이면서 내용이 중복됩니다.&lt;/p&gt;
+&lt;p&gt;사용자 테스트 과정에서 중요한 점은, 절대로 사용자가 하는 말을 듣고 그대로 하면 안된다는 점입니다. 대신 사용자가 어떻게 무엇을 하는지 관찰하고 분석하는게 중요합니다. 사람은 대개 자신이 생각하는 것과 말하는 것, 실제로 하는 게 다르기 때문에 사람의 말에 근거를 두면 안됩니다. 또한 특정한 한 사람의 경험만 고려해도 안됩니다.&lt;/p&gt;
+&lt;p&gt;어찌되었든, 캐노니컬에서는 여러가지 방법으로 사용자 테스트를 진행하는데 ,  이를 통해 얻은 여러가지 교훈은 다음과 같습니다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;제일 먼저 언급하는 게 소프트웨어 이름을 지을때 잘 지으라는 얘기입니다. 가능하면 소프트웨어가 목표로 하는 기능이나 동작을 이름에 포함하는 방식이 일반 사용자에게 더 잘 어필할 수 있다고 합니다.&lt;/li&gt;
+&lt;li&gt;자주 사용하는 전문가가 아닌 처음 사용하는 사용자를 배려한 마법사, 친절한 설명 등이 중요합니다. 왜냐하면 대부분의 사용자는 첫인상을 통해 소프트웨어를 계속 사용할 지 여부를 결정하는 경우가 많기 때문입니다.&lt;/li&gt;
+&lt;li&gt;처음 실행되었을 때 적절하게 모든 인터페이스가 표시될 수 있도록 윈도우 기본 크기를 적절하게 설정해 주는 것도 중요합니다. 또한 800x600 화면 크기를 가지는 넷북같은 장비가 많이지는 만큼 불필요하게 윈도우를 크게 하지 않아야 합니다.&lt;/li&gt;
+&lt;li&gt;당연한 얘기같지만, 윈도우 제목(title)에 표시되는 내용을 윈도우 안에서 중복 표현하면서 불필요하게 공간을 차지하지 않는 것이 좋습니다. 오류가 발생했을 경우 개발자에게만 유용한 메시지를 보여주고 끝내는 것보다 사용자 관점에서 어떻게 해야 이를 해결할 수 있는 지 대안을 제시해 주는 것도 필요합니다. 더불어 불필요한 공백을 남발하는 것도 피해야 합니다.&lt;/li&gt;
+&lt;li&gt;다이얼로그에서 사용자가 엔터(Enter)키나 이스케이프(Escape)키를 눌렀을 경우 원하는 동작을 할 수 있도록 세심한 배려도 필요합니다. 물론 사용자가 옵션을 검토하지 않은 채 눌렀을 경우를 의도록적으로 막아야 하는 경우는 제외합니다.&lt;/li&gt;
+&lt;li&gt;마지막으로, 개발자끼리만 통하는 용어로 일반 사용자를 겁주거나 거짓말하지 않는 것이 중요합니다. 가능한 일반인에게 친화적인 단어를 선택하고 사용자가 익숙한 개념의 단어를 사용하는게 좋습니다.&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>아이폰 증강 현실 어플리케이션</title>
+      <link>/2009/07/23/2009-07-23-iphone-augmented-reality-application/</link>
+      <pubDate>Thu, 23 Jul 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/07/23/2009-07-23-iphone-augmented-reality-application/</guid>
+      <description>&lt;p&gt;아이폰 3GS용으로 이런 어플리케이션도 있군요. &amp;lsquo;acrossair&#39;의 &amp;lsquo;
+&lt;a href=&#34;http://www.acrossair.com/apps_newyorknearestsubway.htm&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;New York Nearest Subway&lt;/a&gt;
+&amp;lsquo;라는 어플리케이션인데, 기술과 아이디어가 절묘하게 결합한 멋진 작품인 것 같습니다.&lt;/p&gt;
+&lt;p&gt;백문이불여일견, 동영상을 보시는게 빠를 것 같습니다.&lt;/p&gt;
+&lt;p&gt;[youtube=http://www.youtube.com/watch?v=ps49T0iJwVg&amp;amp;w=425&amp;amp;h=344]&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://www.youtube.com/watch?v=ps49T0iJwVg&#34;&gt;http://www.youtube.com/watch?v=ps49T0iJwVg&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GTK&#43; 멀티 포인터 X 지원</title>
+      <link>/2009/01/21/2009-01-21-mpx-gtk-multi-pointer-x-support/</link>
+      <pubDate>Wed, 21 Jan 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/01/21/2009-01-21-mpx-gtk-multi-pointer-x-support/</guid>
+      <description>&lt;p&gt;&amp;lsquo;
+&lt;a href=&#34;http://www.phoronix.com/scan.php?page=news_item&amp;amp;px=NzAwNw&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Multi-Pointer X Support For GTK+&lt;/a&gt;
+&amp;rsquo; 기사를 보면 이미 GTK+ 라이브러리에 멀티 포인터 기능을 지원하기 위한 작업이 진행중입니다. 비록 X 서버는 Ubuntu 9.04 버전에 탑재될 1.6 버전에 멀티 포인터 기능이 이미 포함되어 있지만 기본적으로 비활성화되어 있고, 올해 말 즈음에 릴리스할 1.7 버전에 X Input 2.0 스펙과 함께 포함되면서 공식적으로 지원이 될 것 같습니다.&lt;/p&gt;
+&lt;p&gt;Windows 7이 멀티 터치 인터페이스를 공식적으로 지원하고, 
+&lt;a href=&#34;http://www.idg.co.kr/newscenter/common/newCommonView.do?newsId=53180&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;멀티 터치를 지원하는 LCD 모니터&lt;/a&gt;
+까지 등장하고 있으니 이제는 일반 데스크탑 GUI 어플리케이션도 멀티 터치를 고려해서 인터페이스가 만들어져야 하겠네요.&lt;/p&gt;
+&lt;p&gt;아, 프로그래머의 피곤한 삶이여&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Presenter First 개발</title>
+      <link>/2008/12/17/2008-12-17-presenter-first-development/</link>
+      <pubDate>Wed, 17 Dec 2008 00:00:00 +0000</pubDate>
+      <guid>/2008/12/17/2008-12-17-presenter-first-development/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Presenter_First&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;프리젠터 먼저하기(Presenter First)&lt;/a&gt;
+는
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Model_View_Presenter&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;모델-뷰-프리젠터(MVP)&lt;/a&gt;
+ 디자인 패턴과 테스트 주도 개발(TDD) 등의 아이디어를 버무린  소프트웨어 개발 방법론입니다. 이에 대해 설명하기에 앞서 먼저 모델-뷰-컨트롤러(MVC) 패턴과 비교하여 모델-뷰-프리젠터(MVP) 개념을 정리하면 대략 다음과 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;모델(Model)&lt;/strong&gt; : 실제 다루고자 하는 데이터 읽기 / 쓰기. 관찰자(Observer) 패턴처럼 이벤트를 제공하면 더 좋습니다. MVC 패턴에서는 모델이 실제 데이터 뿐 아니라 사용자 인터페이스(View)와 연관된 데이터까지 처리하지만, MVP 패턴에서 모델은 순수하게 데이터만 처리합니다. 즉, 모델은 뷰나 프리젠터(사용자 인터페이스)에 대해서는 알 필요도 없고 알아서도 안됩니다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;뷰(View)&lt;/strong&gt; : 사용자 인터페이스. 데이터 표시 뿐 아니라 사용자 입력까지 모두 처리합니다. MVC 패턴에서는 사용자 입력을 컨트롤러(Controller)에서 처리하지만 MVP 패턴에서는 뷰가 모두 처리합니다. 사용자 이벤트는 프리젠터에게 전달합니다. (관찰자 패턴을 사용합니다) 모델의 데이터가 변경되었다는 이벤트가 발생하면 데이터를 표시합니다. 하지만 초기 MVP 패턴과 달리 요즘에는 뷰와 모델간의 의존성까지 아예 없애버리고, 프리젠터가 디스플레이까지 제어합니다. 프리젠터 먼저하기 방법론에서 특히 이 방식을 이용합니다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프리젠터(Presenter)&lt;/strong&gt; : 뷰가 전달한 사용자 이벤트에 기반하여 시나리오에 따라 모델 데이터를 조작합니다. MVC 패턴에서 어플리케이션 역할을 하는 부분이며, 사용자 요구사항이 변경되거나 로직이 변경되면 수정이 되어야 하는 부분이기도 합니다. 결과적으로, 모델과 뷰에 대해 알고있는 건 오직 프리젠터 뿐이고, 모델과 뷰는 프리젠터를 모릅니다. 뷰는 모델에 대해 알 수도 있지만, 프리젠터 먼저하기 방법론에서는 이 의존성도 없애버립니다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;뷰를 오버로딩 가능한 추상 인터페이스로 만들고 프리젠터가 이 인터페이스를 사용하도록 하면, 뷰를 구현한(implementation) 객체는 플러그인처럼 교체 가능합니다. 즉, 뷰는 어쩔 수 없이 플랫폼이나 GUI 라이브러리에 의존하게 구현해야 하지만 모델과 프리젠터, 추상 뷰는 이와 상관없이 구현할 수 있습니다. 따라서 쉽게 이식 가능할 뿐 이나라, 하나의 데이터에 대해 여러가지 모양의 사용자 인터페이스를 지원하는 소프트웨어 개발이 쉬워집니다. 물론 모델 역시 추상 인터페이스로 만들고 같은 방식으로 프리젠터가 이 인터페이스를 사용하도록 하면 모델 구현 역시 쉽게 교체 가능한 구조가 됩니다. 그리고, 이러한 추상화는 테스트 주도 개발에도 응용할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;결과적으로, 프리젠터 먼저하기 방법론에서 모델-뷰-프리젠터의 관계는 다음 그림과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; [M]  -----&amp;gt;    [P]    &amp;lt;----- [V]
+Model &amp;lt;===== Presenter =====&amp;gt; View
+
+  (---&amp;gt; : Events, ===&amp;gt; : Messages)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;모델과 뷰는 프리젠터에게 이벤트를 전달하고, 프리젠터는 모델과 객체를 제어하기 위한 메시지를 전달합니다. 즉, 프리젠터만 모델과 뷰에 대해 알고 있을 뿐, 모델과 뷰는 다른 구성 요소를 알지 못합니다. 뷰는 비즈니스 로직에서 완전히 분리하고 모든 로직은 프리젠터에서 처리합니다.  뷰 인터페이스는 가능한 얇고 단순해야 하고, 이상적인 경우 사용자 이벤트를 그대로 프리젠터에게 전달하고, 표시할 내용을 읽고 쓰는 동작만 해야 합니다.&lt;/p&gt;
+&lt;p&gt;프리젠터에게 전달하는 이벤트는 비즈니스 로직에서 사용하는 용어를 사용하여 전달되어야 합니다. 엔지니어 관점의 이벤트가 아닌 사용자 관점의 이벤트를 사용해야 한다는 점입니다. 예를 들어, 비즈니스 로직이 &amp;ldquo;추가 버튼을 누르면 텍스트 입력 내용이 할일목록에 추가되어야 함&amp;quot;이라면, 뷰는 &amp;ldquo;save-button-clicked&amp;rdquo; 이벤트가 정의되어야 하고, 프리젠터는 이 이벤트가 발생했을때 호출할 핸들러를 연결합니다. 핸들러에서는 뷰의 &amp;ldquo;get_text()&amp;rdquo; 함수를 호출하여 텍스트 내용을 얻은 뒤 모델의 &amp;ldquo;add_to_list()&amp;rdquo; 함수를 이용해 모델에 추가합니다. 여기서 만일 버튼 대신 예쁜 아이콘으로 뷰가 달라졌다고 이벤트 이름을 &amp;ldquo;save-image-clicked&amp;quot;로 변경하거나 새로운 이벤트를 추가하면 안됩니다. 사용자가 팝업 메뉴를 원해 메뉴 선택을 이용해 동일한 처리를 하게 되더라도 &amp;ldquo;save-menu-activated&amp;quot;로 변경하거나 새로 추가할 필요도 없습니다.  또는 실제로 버튼의 &amp;ldquo;clicked&amp;rdquo; 이벤트가 아닌 &amp;ldquo;button-pressed&amp;rdquo; 이벤트를 사용하더라도 프리젠터에게 전달하는 이벤트 이름은 변경하면 안된다는 점이 중요합니다.&lt;/p&gt;
+&lt;p&gt;위 예를 조금 더 이어보면, 모델의 &amp;ldquo;add_to_list()&amp;rdquo; 함수 내에서는 데이터에 새로운 텍스트 내용을 추가한 뒤 내용이 변경되었음을 알리는 &amp;ldquo;list-changed&amp;rdquo; 이벤트를 발생하고, 프리젠터에서 미리 이 이벤트에 연결한 핸들러는 모델의 &amp;ldquo;get_list()&amp;rdquo; 함수를 호출해 목록을 얻은 뒤, 뷰의 &amp;ldquo;set_list()&amp;rdquo; 함수를 이용해 변경된 데이터를 화면에 표시합니다. 여기까지 설명에서 중요한 점은, 모든 변경사항은 관찰자 패턴처럼 이벤트를 이용해 전달한다는 점이고, 프리젠터가 모델과 뷰 간의 중재 작업을 통해 비즈니스 로직을 완성한다는 점입니다. 만일 할일 목록과 할 일 목록 편집 화면이 분리되어 구현되어 있을 경우 서로 의존성을 가지고 싶지 않을 수도 있습니다. 이런 경우 두 모델을 중재(coordinator)해서 연결하는 새로운 프리젠터, 혹은 어플리케이션 객체를 새로 만들어 이벤트 처리를 하면 두 모델간의 의존성도 사라질 수 있습니다.&lt;/p&gt;
+&lt;p&gt;프리젠터 먼저하기 방법론은 지금까지 설명한 MVP 패턴으로 프로그램을 할때 프리젠터 객체를 가장 먼저 코딩합니다. 어차피 모델과 뷰 객체의 인터페이스(API)와 이벤트는 프리젠터 객체 구현이 마무리 될때까지 계속 수정되므로, 모델과 뷰는 가짜 객체(Mock Object)로 구현합니다. 가짜 객체라고 해도 프리젠터가 원하는 작업은 실제로 수행하는 것처럼 동작해야 하므로 가능한 단순한 자료구조를 이용해야 합니다.  이렇게 해서 비즈니스 로직을 모두 프리젠터에 구현한 뒤에, 모델과 뷰를 실제로 데이터 베이스에 접근하거나 파일에 읽고 쓰든, GTK+ 위젯 라이브러리를 이용하거나 콘솔 GUI를 이용하든 해서 구현하면 됩니다.&lt;/p&gt;
+&lt;p&gt;하지만 유닛 테스트 도구를 사용하지 않는다면 뷰 없이 프리젠터 동작을 확인하는 코드를 만들기는 조금 불편합니다. 이런 경우 뷰를 가짜 객체 방식으로 만들더라도 어느 정도 기본적인 사용자 입출력이 가능하도록 만들면서 해야 합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;참고한 자료&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.wildcrest.com/Potel/Portfolio/mvp.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;ldquo;MVP: Model-View-Presenter, The Taligent Programming Model for C++ and Java&amp;rdquo;&lt;/a&gt;
+, Mike Potel, 1996&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.object-arts.com/papers/TwistingTheTriad.PDF&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;ldquo;TWISTING THE TRIAD, The evolution of the Dolphin Smalltalk MVP application framework&amp;rdquo;&lt;/a&gt;
+, Andy Bower, Blair McGlashan, Tutorial Paper for ESUG 2000&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://atomicobject.com/files/PresenterFirstAgile2006.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;ldquo;Presenter First: Organizing Complex GUI Applications for Test-Drivn Development&amp;rdquo;&lt;/a&gt;
+, agile, pp. 276-288, AGILE 2006 (AGILE&amp;rsquo;06), 2006.&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://atomicobject.com/files/BigComplexTested_Feb07.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;ldquo;Big, Complex, and Tested? Just Say &amp;lsquo;When&amp;rsquo;&amp;quot;&lt;/a&gt;
+, Better Software Magazine February, 2007&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GTK&#43; Animation Effects</title>
+      <link>/2007/07/25/2007-07-25-gtk-animation-effects/</link>
+      <pubDate>Wed, 25 Jul 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/07/25/2007-07-25-gtk-animation-effects/</guid>
+      <description>&lt;p&gt;점점 화려해지는 GUI 추세를 이제서야 인식했는지, GTK+ / GNOME 에서도 애니메이션 효과에 대한 논의와 구현이 점점 활발해지고 있는 것 같다. 아직 GTK+ 메인 소스에 반영되려면 시간이 더 걸릴 것 같지만 
+&lt;a href=&#34;http://bugzilla.gnome.org/show_bug.cgi?id=444659&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GtkTimeline&lt;/a&gt;
+ 이라는 기본적인 시간 관리 객체가 이미 논의 중이고, 이를 기반으로 여러 개발자들이 여기저기에 적용해보기도 하고 있다. (
+&lt;a href=&#34;http://blogs.gnome.org/carlosg/2007/06/06/animateinanimate/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GtkPathBar 스크롤 효과&lt;/a&gt;
+, 
+&lt;a href=&#34;http://micke.hallendal.net/archives/2007/07/bling_in_gtk.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;iPhone 방식 슬라이드 효과&lt;/a&gt;
+, 
+&lt;a href=&#34;http://codeposts.blogspot.com/2007/07/iphone-like-virtual-keyboard.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;iPhone 방식 가상키보드&lt;/a&gt;
+)&lt;/p&gt;
+&lt;p&gt;GtkTimeline API가 참고한 소스 중 하나라고 하는 
+&lt;a href=&#34;http://clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter&lt;/a&gt;
+ 라이브러리는 OpenGL을 렌더링 엔진으로 사용하는데, GObject 기반으로 GTK+와 친근한 방식의 API를 제공하여 이미 여러 프로젝트에서 사용하고 있는 것 같다. 
+&lt;a href=&#34;http://butterfeet.org/?p=38&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter를 이용한 간단한 프리젠테이션 도구&lt;/a&gt;
+, 
+&lt;a href=&#34;http://butterfeet.org/?p=39&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;휴대폰 인터페이스&lt;/a&gt;
+ 등과 같은 예제도 점점 늘어나고 있다. 하지만 OpenGL 기반이라 임베디드 시스템이나 그래픽칩셋이 3D 가속을 지원하지 않는 환경에서는 활용하기 어렵다는 점이 아쉽다. 아직
+&lt;a href=&#34;http://blogs.gnome.org/timj/2007/07/17/17072007-opengl-for-gdkgtk/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;OpenGL API로 모든 2D 그래픽을 대체하는 건 시기상조일 수도 있다는 얘기&lt;/a&gt;
+도 심심챦게 나오고 있고&amp;hellip;&lt;/p&gt;
+&lt;p&gt;참고로 더 나열해보자면, QT 계열에서는 이미 
+&lt;a href=&#34;http://zrusin.blogspot.com/2007/07/scripter.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;코딩하면서 바로 캔버스 API를 테스트할 수 있는 스크립트 엔진&lt;/a&gt;
+도 지원한다. 
+&lt;a href=&#34;http://www.enlightenment.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;E17&lt;/a&gt;
+의 
+&lt;a href=&#34;http://www.enlightenment.org/p.php?p=about/libs&amp;amp;l=en&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;EFL 라이브러리&lt;/a&gt;
+는 이미 오래전부터 Evas, Edje 등으로 조금 앞선 플랫폼을 제공하더니 이제는 
+&lt;a href=&#34;http://www.fluffyspider.com/demos/live_videos/live_videos.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;EFL 기반 솔루션을 제공하는 업체&lt;/a&gt;
+도 생겨났다. 최근의 
+&lt;a href=&#34;http://www.mizi.com/content/view/4/5/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;미지리서치 Prizm 플랫폼&lt;/a&gt;
+도 휴대폰에서 화려한 UI 효과를 쉽게 구현하도록 도와주고 있다.(glib 기반이라 반가웠다)&lt;/p&gt;
+&lt;p&gt;물론 좋은 오픈소스 라이브러리와 플랫폼이 참 많지만, 이미 오랜 시간을 GTK+와 함께 해왔더니 쉽게 다른 플랫폼으로 바꾸기가 어려운 것 같다. 하지만, 언제나 그렇듯이 잘 설계되고 잘 구현된 오픈 소스 프로젝트를 들여다보는 일은 즐겁다. 가능하면 참여중인 프로젝트에 적용해보고도 싶고, 더 나아가 프로젝트에 직접 참여해보기도 싶지만, 언제나 그렇듯이&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>reactable : 테이블 표면 실감형 다중 접촉 인터페이스를 통한 협업 전자 음악 악기</title>
+      <link>/2007/05/22/2007-05-22-reactable/</link>
+      <pubDate>Tue, 22 May 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/05/22/2007-05-22-reactable/</guid>
+      <description>&lt;p&gt;어설픈 영한번역을 거치게 된 
+&lt;a href=&#34;http://mtg.upf.edu/reactable/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;reactable&lt;/a&gt;
+ 프로젝트의 영어 설명은 이렇다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The &lt;em&gt;reactable&lt;/em&gt; is a &lt;strong&gt;collaborative electronic music instrument with a tabletop tangible multi-touch interface&lt;/strong&gt;. Several simultaneous performers share complete control over the instrument by moving and rotating physical objects on a luminous round table surface. By moving and relating these objects, representing components of a classic modular synthesizer, users can create complex and dynamic sonic topologies, with generators, filters and modulators, in a kind of tangible modular synthesizer or graspable flow-controlled programming language.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;여러 연주자가 함께 야광의 둥근 테이블 위에 있는 물리적인 물체를 움직이고 돌리면서 악기를 완전하게 제어한다. 이처럼 고전적인 모듈러 신디사이저 요소를 나타내는 물체를 움직이고 연관을 지으면서, 사용자는 복합적이고 생동적인 음파 형상을 만들 수 있으며, 실감형 모듈러 신디사이저나 잡을 수 있는 흐름 제어 프로그래밍 언어의 한 종류인 발진기, 필터, 변조기를 이용한다.&lt;/p&gt;
+&lt;p&gt;기본적인 원리는 투명한 유리판(?) 밑에서 카메라를 이용해 사용자 반응을 감지하고 처리하며, 프로젝터를 이용해 다시 표시한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/reactivision03.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;또 눈여겨볼 만한 건 
+&lt;a href=&#34;http://mtg.upf.edu/reactable/?software&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;대부분 소프트웨어 소스가 공개&lt;/a&gt;
+되어 있으며 많은 관련 논문과 자료도 잘 정리되어 있다는 점이다. 특히 Windows, MacOSX, Linux를 동시에 지원하는 크로스 플랫폼 비디오 캡쳐 라이브러리인 
+&lt;a href=&#34;http://www.iua.upf.es/mtg/reacTable/?portvideo&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PortVideo&lt;/a&gt;
+ 라이브러리는 눈여겨볼만 하다. (
+&lt;a href=&#34;http://www.portaudio.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PortAudio&lt;/a&gt;
+ 프로젝트 이름을 흉내낸 걸까?)&lt;/p&gt;
+&lt;p&gt;물론 많은 
+&lt;a href=&#34;http://www.iua.upf.es/mtg/reacTable/?media&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;데모 동영상과 그림&lt;/a&gt;
+도 볼 수 있다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>멀티 터치 스크린과 X 서버</title>
+      <link>/2007/02/16/2007-02-16-multi-touch-screen-and-x-server/</link>
+      <pubDate>Fri, 16 Feb 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/02/16/2007-02-16-multi-touch-screen-and-x-server/</guid>
+      <description>&lt;p&gt;멀티 터치 스크린 관련 데모 동영상:&lt;/p&gt;
+&lt;p&gt;이와 더불어 X 서버에서 복수 마우스 입력을 지원하기 위한 프로젝트인 
+&lt;a href=&#34;http://wearables.unisa.edu.au/mpx/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MPX&lt;/a&gt;
+도 눈여겨둘만 하다.&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.burtonini.com/blog/computers/multitouch-2007-02-14-09-44&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Multitouch and GNOME&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.macrumors.com/2007/02/12/more-multitouch-from-jeff-han/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;More Multitouch from Jeff Han&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://wearables.unisa.edu.au/mpx/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The Multi-Pointer X Server&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>MacOS X 탑재한 아이폰(iPhone) / 애플TV(Apple TV)</title>
+      <link>/2007/01/10/2007-01-10-macosx-inside-iphone-appletv/</link>
+      <pubDate>Wed, 10 Jan 2007 00:00:00 +0000</pubDate>
+      <guid>/2007/01/10/2007-01-10-macosx-inside-iphone-appletv/</guid>
+      <description>&lt;p&gt;드디어 스티브 잡스가 맥월드 2007에서 
+&lt;a href=&#34;http://www.apple.com/iphone&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;아이폰(iPhone)&lt;/a&gt;
+을 주제로 한 
+&lt;a href=&#34;http://www.engadget.com/2007/01/09/live-from-macworld-2007-steve-jobs-keynote/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;기조연설(keynote) 내용&lt;/a&gt;
+이 올라왔다. 
+&lt;a href=&#34;http://www.engadget.com/2007/01/09/the-apple-iphone/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MacOS X&lt;/a&gt;
+을 탑재해서 그런지 전체적인 UI 느낌은 매킨토시 그대로다. 반투명 검은 유리 느낌의 일루미누스(Illuminous) 인터페이스와 전체적인 하드웨어 디자인 느낌은, 역시 애플이라는 생각을 들게 한다. 
+&lt;a href=&#34;http://www.apple.com/appletv&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;애플TV(Apple TV)&lt;/a&gt;
+는 일종의 셋탑박스(set-top box)인데, 무선랜이 기본으로 장착되어 있고 역시 편리하고 화려한 인터페이스를 구비하고 있다.&lt;/p&gt;
+&lt;p&gt;MacOS X 운영체제가 이제는 Linux, WindowsCE, Windows XP/Embedded 가 이미 버티고 있는 임베디드 시스템 분야로 확장하고 있다는 점도 무섭다. 이 기사에서 언급한 것처럼 PowerPC 플랫폼에서 벗어나 인텔 CPU를 지원하게 되면서 다른 플랫폼 포팅에 대한 기반을 다졌기 때문에, ARM과 같은 새로운 프로세서를 지원하는 속도가 점점 빨라질 것이다. 마치 리눅스가 그랬던 것처럼.&lt;/p&gt;
+&lt;p&gt;내 경우 가끔 이런 기조 연설을 만나면 내용과 다르게, 프리젠테이션 자료의 화면 구성과 진행 방식도 꽤 유심히 살펴본다. 파워포인트를 이용해 &amp;lsquo;제목 + 목록&amp;rsquo; 형태로 작성하는 구질구질한 프리젠테이션을 벗어나기 위해서는 역시, 모든 일이 그렇지만, 양질의 고급 콘텐트를 자주 보고 느끼는 수 밖에 없는 것 같다.&lt;/p&gt;
+&lt;p&gt;한동안 하드웨어 / 소프트웨어적으로 아류 디자인이 범람할 것 같기도 하다. 그리고 그 중 하나는 나일지도 모르고&amp;hellip;&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.engadget.com/2007/01/09/live-from-macworld-2007-steve-jobs-keynote/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Live from Macworld 2007: Steve Jobs keynote&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.engadget.com/2007/01/09/the-apple-iphone/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The Apple iPhone runs OS X&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.linuxdevices.com/news/NS7732079254.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Apple embeds Mac OS X in phone, set-top box&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>E-페이퍼에 GTK&#43; 사용</title>
+      <link>/2006/12/18/2006-12-18-gtk-for-epaper-device/</link>
+      <pubDate>Mon, 18 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/18/2006-12-18-gtk-for-epaper-device/</guid>
+      <description>&lt;p&gt;iRex 테크놀로지에서 만든 E-페이퍼, 종이처럼 구부러지면서 컴퓨터 화면처럼 동작하는 디스플레이 장치에 들어가는 소프트웨어 개발자들이 GTK+ 라이브러리를 이용한다고 한다. 여러가지 이유로 GTK+ 라이브러리를 거의 모든 회사 프로젝트에 이용하고 있는 입장으로 반갑기도 하고, 놀라운 점도 있다.&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://pvanhoof.be/blog/index.php/2006/12/03/irex-technologies-is-using-gtk-for-an-epaper-device&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;iRex technologies is using gtk+ for an epaper device&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>애플의 새 일루미누스(Illuminous) 인터페이스</title>
+      <link>/2006/12/18/2006-12-18-apple-illuminous-interface/</link>
+      <pubDate>Mon, 18 Dec 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/12/18/2006-12-18-apple-illuminous-interface/</guid>
+      <description>&lt;p&gt;애플(Apple) Mac OS X의 아쿠아(Aqua) 인터페이스가 일루미누스(Illuminous) 인터페이스로 교체된다고 한다. 이미 iTunes 7에서 일부분 선보였듯이, 전체적으로 어둡고 반투명의 검은 유리 같은 패널 위에 심플한 버튼으로 구성되었다. 윈도우즈 비스타의 에어로(Aero)와 비교될 것도 같지만, 언제나 그렇듯이 평범한 것도 애플이 하면 혁신으로 취급받게 되는 것 같다.&lt;/p&gt;
+&lt;p&gt;전혀 허락없이 무단 링크하는 스크린샷은 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/d0045736_08120648.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;iPhoto’s Adjust Window&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/d0045736_08121590.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Front Row’s sliding dark glass&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/d0045736_08122649.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;iTunes 7’s new darker appearance&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/d0045736_08123427.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Aperture 1.5’s navigation window&lt;/p&gt;
+&lt;p&gt;참고:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.appleology.com/2006/12/10/leopards-illuminating-graphical-user-interface-illuminous/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Leopard’s Illuminating Graphical User Interface: Illuminous&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://www.applegazette.com/mac/rumor-aqua-to-be-replaced-with-illuminous/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;RUMOR: Aqua to be replaced with Illuminous&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Crazy Multi-Input Touch Screen</title>
+      <link>/2006/02/18/2006-02-18-crazy-multi-input-touch-screen/</link>
+      <pubDate>Sat, 18 Feb 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/02/18/2006-02-18-crazy-multi-input-touch-screen/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://www.youtube.com/watch?v=zp-y3ZNaCqs&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;YouTube - Crazy Multi-Input Touch Screen&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;마이너리티 리포트와 같은 인터페이스를 가능케 하는 멀티 입력 터치 스크린 데모 비디오 영상이다. 사실 이 동영상에서 더 궁금한 점은 장치가 아니라 동작하는 소프트웨어 운영체제와 프로그램이 아닐까&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

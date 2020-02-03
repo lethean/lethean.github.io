@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Network | 대체로 무해함</title>
+    <link>/tags/network/</link>
+      <atom:link href="/tags/network/index.xml" rel="self" type="application/rss+xml" />
+    <description>Network</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 10 Feb 2015 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Network</title>
+      <link>/tags/network/</link>
+    </image>
+    
+    <item>
+      <title>리눅스에서 이더넷 프레임 보내고 받기</title>
+      <link>/2015/02/10/2015-02-10-send-receive-raw-ethernet-frames-with-custom-ether-type-in-linux/</link>
+      <pubDate>Tue, 10 Feb 2015 00:00:00 +0000</pubDate>
+      <guid>/2015/02/10/2015-02-10-send-receive-raw-ethernet-frames-with-custom-ether-type-in-linux/</guid>
+      <description>&lt;p&gt;다음에 진행할 프로젝트를 위해 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Ethernet_frame&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이더넷 프레임&lt;/a&gt;
+ 패킷을 리눅스에서 소켓 API를 이용해 직접 읽고 쓰는 방법이 필요해서 조사한 결과를 남겨봅니다.&lt;/p&gt;
+&lt;p&gt;언제나처럼 구글의 도움을 받아 발견한 &amp;ldquo;
+&lt;a href=&#34;https://austinmarton.wordpress.com/2012/06/03/receiving-raw-packets-in-linux-without-pcap/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Receiving raw packets in Linux without pcap&lt;/a&gt;
+&amp;rdquo; 글의 코드를 참고해서 샘플로 구현한 소스는 
+&lt;a href=&#34;https://gist.github.com/lethean/5fb0f493a1968939f2f7&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;여기&lt;/a&gt;
+에서 확인할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;윈본 소스와 다른 점은, 알려져 있는 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/EtherType&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이더넷 타입&lt;/a&gt;
+ 대신 자신만의 고유 타입을 사용하고, 브로드캐스트 주소도 인식하면서 간단한 메시지를 전송하거나 수신합니다.&lt;/p&gt;
+&lt;p&gt;컴파일 방법은 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ gcc -Wall -o ethcom ethcom.c
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;사용법은 &lt;code&gt;-l&lt;/code&gt; 옵션을 주면 수신 모드로 동작하고, &lt;code&gt;-i&lt;/code&gt; 옵션으로 네트워크 인터페이스 이름(기본 &lt;code&gt;eth0&lt;/code&gt;)을 지정할 수 있고, &lt;code&gt;-d&lt;/code&gt; 옵션으로 전송할 대상 주소(기본 &lt;code&gt;ff:ff:ff:ff:ff:ff&lt;/code&gt;)를 지정할 수 있습니다. 예를 들어 다음과 같이 입력하면 &amp;lsquo;Hello, World&amp;rsquo; 문자열을 이더넷 네트워크에 브로드캐스트합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo ./ethcom &amp;quot;Hello, World&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다른 장비에서 수신 모드로 실행하면 다음과 같이 문자열을 수신합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo ./ethcom -l
+60:a4:4c:xx:xx:xx -&amp;gt; ff:ff:ff:ff:ff:ff Hello, World
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고로, 실행할 때 반드시 루트(root) 권한이어야 합니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>리눅스 IP 주소 / 링크 상태 변경 여부 감지하기</title>
+      <link>/2012/03/19/2012-03-19-detect-change-of-ip-address-and-link-status-in-linux/</link>
+      <pubDate>Mon, 19 Mar 2012 00:00:00 +0000</pubDate>
+      <guid>/2012/03/19/2012-03-19-detect-change-of-ip-address-and-link-status-in-linux/</guid>
+      <description>&lt;p&gt;리눅스에서 IP 주소가 변경되었거나 링크 상태 변경 여부(예를 들어 랜선이 꽂히거나 빠졌을때)를 자동으로 감지하는 C 코드입니다. &lt;code&gt;ifconfig&lt;/code&gt; 명령등의 결과를 파싱하는 방법이 아닌 리눅스 커널 &lt;code&gt;rtnetlink(7)&lt;/code&gt; 프로토콜과 &lt;code&gt;getifaddrs()&lt;/code&gt; 함수를 이용해 직접 처리합니다. 참조한 소스는 여러군데가 있는데 모두 구글링이 가능하므로 결과물만 기록으로 남겨둡니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+#include &amp;lt;errno.h&amp;gt;
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;sys/types.h&amp;gt;
+#include &amp;lt;sys/socket.h&amp;gt;
+#include &amp;lt;ifaddrs.h&amp;gt;
+#include &amp;lt;net/if.h&amp;gt;
+#include &amp;lt;netdb.h&amp;gt;
+#include &amp;lt;netinet/in.h&amp;gt;
+#include &amp;lt;linux/netlink.h&amp;gt;
+#include &amp;lt;linux/rtnetlink.h&amp;gt;
+
+static int
+create_sock (const char *nic)
+{
+  struct sockaddr_nl addr;
+  int                sock;
+
+  memset (&amp;amp;addr, 0, sizeof (addr));
+  addr.nl_family = AF_NETLINK;
+  addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR | RTMGRP_IPV6_IFADDR;
+
+  sock = socket (PF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+  if (sock &amp;lt; 0)
+    {
+      fprintf (stderr, &amp;quot;failed to open NETLINK_ROUTE socket for %s - %s(%d)&amp;quot;,
+               nic, strerror (errno), errno);
+      return -1;
+    }
+
+  if (bind (sock, (struct sockaddr *)&amp;amp;addr, sizeof(addr)) &amp;lt; 0)
+    {
+      fprintf (stderr, &amp;quot;failed to bind NETLINK_ROUTE socket for %s - %s(%d)&amp;quot;,
+                 nic, strerror (errno), errno);
+      close (sock);
+      return -1;
+    }
+
+  return sock;
+}
+
+static int
+ip_changed (int         sock,
+            const char *nic)
+{
+  struct nlmsghdr   *nlh;
+  char               buffer[4096];
+  int                len;
+  int                idx;
+  int                found;
+
+  len = recv (sock, buffer, sizeof (buffer), 0);
+  if (len &amp;lt;= 0)
+    {
+      fprintf (stderr, &amp;quot;NETLINK_ROUTE socket recv() failedn&amp;quot;);
+      return -1;
+    }
+
+  found = 0;
+  idx = if_nametoindex (nic);
+
+  for (nlh = (struct nlmsghdr *)buffer;
+       NLMSG_OK (nlh, len);
+       nlh = NLMSG_NEXT (nlh, len))
+    {
+      if (nlh-&amp;gt;nlmsg_type == NLMSG_DONE)
+        break;
+      if (nlh-&amp;gt;nlmsg_type == NLMSG_ERROR)
+        continue;
+      if (!(NLMSG_OK (nlh, len)))
+        continue;
+
+      switch (nlh-&amp;gt;nlmsg_type)
+        {
+        case RTM_NEWADDR:
+          {
+            struct ifaddrmsg *ifa = (struct ifaddrmsg *)NLMSG_DATA (nlh);
+
+            if (ifa-&amp;gt;ifa_index == idx)
+              found = 1;
+          }
+          break;
+        case RTM_NEWLINK:
+          {
+            struct ifinfomsg *ifi = (struct ifinfomsg *)NLMSG_DATA (nlh);
+
+            if (ifi-&amp;gt;ifi_index == idx)
+              found = 1;
+          }
+          break;
+        default:
+          break;
+        }
+    }
+
+  return found;
+}
+
+static int
+get_nic_addr (const char     *nic,
+              struct ifaddrs *ifaddr,
+              int             wanted_family,
+              char           *host,
+              int             host_len,
+              int            *active)
+{
+  struct ifaddrs *ifa;
+
+  for (ifa = ifaddr; ifa != NULL; ifa = ifa-&amp;gt;ifa_next)
+    {
+      int family;
+      int s;
+
+      if (ifa-&amp;gt;ifa_addr == NULL)
+        continue;
+
+      if (strcmp (ifa-&amp;gt;ifa_name, nic))
+        continue;
+
+      /* Skip unwanted families. */
+      family = ifa-&amp;gt;ifa_addr-&amp;gt;sa_family;
+      if (family != wanted_family)
+        continue;
+
+      *active = (ifa-&amp;gt;ifa_flags &amp;amp; IFF_RUNNING) ? 1 : 0;
+
+      s = getnameinfo (ifa-&amp;gt;ifa_addr,
+                       family == AF_INET ? sizeof (struct sockaddr_in) :
+                                           sizeof (struct sockaddr_in6),
+                       host,
+                       host_len,
+                       NULL,
+                       0,
+                       NI_NUMERICHOST);
+      if (s != 0)
+        {
+          fprintf (stderr, &amp;quot;failed to getnameinfo() for &#39;%s - %s(%d)&amp;quot;,
+                   ifa-&amp;gt;ifa_name, strerror (errno), errno);
+          continue;
+        }
+
+      /* Get the address of only the first network interface card. */
+      return 1;
+    }
+
+  return 0;
+}
+
+static void
+print_ip (const char *nic)
+{
+  struct ifaddrs *ifaddr;
+  char            addr[NI_MAXHOST];
+  int             active;
+
+  if (getifaddrs (&amp;amp;ifaddr) == -1)
+    {
+      fprintf (stderr, &amp;quot;failed to getifaddrs() - %s(%d)&amp;quot;, strerror (errno), errno);
+      return;
+    }
+
+  if (!get_nic_addr (nic, ifaddr, AF_INET, addr, sizeof (addr), &amp;amp;active))
+    if (!get_nic_addr (nic, ifaddr, AF_INET6, addr, sizeof (addr), &amp;amp;active))
+      {
+        strcpy (addr, &amp;quot;127.0.0.1&amp;quot;);
+        active = 0;
+      }
+
+  freeifaddrs (ifaddr);
+
+  fprintf (stdout, &amp;quot;%s is %s (link %s)n&amp;quot;,
+           nic, addr, active ? &amp;quot;active&amp;quot; : &amp;quot;inactive&amp;quot;);
+}
+
+int
+main (void)
+{
+  char *nic = &amp;quot;eth0&amp;quot;;
+  int   sock;
+
+  print_ip (nic);
+
+  sock = create_sock (nic);
+  if (sock &amp;lt; 0)
+    return -1;
+
+  while (1)
+    {
+      int ret;
+
+      ret = ip_changed (sock, nic);
+      if (ret &amp;lt; 0)
+        return -1;
+
+      if (ret)
+        print_ip (nic);
+    }
+
+  close (sock);
+
+  return 0;
+}
+
+/*
+  Local Variables:
+   mode:c
+   c-file-style:&amp;quot;gnu&amp;quot;
+   indent-tabs-mode:nil
+  End:
+  vim:autoindent:filetype=c:expandtab:shiftwidth=2:softtabstop=2:tabstop=8
+*/
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고로 위 소스에서 네트웍 인터페이스 설정 변경을 감지하기 위해 사용한 소켓 파일 디스크립터(socket file descriptor)는 &lt;code&gt;select()&lt;/code&gt; / &lt;code&gt;poll()&lt;/code&gt; 등을 이용해 비동기적으로 감시하는 것도 가능합니다. 당연하지만, 
+&lt;a href=&#34;/2009/09/21/using-glib-mainloop/&#34;&gt;GLib 메인루프&lt;/a&gt;
+의 &lt;code&gt;g_io_add_watch()&lt;/code&gt; 등을 이용해도 됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATE 2012-03-21]&lt;/strong&gt; &lt;code&gt;rtnetlink(7)&lt;/code&gt; 프로토콜의 기반이 되는 &lt;code&gt;netlink(7)&lt;/code&gt; 프로토콜에 대해 더 자세히 알고 싶다면 
+&lt;a href=&#34;http://www.infradead.org/~tgr/libnl/doc/core.html#core_netlink_fundamentals&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Netlink 라이브러리의 Netlink 프로토콜 기초 문서&lt;/a&gt;
+를 참고하기 바랍니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>구글 프로토콜 버퍼(Protocol Buffers)</title>
+      <link>/2010/02/12/2010-02-12-google-protocol-buffers/</link>
+      <pubDate>Fri, 12 Feb 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/02/12/2010-02-12-google-protocol-buffers/</guid>
+      <description>&lt;p&gt;구글 
+&lt;a href=&#34;http://code.google.com/p/protobuf/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;프로토콜 버퍼&lt;/a&gt;
+ 라이브러리에 대해서는 몇 번 
+&lt;a href=&#34;/2010/01/29/0mq-a-new-approach-to-messaging/&#34;&gt;언급&lt;/a&gt;
+을 한 적이 있는데, 관심만 있고 아직 프로젝트에 사용은 못해보고 있었습니다. 그 이유는 프로젝트 대부분이 C 언어를 사용하는데, &lt;strong&gt;공식적으로&lt;/strong&gt; 지원하는 언어에는 없었기 때문입니다.&lt;/p&gt;
+&lt;p&gt;그런데 오늘 우분투 패키지를 업데이트하다가 
+&lt;a href=&#34;http://code.google.com/p/protobuf-c/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;protobuf-c&lt;/a&gt;
+ 
+&lt;a href=&#34;http://packages.ubuntu.com/lucid/protobuf-c-compiler&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;우분투 패키지&lt;/a&gt;
+가 있어서 확인해보니, 프로토콜 버퍼 데이터를 읽고 쓸 수 있는 런타임 라이브러리와 *.[hc] 파일을 생성하는 컴파일러가 들어있군요. 그래서 아예 구글 코드 사이트에 있는 
+&lt;a href=&#34;http://code.google.com/hosting/search?q=label:protobuf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;protobuf 관련 프로젝트 목록&lt;/a&gt;
+을 훑어보니, C 언어 뿐 아니라 다양한 언어에 대한 바인딩을 지원할 뿐 아니라 이클립스 플러그인, 와이어샤크(wireshark) 플러그인 등처럼 유용한 도구도 많이 찾을 수 있었습니다.&lt;/p&gt;
+&lt;p&gt;이런 경우 언제나 느끼는 거지만, 요즘은 노하우(know-how)보다 노훼어(know-where)가 더 필요한 세상인 것 같습니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>0MQ: 메시지 시스템 라이브러리</title>
+      <link>/2010/01/29/2010-01-29-0mq-a-new-approach-to-messaging/</link>
+      <pubDate>Fri, 29 Jan 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/01/29/2010-01-29-0mq-a-new-approach-to-messaging/</guid>
+      <description>&lt;p&gt;
+&lt;a href=&#34;http://lwn.net/Articles/370307/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN.net&lt;/a&gt;
+에서 
+&lt;a href=&#34;http://www.zeromq.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;0MQ&lt;/a&gt;
+라는 매우 흥미로운 라이브러리를 소개하길래 조금 자세히 살펴 보았습니다.&lt;/p&gt;
+&lt;p&gt;일단 소개부터 하자면, BSD 소켓 비슷한 API를 지원하는 경량 메시지 시스템입니다. 소켓 비슷한 API라고 하지만, 소켓보다 사용하기 훨씬 편합니다. 실행 중 차지하는 용량이 1~20 KB 정도밖에 안될 뿐 아니라, 처음 개발이 실시간 증권 정보 시스템의 일부였기 때문인지 매우 빠릅니다. 네트워크 프로토콜은 TCP, UDP, 
+&lt;a href=&#34;http://en.wikipedia.org/wiki/Pragmatic_General_Multicast&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PGM(Pragmatic General Multicast)&lt;/a&gt;
+, IPC는 물론 쓰레드간 통신도 지원합니다. 지원하는 메시징 모델은 일대일 통신에 유용한 요청/응답(request/reply), 일대다 통신에 좋은 출판/가입(publish/subscribe), 스트리밍(streaming) 등을 지원합니다.&lt;/p&gt;
+&lt;p&gt;대신 이 라이브러리는 메시지 내용 자체에는 관여하지 않습니다. 메시지 내용은 단순한 바이너리 데이터로 취급하기 때문에 개발자가 직접 정의하거나 
+&lt;a href=&#34;http://code.google.com/apis/protocolbuffers&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;구글 프로토콜 버퍼&lt;/a&gt;
+ 같은 전용 라이브러리를 사용해야 합니다. (참고로 구글 프로토콜 버퍼는 좋은 라이브러리이지만,  C++, Java, Python만 지원하고 정작 제가 사용하는 주언어인 C 언어는 지원하지 않아 검토만 하고 실제 프로젝트에서는 사용해 본 적이 없습니다) 즉, 인증 / 암호화 / 압축 / 시리얼라이제이션 등은 개발자가 알아서 하면 됩니다.&lt;/p&gt;
+&lt;p&gt;다양한 언어와 플랫폼을 지원하기 때문에 어떤 프로젝트에서도 향후 확장성이나 호환성을 걱정하지 않고 사용할 수 있습니다. 지원하는 운영체제는  Linux, Windows, Mac OS X, Solaris, AIX, FreeBSD, HP-UX, OpenBSD, OpenVMS, QNX Neutrino 등이고, 아키텍쳐는 i386, x86-64, Sparc, Itanium, Alpha, ARM 등입니다.  사용 가능한 언어는 현재 C, C++, Common Lisp, Java, Python, Ruby 등인데 PHP 같은 웹 개발 언어까지 가능하다면 금상첨화일 것 같습니다.&lt;/p&gt;
+&lt;p&gt;아직 직접 사용해보진 않았으나 긍정적으로 다음 프로젝트 또는 기능 추가시 사용해볼 예정인데, 몇 가지 이유를 적어보면 다음과 같습니다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;멀티플랫폼을 고려해야 하는 프로젝트에서는 모듈간 통신에 어쩔 수 없이 가장 일반적인 TCP/UDP 소켓을 사용합니다. 그런데 아무리 경험많은 개발자라도 매번 통신 모듈을 새로 개발하는 것은 부담스러운데, 이 라이브러리는 이런 고민을 말끔히 해결해주는 동시에 다양한 메시징 모델을 이용하여  응용 프로그램 자체에만 전념할 수 있게 도와줍니다.&lt;/li&gt;
+&lt;li&gt;네트워크 상의 클라이언트-서버 방식 뿐 아니라, 하나의 시스템이 여러 역할별로 프로세스가 할당되어 구성되는 경우도 많습니다. 이 경우 성능을 위해 IPC나 PGM 등과 같은 프로토콜을 사용하다가, 나중에 분산 시스템으로 구성이 변경되더라도 프로토콜만 다시 TCP로 바꾸어 주면 되기 때문에 확장성이 매우 좋습니다. 또한 LWN.net 기사에서도 언급한 것처럼 게이트웨이나 프록시 역할을 하는 기능을 추가하는 것도 매우 쉬어집니다. 이를 응용할 수 있는 것도 매우 많아지는데, 예를 들어 사용자가 여러번 프로그램을 실행해도 한 개의 인스턴스만 존재하도록 하고 싶을때, 간단하게 IPC나 루프백 통신을 이용해 인스턴스 여부를 검사하면 되고, 더 나아가 기존 인스턴스에게 인자를 넘겨주는 것도 가능합니다. (
+&lt;a href=&#34;http://live.gnome.org/LibUnique&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Unique&lt;/a&gt;
+ 라이브러리 참고)&lt;/li&gt;
+&lt;li&gt;게다가 이 라이브러리에서 지원하는 쓰레드간 통신을 이용하면, 물론 뮤텍스나 큐를 사용하는게 더 효율이 좋겠지만, 처음에는 쓰레드로 만들었다가 여러가지 이유로 나중에 프로세스로 분리하거나, 아예 다른 호스트에서 네트워크로 통신해야할 경우에도 쉽게 이전이 가능합니다. 또한 큐는 단순한 일대일 통신에만 사용할 수 있지만, 출판/가입 모델 등과 같이 한 쓰레드가 여러 쓰레드에게 메시지를 전송하는 경우(예를 들어 버스 또는 시그널 방송)도 쉽게 구현할 수 있습니다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+&lt;a href=&#34;http://lwn.net/Articles/370307/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN.net&lt;/a&gt;
+ 페이지를 보시면 각 언어별로 샘플 코드가 나열되어 있으므로 기본적인 사용법이 궁금하신 분은 직접 확인해보시기 바랍니다. 아, 물론 LGPL 오픈소스입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>SSH 디렉토리 백업하기</title>
+      <link>/2010/01/01/2010-01-01-backup-directories-using-ssh/</link>
+      <pubDate>Fri, 01 Jan 2010 00:00:00 +0000</pubDate>
+      <guid>/2010/01/01/2010-01-01-backup-directories-using-ssh/</guid>
+      <description>&lt;p&gt;시간이 갈수록 자주 사용하는 명령어를 기억하지 못해 동일한 검색어로 구글링을 반복하는 경우가 점점 많아져서, 그런 수고를 덜기 위해 여기에 적어두는 글입니다.&lt;/p&gt;
+&lt;p&gt;SSH 원격 셸 명령어를 이용하여 디렉토리 전체를 복사하고자 할 때, 특히 파일의 수정일시, 권한, 심볼릭 링크 등을 그대로 이전하고자 할때 다음과 같이 실행하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ tar czpf - . | ssh lethean@hades &amp;quot;tar xzpvf - -C /home/lethean/backup&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 명령어는 현재 디렉토리의 모든 내용을 그대로 &lt;code&gt;hades&lt;/code&gt; 서버에 &lt;code&gt;lethean&lt;/code&gt; 계정으로 접속해서 &lt;code&gt;/home/lethean/backup&lt;/code&gt; 디렉토리에 복사합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;[UPDATED]&lt;/strong&gt; 네트웍 속도가 충분하고 CPU 점유율을 낮춘 상태로 빨리 복사하고 싶다면 다음과 같이 압축 옵션을 사용하지 않아도 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ tar cpf - . | ssh lethean@hades &amp;quot;tar xpvf - -C /home/lethean/backup&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;:)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>tcpdump를 이용한 네트워크 사용량 측정하기</title>
+      <link>/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/</link>
+      <pubDate>Tue, 15 Dec 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/12/15/2009-12-15-network-traffic-analysis-using-tcpdump/</guid>
+      <description>&lt;p&gt;업무상 실제 패킷 사용량을 측정할 필요때문에 여러가지 도구를 찾던 중 마땅한 걸 찾지 못해 직접 측정한 방식을 정리해 봅니다. 물론 이보다 더 좋은 방법들이 당연히 있을테지만, tcpdump 프로그램만 겨우 사용할 수 있는 환경에서 측정하는 법을 정리한 문서를 찾지 못해 남겨둡니다.&lt;/p&gt;
+&lt;p&gt;우선 어떤 방식으로든 해당 장비에 tcpdump 프로그램을 설치합니다.&lt;/p&gt;
+&lt;p&gt;그리고 측정하려는 과정이나 단계가 시작하는 동시에 다음과 같이 tcpdump 프로그램을 실행합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ tcpdump -qvtttt dst xxx.xxx.xxx.xxx &amp;gt; packet-dump.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;여기서 &lt;code&gt;xxx.xxx.xxx.xxx&lt;/code&gt;는 측정에 사용할 대상 장비입니다. 즉, 위 예제는 특정 IP로 전송하는 패킷량만 캡쳐하여 &lt;code&gt;packet-dump.txt&lt;/code&gt; 파일에 저장합니다. 중요한 점은 앞의 옵션인데, 이 옵셥을 사용해야 아래에서 사용하는 스크립트가 분석할 수 있는 형태의 결과물로 저장됩니다. 그리고, 필요하다면, 저장한 파일을 리눅스 또는 맥 장비로 복사합니다.&lt;/p&gt;
+&lt;p&gt;저장한 파일을 &lt;code&gt;conv2csv.sh&lt;/code&gt; 스크립트를 이용해 엑셀이나 오픈오피스에서 읽어들일 수 있는 CSV 파일 형태로 변환합니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ./conv2csv.sh packet-dump.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;변환된 &lt;code&gt;packet-dump.csv&lt;/code&gt; 파일은 한 행에 &amp;lsquo;&lt;strong&gt;TIMESTAMP BYTES Kbps&lt;/strong&gt;&amp;rsquo; 형태로 각 초당 데이터가 저장되어 있습니다. 따라서 이 파일을 액셀이나 오픈오피스에서 공백(space)을 구분자로 해서 읽어들인 후 3번째 컬럼을 사용하면 됩니다. 참고로 여기서 측정한 크기는 IP/TCP/UDP 헤더까지 포함한 크기입니다.&lt;/p&gt;
+&lt;p&gt;다음은 이렇게 변환한 데이터를 구글 스프레드시트를 이용해 만든 차트입니다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/figures/packet-traffic-analysis.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;위에서 언급한 &lt;code&gt;conv2csv.sh&lt;/code&gt; 스크립트는 다음과 같습니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+
+CSVFILE=&amp;quot;$(dirname $1)/$(basename $1 .txt).csv&amp;quot;
+
+awk &#39;{ print $2, $18 }&#39; $1 | 
+  tr &#39;.)&#39; &#39;  &#39; | 
+  awk &#39;BEGIN { last = &amp;quot;&amp;quot;; sum = 0; } 
+       { if (last == $1) 
+           { sum += $3 } 
+         else 
+           { print last, sum, sum * 8 / 1000; 
+             last = $1; 
+             sum = $3; } 
+       }&#39; &amp;gt; $CSVFILE
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;;)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>우분투에서 이더넷 장치 변경시 장치번호 초기화</title>
+      <link>/2009/08/14/2009-08-14-init-eth-dev-number-when-lan-card-changes-in-ubuntu/</link>
+      <pubDate>Fri, 14 Aug 2009 00:00:00 +0000</pubDate>
+      <guid>/2009/08/14/2009-08-14-init-eth-dev-number-when-lan-card-changes-in-ubuntu/</guid>
+      <description>&lt;p&gt;이더넷 랜카드를 교체하거나, 온보드 이더넷을 CMOS에서 비활성화하고 랜카드만 사용하고 싶거나 또는 그 반대인 경우, 우분투에서 사용하는 udev 데몬은 자동으로 새로 인식한 이더넷 장치에게는 기존 이더넷 장치와 충돌하지 않도록 새로운 이더넷 번호를 할당하고 기억합니다. 예를 들면, eth0 장치가 없는데도, eth0 대신 eth1 장치로 인식하게 됩니다.&lt;/p&gt;
+&lt;p&gt;이는 장치마다 다른 설정을 장비 구성이 달라지더라도 고유하게 계속 유지할 수 있도록 하기 위함인데, 때로는 거슬리기도 하고, 당연히 eth0 장치가 있다고 가정하고 동작하는 프로그램이 있는 경우 골치 아파집니다.&lt;/p&gt;
+&lt;p&gt;이럴 때 쉽게 해결하는 방법은, 다음과 같이 이 정보를 기억하고 있는 파일을 지우고 재부팅하면 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo rm /etc/udev/rules.d/70-persistent-net.rules
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;참고로 CDROM 관련 설정도 있는데, 타이핑이 귀찮을 경우 다음과 같이 해도 됩니다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ sudo rm /etc/udev/rules.d/*
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;왜냐하면 건드리면 피곤해지는 udev 기본 설정 파일은 &lt;code&gt;/lib/udev/rules.d/&lt;/code&gt; 디렉토리에 따로 저장되기 때문입니다.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>SSH 포트 포워딩(port forwarding) &#43; 내부 네트웍 서버 접근하기</title>
+      <link>/2006/09/14/2006-09-14-ssh-port-forwarding-to-access-intranet-servers/</link>
+      <pubDate>Thu, 14 Sep 2006 00:00:00 +0000</pubDate>
+      <guid>/2006/09/14/2006-09-14-ssh-port-forwarding-to-access-intranet-servers/</guid>
+      <description>&lt;p&gt;외부에서 접속할 수 있는 서버가 master.emstone.com 이고, 접근하려고 하는 내부 네트웍 서버가 svn.emstone.com(192.168.0.143), 서비스가 Subversion 이라고 하면 다음과 같은 작업을 통해 외부에서 직접 접근이 가능하다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;우선 master.emstone.com 서버에 SSH 접속이 가능한 계정이 있어야 한다. (여기서는 lethean)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;현재 컴퓨터의 /etc/hosts 파일을 다음 내용을 추가한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;127.0.0.1 svn svn.emstone.com
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;내부 네트웍 서버 IP가 192.168.0.143 일 경우 다음과 같은 옵션으로 master.emstone.com 서버에 접속한다.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ssh lethean@master.emstone.com 
+    -L 3690:192.168.0.143:3690
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Subversion 작업을 하면 동작한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;원리는 이렇다. SSH 접속시 &amp;lsquo;-L&amp;rsquo; 옵션은, 로컬 장비(localhost:3690)의 특정 포트에 대한 연결을 접속한 서버(master.emstone.com)에서 접근 가능한 특정 IP 포트(192.168.0.143:3690)로 무조건 송신하고 그 결과를 다시 돌려받는다. 따라서 실제로는 로컬호스트에 대해 작업을 하는 것처럼 보이지만 SSH 연결을 통해 원격으로 동작하는 셈이다.&lt;/p&gt;
+&lt;p&gt;SSH 연결을 끊으면 당연히 더이상 동작하지 않게 된다.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
