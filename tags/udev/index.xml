@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Udev | 대체로 무해함</title>
-    <link>/tags/udev/</link>
-      <atom:link href="/tags/udev/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/udev/</link>
+      <atom:link href="https://lethean.github.io/tags/udev/index.xml" rel="self" type="application/rss+xml" />
     <description>Udev</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Sun, 29 Jan 2012 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Udev</title>
-      <link>/tags/udev/</link>
+      <link>https://lethean.github.io/tags/udev/</link>
     </image>
     
     <item>
       <title>모니터 없이 X 서버 실행 후 나중에 모니터 연결해도 화면이 안보인다면</title>
-      <link>/2012/01/29/setup-new-connected-monitors-automatically-after-starting-x-server-without-connected-monitors/</link>
+      <link>https://lethean.github.io/2012/01/29/setup-new-connected-monitors-automatically-after-starting-x-server-without-connected-monitors/</link>
       <pubDate>Sun, 29 Jan 2012 00:00:00 +0000</pubDate>
-      <guid>/2012/01/29/setup-new-connected-monitors-automatically-after-starting-x-server-without-connected-monitors/</guid>
+      <guid>https://lethean.github.io/2012/01/29/setup-new-connected-monitors-automatically-after-starting-x-server-without-connected-monitors/</guid>
       <description>&lt;p&gt;제목이 조금 길지만, 이 글의 내용은 제목 그대로입니다. (참고로, 이 글은 최근 인텔 그래픽 칩셋을 대상으로 작성되었습니다. 즉, 다른 그래픽 칩셋 드라이버는 어떻게 동작하는지 확인을 안 해 보았다는 의미입니다)&lt;/p&gt;
 &lt;p&gt;요즘 X 서버는 연결된 모니터가 없고, &lt;code&gt;/etc/X11/xorg.conf&lt;/code&gt; 파일에 수직/수평 주파수가 정의되어 있지 않다고 하더라도 일단 정상적으로 실행됩니다. 다만, 초기 해상도가 320x200 처럼 매우 작을 수 있습니다. 그런데 나중에 필요에 의해 모니터를 연결했는데 화면이 보이지 않는 경우가 발생합니다. 이 경우, 네트웍으로 접속해서 다음 명령어를 실행합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ export DISPLAY=:0.0
@@ -40,9 +40,9 @@ xrandr --dpi 96
     
     <item>
       <title>GUDev 사용하기</title>
-      <link>/2011/03/07/using-gudev/</link>
+      <link>https://lethean.github.io/2011/03/07/using-gudev/</link>
       <pubDate>Mon, 07 Mar 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/03/07/using-gudev/</guid>
+      <guid>https://lethean.github.io/2011/03/07/using-gudev/</guid>
       <description>&lt;p&gt;이제는 리눅스 데스크탑 뿐 아니라 임베디드 시스템에서도 당연하게 사용하는 
 &lt;a href=&#34;http://en.wikipedia.org/wiki/Udev&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;udev&lt;/a&gt;
  시스템은 단순히 장치 파일을 자동으로 생성해 주는 역할 뿐 아니라 여러 핫플러그(hot-plug) 방식 장치를 감지하는데도 유용하게 사용됩니다. 비단 키보드, 마우스 같은 입력 장치 뿐 아니라 USB 플래시, SATA / IDE / SCSI 하드디스크, CD-RW 등과 같은 저장장치가 삽입되었거나 제거되었을 경우 쉽게 감지할 수 있게 도와줍니다.&lt;/p&gt;
@@ -303,9 +303,9 @@ main (int    argc,
     
     <item>
       <title>우분투에서 이더넷 장치 변경시 장치번호 초기화</title>
-      <link>/2009/08/14/init-eth-dev-number-when-lan-card-changes-in-ubuntu/</link>
+      <link>https://lethean.github.io/2009/08/14/init-eth-dev-number-when-lan-card-changes-in-ubuntu/</link>
       <pubDate>Fri, 14 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/14/init-eth-dev-number-when-lan-card-changes-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2009/08/14/init-eth-dev-number-when-lan-card-changes-in-ubuntu/</guid>
       <description>&lt;p&gt;이더넷 랜카드를 교체하거나, 온보드 이더넷을 CMOS에서 비활성화하고 랜카드만 사용하고 싶거나 또는 그 반대인 경우, 우분투에서 사용하는 udev 데몬은 자동으로 새로 인식한 이더넷 장치에게는 기존 이더넷 장치와 충돌하지 않도록 새로운 이더넷 번호를 할당하고 기억합니다. 예를 들면, eth0 장치가 없는데도, eth0 대신 eth1 장치로 인식하게 됩니다.&lt;/p&gt;
 &lt;p&gt;이는 장치마다 다른 설정을 장비 구성이 달라지더라도 고유하게 계속 유지할 수 있도록 하기 위함인데, 때로는 거슬리기도 하고, 당연히 eth0 장치가 있다고 가정하고 동작하는 프로그램이 있는 경우 골치 아파집니다.&lt;/p&gt;
 &lt;p&gt;이럴 때 쉽게 해결하는 방법은, 다음과 같이 이 정보를 기억하고 있는 파일을 지우고 재부팅하면 됩니다.&lt;/p&gt;
@@ -320,9 +320,9 @@ main (int    argc,
     
     <item>
       <title>리눅스 커널에서 devfs 제거</title>
-      <link>/2006/07/03/devfs-removed-from-linux-kernel/</link>
+      <link>https://lethean.github.io/2006/07/03/devfs-removed-from-linux-kernel/</link>
       <pubDate>Mon, 03 Jul 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/07/03/devfs-removed-from-linux-kernel/</guid>
+      <guid>https://lethean.github.io/2006/07/03/devfs-removed-from-linux-kernel/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://kerneltrap.org/node/6744&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Linux: The Case For Removing devfs&lt;/a&gt;
 &lt;/p&gt;

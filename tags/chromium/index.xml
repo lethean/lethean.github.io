@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Chromium | 대체로 무해함</title>
-    <link>/tags/chromium/</link>
-      <atom:link href="/tags/chromium/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/chromium/</link>
+      <atom:link href="https://lethean.github.io/tags/chromium/index.xml" rel="self" type="application/rss+xml" />
     <description>Chromium</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Mon, 03 Aug 2009 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Chromium</title>
-      <link>/tags/chromium/</link>
+      <link>https://lethean.github.io/tags/chromium/</link>
     </image>
     
     <item>
       <title>우분투 구글 크롬 브라우저</title>
-      <link>/2009/08/03/chromium-browser-in-ubuntu/</link>
+      <link>https://lethean.github.io/2009/08/03/chromium-browser-in-ubuntu/</link>
       <pubDate>Mon, 03 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/03/chromium-browser-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2009/08/03/chromium-browser-in-ubuntu/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.google.com/chrome&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;구글 크롬(Google Chrome)&lt;/a&gt;
 의 리눅스 버전 오픈소스 프로젝트인 크로미엄(Chromium)을 우분투에 설치하고 사용하고 있습니다. 

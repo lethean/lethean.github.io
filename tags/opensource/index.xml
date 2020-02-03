@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>OpenSource | 대체로 무해함</title>
-    <link>/tags/opensource/</link>
-      <atom:link href="/tags/opensource/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/opensource/</link>
+      <atom:link href="https://lethean.github.io/tags/opensource/index.xml" rel="self" type="application/rss+xml" />
     <description>OpenSource</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Fri, 29 Jan 2010 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>OpenSource</title>
-      <link>/tags/opensource/</link>
+      <link>https://lethean.github.io/tags/opensource/</link>
     </image>
     
     <item>
       <title>0MQ: 메시지 시스템 라이브러리</title>
-      <link>/2010/01/29/0mq-a-new-approach-to-messaging/</link>
+      <link>https://lethean.github.io/2010/01/29/0mq-a-new-approach-to-messaging/</link>
       <pubDate>Fri, 29 Jan 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/01/29/0mq-a-new-approach-to-messaging/</guid>
+      <guid>https://lethean.github.io/2010/01/29/0mq-a-new-approach-to-messaging/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://lwn.net/Articles/370307/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LWN.net&lt;/a&gt;
 에서 
@@ -45,9 +45,9 @@
     
     <item>
       <title>Pango 1.15.2 한글 표시 문제</title>
-      <link>/2006/12/23/pango-1152-hangul-display-problem/</link>
+      <link>https://lethean.github.io/2006/12/23/pango-1152-hangul-display-problem/</link>
       <pubDate>Sat, 23 Dec 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/12/23/pango-1152-hangul-display-problem/</guid>
+      <guid>https://lethean.github.io/2006/12/23/pango-1152-hangul-display-problem/</guid>
       <description>&lt;p&gt;한글 메일링 리스트에서 pango 라이브러리 최적화 논의가 오고 가더니 그 결과가 최신 버전에 이미 반영된 모양이다. 엊그제(?) 우분투 개발 버전에 새로 1.15.2-0ubuntu1 버전 패키지가 올라왔는데, 릴리스 변동 사항에 포함되어 있었다. 문제는 몇몇 한글 글자가 흩어져서(?) 표시되는 현상이 발생하길래, 조금 있으면 버그가 수정되어 올라오겠지 기다리다가 참지 못하고 오늘 결국 직접 원인을 찾아보았더니, 의외로 빨리 해결책을 얻을 수 있었다.&lt;/p&gt;
 &lt;p&gt;그놈 버그질라에 이미 &amp;lsquo;
 &lt;a href=&#34;http://bugzilla.gnome.org/show_bug.cgi?id=388581&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Composing jamo is broken in pango-1.15.2&amp;rsquo;&lt;/a&gt;
@@ -58,9 +58,9 @@
     
     <item>
       <title>임베디드 시스템에 오픈 소스를 사용하면 좋은 이유</title>
-      <link>/2006/01/12/advantages-of-free-software-and-open-source-in-embedded-systems/</link>
+      <link>https://lethean.github.io/2006/01/12/advantages-of-free-software-and-open-source-in-embedded-systems/</link>
       <pubDate>Thu, 12 Jan 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/01/12/advantages-of-free-software-and-open-source-in-embedded-systems/</guid>
+      <guid>https://lethean.github.io/2006/01/12/advantages-of-free-software-and-open-source-in-embedded-systems/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://free-electrons.com/articles/reasons/en&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;임베디드 시스템에 오픈 소스를 사용하면 좋은 이유(Advantages of Free Software and Open Source in embedded systems)&lt;/a&gt;
 &lt;/p&gt;

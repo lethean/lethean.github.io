@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Subversion | 대체로 무해함</title>
-    <link>/tags/subversion/</link>
-      <atom:link href="/tags/subversion/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/subversion/</link>
+      <atom:link href="https://lethean.github.io/tags/subversion/index.xml" rel="self" type="application/rss+xml" />
     <description>Subversion</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Thu, 16 Jul 2009 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Subversion</title>
-      <link>/tags/subversion/</link>
+      <link>https://lethean.github.io/tags/subversion/</link>
     </image>
     
     <item>
       <title>우분투에서 서브버전 저장소 운영하기</title>
-      <link>/2009/07/16/manage-subversion-repositories-in-ubuntu/</link>
+      <link>https://lethean.github.io/2009/07/16/manage-subversion-repositories-in-ubuntu/</link>
       <pubDate>Thu, 16 Jul 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/07/16/manage-subversion-repositories-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2009/07/16/manage-subversion-repositories-in-ubuntu/</guid>
       <description>&lt;p&gt;회사에서 사용하는 버전 관리 시스템을 Git으로 이전하기 전에, 나중에 또 언젠가 다시 필요할 지 모르는 일이므로, 7년동안 운영해 왔던 Subversion 서버 구성과 운영 방식을 기록해 둡니다. 물론, 우분투 리눅스 환경이고 로컬 / 외부 네트웍 모두에서 svn.example.com 주소로 어디에서든 서브버전에 접근할 수 있도록 환경을 구성하는데 목적이 있습니다.&lt;/p&gt;
 &lt;p&gt;제일 먼저 서브버전 패키지를 설치합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ sudo apt-get install subversion
@@ -260,9 +260,9 @@ $ sudo /etc/init.d/apache2 restart
     
     <item>
       <title>GLib과 GTK&#43;도 Subversion에서 Git으로 이동</title>
-      <link>/2009/04/01/glib-gtk-moved-to-git/</link>
+      <link>https://lethean.github.io/2009/04/01/glib-gtk-moved-to-git/</link>
       <pubDate>Wed, 01 Apr 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/04/01/glib-gtk-moved-to-git/</guid>
+      <guid>https://lethean.github.io/2009/04/01/glib-gtk-moved-to-git/</guid>
       <description>&lt;p&gt;2009년 4월 1일을 기준으로 GNOME 프로젝트의 핵심이 되는 glib, gtk, pango, atk 프로젝트가 기존 서브버전에서 
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-March/msg00206.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;git으로 소스 버전 관리 시스템을 변경&lt;/a&gt;
 했습니다. 한동안 어떤 버전 관리 시스템을 사용할지 논의가 많았는데, 결국 대세를 거를 수는 없었던 모양입니다. 달라진 사용법은 
@@ -274,9 +274,9 @@ $ sudo /etc/init.d/apache2 restart
     
     <item>
       <title>서브버전 스위치 명령어 사용하기</title>
-      <link>/2009/02/06/using-subversion-switch-command/</link>
+      <link>https://lethean.github.io/2009/02/06/using-subversion-switch-command/</link>
       <pubDate>Fri, 06 Feb 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/02/06/using-subversion-switch-command/</guid>
+      <guid>https://lethean.github.io/2009/02/06/using-subversion-switch-command/</guid>
       <description>&lt;p&gt;서브버전(Subversion) 기반으로 개발할때 브랜치(branches) 작업은 빈번하게 발생합니다. 서브버전은 브랜치 작업을 효율적으로 수행할 수 있도록 스위치(switch) 명령어를 지원하는데, 생각보다 이 명령어를 활용하는 사람이 별로 없는 것 같아 간단하게 사용법을 소개하려 합니다. 여기서 소개하는 방법은 커맨드 라인 명령어를 사용하고 있지만 TortoiseSVN 등과 같은 GUI 프로그램을 이용해도 동일한 작업을 처리할 수 있습니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;현재 작업 중인 소스 트리를 그대로 이용하기&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;디스크 공간이 부족하거나 다른 브랜치 작업 내용을 잠시만 확인하고 수정할 필요가 있을 경우, 굳이 다른 브랜치를 새로 체크아웃(checkout) 할 필요 없이 현재 소스 트리를 변경만 하면 됩니다. 특히 방대한 전체 소스가 아닌 특정 디렉토리만 해당 브랜치의 디렉토리로 변경하면 시간도 절약됩니다.&lt;/p&gt;
@@ -306,9 +306,9 @@ svn switch $SVN/dooly/branches/cms-2.1-0-remote
     
     <item>
       <title>Subversion 서버 응답이 느린 문제</title>
-      <link>/2006/10/20/slow-subversion-server-response/</link>
+      <link>https://lethean.github.io/2006/10/20/slow-subversion-server-response/</link>
       <pubDate>Fri, 20 Oct 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/10/20/slow-subversion-server-response/</guid>
+      <guid>https://lethean.github.io/2006/10/20/slow-subversion-server-response/</guid>
       <description>&lt;p&gt;업무에 서브버전(Subversion)을 사용한지 오래 되었지만 가끔씩 서버(svnserve)가 늦게 응답을 주는 경우가 종종 있었다. 가끔씩 벌어지는 현상이고, 서버 데몬을 재시작하면 해결되는 문제라 무시하고 있다가 문득 구글링을 해보고 원인을 알았다.&lt;/p&gt;
 &lt;p&gt;서브버전은 사용자 인증을 위해 리눅스에서 &lt;code&gt;/dev/random&lt;/code&gt; 난수 생성 장치를 이용하는데, 엔트로피가 부족할 경우 채워질때까지 대기하기 때문에 발생하는 현상이다. 서버 장비는 키보드도 거의 사용안하고, IDE 디스크도 없기 때문에 난수 엔트로피를 채워줄 정보가 부족해서 발생하는 경우이다.&lt;/p&gt;
 &lt;p&gt;검색을 해보면 설정 옵션을 변경해서 다시 컴파일하라는 둥, 데비안 패키지에 길들여진 내게 무리한 방법만 제시하길래 그냥 다음과 같이 무식하고 단순하며 보안에 위험하다는 방법으로 해결했다.&lt;/p&gt;
@@ -321,9 +321,9 @@ svn switch $SVN/dooly/branches/cms-2.1-0-remote
     
     <item>
       <title>Git을 이용한 소스코드 관리</title>
-      <link>/2006/07/03/manage-source-code-using-git/</link>
+      <link>https://lethean.github.io/2006/07/03/manage-source-code-using-git/</link>
       <pubDate>Mon, 03 Jul 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/07/03/manage-source-code-using-git/</guid>
+      <guid>https://lethean.github.io/2006/07/03/manage-source-code-using-git/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www-128.ibm.com/developerworks/linux/library/l-git/?ca=dgr-lnxw07UsingGit&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&amp;lsquo;Manage source code using Git&amp;rsquo;&lt;/a&gt;
 &lt;/p&gt;

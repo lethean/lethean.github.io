@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Schedule | 대체로 무해함</title>
-    <link>/tags/schedule/</link>
-      <atom:link href="/tags/schedule/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/schedule/</link>
+      <atom:link href="https://lethean.github.io/tags/schedule/index.xml" rel="self" type="application/rss+xml" />
     <description>Schedule</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Sat, 20 Nov 2010 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Schedule</title>
-      <link>/tags/schedule/</link>
+      <link>https://lethean.github.io/tags/schedule/</link>
     </image>
     
     <item>
       <title>리눅스 데스크탑 반응속도 향상 패치 테스트</title>
-      <link>/2010/11/20/test-a-patch-to-improve-responsiveness-in-linux-desktop/</link>
+      <link>https://lethean.github.io/2010/11/20/test-a-patch-to-improve-responsiveness-in-linux-desktop/</link>
       <pubDate>Sat, 20 Nov 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/11/20/test-a-patch-to-improve-responsiveness-in-linux-desktop/</guid>
+      <guid>https://lethean.github.io/2010/11/20/test-a-patch-to-improve-responsiveness-in-linux-desktop/</guid>
       <description>&lt;p&gt;며칠전부터 리눅스 커뮤니티와 관련 뉴스 사이트에서 리눅스 데스크탑 반응속도(reponsiveness)를 획기적으로 향상시킨다는 
 &lt;a href=&#34;http://marc.info/?l=linux-kernel&amp;amp;m=128978361700898&amp;amp;w=2&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;233라인짜리 패치&lt;/a&gt;
 에 대한 
@@ -40,9 +40,9 @@ echo $(pidof X) &amp;gt; /mnt/cgroups/cpu/Xorg/tasks
     
     <item>
       <title>리눅스 커널 스케줄링 영역과 클래스</title>
-      <link>/2010/10/06/linux-kernel-scheduling-domains-and-classes/</link>
+      <link>https://lethean.github.io/2010/10/06/linux-kernel-scheduling-domains-and-classes/</link>
       <pubDate>Wed, 06 Oct 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/10/06/linux-kernel-scheduling-domains-and-classes/</guid>
+      <guid>https://lethean.github.io/2010/10/06/linux-kernel-scheduling-domains-and-classes/</guid>
       <description>&lt;p&gt;&lt;strong&gt;스케줄링 영역 (Scheduling Domain)&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;멀티 프로세서 시스템에서 스케줄러의 중요한 역할 중 하나는 모든 CPU의 부하를 균등하게 맞추는 일입니다. 이를 위해 스케줄러는 한 CPU에서 동작하던 태스크를 다른 CPU로 이동해야 하는 경우, 각 아키텍쳐의 특성을 고려해야 합니다.  왜냐하면, 한 CPU에서 동작하던 태스크를 다른 CPU로 옮기면(migration) 캐시 불일치 등으로 인한 오버헤드가 발생하는 것은 물론 아키텍쳐에 따라 심각한 성능 저하를 일으킬 수도 있기 때문입니다.[1]&lt;/p&gt;
 &lt;p&gt;예를 들어, 하이퍼 쓰레드 프로세서는 하나의 프로세서 안에 논리적인 CPU가 여러 개 포함된 구조이기 때문에 여러 논리 CPU는 모두 캐시와 메모리를 모두 공유합니다. 따라서 이 논리 CPU간에는 태스크를 이동하는데 오버헤드가 없습니다. SMP(Symmectric Multi Processor) 시스템이나 멀티 코어(Multi Core) 프로세서에는 하나의 물리 CPU 안에 한 개 이상의 CPU 코어가 장착되어 있습니다. 이 CPU 코어는 각각 캐시(cache)를 가지고 있지만, 메모리는 모두 공유합니다. 따라서 프로세서간 태스크 이동(migration)이 가능한 적을수록 좋은 성능을 얻을 수 있습니다. NUMA 아키텍쳐는 여러 노드로 구성되는데, 한 노드는 하나의 CPU와 메모리, 캐시로 구성됩니다. 그리고 한 CPU가 같은 노드의 메모리를 접근할 때는 속도가 다른 노드의 메모리를 접근할 때보다 훨씬 빠릅니다. 그러므로 CPU간 태스크 이동은 정책적으로 반드시 필요한 경우에만 일어나야 합니다. 최근 출시되는 프로세서는 대부분 멀티 코어이면서 각 프로세서 코어가 다시 하이퍼 쓰레드를 통해 논리 CPU를 지원하고, NUMA 아키텍쳐에서 한 노드의 프로세서가 하이퍼 쓰레드를 지원하기도 합니다.&lt;/p&gt;
@@ -97,9 +97,9 @@ echo $(pidof X) &amp;gt; /mnt/cgroups/cpu/Xorg/tasks
     
     <item>
       <title>리눅스 커널 I/O 스케줄링 우선순위</title>
-      <link>/2010/10/05/linux-kernel-io-scheduler-priority/</link>
+      <link>https://lethean.github.io/2010/10/05/linux-kernel-io-scheduler-priority/</link>
       <pubDate>Tue, 05 Oct 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/10/05/linux-kernel-io-scheduler-priority/</guid>
+      <guid>https://lethean.github.io/2010/10/05/linux-kernel-io-scheduler-priority/</guid>
       <description>&lt;p&gt;리눅스 커널 CPU 스케줄링과 마찬가지로 I/O 스케줄링에 적용되는 스케줄링 클래스와 우선순위도 
 &lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/ioprio_set.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ioprio_set()&lt;/code&gt;&lt;/a&gt;
  시스템콜을 이용해 사용자가 제어할 수 있습니다. 하지만 리눅스 커널이 제공하는 여러가지 I/O 스케줄러 중에서 CFQ(Completely Fair Queuing) 스케줄러에서만 사용할 수 있습니다. 물론 리눅스 커널은 블럭 장치마다 다른 I/O 스케줄러를 사용할 수 있도록 허용하므로 필요한 경우 적절하게 시스템을 구성하는 것도 가능합니다.[1]&lt;/p&gt;
@@ -138,9 +138,9 @@ static inline int ioprio_get (int which, int who)
     
     <item>
       <title>리눅스 커널 실시간 스케줄링 우선순위</title>
-      <link>/2010/09/30/linux-kernel-realtime-scheduling-priority/</link>
+      <link>https://lethean.github.io/2010/09/30/linux-kernel-realtime-scheduling-priority/</link>
       <pubDate>Thu, 30 Sep 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/09/30/linux-kernel-realtime-scheduling-priority/</guid>
+      <guid>https://lethean.github.io/2010/09/30/linux-kernel-realtime-scheduling-priority/</guid>
       <description>&lt;p&gt;&lt;code&gt;SCHED_OTHER&lt;/code&gt;, &lt;code&gt;SCHED_IDLE&lt;/code&gt;, &lt;code&gt;SCHED_BATCH&lt;/code&gt; 스케줄링 정책(policy)에 속하는 일반 태스크는 스케줄링 우선순위(priority)는 항상 0입니다. 하지만 &lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_RR&lt;/code&gt; 등과 같은 실시간 스케줄링 정책에 속하는 태스크는 가장 낮은 1부터 가장 높은 99까지의 우선순위가 부여됩니다.&lt;/p&gt;
 &lt;p&gt;리눅스 커널 스케줄러는 태스크 우선순위별로 실행 가능한 태스크 목록을 유지하고,  가장 높은 우선순위부터 차례대로 각 우선순위별 태스크 목록이 비어있는지 검사해서 태스크가 있을 경우 목록의 첫번째 태스크를 다음에 실행할 태스크로 선택합니다. 따라서, 항상 가장 높은 우선순위가 부여된 실시간 태스크가 실행되고, 결과적으로 일반 태스크는 항상 실시간 태스크보다 나중에 스케줄링됩니다.&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;SCHED_FIFO&lt;/code&gt;, &lt;code&gt;SCHED_RR&lt;/code&gt; 정책은 우선순위가 같을 경우 태스크를 목록 어디에 삽입할 지를 결정하는데 사용합니다. &lt;code&gt;SCHED_FIFO&lt;/code&gt; 정책에 속하는 태스크는 실행 가능 상태가 되면 우선순위 태스크 목록의 마지막에 삽입됩니다. 이 태스크는 I/O 요청을 기다리거나, 우선순위가 더 높은 태스크에 의해 선점(preempted)되는 경우, 직접 

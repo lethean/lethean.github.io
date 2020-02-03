@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Clutter | 대체로 무해함</title>
-    <link>/tags/clutter/</link>
-      <atom:link href="/tags/clutter/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/clutter/</link>
+      <atom:link href="https://lethean.github.io/tags/clutter/index.xml" rel="self" type="application/rss+xml" />
     <description>Clutter</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Fri, 06 Mar 2015 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Clutter</title>
-      <link>/tags/clutter/</link>
+      <link>https://lethean.github.io/tags/clutter/</link>
     </image>
     
     <item>
       <title>Cairo 라이브러리를 이용해 Font Awesome 아이콘 그리기</title>
-      <link>/2015/03/06/draw-font-awesome-icons-with-cairo/</link>
+      <link>https://lethean.github.io/2015/03/06/draw-font-awesome-icons-with-cairo/</link>
       <pubDate>Fri, 06 Mar 2015 00:00:00 +0000</pubDate>
-      <guid>/2015/03/06/draw-font-awesome-icons-with-cairo/</guid>
+      <guid>https://lethean.github.io/2015/03/06/draw-font-awesome-icons-with-cairo/</guid>
       <description>&lt;p&gt;요즘 웹에는 글꼴 아이콘(font icon)을 많이 사용합니다. 벡터 그래픽 방식이라
 확대해도 좋은 품질을 보여주고, 자주 사용되는 다양한 모양도 많이 제공됩니다.
 덕분에 작은 규모의 팀에서 간단한 웹 사이트나 웹앱을 개발할 때, 디자이너의
@@ -207,9 +207,9 @@ draw_icon_content (ClutterCanvas *canvas,
     
     <item>
       <title>Raspberry Pi &#43; X11 &#43; Clutter(&#43; Cogl)</title>
-      <link>/2015/02/16/try-cogl-with-x11-on-raspberry-pi/</link>
+      <link>https://lethean.github.io/2015/02/16/try-cogl-with-x11-on-raspberry-pi/</link>
       <pubDate>Mon, 16 Feb 2015 00:00:00 +0000</pubDate>
-      <guid>/2015/02/16/try-cogl-with-x11-on-raspberry-pi/</guid>
+      <guid>https://lethean.github.io/2015/02/16/try-cogl-with-x11-on-raspberry-pi/</guid>
       <description>&lt;p&gt;결론부터 말하자면 실패한 해킹에 대한 기록입니다.&lt;/p&gt;
 &lt;p&gt;Raspberry Pi 2 장비를 하나 얻게 되어, 이삼일 정도 클러터(Clutter) 라이브러리가 제대로 동작하도록 삽질을 했습니다.&lt;/p&gt;
 &lt;p&gt;구글에는 X 서버, 즉 X 윈도 없이 리눅스 프레임 버퍼 위에서 EGL + GLES2 API를 이용하는 방법은 많이 나와 있는데, X11 + EGL + GLES2 조합은 없어서 여기저기 구글링을 통해 얻은 정보를 이용해 Cogl 예제 디렉터리에 있는 프로그램들이, 비록 전체화면 방식이기는 하지만, 문제없이 실행되게 하는 데까지는 성공했습니다. (
@@ -225,35 +225,35 @@ draw_icon_content (ClutterCanvas *canvas,
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (5)</title>
-      <link>/2012/02/24/oop-with-gobject-5/</link>
+      <link>https://lethean.github.io/2012/02/24/oop-with-gobject-5/</link>
       <pubDate>Fri, 24 Feb 2012 00:00:00 +0000</pubDate>
-      <guid>/2012/02/24/oop-with-gobject-5/</guid>
+      <guid>https://lethean.github.io/2012/02/24/oop-with-gobject-5/</guid>
       <description>&lt;p&gt;거의 2년만에 GObject 객체 지향 프로그래밍 연재 글을 포스팅합니다. 사실 이 글의 일부는 예전에 작성해 둔 것인데, 이번 
 &lt;a href=&#34;http://gnome-kr.blogspot.com/2012/02/2-gnome-tech-talks.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME Tech Talks&lt;/a&gt;
 에서 발표 하나를 맡게 되면서, 슬라이드 자료를 따로 만들 시간은 없고 그렇다고 오래된 자료를 재탕하는 건 실례인 것 같아 조금 보완해서 작성했습니다. 참고로, GObject 개념을 잘 모르는 분이라면 이전 연재 글을 먼저 읽어 보시면 도움이 될 수 있습니다. :)&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2009/08/10/oop-with-gobject-1/&#34; title=&#34;GObject 객체 지향 프로그래밍 (1)&#34;&gt;GObject 객체 지향 프로그래밍 (1)&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/08/10/oop-with-gobject-1/&#34; title=&#34;GObject 객체 지향 프로그래밍 (1)&#34;&gt;GObject 객체 지향 프로그래밍 (1)&lt;/a&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2009/08/14/oop-with-gobject-2/&#34; title=&#34;GObject 객체 지향 프로그래밍 (2)&#34;&gt;GObject 객체 지향 프로그래밍 (2)&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/08/14/oop-with-gobject-2/&#34; title=&#34;GObject 객체 지향 프로그래밍 (2)&#34;&gt;GObject 객체 지향 프로그래밍 (2)&lt;/a&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2009/08/18/oop-with-gobject-3/&#34; title=&#34;GObject 객체 지향 프로그래밍 (3)&#34;&gt;GObject 객체 지향 프로그래밍 (3)&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/08/18/oop-with-gobject-3/&#34; title=&#34;GObject 객체 지향 프로그래밍 (3)&#34;&gt;GObject 객체 지향 프로그래밍 (3)&lt;/a&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2009/08/24/oop-with-gobject-4/&#34; title=&#34;GObject 객체 지향 프로그래밍 (4)&#34;&gt;GObject 객체 지향 프로그래밍 (4)&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/08/24/oop-with-gobject-4/&#34; title=&#34;GObject 객체 지향 프로그래밍 (4)&#34;&gt;GObject 객체 지향 프로그래밍 (4)&lt;/a&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2010/02/11/how-to-make-a-gobject-singleton/&#34; title=&#34;싱글턴(Singleton) GObject 객체 만들기&#34;&gt;싱글턴(Singleton) GObject 객체 만들기&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2010/02/11/how-to-make-a-gobject-singleton/&#34; title=&#34;싱글턴(Singleton) GObject 객체 만들기&#34;&gt;싱글턴(Singleton) GObject 객체 만들기&lt;/a&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2010/04/07/serialize-gobject-properties/&#34; title=&#34;GObject 속성 직렬화(Serialization)하기&#34;&gt;GObject 속성 직렬화(Serialization)하기&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2010/04/07/serialize-gobject-properties/&#34; title=&#34;GObject 속성 직렬화(Serialization)하기&#34;&gt;GObject 속성 직렬화(Serialization)하기&lt;/a&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;GObject 객체 지향 시스템을 구성하는 여러가지 개념 중 상속(inheritance), 참고 카운터(reference counting), 속성(properties) 등에 대해서는 지난 글에서 이미 소개했습니다. 아직 GObject 라이브러리에서 소개하지 않은 개념이 아직 많이 남아 있지만, 그 중에서 가장 중요한 것 중 하나는 바로 시그널(signals)이 아닐까 생각합니다. 속성이 변경되었을때 자동으로 호출되는 콜백 함수를 등록해서 사용하는 방법을 설명할 때 약간 소개했지만, 아무래도 그걸로는 부족하기 때문에 이번 글은 시그널의 개념과 사용 방법, 그리고 속성 바인딩을 정리해 보았습니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;간단한 클러터 기반 시계&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/myclock-screenshot.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/myclock-screenshot.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;언제나 그렇듯이 재미없는 예제 소스를 먼저 보여드립니다. 이 소스를 컴파일해서 실행하면 위 그림과 같은 시계가 동작합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;/* myclock1.c */
 
@@ -603,9 +603,9 @@ main (int    argc,
 }
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;위 코드에서 변경된 내용은, &lt;code&gt;MyClock&lt;/code&gt;에 문자열 형식의 &lt;code&gt;text&lt;/code&gt; 속성을 추가하고[&lt;code&gt;my_clock_class_init()&lt;/code&gt;], &lt;code&gt;datetime&lt;/code&gt; 속성을 갱신할때 &lt;code&gt;text&lt;/code&gt; 속성도 함께 갱신하도록 한 다음[&lt;code&gt;my_clock_set_date_time()&lt;/code&gt;], 기존 속성 변경(&lt;code&gt;notify::datetime&lt;/code&gt;)에 대한 &lt;code&gt;g_signal_connect()&lt;/code&gt; 함수 호출 대신 &lt;code&gt;g_object_bind_property()&lt;/code&gt; 함수를 이용해 두 객체의 속성을 묶었다는 점입니다. 여기서 핵심은 물론 &lt;code&gt;g_object_bind_property()&lt;/code&gt; 함수인데, 이 함수는 
-&lt;a href=&#34;/2010/10/02/glib-2-26-0-release/&#34;&gt;GLib 2.26 버전에 추가&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2010/10/02/glib-2-26-0-release/&#34;&gt;GLib 2.26 버전에 추가&lt;/a&gt;
 되었으며 
-&lt;a href=&#34;/2008/12/15/exobinding/&#34;&gt;예전에 소개한 ExoBinding&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/12/15/exobinding/&#34;&gt;예전에 소개한 ExoBinding&lt;/a&gt;
 과 사용법이 거의 유사합니다. 물론, 옵션을 통해 바인딩하는 시점부터 값을 동기화할 지(&lt;code&gt;G_BINDING_SYNC_CREATE&lt;/code&gt;), 단방향이 아닌 양방향으로 동기화할 지(&lt;code&gt;G_BINDING_BIDIRECTIONAL&lt;/code&gt;) 등을 지정할 수도 있습니다. 이처럼, 위의 코드에서 볼 수 있듯이, 속성 바인딩을 이용하면 매번 콜백함수를 만들지 않고도 간단하게 코드 몇 줄로 원하는 객체 속성간의 동기화(synchronization)를 처리할 수 있습니다.&lt;/p&gt;
 &lt;p&gt;여담이지만, 처음 이 기능을 접했을때 맥, 아이폰 응용 프로그램을 개발하기 위해 XCode에서 마우스 드래그 만으로 객체 속성간 바인딩이 지원되는 것처럼, 코딩이 아닌, Glade 같은 GUI 도구에서 위젯 속성간 바인딩이 지원되면 참 편하지 않을까 하는 생각이 들었던 적도 있습니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;시그널 (Signals)&lt;/strong&gt;&lt;/p&gt;
@@ -745,16 +745,16 @@ main (int    argc,
     
     <item>
       <title>Clutter 메모리 누수 디버깅</title>
-      <link>/2011/09/28/clutter-memory-leak-debugging/</link>
+      <link>https://lethean.github.io/2011/09/28/clutter-memory-leak-debugging/</link>
       <pubDate>Wed, 28 Sep 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/09/28/clutter-memory-leak-debugging/</guid>
+      <guid>https://lethean.github.io/2011/09/28/clutter-memory-leak-debugging/</guid>
       <description>&lt;p&gt;최근 
-&lt;a href=&#34;/2011/09/15/note-about-using-clutter/&#34;&gt;클러터를 이용한 프로그램을 개발&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2011/09/15/note-about-using-clutter/&#34;&gt;클러터를 이용한 프로그램을 개발&lt;/a&gt;
 하면서 메모리 누수 현상을 발견했습니다. 코드를 하나 하나 막아가면서 테스트를 한 결과 
 &lt;a href=&#34;http://developer.gnome.org/clutter-gst/1.3/ClutterGstVideoSink.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;ClutterGstVideoSink&lt;/code&gt;&lt;/a&gt;
  객체를 사용하지 않으면 메모리 누수가 발생하지 않았습니다. 하지만, 아무리 소스를 분석해도 원인을 찾아낼 수 없었고, 잘못된 부분도 없는 것 같았습니다. 물론 구글링을 해도, 검색 실력이 미천한지, 답을 찾을 수 없었습니다.&lt;/p&gt;
 &lt;p&gt;그래서 결국 예전에 소개한 적 있는 
-&lt;a href=&#34;/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/&#34;&gt;구글 성능 도구(google-perftools)를 이용해 디버깅&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/&#34;&gt;구글 성능 도구(google-perftools)를 이용해 디버깅&lt;/a&gt;
 을 했습니다. 그런데 문제는, 
 &lt;a href=&#34;http://www.archlinux.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;아치 리눅스(Arch Linux)&lt;/a&gt;
  x86_64 환경으로 개발 환경을 바꾸면서 메모리 프로파일 기능이 제대로 동작하지 않는다는 사실인데, 특히 메모리 누수 발생 지점을 정확하게 알기 위해서 필요한 함수 호출 백트레이스(backtrace) 정보가 추출되지 않는 게 가장 큰 문제였습니다. 이 문제를 해결하기 위한 과정을 기록으로 남겨봅니다.&lt;/p&gt;
@@ -818,7 +818,7 @@ Dumping heap profile to /tmp/profile.0004.heap (...)
     &amp;gt; profile-1.pdf
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;이렇게 생성된 그래프는 다음과 같습니다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/clutter-1-6-memory-leak-profile.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/clutter-1-6-memory-leak-profile.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;이 그래프를 분석해서 관련 코드를 분석해 보니, 결정적으로 두 군데에 문제가 있습니다. 첫번째는 &lt;code&gt;cogl_pipeline_fragend_arbfp_start()&lt;/code&gt; 함수 내부에서 생성한 &lt;code&gt;arbfp_program_state&lt;/code&gt; 객체를 해제하는 곳이 없다는 점이고, 두번째는 &lt;code&gt;cogl_pipeline_get_layers()&lt;/code&gt; 함수에서 생성한 &lt;code&gt;deprecated_get_layers_list&lt;/code&gt; 리스트를 해제하는 곳이 없다는 점입니다. 그런데 최근 클러터 1.8 버전 소스를 보면 두번째 문제는 해결이 된 것 같은데, 첫번째 문제가 있는 곳은 코드 수정이 많이 되어 해결 여부를 알 수가 없습니다.&lt;/p&gt;
 &lt;p&gt;그래서 결론은, 며칠 전에 릴리스된 클러터 1.8 안정 버전이 아치 리눅스 패키지로 올라오면 다시 메모리 누수 여부를 확인해볼 예정입니다. (GNOME 3 핵심 라이브러리를 직접 컴파일해서 사용하는게 귀찮기도 하고 두렵기도 해서입니다&amp;hellip; :)&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;[UPDATE 2011-10-04]&lt;/strong&gt; 클러터 1.8 버전에서 확인해 보니 메모리 누수 문제가 해결된 것 같습니다. 역시, 미루기를 잘 했습니다. ;)&lt;/p&gt;
@@ -852,9 +852,9 @@ Dumping heap profile to /tmp/profile.0004.heap (...)
     
     <item>
       <title>클러터(Clutter) 사용기</title>
-      <link>/2011/09/15/note-about-using-clutter/</link>
+      <link>https://lethean.github.io/2011/09/15/note-about-using-clutter/</link>
       <pubDate>Thu, 15 Sep 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/09/15/note-about-using-clutter/</guid>
+      <guid>https://lethean.github.io/2011/09/15/note-about-using-clutter/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터(Clutter)&lt;/a&gt;
  라이브러리를 이용하면서 부딪친 대부분의 문제는 성능과 관련된 것입니다. 클러터 라이브러리 자체가 느리다는 얘기가 아니라, 주로 개발하는 분야에서 요구되는 16채널 이상 다채널 라이브 / 녹화 동영상 재생을 구현할 때, 고사양 장비는 문제가 되지 않지만 저사양 임베디드 보드에서는 성능 저하가 발생하기 때문입니다. 하지만, 효율적인 2D 그래픽을 위한 3D 그래픽 라이브러리로서 클러터는 아직까지 만족스럽습니다. OpenGL 기반 라이브러리는 기존 2D 그래픽 라이브러리와 여러가지 기본 개념이 달라서, 저처럼 이쪽 세상에 입문한지 얼마 안되는 개발자는 많은 시행 착오를 겪을 수 밖에 없는데,  이미 사용해 본  
@@ -1007,9 +1007,9 @@ Dumping heap profile to /tmp/profile.0004.heap (...)
     
     <item>
       <title>GNOME 개발 설명서 / 동영상</title>
-      <link>/2011/07/15/gnome-development-screencasts-and-tutorials/</link>
+      <link>https://lethean.github.io/2011/07/15/gnome-development-screencasts-and-tutorials/</link>
       <pubDate>Fri, 15 Jul 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/07/15/gnome-development-screencasts-and-tutorials/</guid>
+      <guid>https://lethean.github.io/2011/07/15/gnome-development-screencasts-and-tutorials/</guid>
       <description>&lt;p&gt;오랜만에 
 &lt;a href=&#34;http://developer.gnome.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 개발자 센터&lt;/a&gt;
 를 들어갔더니, 모양 뿐 아니라 내용도 확 바뀌어 있습니다. 예전에도 있었는데 제가 몰랐던 건지도 모르지만, 
@@ -1067,16 +1067,16 @@ Dumping heap profile to /tmp/profile.0004.heap (...)
     
     <item>
       <title>The Board 소개</title>
-      <link>/2010/12/23/the-board-project-introduction/</link>
+      <link>https://lethean.github.io/2010/12/23/the-board-project-introduction/</link>
       <pubDate>Thu, 23 Dec 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/12/23/the-board-project-introduction/</guid>
+      <guid>https://lethean.github.io/2010/12/23/the-board-project-introduction/</guid>
       <description>&lt;p&gt;힘겹게 겨우 다시 한 학기를 마무리했지만, 할 일은 여전히 밀려 있습니다. 그래서 잠시 머리도 식힐겸 요즘 관심있게 지켜보고 있는 GNOME 프로젝트 중 하나인 
 &lt;a href=&#34;http://live.gnome.org/TheBoardProject&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The Board&lt;/a&gt;
  프로젝트에 대해 간략하게 소개해볼까 합니다.&lt;/p&gt;
 &lt;p&gt;일단, 백마디 말보다 스크린샷 하나가 더 좋을 것 같군요.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/TheBoardProject?action=AttachFile&amp;amp;do=get&amp;amp;target=the-board.jpg&#34; alt=&#34;&#34; title=&#34;The Board Project&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/TheBoardProject?action=AttachFile&amp;amp;do=get&amp;amp;target=the-board.jpg&#34; alt=&#34;&#34; title=&#34;The Board Project&#34;&gt;&lt;/p&gt;
 &lt;p&gt;이 프로그램은 쉽게 말해 다음과 같은 오프라인 보드를 컴퓨터에서 흉내내는 것입니다. 다만 아직은 개인 자료 수집용입니다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/Infinite-corridor-bboard.jpeg&#34; alt=&#34;&#34; title=&#34;Infinite Corridor Bulletin Board&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/Infinite-corridor-bboard.jpeg&#34; alt=&#34;&#34; title=&#34;Infinite Corridor Bulletin Board&#34;&gt;&lt;/p&gt;
 &lt;p&gt;
 &lt;a href=&#34;http://live.gnome.org/GnomeShell&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그놈 셸(GNOME Shell)&lt;/a&gt;
 과 마찬가지로, 
@@ -1130,9 +1130,9 @@ Dumping heap profile to /tmp/profile.0004.heap (...)
     
     <item>
       <title>GLib 테스트 프레임워크 사용하기</title>
-      <link>/2010/02/12/using-glib-test-framework/</link>
+      <link>https://lethean.github.io/2010/02/12/using-glib-test-framework/</link>
       <pubDate>Fri, 12 Feb 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/02/12/using-glib-test-framework/</guid>
+      <guid>https://lethean.github.io/2010/02/12/using-glib-test-framework/</guid>
       <description>&lt;p&gt;GLib 라이브러리 2.16 버전부터 지원하는 
 &lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;테스트 프레임워크&lt;/a&gt;
 는 C 언어용 
@@ -1204,7 +1204,7 @@ PASS: g-test-sample1
 $ gtester-report sample-log.xml &amp;gt; sample-log.html
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;위와 같이 실행하여 생성한 HTML 문서 결과는 다음과 같습니다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/gtester-report-screenshot.png&#34; alt=&#34;&#34; title=&#34;gtester-report screenshot&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/gtester-report-screenshot.png&#34; alt=&#34;&#34; title=&#34;gtester-report screenshot&#34;&gt;&lt;/p&gt;
 &lt;p&gt;참고로, gtester 프로그램의 인수로 여러 테스트 실행 파일을 한꺼번에 전달하면 모든 테스트 실행 파일의 테스트 슈트가 하나의 결과로 통합됩니다.&lt;/p&gt;
 &lt;p&gt;위 코드에서 사용한 테스트 코드를 보면 제일 먼저 
 &lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-init&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_init()&lt;/code&gt;&lt;/a&gt;
@@ -1236,7 +1236,7 @@ $ gtester-report sample-log.xml &amp;gt; sample-log.html
 ) 있으므로, 별로 길지 않으니, 직접 확인해 보시기 바랍니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;프로젝트에 활용하기&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;MVP 개발 모델과 TDD + 유닛테스트 도구를 이용하여 응용 프로그램을 개발하면(
-&lt;a href=&#34;/2008/12/17/presenter-first-development/&#34;&gt;Presenter First 개발&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/12/17/presenter-first-development/&#34;&gt;Presenter First 개발&lt;/a&gt;
 ) 더 빠르고 쉽게 튼튼한 코드를 만들 수 있으니, 한 번 검토해 보시기 바랍니다. 개발자가 TDD 방법론을 주저하는 이유 중 하나가 테스트 코드까지 만들다 보니 늘어나는 코드량과 늘어나는 개발 시간 때문인데, 테스트 코드를 그대로 실제 코드로 재활용할 수 있다면 얘기가 달라지겠죠.&lt;/p&gt;
 &lt;p&gt;프로젝트 일일빌드시 테스트 루틴도 동작하도록 한뒤 자동으로 테스트 결과를 웹사이트에 게재하는 것도 좋은 개발 습관입니다. 아예 코드 수정 후 저장소에 커밋하면 반드시 모든 테스트 케이스를 통과해야만 커밋되도록 저장소를 설정할 수도 있지만, 엄청난 서버 부하를 야기할 수 있으므로, 테스트 케이스를 통과한 코드만 커밋할 수 있도록 가이드라인을 규정하는 것도 좋습니다.&lt;/p&gt;
 &lt;p&gt;유닛테스트는 특정 객체나 모듈의 모든 API가 항상 정상적으로 동작하는지를 검사하기 위해 사용합니다. 그래서 가장 기본적인 사용법은 공개 함수를 다양한 인수로 호출한 뒤 그 결과값을 확인하는 방식입니다. 하지만 실무에서는 그렇게 단순한(?) 버그만 존재하는게 아니라서, 특정 시나리오나 특정 조건을 만족할 경우에만 버그 현상이 재현되는 경우도 많습니다. 이러한 경우, 버그에 대한 테스트 케이스를 추가하고 이 케이스에 대한 테스트가 통과할때까지 디버깅을 합니다. 이렇게 해두면 동일한 버그가 나중에 재발하는 걸 방지할 수 있습니다. 대부분 회사에서는 버그(이슈)관리시스템을 사용하므로 
@@ -1260,9 +1260,9 @@ $ gtester-report sample-log.xml &amp;gt; sample-log.html
     
     <item>
       <title>클러터와 GTK</title>
-      <link>/2009/09/08/clutter-and-gtk/</link>
+      <link>https://lethean.github.io/2009/09/08/clutter-and-gtk/</link>
       <pubDate>Tue, 08 Sep 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/09/08/clutter-and-gtk/</guid>
+      <guid>https://lethean.github.io/2009/09/08/clutter-and-gtk/</guid>
       <description>&lt;p&gt;`
 &lt;a href=&#34;http://blog.didrocks.fr/index.php/post/Design-experience-and-demos-in-GTK-Clutter&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Design experience and demos in GTK and Clutter&lt;/a&gt;
 &amp;rsquo; 라는 포스트가 얼마 전에 올라왔는데 이제야 리뷰를 해봅니다. 이 포스트를 클릭해서 들어가 보시면 데모 동영상이 여러개 있는데, 클러터 안에 GTK 노트북 위젯을 넣어 여러가지 효과를 보여주고 있습니다. 이 포스트는 &lt;span style=&#34;background-color:#ffffff;&#34;&gt;`
@@ -1275,9 +1275,9 @@ $ gtester-report sample-log.xml &amp;gt; sample-log.html
     
     <item>
       <title>클러터 1.0 애니메이션 API</title>
-      <link>/2009/08/03/clutter-1-0-animation-api/</link>
+      <link>https://lethean.github.io/2009/08/03/clutter-1-0-animation-api/</link>
       <pubDate>Mon, 03 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/03/clutter-1-0-animation-api/</guid>
+      <guid>https://lethean.github.io/2009/08/03/clutter-1-0-animation-api/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://lists.o-hand.com/clutter/2982.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 1.0 버전이 릴리스&lt;/a&gt;
  된지 한참 되었습니다&amp;hellip;:) 몇몇 GLES 플랫폼에서 동작하지 않는다는 보고도 있고, clutter-gst / clutter-gtk 같은 라이브러리는 지금도 동작은 하지만 의존하는 다른 프로젝트 진행상황과 맞물린 관계로 완전히 마무리된 
@@ -1351,9 +1351,9 @@ clutter_actor_animate (actor, CLUTTER_EASE_IN, 100,
     
     <item>
       <title>2009 GUADEC 클러터 발표 자료</title>
-      <link>/2009/07/25/2009-guadec-clutter-slides/</link>
+      <link>https://lethean.github.io/2009/07/25/2009-guadec-clutter-slides/</link>
       <pubDate>Sat, 25 Jul 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/07/25/2009-guadec-clutter-slides/</guid>
+      <guid>https://lethean.github.io/2009/07/25/2009-guadec-clutter-slides/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.clutter-project.org/blog/?p=78&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 블로그&lt;/a&gt;
 에 GUADEC 2009에서 발표한 클러터 관련 발표 자료가 공개되었습니다.&lt;/p&gt;
@@ -1365,9 +1365,9 @@ clutter_actor_animate (actor, CLUTTER_EASE_IN, 100,
     
     <item>
       <title>X 윈도우 비디오 가속(VA) API</title>
-      <link>/2009/07/13/x-window-video-acceleration-api-overview/</link>
+      <link>https://lethean.github.io/2009/07/13/x-window-video-acceleration-api-overview/</link>
       <pubDate>Mon, 13 Jul 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/07/13/x-window-video-acceleration-api-overview/</guid>
+      <guid>https://lethean.github.io/2009/07/13/x-window-video-acceleration-api-overview/</guid>
       <description>&lt;p&gt;기존 X 윈도우 프로그래밍에서 하드웨어 가속 기능을 이용하여  YUV 형식의 비디오를 재생하거나 MPEG2 코덱을 디코딩하려면  
 &lt;a href=&#34;http://en.wikipedia.org/wiki/X_video_extension&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Xv (X Video)&lt;/a&gt;
 와 
@@ -1392,14 +1392,14 @@ clutter_actor_animate (actor, CLUTTER_EASE_IN, 100,
     
     <item>
       <title>클러터와 모블린(Moblin)</title>
-      <link>/2009/07/07/clutter-and-moblin/</link>
+      <link>https://lethean.github.io/2009/07/07/clutter-and-moblin/</link>
       <pubDate>Tue, 07 Jul 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/07/07/clutter-and-moblin/</guid>
+      <guid>https://lethean.github.io/2009/07/07/clutter-and-moblin/</guid>
       <description>&lt;p&gt;최근 들어 제 블로그에 방문수가 많아지는 게 이상해서 확인해보니 클러터(clutter) 라이브러리 관련 정보를 찾다가 오신 분이 많더군요.&lt;/p&gt;
 &lt;p&gt;2008년 10월 즈음부터 메일링 리스트에서 메인 개발자 이메일 주소가 인텔로 바뀌는가 싶더니 조금 후에 인텔에서 공식적으로 클러터 프로젝트를 지원하는 것을 공표하고, 급기야 인텔이 차세대 넷북 플랫폼으로 밀고 있는 
 &lt;a href=&#34;http://moblin.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;모블린(Moblin)&lt;/a&gt;
  프로젝트의 핵심 라이브러리로 자리잡으면서 사람들이 클러터에 관심을 가지게 된 게 아닌가 싶습니다. 물론 
-&lt;a href=&#34;/2009/06/02/gnome-3-shell/&#34;&gt;그놈 3.0 셸(shell)을 클러터 기반으로 개발&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/06/02/gnome-3-shell/&#34;&gt;그놈 3.0 셸(shell)을 클러터 기반으로 개발&lt;/a&gt;
 중이고, 현재 개발 버전 GTK+ (2.17) 메인 소스에 클러터에 GTK+ 위젯을 쉽게 넣어 연동할 수 있도록 도와주는 
 &lt;a href=&#34;http://live.gnome.org/GTK%2B/ClientSideWindows&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클라이언트-방식-윈도우(client-side-windows)&lt;/a&gt;
  구현이 반영된 것도 사람들의 호기심을 증가시킨 것 같습니다. 게다가 이제는 인터넷을 찾아보면 클러터를 사용하는 게임이나 프로젝트도 점점 늘어나는 추세이고, 조만간 성능과 API가 대폭 개선된 클러터 1.0 버전이 출시될 예정이라 기다리는 사람이 많은 것 같습니다.&lt;/p&gt;
@@ -1411,9 +1411,9 @@ clutter_actor_animate (actor, CLUTTER_EASE_IN, 100,
     
     <item>
       <title>GNOME 3.0 셸(GNOME Shell) 소개</title>
-      <link>/2009/06/02/gnome-3-shell/</link>
+      <link>https://lethean.github.io/2009/06/02/gnome-3-shell/</link>
       <pubDate>Tue, 02 Jun 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/06/02/gnome-3-shell/</guid>
+      <guid>https://lethean.github.io/2009/06/02/gnome-3-shell/</guid>
       <description>&lt;p&gt;GNOME 3.0의 기본 프로그램 역할을 하게 될 
 &lt;a href=&#34;http://live.gnome.org/GnomeShell&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그놈 셸(GNOME Shell)&lt;/a&gt;
 에 대한 소식이 요즘 많이 보이는군요. 하지만 역시 엔지니어라서 그런지, 사용자 관점의 변화보다 기술적인 면에 더 관심이 갈 수 밖에 없는터라 그 부분을 조금 정리해 보았습니다.&lt;/p&gt;
@@ -1438,9 +1438,9 @@ clutter_actor_animate (actor, CLUTTER_EASE_IN, 100,
     
     <item>
       <title>리눅스에서 위치 인식 소프트웨어</title>
-      <link>/2009/02/03/location-aware-softwares-in-linux/</link>
+      <link>https://lethean.github.io/2009/02/03/location-aware-softwares-in-linux/</link>
       <pubDate>Tue, 03 Feb 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/02/03/location-aware-softwares-in-linux/</guid>
+      <guid>https://lethean.github.io/2009/02/03/location-aware-softwares-in-linux/</guid>
       <description>&lt;p&gt;&amp;lsquo;
 &lt;a href=&#34;http://arstechnica.com/open-source/news/2009/01/location-awareness-comes-to-the-linux-platform.ars&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Location-aware software comes to the Linux platform&lt;/a&gt;
 &amp;rsquo; 글에서 모바일 위치 정보와 지도 렌더링을 오픈소스 리눅스 플랫폼에서 처리하는 방법을 정리해 놓았는데, 나중을 위해 간략하게 정리해 보았습니다.&lt;/p&gt;
@@ -1452,16 +1452,16 @@ clutter_actor_animate (actor, CLUTTER_EASE_IN, 100,
 입니다. OpenStreetMap이나 OpenAerialMap 같은 인터넷 지도 서버를 이용하면서, 렌더링에는 
 &lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Clutter&lt;/a&gt;
 라이브러리를 사용하지만 GTK+ 위젯 기반이기 때문에 쉽게 그놈 / GTK+ 어플리케이션에도 사용이 가능합니다. 이미 그놈 프로젝트의 기본 이미지 보기 프로그램인 EOG에도 플러그인이 추가되었고, 인스턴트 메신저에도 적용되고 있습니다. (예를 들어 iPhone이나 최신 디지털 카메라는 촬영시 GPS 정보를 이미지에 저장하는데, 이를 읽어들여 이미지를 볼때 이미지를 촬영한 장소의 지도 이미지를 함께 보여줍니다. 또한 메신저 친구 목록에서 친구를 클릭하면 현재 친구가 위치한 장소가 어디인지 알려주고 지도에 표시해 주기도 하는 거죠. 허락없이 무단링크한 다음 스크린샷을 확인해 보시길&amp;hellip;)&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/eog-champlain.png&#34; alt=&#34;&#34; title=&#34;EOG에서 champlain 플러그인 사용 화면&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/eog-champlain.png&#34; alt=&#34;&#34; title=&#34;EOG에서 champlain 플러그인 사용 화면&#34;&gt;&lt;/p&gt;
 &lt;p&gt;참고로, 이 소프트웨어들은 일반 데스크탑이나 서버 뿐 아니라 휴대폰, PDA 등과 같은 모바일 장치에서도 사용할 수 있습니다. 따라서 앞으로는 웹서비스 뿐 아니라 일반 어플리케이션도 위치 정보와 지도 서비스를 활용해 계속 진화하지 않을까 예측해 봅니다.&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>Clutter 액터 구현하기 (Implementing Actors)</title>
-      <link>/2009/01/16/implementing-clutter-actors/</link>
+      <link>https://lethean.github.io/2009/01/16/implementing-clutter-actors/</link>
       <pubDate>Fri, 16 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/16/implementing-clutter-actors/</guid>
+      <guid>https://lethean.github.io/2009/01/16/implementing-clutter-actors/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;(클러터 튜토리얼&lt;/a&gt;
  내용이 조금 더 남아 있지만 여기까지만 정리할 생각입니다. 나머지는 아직까지 관심 밖이라서&amp;hellip; 아무튼 
@@ -1861,9 +1861,9 @@ int main(int argc, char *argv[])
     
     <item>
       <title>클러터(Clutter) 사용하기 (5)</title>
-      <link>/2009/01/16/using-clutter-5/</link>
+      <link>https://lethean.github.io/2009/01/16/using-clutter-5/</link>
       <pubDate>Fri, 16 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/16/using-clutter-5/</guid>
+      <guid>https://lethean.github.io/2009/01/16/using-clutter-5/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 튜토리얼&lt;/a&gt;
  계속 이어집니다.&lt;/p&gt;
@@ -1893,7 +1893,7 @@ int main(int argc, char *argv[])
  값은 불투명도 100%를 의미합니다. 물론 모든 계산을 직접 할 수도 있지만 
 &lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/ClutterAlpha.html#CLUTTER-ALPHA-SINE:CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;CLUTTER_ALPHA_SINE&lt;/code&gt;&lt;/a&gt;
 처럼 미리 정의된 콜백 함수를 이용하면 쉽게 자연스러운 움직임을 얻을 수 있습니다. 다음 그림은 미리 정의된 몇가지 알파 콜백 함수가 반환하는 값을 그래프로 표현한 것입니다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/clutter-alpha-func.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/clutter-alpha-func.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;이렇게 만들어진 ClutterEffectTemplate 객체를 사용하려는 
 &lt;a href=&#34;http://clutter-project.org/docs/clutter/0.8/clutter-Clutter-Effects.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_effect_*()&lt;/code&gt;&lt;/a&gt;
  함수를 호출하면서 전달하면 됩니다.&lt;/p&gt;
@@ -1907,7 +1907,7 @@ int main(int argc, char *argv[])
 &lt;p&gt;효과 기능은 간단하지만, 더 복잡하고 다양한 애니메이션을 제어하기에는 부족하기 때문에 가끔은 움직임(Behaviours) 객체를 직접 사용해야 하는 경우가 있습니다. 효과 함수와 달리 움직임 객체를 사용하면 여러 액터를 동시에 제어할 수 있고 타임라인이 실행중이라도 움직임 파라메터를 변경할 수 있습니다. 예를 들어 
 &lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterBehaviourPath.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ClutterBehaviourPath&lt;/a&gt;
 는 액터를 지정한 경로(path)를 따라 움직이는데, 매 프레임마다 &lt;code&gt;alpha_func&lt;/code&gt; 콜백을 호출해서 경로상의 위치를 계산합니다. 다음 그림은 경로 상에서 알파 함수의 효과를 그래프로 표현한 것입니다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/clutter-path-alpha-func.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/clutter-path-alpha-func.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;콜백 함수 동작 방식은 효과(effect) 함수에서 사용하는 것과 동일합니다.&lt;/p&gt;
 &lt;p&gt;타임라인이 무한루프 방식으로 동작하지 않을 경우, 움직임(behaviour)의 타임라인이 시작되면 움직임은 항상 마지막 점에 도달한 뒤 거기서 끝납니다. 예를 들자면, 액터는 타임라인에서 지정한 총 프레임 수와 초당 프레임 수에서 지정한 만큼 변경되면서 마지막 지점에 도달할때까지 경로를 따라 움직입니다.&lt;/p&gt;
 &lt;p&gt;액터와 마찬가지로 
@@ -1942,11 +1942,11 @@ int main(int argc, char *argv[])
     
     <item>
       <title>클러터(Clutter) 사용하기 (6)</title>
-      <link>/2009/01/16/using-clutter-6/</link>
+      <link>https://lethean.github.io/2009/01/16/using-clutter-6/</link>
       <pubDate>Fri, 16 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/16/using-clutter-6/</guid>
+      <guid>https://lethean.github.io/2009/01/16/using-clutter-6/</guid>
       <description>&lt;p&gt;지금까지 예제가 단편적이라면 이번에는 조금 제대로 된 기능하는 코드입니다. 이 예제는 이미지 파일을 읽어들여 타원 주위로 회전시키며 보여줍니다. 사용자가 이미지를 클릭하면 맨 앞으로 오면서 확대되면서 파일 이름도 보여줍니다. 먼저 스크린샷부터.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/clutter-image-viewer.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/clutter-image-viewer.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;여러 타임라인과 움직임 객체를 이용해서 조금 복잡해 보이지만, 아마도 실제 어플리케이션은 이보다 훨씬 더 유연하고 기능적으로 동작해야겠지요. 주석을 우리말로 번역하고, 원본보다 조금 더 속도감있게 변경한 소스는 다음과 같습니다. (조금 길지요&amp;hellip;)&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;#include &amp;lt;clutter/clutter.h&amp;gt;
 #include &amp;lt;stdlib.h&amp;gt;
@@ -2423,9 +2423,9 @@ main (int argc, char *argv[])
     
     <item>
       <title>클러터(Clutter) 사용하기 (2)</title>
-      <link>/2009/01/15/using-clutter-2/</link>
+      <link>https://lethean.github.io/2009/01/15/using-clutter-2/</link>
       <pubDate>Thu, 15 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/15/using-clutter-2/</guid>
+      <guid>https://lethean.github.io/2009/01/15/using-clutter-2/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 튜토리얼&lt;/a&gt;
  내용을 계속 정리해 봅니다.&lt;/p&gt;
@@ -2460,7 +2460,7 @@ main (int argc, char *argv[])
 를 호출해야 비로소 보여집니다. 물론 다시 안보이게 하려면 
 &lt;a href=&#34;http://clutter-project.org/docs/clutter/stable/ClutterActor.html#clutter-actor-hide&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;clutter_actor_hide()&lt;/code&gt;&lt;/a&gt;
 를 사용하면 됩니다. 또한 GTK+ 위젯 시스템과 동일한 부동 참조(floating reference) 개념을 사용하여 리소스를 관리합니다. (더 자세한 내용이 궁금하신 분은 &amp;lsquo;
-&lt;a href=&#34;/2008/12/28/gtk-memory-management/&#34;&gt;GTK+ 메모리 관리&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/12/28/gtk-memory-management/&#34;&gt;GTK+ 메모리 관리&lt;/a&gt;
 &amp;rsquo; 항목을 참고하세요)&lt;/p&gt;
 &lt;p&gt;모든 액터는 당연히 확대 및 축소(scaling), 회전(rotation) 시킬 수 있고, 부분적으로 투명하게 할 수도 있습니다.&lt;/p&gt;
 &lt;p&gt;액터의 크기를 확대하거나 축소하려면 
@@ -2537,15 +2537,15 @@ int main(int argc, char *argv[])
 }
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;이 코드를 실행하면 다음과 같은 화면을 얻을 수 있습니다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/clutter-actor-example.png&#34; alt=&#34;clutter-actor-example&#34; title=&#34;clutter-actor-example&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/clutter-actor-example.png&#34; alt=&#34;clutter-actor-example&#34; title=&#34;clutter-actor-example&#34;&gt;&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>클러터(Clutter) 사용하기 (3)</title>
-      <link>/2009/01/15/using-clutter-3/</link>
+      <link>https://lethean.github.io/2009/01/15/using-clutter-3/</link>
       <pubDate>Thu, 15 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/15/using-clutter-3/</guid>
+      <guid>https://lethean.github.io/2009/01/15/using-clutter-3/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 튜토리얼&lt;/a&gt;
  내용 계속됩니다.&lt;/p&gt;
@@ -2786,9 +2786,9 @@ int main(int argc, char *argv[])
     
     <item>
       <title>클러터(Clutter) 사용하기 (4)</title>
-      <link>/2009/01/15/using-clutter-4/</link>
+      <link>https://lethean.github.io/2009/01/15/using-clutter-4/</link>
       <pubDate>Thu, 15 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/15/using-clutter-4/</guid>
+      <guid>https://lethean.github.io/2009/01/15/using-clutter-4/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.openismus.com/documents/clutter_tutorial/0.8/docs/tutorial/html/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터 튜토리얼&lt;/a&gt;
  계속 이어집니다.&lt;/p&gt;
@@ -2948,9 +2948,9 @@ int main(int argc, char *argv[])
     
     <item>
       <title>클러터(Clutter) 사용하기 (1)</title>
-      <link>/2009/01/14/using-clutter-1/</link>
+      <link>https://lethean.github.io/2009/01/14/using-clutter-1/</link>
       <pubDate>Wed, 14 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/14/using-clutter-1/</guid>
+      <guid>https://lethean.github.io/2009/01/14/using-clutter-1/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터(Clutter)&lt;/a&gt;
 는 C 언어로 구현한 2D 그래픽 사용자 인터페이스 라이브러리입니다. 2D임에도 불구하고 OpenGL 또는 OpenGL ES를 렌더링에 사용하며, GLib의 GObject 기반으로 API가 구성되어 있습니다. 뭐, 소개하자면 끝이 없고, 더 궁금한 분은 공식 홈페이지를 참고하기 바랍니다. 이 글은 
@@ -3129,9 +3129,9 @@ int main(int argc, char *argv[])
     
     <item>
       <title>GTK&#43; Animation Effects</title>
-      <link>/2007/07/25/gtk-animation-effects/</link>
+      <link>https://lethean.github.io/2007/07/25/gtk-animation-effects/</link>
       <pubDate>Wed, 25 Jul 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/07/25/gtk-animation-effects/</guid>
+      <guid>https://lethean.github.io/2007/07/25/gtk-animation-effects/</guid>
       <description>&lt;p&gt;점점 화려해지는 GUI 추세를 이제서야 인식했는지, GTK+ / GNOME 에서도 애니메이션 효과에 대한 논의와 구현이 점점 활발해지고 있는 것 같다. 아직 GTK+ 메인 소스에 반영되려면 시간이 더 걸릴 것 같지만 
 &lt;a href=&#34;http://bugzilla.gnome.org/show_bug.cgi?id=444659&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GtkTimeline&lt;/a&gt;
  이라는 기본적인 시간 관리 객체가 이미 논의 중이고, 이를 기반으로 여러 개발자들이 여기저기에 적용해보기도 하고 있다. (

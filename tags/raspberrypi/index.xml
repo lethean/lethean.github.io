@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>RaspberryPi | 대체로 무해함</title>
-    <link>/tags/raspberrypi/</link>
-      <atom:link href="/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/raspberrypi/</link>
+      <atom:link href="https://lethean.github.io/tags/raspberrypi/index.xml" rel="self" type="application/rss+xml" />
     <description>RaspberryPi</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Mon, 16 Feb 2015 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>RaspberryPi</title>
-      <link>/tags/raspberrypi/</link>
+      <link>https://lethean.github.io/tags/raspberrypi/</link>
     </image>
     
     <item>
       <title>Raspberry Pi &#43; X11 &#43; Clutter(&#43; Cogl)</title>
-      <link>/2015/02/16/try-cogl-with-x11-on-raspberry-pi/</link>
+      <link>https://lethean.github.io/2015/02/16/try-cogl-with-x11-on-raspberry-pi/</link>
       <pubDate>Mon, 16 Feb 2015 00:00:00 +0000</pubDate>
-      <guid>/2015/02/16/try-cogl-with-x11-on-raspberry-pi/</guid>
+      <guid>https://lethean.github.io/2015/02/16/try-cogl-with-x11-on-raspberry-pi/</guid>
       <description>&lt;p&gt;결론부터 말하자면 실패한 해킹에 대한 기록입니다.&lt;/p&gt;
 &lt;p&gt;Raspberry Pi 2 장비를 하나 얻게 되어, 이삼일 정도 클러터(Clutter) 라이브러리가 제대로 동작하도록 삽질을 했습니다.&lt;/p&gt;
 &lt;p&gt;구글에는 X 서버, 즉 X 윈도 없이 리눅스 프레임 버퍼 위에서 EGL + GLES2 API를 이용하는 방법은 많이 나와 있는데, X11 + EGL + GLES2 조합은 없어서 여기저기 구글링을 통해 얻은 정보를 이용해 Cogl 예제 디렉터리에 있는 프로그램들이, 비록 전체화면 방식이기는 하지만, 문제없이 실행되게 하는 데까지는 성공했습니다. (

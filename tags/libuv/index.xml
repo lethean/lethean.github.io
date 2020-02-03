@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>libuv | 대체로 무해함</title>
-    <link>/tags/libuv/</link>
-      <atom:link href="/tags/libuv/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/libuv/</link>
+      <atom:link href="https://lethean.github.io/tags/libuv/index.xml" rel="self" type="application/rss+xml" />
     <description>libuv</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 08 Mar 2016 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>libuv</title>
-      <link>/tags/libuv/</link>
+      <link>https://lethean.github.io/tags/libuv/</link>
     </image>
     
     <item>
       <title>libuv 사용기</title>
-      <link>/2016/03/08/note-about-libuv/</link>
+      <link>https://lethean.github.io/2016/03/08/note-about-libuv/</link>
       <pubDate>Tue, 08 Mar 2016 00:00:00 +0000</pubDate>
-      <guid>/2016/03/08/note-about-libuv/</guid>
+      <guid>https://lethean.github.io/2016/03/08/note-about-libuv/</guid>
       <description>&lt;p&gt;요즘은 비동기 이벤트 루프가 필요하면 
 &lt;a href=&#34;https://en.wikipedia.org/wiki/GLib&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib&lt;/a&gt;
  라이브러리 대신 

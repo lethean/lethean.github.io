@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>WordPress | 대체로 무해함</title>
-    <link>/tags/wordpress/</link>
-      <atom:link href="/tags/wordpress/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/wordpress/</link>
+      <atom:link href="https://lethean.github.io/tags/wordpress/index.xml" rel="self" type="application/rss+xml" />
     <description>WordPress</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Wed, 06 Aug 2008 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>WordPress</title>
-      <link>/tags/wordpress/</link>
+      <link>https://lethean.github.io/tags/wordpress/</link>
     </image>
     
     <item>
       <title>카테고리 RSS 링크 추가</title>
-      <link>/2008/08/06/adding-category-rss-link/</link>
+      <link>https://lethean.github.io/2008/08/06/adding-category-rss-link/</link>
       <pubDate>Wed, 06 Aug 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/08/06/adding-category-rss-link/</guid>
+      <guid>https://lethean.github.io/2008/08/06/adding-category-rss-link/</guid>
       <description>&lt;p&gt;워드프레스로 블로그를 옮기면서 다짐했던 것 중 하나가 가능한 소스를 건드리지 않고 일반 사용자처럼 사용하자였는데&amp;hellip; 카테고리별 RSS 피드를 왜 설정에서 쉽게 변경하지 못하고, 테마나 위젯 소스를 건드려야만 하도록 했을까, 결국 위젯 코드를 수정해서 원하는 기능을 얻었습니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;public_html/wp-includes/widgets.php 2008-07-22 12:09:23
 @@ -745,6 +745,8 @@
@@ -35,9 +35,9 @@
     
     <item>
       <title>워드프레스(WordPress)로 옮김</title>
-      <link>/2008/07/12/moved-to-wordpress/</link>
+      <link>https://lethean.github.io/2008/07/12/moved-to-wordpress/</link>
       <pubDate>Sat, 12 Jul 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/07/12/moved-to-wordpress/</guid>
+      <guid>https://lethean.github.io/2008/07/12/moved-to-wordpress/</guid>
       <description>&lt;p&gt;꽤 오랫동안 마음의 여유가 없었습니다.&lt;/p&gt;
 &lt;p&gt;그러다가 이런 저런 이유로 블로그를 다시 시작하게 되었는데, 몇몇 블로그 호스팅 서비스를 이용하던 과거와 달리 이번에는 
 &lt;a href=&#34;http://ko.wordpress.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;워드프레스(WordPress)&lt;/a&gt;

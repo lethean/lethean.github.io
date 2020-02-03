@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Reading | 대체로 무해함</title>
-    <link>/tags/reading/</link>
-      <atom:link href="/tags/reading/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/reading/</link>
+      <atom:link href="https://lethean.github.io/tags/reading/index.xml" rel="self" type="application/rss+xml" />
     <description>Reading</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Reading</title>
-      <link>/tags/reading/</link>
+      <link>https://lethean.github.io/tags/reading/</link>
     </image>
     
     <item>
       <title>대체로 무해한 읽을거리 (2019-05-28)</title>
-      <link>/2019/05/28/reading-2019-05-28/</link>
+      <link>https://lethean.github.io/2019/05/28/reading-2019-05-28/</link>
       <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
-      <guid>/2019/05/28/reading-2019-05-28/</guid>
+      <guid>https://lethean.github.io/2019/05/28/reading-2019-05-28/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -58,9 +58,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2019-04-23)</title>
-      <link>/2019/04/23/reading-2019-04-23/</link>
+      <link>https://lethean.github.io/2019/04/23/reading-2019-04-23/</link>
       <pubDate>Tue, 23 Apr 2019 00:00:00 +0000</pubDate>
-      <guid>/2019/04/23/reading-2019-04-23/</guid>
+      <guid>https://lethean.github.io/2019/04/23/reading-2019-04-23/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -101,9 +101,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2019-03-22)</title>
-      <link>/2019/03/22/reading-2019-03-22/</link>
+      <link>https://lethean.github.io/2019/03/22/reading-2019-03-22/</link>
       <pubDate>Fri, 22 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>/2019/03/22/reading-2019-03-22/</guid>
+      <guid>https://lethean.github.io/2019/03/22/reading-2019-03-22/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -161,9 +161,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2019-02-25)</title>
-      <link>/2019/02/25/reading-2019-02-25/</link>
+      <link>https://lethean.github.io/2019/02/25/reading-2019-02-25/</link>
       <pubDate>Mon, 25 Feb 2019 00:00:00 +0000</pubDate>
-      <guid>/2019/02/25/reading-2019-02-25/</guid>
+      <guid>https://lethean.github.io/2019/02/25/reading-2019-02-25/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -201,9 +201,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2019-02-18)</title>
-      <link>/2019/02/18/reading-2019-02-18/</link>
+      <link>https://lethean.github.io/2019/02/18/reading-2019-02-18/</link>
       <pubDate>Mon, 18 Feb 2019 00:00:00 +0000</pubDate>
-      <guid>/2019/02/18/reading-2019-02-18/</guid>
+      <guid>https://lethean.github.io/2019/02/18/reading-2019-02-18/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -255,9 +255,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2019-01-04)</title>
-      <link>/2019/01/04/reading-2019-01-04/</link>
+      <link>https://lethean.github.io/2019/01/04/reading-2019-01-04/</link>
       <pubDate>Fri, 04 Jan 2019 00:00:00 +0000</pubDate>
-      <guid>/2019/01/04/reading-2019-01-04/</guid>
+      <guid>https://lethean.github.io/2019/01/04/reading-2019-01-04/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -289,9 +289,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2018-12-27)</title>
-      <link>/2018/12/27/reading-2018-12-27/</link>
+      <link>https://lethean.github.io/2018/12/27/reading-2018-12-27/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 +0000</pubDate>
-      <guid>/2018/12/27/reading-2018-12-27/</guid>
+      <guid>https://lethean.github.io/2018/12/27/reading-2018-12-27/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -317,9 +317,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2018-12-15)</title>
-      <link>/2018/12/15/reading-2018-12-15/</link>
+      <link>https://lethean.github.io/2018/12/15/reading-2018-12-15/</link>
       <pubDate>Sat, 15 Dec 2018 00:00:00 +0000</pubDate>
-      <guid>/2018/12/15/reading-2018-12-15/</guid>
+      <guid>https://lethean.github.io/2018/12/15/reading-2018-12-15/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -345,9 +345,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2018-11-30)</title>
-      <link>/2018/11/30/reading-2018-11-30/</link>
+      <link>https://lethean.github.io/2018/11/30/reading-2018-11-30/</link>
       <pubDate>Fri, 30 Nov 2018 00:00:00 +0000</pubDate>
-      <guid>/2018/11/30/reading-2018-11-30/</guid>
+      <guid>https://lethean.github.io/2018/11/30/reading-2018-11-30/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -393,9 +393,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2018-11-23)</title>
-      <link>/2018/11/23/reading-2018-11-23/</link>
+      <link>https://lethean.github.io/2018/11/23/reading-2018-11-23/</link>
       <pubDate>Fri, 23 Nov 2018 00:00:00 +0000</pubDate>
-      <guid>/2018/11/23/reading-2018-11-23/</guid>
+      <guid>https://lethean.github.io/2018/11/23/reading-2018-11-23/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -455,9 +455,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2018-11-16)</title>
-      <link>/2018/11/16/reading-2018-11-16/</link>
+      <link>https://lethean.github.io/2018/11/16/reading-2018-11-16/</link>
       <pubDate>Fri, 16 Nov 2018 00:00:00 +0000</pubDate>
-      <guid>/2018/11/16/reading-2018-11-16/</guid>
+      <guid>https://lethean.github.io/2018/11/16/reading-2018-11-16/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -499,9 +499,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2018-11-01)</title>
-      <link>/2018/11/01/reading-2018-11-01/</link>
+      <link>https://lethean.github.io/2018/11/01/reading-2018-11-01/</link>
       <pubDate>Thu, 01 Nov 2018 00:00:00 +0000</pubDate>
-      <guid>/2018/11/01/reading-2018-11-01/</guid>
+      <guid>https://lethean.github.io/2018/11/01/reading-2018-11-01/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -551,9 +551,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2018-10-29)</title>
-      <link>/2018/10/29/reading-2018-10-29/</link>
+      <link>https://lethean.github.io/2018/10/29/reading-2018-10-29/</link>
       <pubDate>Mon, 29 Oct 2018 00:00:00 +0000</pubDate>
-      <guid>/2018/10/29/reading-2018-10-29/</guid>
+      <guid>https://lethean.github.io/2018/10/29/reading-2018-10-29/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -627,9 +627,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2018-09-16)</title>
-      <link>/2018/09/16/reading-2018-09-16/</link>
+      <link>https://lethean.github.io/2018/09/16/reading-2018-09-16/</link>
       <pubDate>Sun, 16 Sep 2018 00:00:00 +0000</pubDate>
-      <guid>/2018/09/16/reading-2018-09-16/</guid>
+      <guid>https://lethean.github.io/2018/09/16/reading-2018-09-16/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -681,9 +681,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2018-09-14)</title>
-      <link>/2018/09/14/reading-2018-09-14/</link>
+      <link>https://lethean.github.io/2018/09/14/reading-2018-09-14/</link>
       <pubDate>Fri, 14 Sep 2018 00:00:00 +0000</pubDate>
-      <guid>/2018/09/14/reading-2018-09-14/</guid>
+      <guid>https://lethean.github.io/2018/09/14/reading-2018-09-14/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;
@@ -737,9 +737,9 @@
     
     <item>
       <title>대체로 무해한 읽을거리 (2018-09-12)</title>
-      <link>/2018/09/12/reading-2018-09-12/</link>
+      <link>https://lethean.github.io/2018/09/12/reading-2018-09-12/</link>
       <pubDate>Wed, 12 Sep 2018 00:00:00 +0000</pubDate>
-      <guid>/2018/09/12/reading-2018-09-12/</guid>
+      <guid>https://lethean.github.io/2018/09/12/reading-2018-09-12/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;

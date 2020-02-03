@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>glibc | 대체로 무해함</title>
-    <link>/tags/glibc/</link>
-      <atom:link href="/tags/glibc/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/glibc/</link>
+      <atom:link href="https://lethean.github.io/tags/glibc/index.xml" rel="self" type="application/rss+xml" />
     <description>glibc</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 17 Feb 2015 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>glibc</title>
-      <link>/tags/glibc/</link>
+      <link>https://lethean.github.io/tags/glibc/</link>
     </image>
     
     <item>
       <title>리눅스에서 시간 변경 감지하기</title>
-      <link>/2015/02/17/detect-time-change-with-timerfd-in-linux/</link>
+      <link>https://lethean.github.io/2015/02/17/detect-time-change-with-timerfd-in-linux/</link>
       <pubDate>Tue, 17 Feb 2015 00:00:00 +0000</pubDate>
-      <guid>/2015/02/17/detect-time-change-with-timerfd-in-linux/</guid>
+      <guid>https://lethean.github.io/2015/02/17/detect-time-change-with-timerfd-in-linux/</guid>
       <description>&lt;p&gt;&lt;code&gt;systemd&lt;/code&gt; 데몬은 가끔 &amp;ldquo;Time has been changed&amp;quot;라는 로그 메시지를 출력합니다. 그래서 과연 어떤 방식으로 시간이 변경되는 이벤트를 감지하는지 궁금해서 
 &lt;a href=&#34;http://cgit.freedesktop.org/systemd/systemd/tree/src/core/manager.c#n1920&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;소스 코드&lt;/a&gt;
 를 한 번 들여다보았습니다.&lt;/p&gt;
@@ -39,9 +39,9 @@ then the timer is expired if the clock is reset.&lt;/p&gt;
     
     <item>
       <title>리눅스 IP 주소 / 링크 상태 변경 여부 감지하기</title>
-      <link>/2012/03/19/detect-change-of-ip-address-and-link-status-in-linux/</link>
+      <link>https://lethean.github.io/2012/03/19/detect-change-of-ip-address-and-link-status-in-linux/</link>
       <pubDate>Mon, 19 Mar 2012 00:00:00 +0000</pubDate>
-      <guid>/2012/03/19/detect-change-of-ip-address-and-link-status-in-linux/</guid>
+      <guid>https://lethean.github.io/2012/03/19/detect-change-of-ip-address-and-link-status-in-linux/</guid>
       <description>&lt;p&gt;리눅스에서 IP 주소가 변경되었거나 링크 상태 변경 여부(예를 들어 랜선이 꽂히거나 빠졌을때)를 자동으로 감지하는 C 코드입니다. &lt;code&gt;ifconfig&lt;/code&gt; 명령등의 결과를 파싱하는 방법이 아닌 리눅스 커널 &lt;code&gt;rtnetlink(7)&lt;/code&gt; 프로토콜과 &lt;code&gt;getifaddrs()&lt;/code&gt; 함수를 이용해 직접 처리합니다. 참조한 소스는 여러군데가 있는데 모두 구글링이 가능하므로 결과물만 기록으로 남겨둡니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;stdio.h&amp;gt;
 #include &amp;lt;string.h&amp;gt;
@@ -257,7 +257,7 @@ main (void)
 */
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;참고로 위 소스에서 네트웍 인터페이스 설정 변경을 감지하기 위해 사용한 소켓 파일 디스크립터(socket file descriptor)는 &lt;code&gt;select()&lt;/code&gt; / &lt;code&gt;poll()&lt;/code&gt; 등을 이용해 비동기적으로 감시하는 것도 가능합니다. 당연하지만, 
-&lt;a href=&#34;/2009/09/21/using-glib-mainloop/&#34;&gt;GLib 메인루프&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/09/21/using-glib-mainloop/&#34;&gt;GLib 메인루프&lt;/a&gt;
 의 &lt;code&gt;g_io_add_watch()&lt;/code&gt; 등을 이용해도 됩니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;[UPDATE 2012-03-21]&lt;/strong&gt; &lt;code&gt;rtnetlink(7)&lt;/code&gt; 프로토콜의 기반이 되는 &lt;code&gt;netlink(7)&lt;/code&gt; 프로토콜에 대해 더 자세히 알고 싶다면 
 &lt;a href=&#34;http://www.infradead.org/~tgr/libnl/doc/core.html#core_netlink_fundamentals&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Netlink 라이브러리의 Netlink 프로토콜 기초 문서&lt;/a&gt;
@@ -267,13 +267,13 @@ main (void)
     
     <item>
       <title>eventfd 소개</title>
-      <link>/2011/07/07/eventfd/</link>
+      <link>https://lethean.github.io/2011/07/07/eventfd/</link>
       <pubDate>Thu, 07 Jul 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/07/07/eventfd/</guid>
+      <guid>https://lethean.github.io/2011/07/07/eventfd/</guid>
       <description>&lt;p&gt;리눅스에서 비단 부모 자식 프로세스간 통신 뿐 아니라, 쓰레드간 메시지 전달에도 
 &lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/pipe.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;pipe()&lt;/a&gt;
 를 자주 이용합니다. 읽거나 쓸때 별도로 뮤텍스로 보호해줄 필요가 없기 때문이기도 하지만, 무엇보다도 poll(), select(), epoll() 등과 함께 사용할 수 있기 때문입니다. 예를 들어 예전에 적었던 
-&lt;a href=&#34;/2008/08/06/glib-thread-programming/&#34;&gt;GLib 쓰레드 프로그래밍&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/08/06/glib-thread-programming/&#34;&gt;GLib 쓰레드 프로그래밍&lt;/a&gt;
 에서 쓰레드간 통신에 g_async_queue()를 이용하는데, 이 방법의 단점은 쓰레드가 오직 이 메시지가 도착했을때만 깨어난다는 점입니다. 만일 이 쓰레드가 네트웍 소켓 작업이나 파일 읽기 쓰기 작업을 비동기적으로 계속 처리해야 한다면 타임아웃을 주어 처리하거나 반대로 다시 주기적으로 메시지큐를 검사하는 방법밖에 없습니다. 하지만, 리눅스에서 모든 소켓 작업, 파일 작업은 디스크립터(descriptor)로 단일화되어 있기 때문에 pipe()로 생성된 디스크립터와 실제 작업 디스크립터를 한꺼번에 epoll() 등을 이용해 처리하면 불필요한 오버헤드 없이 정확하게 작업을 처리해야할 시점에 깨어나 필요한 작업을 처리하게 됩니다. 즉, 메시지큐에 실제 메시지를 넣고 파이프의 쓰기 디스크립터에 더미 데이터를 쓰면, 작업 쓰레드에서는 파이프 읽기 디스크립터에 내용이 있을 경우 poll() 등이 감지하기 때문에 자동으로 깨어나 처리하는 방식입니다. 심지어, 파이프 전송시 더미 데이터가 아닌 메시지 내용 혹은 주소(pointer)를 쓰고, 읽는 쓰레드에서 이를 읽어 처리하면 별도의 메시지큐도 불필요하게 됩니다.&lt;/p&gt;
 &lt;p&gt;이 글에서 소개하려는 
 &lt;a href=&#34;http://www.kernel.org/doc/man-pages/online/pages/man2/eventfd.2.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;eventfd()&lt;/a&gt;
@@ -287,7 +287,7 @@ main (void)
 &lt;a href=&#34;http://linux.die.net/man/4/epoll&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;epoll()&lt;/a&gt;
  등을 함께 사용하면 고전 유닉스 프로그래밍의 한계에서 벗어나 마음껏 이벤트 기반 코드를 만들 수 있습니다.&lt;/p&gt;
 &lt;p&gt;물론 이미 잘 만들어진 
-&lt;a href=&#34;/2009/09/21/using-glib-mainloop/&#34;&gt;GLib 메인루프&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/09/21/using-glib-mainloop/&#34;&gt;GLib 메인루프&lt;/a&gt;
 나 
 &lt;a href=&#34;http://bebop.emstone.com/2011/05/18/libevent/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libevent&lt;/a&gt;
  등과 같은 라이브러리를 사용하는 것도 좋지만&amp;hellip; :)&lt;/p&gt;
@@ -296,9 +296,9 @@ main (void)
     
     <item>
       <title>도메인 메일 호스트(MX) 주소 얻기</title>
-      <link>/2011/04/05/get-domain-mx-host-name/</link>
+      <link>https://lethean.github.io/2011/04/05/get-domain-mx-host-name/</link>
       <pubDate>Tue, 05 Apr 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/04/05/get-domain-mx-host-name/</guid>
+      <guid>https://lethean.github.io/2011/04/05/get-domain-mx-host-name/</guid>
       <description>&lt;p&gt;예를 들어 &lt;a href=&#34;mailto:nobody@hades.net&#34;&gt;nobody@hades.net&lt;/a&gt;이라는 메일 주소의 서버는 hades.net인 것 같지만 실제로 메일을 호스팅하는 서버는 해당 도메인 서버에 질의해서 MX 레코드에 기록된 호스트를 찾아야 합니다. 그리고 이 작업을 위해 DNS 관련 프로토콜을 직접 구현하거나. 
 &lt;a href=&#34;http://cr.yp.to/djbdns.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;djbdns&lt;/a&gt;
  등과 같은 라이브러리를 이용합니다.&lt;/p&gt;
@@ -367,9 +367,9 @@ lookup_mx (const char *name)
     
     <item>
       <title>파일 공간 미리 할당하기</title>
-      <link>/2011/01/12/allocate-file-space-in-advance/</link>
+      <link>https://lethean.github.io/2011/01/12/allocate-file-space-in-advance/</link>
       <pubDate>Wed, 12 Jan 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/01/12/allocate-file-space-in-advance/</guid>
+      <guid>https://lethean.github.io/2011/01/12/allocate-file-space-in-advance/</guid>
       <description>&lt;p&gt;비단 비트토런트(BitTorrent)나 어뮬(aMule) 같은 P2P 응용 프로그램이 아니라도 파일 크기를 (대략이라도) 미리 알고 있을 경우, 디스크 공간을 미리 할당해서 단편화(fragmentation)를 줄이는 것은 물론 용량 부족으로 인한 쓰기 오류를 미리 막는 기법은 종종 필요합니다.&lt;/p&gt;
 &lt;p&gt;예전에는 이를 위해 파일을 생성한뒤 원하는 크기의 0으로 채워진 파일을 미리 만들어 두는 무식한 방법을 사용하거나, &lt;code&gt;lseek()&lt;/code&gt; 함수를 이용해 원하는 크기만큼 뒤로 이동한 뒤 더미 1바이트르 쓰는 기법 등을 사용했습니다. 물론 이 기법은 지금도 유용합니다.&lt;/p&gt;
 &lt;p&gt;그런데 요즘 리눅스 커널에서 주로 사용하는 파일시스템이 이런 기능을 근본적으로 지원하게 되면서 쉽게 사용할 수 있는 API가 추가되었는데, 다름아닌 &lt;code&gt;fallocate()&lt;/code&gt; / &lt;code&gt;posix_fallocate()&lt;/code&gt; 함수입니다. 매뉴얼에 의하면 리눅스 커널 2.6.23 버전, glibc 2.10 버전 이후부터 btrfs, ext4, ocfs2, xfs 파일시스템에서 지원한다고 하는데, 해당 파일시스템이 직접 지원하지 않을 경우 커널이 알아서 비효율적인 방법으로 처리해 주는 것 같습니다.&lt;/p&gt;
@@ -382,9 +382,9 @@ lookup_mx (const char *name)
     
     <item>
       <title>리눅스 / 맥오에스에서 CPU 갯수 얻기</title>
-      <link>/2009/12/27/get-number-of-cpu-on-linux-and-macosx/</link>
+      <link>https://lethean.github.io/2009/12/27/get-number-of-cpu-on-linux-and-macosx/</link>
       <pubDate>Sun, 27 Dec 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/12/27/get-number-of-cpu-on-linux-and-macosx/</guid>
+      <guid>https://lethean.github.io/2009/12/27/get-number-of-cpu-on-linux-and-macosx/</guid>
       <description>&lt;p&gt;Linux / MacOS X 플랫폼에서 CPU 갯수를 얻어오는 함수입니다. 잊어버릴까봐 기록해 둡니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
 #ifdef __linux__
@@ -429,14 +429,14 @@ main (int argc, char **argv)
     
     <item>
       <title>TCMalloc 구글 성능 도구를 이용한 메모리 누수 디버깅</title>
-      <link>/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/</link>
+      <link>https://lethean.github.io/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/</link>
       <pubDate>Thu, 18 Jun 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/</guid>
+      <guid>https://lethean.github.io/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/</guid>
       <description>&lt;p&gt;리눅스에서 메모리 침범이나 메모리 누수, 혹은 복잡한 메모리 접근 관련 오류를 디버깅할때는 대부분 
 &lt;a href=&#34;http://valgrind.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Valgrind&lt;/a&gt;
  도구를 이용합니다. 하지만 Valgrind는 많은 메모리를 사용하고 실행 속도가 현저하게 느려지기 때문에, 별도의 타겟 장비에서 제한된 조건으로 동작하는 어플리케이션에는 조금 무리가 있습니다. 게다가 Valgrind의 메모리 검사 도구는 프로그램이 종료된 시점에서 누수된 메모리만 찾기 때문에, 실행 중에는 엄청나게 메모리를 사용하다가 정상적인 객체 해제 루틴이 호출되면 모든 메모리가 정리되어 찾을 수 없는 경우는 발견하지 못합니다.&lt;/p&gt;
 &lt;p&gt;
-&lt;a href=&#34;/2009/04/29/tcmalloc-google-perftools/&#34;&gt;구글 성능 도구&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/04/29/tcmalloc-google-perftools/&#34;&gt;구글 성능 도구&lt;/a&gt;
 를 다시 검토하고 사용하게 된 이유도 바로 여기에 있습니다. 현재 디버깅 중인 프로그램의 문제가 대략 이렇습니다. 몇날 며칠이고 문제없이 가동해야 하는 프로그램이 특정 설정을 적용한 후에는, 자고 일어나면 10~20메가씩 메모리 점유율이 한꺼번에 올라갑니다. 하지만 Valgrind 도구를 사용해도 어느 부분이 문제인지 찾을 수가 없습니다. 지난 글에서 TCMalloc 메모리 할당자로 교체한 후 문제가 해결된 줄 알았던 바로 그 패턴이기도 합니다. 그래서 이번에는 프로파일 기능을 이용해 직접 메모리 누수를 디버깅 해보고, 나중을 위해 그 과정을 정리해 보았습니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;디버깅 환경&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;디버깅 환경은 우분투 9.04 x86_32 플랫폼입니다. x86_64 플랫폼에서는 이상하게 호출 그래프가 그려지지 않아서 일단 무시했습니다. 사용한 버전은 
@@ -494,9 +494,9 @@ $ sudo make install
     
     <item>
       <title>TCMalloc, 구글 성능 도구</title>
-      <link>/2009/04/29/tcmalloc-google-perftools/</link>
+      <link>https://lethean.github.io/2009/04/29/tcmalloc-google-perftools/</link>
       <pubDate>Wed, 29 Apr 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/04/29/tcmalloc-google-perftools/</guid>
+      <guid>https://lethean.github.io/2009/04/29/tcmalloc-google-perftools/</guid>
       <description>&lt;p&gt;장기간 실행되면서 빈번하게 메모리를 할당 / 해제하는 것은 물론 수십 개의 쓰레드가 동작하는 프로그램에서는 어쩔 수 없이 메모리 단편화(Memory Fragmentation)가 발생합니다. 메모리 단편화가 많을 경우 어플리케이션 로직에 메모리 누수(memork leak)가 없어도 C 라이브러리 메모리 관리자가 메모리를 커널에 반환하지 않기 때문에 프로세스의 메모리 사용량은 계속 늘어납니다.(참고로 이러한 경우인지 여부는 주기적으로 &lt;code&gt;mallinfo()&lt;/code&gt; 정보를 확인하면 됩니다) 물론 이를 회피하기 위한 기법이나 아키텍쳐는 많이 있지만, 그리 쉽게 원하는 성능과 효율을 얻기는 힘들더군요.&lt;/p&gt;
 &lt;p&gt;그런데, 며칠 동안 이와 비슷한 문제를 디버깅하다가 예전에 무심코 지나쳤던 
 &lt;a href=&#34;http://code.google.com/p/google-perftools/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Google Performance Tools&lt;/a&gt;
@@ -516,9 +516,9 @@ $ sudo make install
     
     <item>
       <title>우분투에서 C 라이브러리 맨페이지(manpage) 설치하기</title>
-      <link>/2009/04/08/pthread-man-pages-in-ubuntu-or-debian/</link>
+      <link>https://lethean.github.io/2009/04/08/pthread-man-pages-in-ubuntu-or-debian/</link>
       <pubDate>Wed, 08 Apr 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/04/08/pthread-man-pages-in-ubuntu-or-debian/</guid>
+      <guid>https://lethean.github.io/2009/04/08/pthread-man-pages-in-ubuntu-or-debian/</guid>
       <description>&lt;p&gt;리눅스에서 개발할때 &amp;lsquo;man&amp;rsquo; 명령을 이용해 매뉴얼 페이지를 많이 참고하는데, 자주 시스템을 다시 설치하다 보니 설치되지 않은 매뉴얼 때문에 매번 구글을 찾는라 귀찮은 적이 많아 적어둡니다. 우분투나 데비안에서만 유효합니다.&lt;/p&gt;
 &lt;p&gt;기본적인 C 라이브러리 관련 매뉴얼 패이지는 `manpages-dev&amp;rsquo; 패키지를 설치하면 되고, pthread_*()  류의 함수는 `glibc-doc&amp;rsquo; 패키지를 설치하면 됩니다. 즉, 터미널에서 다음과 같이 입력하면 됩니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;sudo apt-get install manpages-dev glibc-doc
@@ -528,9 +528,9 @@ $ sudo make install
     
     <item>
       <title>리눅스 멀티쓰레드(futex) 호출 디버깅</title>
-      <link>/2006/12/21/linux-multithread-futex-call-debugging/</link>
+      <link>https://lethean.github.io/2006/12/21/linux-multithread-futex-call-debugging/</link>
       <pubDate>Thu, 21 Dec 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/12/21/linux-multithread-futex-call-debugging/</guid>
+      <guid>https://lethean.github.io/2006/12/21/linux-multithread-futex-call-debugging/</guid>
       <description>&lt;p&gt;리눅스 커널 2.6 이후, 즉 최신 리눅스 환경에서 어플리케이션을 개발할때 멀티쓰레드인 경우 데드락이나 블럭킹 현상을 디버깅하려면 매우 골치가 아프다. strace나 gdb 백트레이스를 추적하다보면 결국 &lt;code&gt;futex()&lt;/code&gt; 시스템콜을 호출하고, 여기서 멈춰있는 경우가 대부분이다. 이 경우 대부분 이 시스템콜은 pthread 라이브러리가 호출하는 것이다. 이 경우 정확히 어떤 공유 라이브러리와 연관이 있는지 확인하기 힘든데 
 &lt;a href=&#34;http://galathilion.livejournal.com/91051.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;여기&lt;/a&gt;
  블로그에 달린 댓글을 보면 다음 2가지 방법을 권하고 있다.&lt;/p&gt;
@@ -550,9 +550,9 @@ $ sudo make install
     
     <item>
       <title>glibc 메모리 할당 방식 튜닝</title>
-      <link>/2006/03/17/glibc-memory-allocation-tune/</link>
+      <link>https://lethean.github.io/2006/03/17/glibc-memory-allocation-tune/</link>
       <pubDate>Fri, 17 Mar 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/03/17/glibc-memory-allocation-tune/</guid>
+      <guid>https://lethean.github.io/2006/03/17/glibc-memory-allocation-tune/</guid>
       <description>&lt;p&gt;&amp;lsquo;Malloc 연구 : 과도한 마이너 폴트 사례 (
 &lt;a href=&#34;http://www.usenix.org/publications/library/proceedings/als01/ezolt.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;A Study in Malloc: A Case of Excessive Minor Faults&lt;/a&gt;
 &amp;lsquo;라는 논문은 개발자가 흔히 부딪힐 수 있는 문제에 대하여 원인 추적 및 해결 과정을 흥미롭게 보여준다. 더불어 리눅스에서 GNU libc의 메모리 관리자를 튜닝하는 방법을 이용해 코드 재작성 없이 어플리케이션 성능을 향상시키는 방법에 대해 논하고 있다.&lt;/p&gt;
@@ -578,9 +578,9 @@ export MALLOC_TRIM_THRESHOLD_=-1
     
     <item>
       <title>GCC와 GLIBC로 최적화하기</title>
-      <link>/2006/03/13/optimizing-applications-with-gcc-and-glibc/</link>
+      <link>https://lethean.github.io/2006/03/13/optimizing-applications-with-gcc-and-glibc/</link>
       <pubDate>Mon, 13 Mar 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/03/13/optimizing-applications-with-gcc-and-glibc/</guid>
+      <guid>https://lethean.github.io/2006/03/13/optimizing-applications-with-gcc-and-glibc/</guid>
       <description>&lt;p&gt;gcc와 glibc로 어플리케이션 최적화하기 (
 &lt;a href=&#34;http://people.redhat.com/drepper/optimtut1.ps.gz&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Optimizing Applications with gcc &amp;amp; glibc&lt;/a&gt;
 )&lt;/p&gt;
@@ -673,9 +673,9 @@ strcmp(), strcpy(), strlen()
     
     <item>
       <title>라이브러리 설계, 구현, 유지에 좋은 습관</title>
-      <link>/2006/02/24/good-practices-in-library-design-implementation-and-maintenance/</link>
+      <link>https://lethean.github.io/2006/02/24/good-practices-in-library-design-implementation-and-maintenance/</link>
       <pubDate>Fri, 24 Feb 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/02/24/good-practices-in-library-design-implementation-and-maintenance/</guid>
+      <guid>https://lethean.github.io/2006/02/24/good-practices-in-library-design-implementation-and-maintenance/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.gnu.org/software/libc/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;glibc(GNU libc)&lt;/a&gt;
  관리자이며 개발자인 
@@ -709,9 +709,9 @@ strcmp(), strcpy(), strlen()
     
     <item>
       <title>linux-gate.so.1</title>
-      <link>/2006/01/17/linux-gateso1/</link>
+      <link>https://lethean.github.io/2006/01/17/linux-gateso1/</link>
       <pubDate>Tue, 17 Jan 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/01/17/linux-gateso1/</guid>
+      <guid>https://lethean.github.io/2006/01/17/linux-gateso1/</guid>
       <description>&lt;p&gt;데비안 패키지 glibc-2.3.5 이후부터 &lt;code&gt;ldd&lt;/code&gt; 명령의 결과에 예전에 없던 &amp;lsquo;linux-gate.so.1&amp;rsquo; 공유 라이브러리가 포함되어 있어 궁금했다. 다음 예에서 첫번째 줄이다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;# ldd /bin/sh
 linux-gate.so.1 =&amp;gt;  (0xffffe000)

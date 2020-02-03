@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Vala | 대체로 무해함</title>
-    <link>/tags/vala/</link>
-      <atom:link href="/tags/vala/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/vala/</link>
+      <atom:link href="https://lethean.github.io/tags/vala/index.xml" rel="self" type="application/rss+xml" />
     <description>Vala</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Wed, 15 Jun 2011 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Vala</title>
-      <link>/tags/vala/</link>
+      <link>https://lethean.github.io/tags/vala/</link>
     </image>
     
     <item>
       <title>Vala 언어 소개</title>
-      <link>/2011/06/15/vala-language-introduction/</link>
+      <link>https://lethean.github.io/2011/06/15/vala-language-introduction/</link>
       <pubDate>Wed, 15 Jun 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/06/15/vala-language-introduction/</guid>
+      <guid>https://lethean.github.io/2011/06/15/vala-language-introduction/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;https://live.gnome.org/Vala&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Vala&lt;/a&gt;
  언어는 C# 언어와 문법이 비슷한 객체 지향 언어입니다. Vala 언어로 작성한 소스를 이용해 실행 파일을 직접 만들 수도 있지만 C 소스 코드로 변환할 수도 있는데, 더 정확히 말하면, GObject 프레임워크를 이용하는 순수 GLib 기반 C 언어 코드를 생성한 뒤 이를 다시 C 컴파일를 이용해 실행 파일을 생성합니다. 따라서 이렇게 생성된 C 소스 코드는 이론적으로 GLib 라이브러리가 포팅된 어떤 플랫폼에서든 동작할 수 있고, 실행 속도 역시 C 언어로 작성된 코드와 거의 동일한 성능을 보여 줍니다. 생성된 소스 코드나 라이브러리는 GLib 외의 다른 라이브러리 의존성이 없기 때문에(posix 프로파일을 사용하면 GLib 의존성도 없어짐) 당연히 다른 C 언어에서도 이용할 수 있고, 반대로 C 언어로 개발된 라이브러리를 별다른 바인딩 코드 없이 VAPI 기법을 통해 사용할 수도 있습니다.&lt;/p&gt;

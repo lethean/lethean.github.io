@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Bugzilla | 대체로 무해함</title>
-    <link>/tags/bugzilla/</link>
-      <atom:link href="/tags/bugzilla/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/bugzilla/</link>
+      <atom:link href="https://lethean.github.io/tags/bugzilla/index.xml" rel="self" type="application/rss+xml" />
     <description>Bugzilla</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Wed, 11 Jan 2006 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Bugzilla</title>
-      <link>/tags/bugzilla/</link>
+      <link>https://lethean.github.io/tags/bugzilla/</link>
     </image>
     
     <item>
       <title>Trac and Bugzilla</title>
-      <link>/2006/01/11/trac-and-bugzilla/</link>
+      <link>https://lethean.github.io/2006/01/11/trac-and-bugzilla/</link>
       <pubDate>Wed, 11 Jan 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/01/11/trac-and-bugzilla/</guid>
+      <guid>https://lethean.github.io/2006/01/11/trac-and-bugzilla/</guid>
       <description>&lt;p&gt;Edgewall Software의 
 &lt;a href=&#34;http://www.edgewall.com/trac/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Trac&lt;/a&gt;
  시스템에 대해 

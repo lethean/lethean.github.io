@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>GLib | 대체로 무해함</title>
-    <link>/tags/glib/</link>
-      <atom:link href="/tags/glib/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/glib/</link>
+      <atom:link href="https://lethean.github.io/tags/glib/index.xml" rel="self" type="application/rss+xml" />
     <description>GLib</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 08 Mar 2016 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>GLib</title>
-      <link>/tags/glib/</link>
+      <link>https://lethean.github.io/tags/glib/</link>
     </image>
     
     <item>
       <title>libuv 사용기</title>
-      <link>/2016/03/08/note-about-libuv/</link>
+      <link>https://lethean.github.io/2016/03/08/note-about-libuv/</link>
       <pubDate>Tue, 08 Mar 2016 00:00:00 +0000</pubDate>
-      <guid>/2016/03/08/note-about-libuv/</guid>
+      <guid>https://lethean.github.io/2016/03/08/note-about-libuv/</guid>
       <description>&lt;p&gt;요즘은 비동기 이벤트 루프가 필요하면 
 &lt;a href=&#34;https://en.wikipedia.org/wiki/GLib&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib&lt;/a&gt;
  라이브러리 대신 
@@ -59,9 +59,9 @@
     
     <item>
       <title>리눅스 IP 주소 / 링크 상태 변경 여부 감지하기</title>
-      <link>/2012/03/19/detect-change-of-ip-address-and-link-status-in-linux/</link>
+      <link>https://lethean.github.io/2012/03/19/detect-change-of-ip-address-and-link-status-in-linux/</link>
       <pubDate>Mon, 19 Mar 2012 00:00:00 +0000</pubDate>
-      <guid>/2012/03/19/detect-change-of-ip-address-and-link-status-in-linux/</guid>
+      <guid>https://lethean.github.io/2012/03/19/detect-change-of-ip-address-and-link-status-in-linux/</guid>
       <description>&lt;p&gt;리눅스에서 IP 주소가 변경되었거나 링크 상태 변경 여부(예를 들어 랜선이 꽂히거나 빠졌을때)를 자동으로 감지하는 C 코드입니다. &lt;code&gt;ifconfig&lt;/code&gt; 명령등의 결과를 파싱하는 방법이 아닌 리눅스 커널 &lt;code&gt;rtnetlink(7)&lt;/code&gt; 프로토콜과 &lt;code&gt;getifaddrs()&lt;/code&gt; 함수를 이용해 직접 처리합니다. 참조한 소스는 여러군데가 있는데 모두 구글링이 가능하므로 결과물만 기록으로 남겨둡니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;stdio.h&amp;gt;
 #include &amp;lt;string.h&amp;gt;
@@ -277,7 +277,7 @@ main (void)
 */
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;참고로 위 소스에서 네트웍 인터페이스 설정 변경을 감지하기 위해 사용한 소켓 파일 디스크립터(socket file descriptor)는 &lt;code&gt;select()&lt;/code&gt; / &lt;code&gt;poll()&lt;/code&gt; 등을 이용해 비동기적으로 감시하는 것도 가능합니다. 당연하지만, 
-&lt;a href=&#34;/2009/09/21/using-glib-mainloop/&#34;&gt;GLib 메인루프&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/09/21/using-glib-mainloop/&#34;&gt;GLib 메인루프&lt;/a&gt;
 의 &lt;code&gt;g_io_add_watch()&lt;/code&gt; 등을 이용해도 됩니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;[UPDATE 2012-03-21]&lt;/strong&gt; &lt;code&gt;rtnetlink(7)&lt;/code&gt; 프로토콜의 기반이 되는 &lt;code&gt;netlink(7)&lt;/code&gt; 프로토콜에 대해 더 자세히 알고 싶다면 
 &lt;a href=&#34;http://www.infradead.org/~tgr/libnl/doc/core.html#core_netlink_fundamentals&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Netlink 라이브러리의 Netlink 프로토콜 기초 문서&lt;/a&gt;
@@ -287,35 +287,35 @@ main (void)
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (5)</title>
-      <link>/2012/02/24/oop-with-gobject-5/</link>
+      <link>https://lethean.github.io/2012/02/24/oop-with-gobject-5/</link>
       <pubDate>Fri, 24 Feb 2012 00:00:00 +0000</pubDate>
-      <guid>/2012/02/24/oop-with-gobject-5/</guid>
+      <guid>https://lethean.github.io/2012/02/24/oop-with-gobject-5/</guid>
       <description>&lt;p&gt;거의 2년만에 GObject 객체 지향 프로그래밍 연재 글을 포스팅합니다. 사실 이 글의 일부는 예전에 작성해 둔 것인데, 이번 
 &lt;a href=&#34;http://gnome-kr.blogspot.com/2012/02/2-gnome-tech-talks.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME Tech Talks&lt;/a&gt;
 에서 발표 하나를 맡게 되면서, 슬라이드 자료를 따로 만들 시간은 없고 그렇다고 오래된 자료를 재탕하는 건 실례인 것 같아 조금 보완해서 작성했습니다. 참고로, GObject 개념을 잘 모르는 분이라면 이전 연재 글을 먼저 읽어 보시면 도움이 될 수 있습니다. :)&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2009/08/10/oop-with-gobject-1/&#34; title=&#34;GObject 객체 지향 프로그래밍 (1)&#34;&gt;GObject 객체 지향 프로그래밍 (1)&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/08/10/oop-with-gobject-1/&#34; title=&#34;GObject 객체 지향 프로그래밍 (1)&#34;&gt;GObject 객체 지향 프로그래밍 (1)&lt;/a&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2009/08/14/oop-with-gobject-2/&#34; title=&#34;GObject 객체 지향 프로그래밍 (2)&#34;&gt;GObject 객체 지향 프로그래밍 (2)&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/08/14/oop-with-gobject-2/&#34; title=&#34;GObject 객체 지향 프로그래밍 (2)&#34;&gt;GObject 객체 지향 프로그래밍 (2)&lt;/a&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2009/08/18/oop-with-gobject-3/&#34; title=&#34;GObject 객체 지향 프로그래밍 (3)&#34;&gt;GObject 객체 지향 프로그래밍 (3)&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/08/18/oop-with-gobject-3/&#34; title=&#34;GObject 객체 지향 프로그래밍 (3)&#34;&gt;GObject 객체 지향 프로그래밍 (3)&lt;/a&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2009/08/24/oop-with-gobject-4/&#34; title=&#34;GObject 객체 지향 프로그래밍 (4)&#34;&gt;GObject 객체 지향 프로그래밍 (4)&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/08/24/oop-with-gobject-4/&#34; title=&#34;GObject 객체 지향 프로그래밍 (4)&#34;&gt;GObject 객체 지향 프로그래밍 (4)&lt;/a&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2010/02/11/how-to-make-a-gobject-singleton/&#34; title=&#34;싱글턴(Singleton) GObject 객체 만들기&#34;&gt;싱글턴(Singleton) GObject 객체 만들기&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2010/02/11/how-to-make-a-gobject-singleton/&#34; title=&#34;싱글턴(Singleton) GObject 객체 만들기&#34;&gt;싱글턴(Singleton) GObject 객체 만들기&lt;/a&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;a href=&#34;/2010/04/07/serialize-gobject-properties/&#34; title=&#34;GObject 속성 직렬화(Serialization)하기&#34;&gt;GObject 속성 직렬화(Serialization)하기&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2010/04/07/serialize-gobject-properties/&#34; title=&#34;GObject 속성 직렬화(Serialization)하기&#34;&gt;GObject 속성 직렬화(Serialization)하기&lt;/a&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;GObject 객체 지향 시스템을 구성하는 여러가지 개념 중 상속(inheritance), 참고 카운터(reference counting), 속성(properties) 등에 대해서는 지난 글에서 이미 소개했습니다. 아직 GObject 라이브러리에서 소개하지 않은 개념이 아직 많이 남아 있지만, 그 중에서 가장 중요한 것 중 하나는 바로 시그널(signals)이 아닐까 생각합니다. 속성이 변경되었을때 자동으로 호출되는 콜백 함수를 등록해서 사용하는 방법을 설명할 때 약간 소개했지만, 아무래도 그걸로는 부족하기 때문에 이번 글은 시그널의 개념과 사용 방법, 그리고 속성 바인딩을 정리해 보았습니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;간단한 클러터 기반 시계&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/myclock-screenshot.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/myclock-screenshot.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;언제나 그렇듯이 재미없는 예제 소스를 먼저 보여드립니다. 이 소스를 컴파일해서 실행하면 위 그림과 같은 시계가 동작합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;/* myclock1.c */
 
@@ -665,9 +665,9 @@ main (int    argc,
 }
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;위 코드에서 변경된 내용은, &lt;code&gt;MyClock&lt;/code&gt;에 문자열 형식의 &lt;code&gt;text&lt;/code&gt; 속성을 추가하고[&lt;code&gt;my_clock_class_init()&lt;/code&gt;], &lt;code&gt;datetime&lt;/code&gt; 속성을 갱신할때 &lt;code&gt;text&lt;/code&gt; 속성도 함께 갱신하도록 한 다음[&lt;code&gt;my_clock_set_date_time()&lt;/code&gt;], 기존 속성 변경(&lt;code&gt;notify::datetime&lt;/code&gt;)에 대한 &lt;code&gt;g_signal_connect()&lt;/code&gt; 함수 호출 대신 &lt;code&gt;g_object_bind_property()&lt;/code&gt; 함수를 이용해 두 객체의 속성을 묶었다는 점입니다. 여기서 핵심은 물론 &lt;code&gt;g_object_bind_property()&lt;/code&gt; 함수인데, 이 함수는 
-&lt;a href=&#34;/2010/10/02/glib-2-26-0-release/&#34;&gt;GLib 2.26 버전에 추가&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2010/10/02/glib-2-26-0-release/&#34;&gt;GLib 2.26 버전에 추가&lt;/a&gt;
 되었으며 
-&lt;a href=&#34;/2008/12/15/exobinding/&#34;&gt;예전에 소개한 ExoBinding&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/12/15/exobinding/&#34;&gt;예전에 소개한 ExoBinding&lt;/a&gt;
 과 사용법이 거의 유사합니다. 물론, 옵션을 통해 바인딩하는 시점부터 값을 동기화할 지(&lt;code&gt;G_BINDING_SYNC_CREATE&lt;/code&gt;), 단방향이 아닌 양방향으로 동기화할 지(&lt;code&gt;G_BINDING_BIDIRECTIONAL&lt;/code&gt;) 등을 지정할 수도 있습니다. 이처럼, 위의 코드에서 볼 수 있듯이, 속성 바인딩을 이용하면 매번 콜백함수를 만들지 않고도 간단하게 코드 몇 줄로 원하는 객체 속성간의 동기화(synchronization)를 처리할 수 있습니다.&lt;/p&gt;
 &lt;p&gt;여담이지만, 처음 이 기능을 접했을때 맥, 아이폰 응용 프로그램을 개발하기 위해 XCode에서 마우스 드래그 만으로 객체 속성간 바인딩이 지원되는 것처럼, 코딩이 아닌, Glade 같은 GUI 도구에서 위젯 속성간 바인딩이 지원되면 참 편하지 않을까 하는 생각이 들었던 적도 있습니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;시그널 (Signals)&lt;/strong&gt;&lt;/p&gt;
@@ -807,9 +807,9 @@ main (int    argc,
     
     <item>
       <title>Vala 언어 소개</title>
-      <link>/2011/06/15/vala-language-introduction/</link>
+      <link>https://lethean.github.io/2011/06/15/vala-language-introduction/</link>
       <pubDate>Wed, 15 Jun 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/06/15/vala-language-introduction/</guid>
+      <guid>https://lethean.github.io/2011/06/15/vala-language-introduction/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;https://live.gnome.org/Vala&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Vala&lt;/a&gt;
  언어는 C# 언어와 문법이 비슷한 객체 지향 언어입니다. Vala 언어로 작성한 소스를 이용해 실행 파일을 직접 만들 수도 있지만 C 소스 코드로 변환할 수도 있는데, 더 정확히 말하면, GObject 프레임워크를 이용하는 순수 GLib 기반 C 언어 코드를 생성한 뒤 이를 다시 C 컴파일를 이용해 실행 파일을 생성합니다. 따라서 이렇게 생성된 C 소스 코드는 이론적으로 GLib 라이브러리가 포팅된 어떤 플랫폼에서든 동작할 수 있고, 실행 속도 역시 C 언어로 작성된 코드와 거의 동일한 성능을 보여 줍니다. 생성된 소스 코드나 라이브러리는 GLib 외의 다른 라이브러리 의존성이 없기 때문에(posix 프로파일을 사용하면 GLib 의존성도 없어짐) 당연히 다른 C 언어에서도 이용할 수 있고, 반대로 C 언어로 개발된 라이브러리를 별다른 바인딩 코드 없이 VAPI 기법을 통해 사용할 수도 있습니다.&lt;/p&gt;
@@ -831,9 +831,9 @@ main (int    argc,
     
     <item>
       <title>GUDev 사용하기</title>
-      <link>/2011/03/07/using-gudev/</link>
+      <link>https://lethean.github.io/2011/03/07/using-gudev/</link>
       <pubDate>Mon, 07 Mar 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/03/07/using-gudev/</guid>
+      <guid>https://lethean.github.io/2011/03/07/using-gudev/</guid>
       <description>&lt;p&gt;이제는 리눅스 데스크탑 뿐 아니라 임베디드 시스템에서도 당연하게 사용하는 
 &lt;a href=&#34;http://en.wikipedia.org/wiki/Udev&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;udev&lt;/a&gt;
  시스템은 단순히 장치 파일을 자동으로 생성해 주는 역할 뿐 아니라 여러 핫플러그(hot-plug) 방식 장치를 감지하는데도 유용하게 사용됩니다. 비단 키보드, 마우스 같은 입력 장치 뿐 아니라 USB 플래시, SATA / IDE / SCSI 하드디스크, CD-RW 등과 같은 저장장치가 삽입되었거나 제거되었을 경우 쉽게 감지할 수 있게 도와줍니다.&lt;/p&gt;
@@ -1094,9 +1094,9 @@ main (int    argc,
     
     <item>
       <title>GLib 2.26.0 출시</title>
-      <link>/2010/10/02/glib-2-26-0-release/</link>
+      <link>https://lethean.github.io/2010/10/02/glib-2-26-0-release/</link>
       <pubDate>Sat, 02 Oct 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/10/02/glib-2-26-0-release/</guid>
+      <guid>https://lethean.github.io/2010/10/02/glib-2-26-0-release/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-list/2010-September/msg00083.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib 2.26.0 안정버전&lt;/a&gt;
 이 출시되었습니다. 한동안 개인적으로 관심있는 업데이트가 없어서 정리를 안 했는데, 이번 업데이트는 흥미로운 기능이 매우 많이 추가되어 있어 관심을 가질 수 밖에 없을 것 같습니다.&lt;/p&gt;
@@ -1111,11 +1111,11 @@ main (int    argc,
 &lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Date-and-Time-Functions.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;GDate&lt;/code&gt;&lt;/a&gt;
  API만 있어서 매번 시 / 분 / 초를 표현하는 자료구조와 API를 만들어 사용했던 번거로움이 사라질 것 같습니다.&lt;/p&gt;
 &lt;p&gt;gobject 모듈에는 
-&lt;a href=&#34;/2009/04/20/gobject-property-binding-required/&#34;&gt;제가 무척이나 아쉬워했던&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/04/20/gobject-property-binding-required/&#34;&gt;제가 무척이나 아쉬워했던&lt;/a&gt;
  객체 속성 바인딩 
 &lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/GBinding.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;GBinding&lt;/code&gt;&lt;/a&gt;
  기능이 추가되었습니다. 사용법은 이전에 제가 소개했던 
-&lt;a href=&#34;/2008/12/15/exobinding/&#34;&gt;&lt;code&gt;ExoBinding&lt;/code&gt;&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/12/15/exobinding/&#34;&gt;&lt;code&gt;ExoBinding&lt;/code&gt;&lt;/a&gt;
 과 거의 비슷하고, 내부 구현도 거의 유사합니다. 더불어 트리모델이나 객체 속성으로 기존 구조체를 사용하기 위해 매번 GBoxed 타입을 구현했는데, 이를 쉽게 해주는 
 &lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-Type-Information.html#G-DEFINE-BOXED-TYPE:CAPS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;G_DEFINE_BOXED_TYPE()&lt;/code&gt;&lt;/a&gt;
 , 
@@ -1144,9 +1144,9 @@ main (int    argc,
     
     <item>
       <title>GObject 속성 직렬화(Serialization)하기</title>
-      <link>/2010/04/07/serialize-gobject-properties/</link>
+      <link>https://lethean.github.io/2010/04/07/serialize-gobject-properties/</link>
       <pubDate>Wed, 07 Apr 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/04/07/serialize-gobject-properties/</guid>
+      <guid>https://lethean.github.io/2010/04/07/serialize-gobject-properties/</guid>
       <description>&lt;p&gt;GObject 객체의 속성(properties)을 자동으로 저장하고 다시 자동으로 불러들이는 일련의 작업을 자동화할 수 있다면 편하지 않을까 생각해 본 적이 있을겁니다. 이러한 과정을 
 &lt;a href=&#34;http://en.wikipedia.org/wiki/Serialization&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;직렬화(serialization)&lt;/a&gt;
 라고 부른다면, 오브젝티브-C, 자바 등과 같은 많은 언어가 이미 기본적으로 직렬화를 지원하거나 관련 라이브러리를 제공하고 있는만큼, GObject 객체 직렬화 라이브러리가 없을리가 없습니다. 예를 들어, 
@@ -1156,7 +1156,7 @@ main (int    argc,
  등과 같은 라이브러리를 사용하면 됩니다.&lt;/p&gt;
 &lt;p&gt;그런데, 여기서 드는 의문은, 왜 GObject 라이브러리 자체에는 정작 이 기능이 없을까입니다. 그리고, 잠깐 생각해보고 내린 결론은, 특정한 형식을 제한하기보다는, 직렬화를 위한 기본 기능만 지원하고, 어플리케이션 특성에 맞게 직렬화는 프로그래머의 자유에 맡긴게 아닌가 합니다. 위에서 언급한 라이브러리도 기능은 강력하지만, 특정 용도에서 사용하기 위해 만들어지다 보니 불필요하거나 어려운 부분이 조금 있습니다.&lt;/p&gt;
 &lt;p&gt;그래서 이 글에서는 
-&lt;a href=&#34;/2009/08/24/oop-with-gobject-4/&#34;&gt;이전 글&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/08/24/oop-with-gobject-4/&#34;&gt;이전 글&lt;/a&gt;
 에서 잠깐 언급한 객체 속성 정보 얻는 방법을 이용하여 간단한 GObject 속성 직렬화 코드를 구현하는데 필요한 몇 가지 기법을 소개하려고 합니다. 실제 직렬화 기능은 용도와 방식에 맞게 구현하면 되리라 생각합니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;직렬화 대상 속성 지정하기&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;직렬화하려는 속성을 매번 지정하는 것보다 객체 설계시 아예 지정해버릴 수 있는 방법이 있으면 자동화에 편합니다. 이때 사용할 수 있는 기법이 &lt;code&gt;G_PARAM_USER_SHIFT&lt;/code&gt; 매크로입니다. 객체 클래스 초기화 함수에서 속성을 추가(install)할때 보통 &lt;code&gt;G_PARAM_READABLE&lt;/code&gt;, &lt;code&gt;G_PARAM_READWRITE&lt;/code&gt; 등과 같은 미리 정의되어 있는 특성을 지정하는데, &lt;code&gt;G_PARAM_USER_SHIFT&lt;/code&gt; 매크로를 이용해 사용자가 임의의 특성을 더 추가할 수 있습니다. 예를 들어 다음과 같이 정의하면 됩니다.&lt;/p&gt;
@@ -1313,9 +1313,9 @@ register_transform_funcs (void)
     
     <item>
       <title>GLib 테스트 프레임워크 사용하기</title>
-      <link>/2010/02/12/using-glib-test-framework/</link>
+      <link>https://lethean.github.io/2010/02/12/using-glib-test-framework/</link>
       <pubDate>Fri, 12 Feb 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/02/12/using-glib-test-framework/</guid>
+      <guid>https://lethean.github.io/2010/02/12/using-glib-test-framework/</guid>
       <description>&lt;p&gt;GLib 라이브러리 2.16 버전부터 지원하는 
 &lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;테스트 프레임워크&lt;/a&gt;
 는 C 언어용 
@@ -1387,7 +1387,7 @@ PASS: g-test-sample1
 $ gtester-report sample-log.xml &amp;gt; sample-log.html
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;위와 같이 실행하여 생성한 HTML 문서 결과는 다음과 같습니다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/gtester-report-screenshot.png&#34; alt=&#34;&#34; title=&#34;gtester-report screenshot&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/gtester-report-screenshot.png&#34; alt=&#34;&#34; title=&#34;gtester-report screenshot&#34;&gt;&lt;/p&gt;
 &lt;p&gt;참고로, gtester 프로그램의 인수로 여러 테스트 실행 파일을 한꺼번에 전달하면 모든 테스트 실행 파일의 테스트 슈트가 하나의 결과로 통합됩니다.&lt;/p&gt;
 &lt;p&gt;위 코드에서 사용한 테스트 코드를 보면 제일 먼저 
 &lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-init&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_init()&lt;/code&gt;&lt;/a&gt;
@@ -1419,7 +1419,7 @@ $ gtester-report sample-log.xml &amp;gt; sample-log.html
 ) 있으므로, 별로 길지 않으니, 직접 확인해 보시기 바랍니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;프로젝트에 활용하기&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;MVP 개발 모델과 TDD + 유닛테스트 도구를 이용하여 응용 프로그램을 개발하면(
-&lt;a href=&#34;/2008/12/17/presenter-first-development/&#34;&gt;Presenter First 개발&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/12/17/presenter-first-development/&#34;&gt;Presenter First 개발&lt;/a&gt;
 ) 더 빠르고 쉽게 튼튼한 코드를 만들 수 있으니, 한 번 검토해 보시기 바랍니다. 개발자가 TDD 방법론을 주저하는 이유 중 하나가 테스트 코드까지 만들다 보니 늘어나는 코드량과 늘어나는 개발 시간 때문인데, 테스트 코드를 그대로 실제 코드로 재활용할 수 있다면 얘기가 달라지겠죠.&lt;/p&gt;
 &lt;p&gt;프로젝트 일일빌드시 테스트 루틴도 동작하도록 한뒤 자동으로 테스트 결과를 웹사이트에 게재하는 것도 좋은 개발 습관입니다. 아예 코드 수정 후 저장소에 커밋하면 반드시 모든 테스트 케이스를 통과해야만 커밋되도록 저장소를 설정할 수도 있지만, 엄청난 서버 부하를 야기할 수 있으므로, 테스트 케이스를 통과한 코드만 커밋할 수 있도록 가이드라인을 규정하는 것도 좋습니다.&lt;/p&gt;
 &lt;p&gt;유닛테스트는 특정 객체나 모듈의 모든 API가 항상 정상적으로 동작하는지를 검사하기 위해 사용합니다. 그래서 가장 기본적인 사용법은 공개 함수를 다양한 인수로 호출한 뒤 그 결과값을 확인하는 방식입니다. 하지만 실무에서는 그렇게 단순한(?) 버그만 존재하는게 아니라서, 특정 시나리오나 특정 조건을 만족할 경우에만 버그 현상이 재현되는 경우도 많습니다. 이러한 경우, 버그에 대한 테스트 케이스를 추가하고 이 케이스에 대한 테스트가 통과할때까지 디버깅을 합니다. 이렇게 해두면 동일한 버그가 나중에 재발하는 걸 방지할 수 있습니다. 대부분 회사에서는 버그(이슈)관리시스템을 사용하므로 
@@ -1443,9 +1443,9 @@ $ gtester-report sample-log.xml &amp;gt; sample-log.html
     
     <item>
       <title>싱글턴(Singleton) GObject 객체 만들기</title>
-      <link>/2010/02/11/how-to-make-a-gobject-singleton/</link>
+      <link>https://lethean.github.io/2010/02/11/how-to-make-a-gobject-singleton/</link>
       <pubDate>Thu, 11 Feb 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/02/11/how-to-make-a-gobject-singleton/</guid>
+      <guid>https://lethean.github.io/2010/02/11/how-to-make-a-gobject-singleton/</guid>
       <description>&lt;p&gt;좋은 
 &lt;a href=&#34;http://blogs.gnome.org/xclaesse/2010/02/11/how-to-make-a-gobject-singleton/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;블로그 포스트&lt;/a&gt;
 가 올라왔길래, 우리말로 정리해 보았습니다.&lt;/p&gt;
@@ -1503,16 +1503,16 @@ foo_bar_class_init (FooBarClass *klass)
     
     <item>
       <title>GLib 2.22.0 출시</title>
-      <link>/2009/09/24/glib-2-22-0-release/</link>
+      <link>https://lethean.github.io/2009/09/24/glib-2-22-0-release/</link>
       <pubDate>Thu, 24 Sep 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/09/24/glib-2-22-0-release/</guid>
+      <guid>https://lethean.github.io/2009/09/24/glib-2-22-0-release/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-September/msg00053.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib 2.22.0 안정버전 출시 소식&lt;/a&gt;
 이 도착했습니다. 물론 
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-September/msg00054.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 2.18.0 버전도 함께 출시&lt;/a&gt;
 되었지만 이 포스트에서는 일단 GLib에 대한 내용만 다루고, GTK+ 변경사항은 다른 포스트에서 정리할 예정입니다. 물론 그대로 우리말로 옮기는 건 지루하고 재미없는 작업이라, 한두가지 눈에 띄는 것만 정리합니다.&lt;/p&gt;
 &lt;p&gt;제일 먼저 눈에 띄는 추가 사항은, 
-&lt;a href=&#34;/2009/09/21/using-glib-mainloop/&#34;&gt;이전 포스트&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/09/21/using-glib-mainloop/&#34;&gt;이전 포스트&lt;/a&gt;
 에서 언급했던 GMainContext 객체를 쓰레드별로 자동 관리해주는 API가 추가되었다는 점입니다. 새로 추가된 
 &lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#g-main-context-get-thread-default&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;g_main_context_get_thread_default ()&lt;/a&gt;
  함수는 쓰레드별 GMainContext 객체를 돌려주는데, 이 객체는 자동으로 생성되는 건 아니고, 쓰레드가 생성되자마자 바로 
@@ -1529,13 +1529,13 @@ foo_bar_class_init (FooBarClass *klass)
     
     <item>
       <title>GLib 메인루프 이용하기</title>
-      <link>/2009/09/21/using-glib-mainloop/</link>
+      <link>https://lethean.github.io/2009/09/21/using-glib-mainloop/</link>
       <pubDate>Mon, 21 Sep 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/09/21/using-glib-mainloop/</guid>
+      <guid>https://lethean.github.io/2009/09/21/using-glib-mainloop/</guid>
       <description>&lt;p&gt;GLib API를 이용한 멀티쓰레드 프로그래밍에서 비동기 메시지 큐를 이용하는 방법은 지난 
-&lt;a href=&#34;/2008/08/06/glib-thread-programming/&#34;&gt;포스트&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/08/06/glib-thread-programming/&#34;&gt;포스트&lt;/a&gt;
 에서 설명한 적이 있는데, 이번에는 
-&lt;a href=&#34;/2009/09/17/glib-mainloop-vs-libdispatch-of-apple-gcd/&#34;&gt;애플 GCD의 libdispatch와 비교되는 GLib의 메인루프&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/09/17/glib-mainloop-vs-libdispatch-of-apple-gcd/&#34;&gt;애플 GCD의 libdispatch와 비교되는 GLib의 메인루프&lt;/a&gt;
 를 이용하는 방법을 정리해 보았습니다. 이 방법은 어떤 관점에서 보면 더 쉽고, 이미 많은 기능이 기본적으로 지원되기 때문에 몇몇 경우를 제외하면 더 좋은 방법입니다. 다만 API 사용법을 이해하기가 처음에 조금 까다롭다는 점이 걸림돌입니다.&lt;/p&gt;
 &lt;p&gt;일반적으로 GLib / GTK 어플리케이션은 메인 쓰레드에서 실행되는 메인 이벤트 루프 기반에서 동작합니다. 키보드 / 마우스 이벤트 처리, 화면 표시, 사용자가 등록한 Idle / Timeout 함수 처리 등이 모두 이 메인 이벤트 루프에서 처리됩니다. 그런데 이 메인 이벤트 루프라는 건 마냥 개념적인게 아니라, 실제로 
 &lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-The-Main-Event-Loop.html#GMainLoop&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GMainLoop&lt;/a&gt;
@@ -1648,9 +1648,9 @@ add_socket_to_my_thread (gint sock_fd)
     
     <item>
       <title>GLib 메인루프와 애플 GCD의 libdispatch</title>
-      <link>/2009/09/17/glib-mainloop-vs-libdispatch-of-apple-gcd/</link>
+      <link>https://lethean.github.io/2009/09/17/glib-mainloop-vs-libdispatch-of-apple-gcd/</link>
       <pubDate>Thu, 17 Sep 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/09/17/glib-mainloop-vs-libdispatch-of-apple-gcd/</guid>
+      <guid>https://lethean.github.io/2009/09/17/glib-mainloop-vs-libdispatch-of-apple-gcd/</guid>
       <description>&lt;p&gt;GTK 메일링 리스트에 
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-September/msg00036.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;흥미있는 포스트&lt;/a&gt;
 가 있어서 정리해 봅니다.&lt;/p&gt;
@@ -1676,7 +1676,7 @@ add_socket_to_my_thread (gint sock_fd)
 되었고, 구글 어스나 나사의 월드윈드처럼 3차원으로 지구 지도를 보여주도록 도와주는 
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-list/2009-September/msg00050.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;AWether 라이브러리도 공개&lt;/a&gt;
 되었습니다. 물론 
-&lt;a href=&#34;/2009/02/03/location-aware-softwares-in-linux/&#34;&gt;이전 포스트&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2009/02/03/location-aware-softwares-in-linux/&#34;&gt;이전 포스트&lt;/a&gt;
 에서 다룬 
 &lt;a href=&#34;http://projects.gnome.org/libchamplain/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libchamplain&lt;/a&gt;
  라이브러리에 더 관심이 많아 그다지 흥미롭지는 않았는데, 모르고 있던 
@@ -1690,9 +1690,9 @@ add_socket_to_my_thread (gint sock_fd)
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (4)</title>
-      <link>/2009/08/24/oop-with-gobject-4/</link>
+      <link>https://lethean.github.io/2009/08/24/oop-with-gobject-4/</link>
       <pubDate>Mon, 24 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/24/oop-with-gobject-4/</guid>
+      <guid>https://lethean.github.io/2009/08/24/oop-with-gobject-4/</guid>
       <description>&lt;p&gt;이전 글에 계속 이어집니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;객체 속성 정보 얻기&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;EdcHost 객체의 속성 정보를 실행 중에 얻어볼까 합니다.&lt;/p&gt;
@@ -1880,9 +1880,9 @@ edc_host_set_property (GObject      *object,
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (3)</title>
-      <link>/2009/08/18/oop-with-gobject-3/</link>
+      <link>https://lethean.github.io/2009/08/18/oop-with-gobject-3/</link>
       <pubDate>Tue, 18 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/18/oop-with-gobject-3/</guid>
+      <guid>https://lethean.github.io/2009/08/18/oop-with-gobject-3/</guid>
       <description>&lt;p&gt;이 글은 회사 개발팀 내부 세미나를 위해 작성중인 글입니다. 하지만, 블로그란 매체의 특성상 외부에도 공개되고 있는데, 댓글은 달지 않아도 접속하는 사람들 대부분이 제가 아는 분일 거라 생각하고 한마디 하자면, 세상에 공짜가 어디 있는가, 주저하지 말고 내게 연락해서 술 한 잔 사게! (언젠가부터 술 강요 청탁 협박 블로그가 되어 가고 있군&amp;hellip;)&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;속성 (Properties) 추가하기&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;이제, GObject 속성(properties) 기능을 추가하려고 하는데, 왜 쓸데없이 일을 만들어서 하냐고 물으면 할 말이 있어야할 것 같아서, GObject 속성의 특징을 요약해 봤습니다.&lt;/p&gt;
@@ -2144,9 +2144,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (2)</title>
-      <link>/2009/08/14/oop-with-gobject-2/</link>
+      <link>https://lethean.github.io/2009/08/14/oop-with-gobject-2/</link>
       <pubDate>Fri, 14 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/14/oop-with-gobject-2/</guid>
+      <guid>https://lethean.github.io/2009/08/14/oop-with-gobject-2/</guid>
       <description>&lt;p&gt;첫번째 글이 당연한 내용을 너무 길게 설명했다는 의견이 있어서, 이번 글부터는 더 짧고 간결하게 정리해 보려고 노력하고 있습니다. 그리고, 이 글의 대상은 한 번이라도 GTK+ / GLib 라이브러리를 사용한 경험이 있는 개발자입니다. 그래서 정말로 기초적인 내용은 피하고 있습니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;접근자 (Accessors)&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;소프트웨어 공학에서 모듈이나 객체 설계시 기본적으로 강조하는 정보은닉(information hiding), 캡슐화(encapsulation), 결합도(coupling) 등과 같은 개념에 의하면, C 언어처럼 구조체의 필드 변수를 외부로 직접 공개하는 건 좋지 않다고 합니다. 그리고 대부분의 경우 직접 접근 방식보다 읽고 쓰는 접근자(accessors)를 제공하는 게 여러모로 좋다고 하지요. 물론 성능 문제로 직접 접근 방식을 고려해야 하는 경우도 있지만, 지금까지 경험에 비춰보면, 병목을 일으키는 부분은 프로파일러를 돌려서 정확하게 파악한 다음에 해결하는 게 대부분 좋기 때문에 처음부터 그럴 필요는 없을 것 같습니다.&lt;/p&gt;
@@ -2289,7 +2289,7 @@ edc_host_set_name (EdcHost     *host,
 ] 그리고 모든 함수에서 이 구조체를 쉽게 얻어오기 위해 정의한 &lt;code&gt;EDC_HOST_GET_PRIVATE()&lt;/code&gt; 매크로를 사용해 필요한 작업을 수행합니다.&lt;/p&gt;
 &lt;p&gt;부가적으로 조금만 더 설명하면, 모든 문자열을 넘겨주는 API는 문자열을 복사해서 넘겨주어 원본 문자열을 보호합니다. 따라서 API 문서에 넘겨받은 문자열을 반드시 해제하라고 명시되어 있어야 하겠죠. 또한 지난 글에서 잠시 언급한 것처럼, 공개된 함수 진입 시점에서 인수 적합성 검사를 할때 &lt;code&gt;EDC_IS_HOST()&lt;/code&gt; 매크로를 사용해 NULL 여부 뿐 아니라 정확하게 해당 객체인지 검사하도록 합니다.&lt;/p&gt;
 &lt;p&gt;참고로 위 예제에서 비공개(private) 객체에 접근하는 방법은 설명을 위해 오버헤드가 존재하는 단순한 방식입니다. 따라서 실제로 사용하려면 반드시 이 
-&lt;a href=&#34;/2008/12/23/reduce-accesing-overhead-for-gobject-private-data/&#34;&gt;포스트&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/12/23/reduce-accesing-overhead-for-gobject-private-data/&#34;&gt;포스트&lt;/a&gt;
 를 참고하시기 바랍니다.&lt;/p&gt;
 &lt;p&gt;이렇게 해서 기본적인 객체 속성에 대한 접근자를 구현했습니다. 물론 이게 다는 아니고, 다음에 설명할 GObject 속성(properties) 기능을 이용하면 사실 접근자를 구현할 필요도 없습니다. 하지만, GTK+와 같은 대부분의 GObject 기반 객체는 함수 API 기반의 접근자를 동시에 제공하고 있으므로 관례를 따르는 게 나쁘지는 않겠지요.&lt;/p&gt;
 &lt;p&gt;글머리에서 언급했듯이, 계속 적다 보면 내용도 길어지고 포스팅 주기도 길어질 것 같아 오늘은 일단 여기까지만 적습니다. 다음에는 본격적으로 GObject 속성(properties)을 추가할 예정인데, 설명할 게 많아서&amp;hellip; ;)&lt;/p&gt;
@@ -2298,9 +2298,9 @@ edc_host_set_name (EdcHost     *host,
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (1)</title>
-      <link>/2009/08/10/oop-with-gobject-1/</link>
+      <link>https://lethean.github.io/2009/08/10/oop-with-gobject-1/</link>
       <pubDate>Mon, 10 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/10/oop-with-gobject-1/</guid>
+      <guid>https://lethean.github.io/2009/08/10/oop-with-gobject-1/</guid>
       <description>&lt;p&gt;GTK+, Clutter 등과 같은 라이브러리는 C 언어로 구현되었지만 객체 지향 개념을 충실히 따르고 있는데, 그 중심에는 GLib 라이브러리의 GObject가 있습니다. 따라서 이러한 라이브러리를 제대로 이해하고 사용하려면 필수적으로 GObject 개념을 잘 이해하고 있어야 합니다. 그런데, 생각보다 GObject 개념은 이해하기 어렵습니다. 이해하더라도 이를 응용하려면 그만큼 시간이 또 필요합니다.&lt;/p&gt;
 &lt;p&gt;그래서 이번 글을 시작으로 GObject 라이브러리를 이용한 C 언어에서 객체 지향 프로그래밍이라는 거창한 주제를 예제 형식을 이용해 다루어 보려고 합니다. 바로 새 GTK+ 위젯을 구현하거나 클러터 객체를 분석하는 방식이 아니라 왜 GObject가 이런 방식으로 설계되었는지 그 철학을 따라가 보려고 합니다. 그리고, 가능한 기존 GObject 튜토리얼의 어려운 설명이 아니라 실제 사용하는 코드를 중심으로 설명할 예정이니, 그래도 무슨 말인지 모르겠거나 더 풀어서 설명을 하는 게 좋을 것 같을 경우 의견 주시기 바랍니다.&lt;/p&gt;
 &lt;p&gt;여기서 예제로 사용할 개념은 네트워크 카메라 호스트와 호스트 목록입니다. (하는 일이 이쪽 분야라서&amp;hellip; :)&lt;/p&gt;
@@ -2702,7 +2702,7 @@ edc_host_class_init (EdcHostClass *klass)
 &lt;a href=&#34;http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-unref&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_object_unref()&lt;/code&gt;&lt;/a&gt;
  함수 등을 이용해 참조 카운터를 제어할 수 있습니다. GObject 소스 코드를 확인해 보시면 알겠지만, 실제 객체 참조 카운터 기능은 거의 비슷하게 구현되어 있습니다. 더 많은 경우의 수를 고려하고 더 많은 기능을 제공하다보니 코드가 더 복잡한 것 뿐입니다.&lt;/p&gt;
 &lt;p&gt;더 중요한 점은 모든 GObject 기반 객체, 예를 들어 GTK+ 위젯이나 클러터 객체 모두 GObject 기반이기 때문에 객체간 연결(부모-자식, 컨테이너-아이템 등)시 객체에 대한 포인터를 유지하면서 동시에 참조 카운터를 유지하여 메모리를 관리한다는 점입니다. 이 부분에 대한 더 자세한 설명은 
-&lt;a href=&#34;/2008/12/28/gtk-memory-management/&#34;&gt;GTK+ 메모리 관리&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/12/28/gtk-memory-management/&#34;&gt;GTK+ 메모리 관리&lt;/a&gt;
  글에서 확인하시기 바랍니다.&lt;/p&gt;
 &lt;p&gt;오늘은 일단 여기까지만&amp;hellip; ;)&lt;/p&gt;
 </description>
@@ -2710,9 +2710,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GNOME 3.0 셸(GNOME Shell) 소개</title>
-      <link>/2009/06/02/gnome-3-shell/</link>
+      <link>https://lethean.github.io/2009/06/02/gnome-3-shell/</link>
       <pubDate>Tue, 02 Jun 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/06/02/gnome-3-shell/</guid>
+      <guid>https://lethean.github.io/2009/06/02/gnome-3-shell/</guid>
       <description>&lt;p&gt;GNOME 3.0의 기본 프로그램 역할을 하게 될 
 &lt;a href=&#34;http://live.gnome.org/GnomeShell&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;그놈 셸(GNOME Shell)&lt;/a&gt;
 에 대한 소식이 요즘 많이 보이는군요. 하지만 역시 엔지니어라서 그런지, 사용자 관점의 변화보다 기술적인 면에 더 관심이 갈 수 밖에 없는터라 그 부분을 조금 정리해 보았습니다.&lt;/p&gt;
@@ -2737,12 +2737,12 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GObject Property Binding 기능이 필요함</title>
-      <link>/2009/04/20/gobject-property-binding-required/</link>
+      <link>https://lethean.github.io/2009/04/20/gobject-property-binding-required/</link>
       <pubDate>Mon, 20 Apr 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/04/20/gobject-property-binding-required/</guid>
+      <guid>https://lethean.github.io/2009/04/20/gobject-property-binding-required/</guid>
       <description>&lt;p&gt;맥 코코아 프레임웍을 공부하면서 GTK+ / GObject 라이브러리에도 있으면 참 좋겠다고 생각한 것 중 하나가 특정 속성(property)을 다른 객체의 속성과 결합하는(binding) 개념입니다. 이를 이용해 자동으로 모델과 뷰를 클릭 몇 번으로 연결하고, 더 나아가 객체 배열은 물론 선택한 항목까지 자동으로 동기화되는 걸 보면서 정말 잘 만들어진 프레임웍이라는 걸 새삼 느낍니다. 또한 사용자가 직접 설계한 클래스를 인터페이스 빌더의 객체로 등록해서 마우스 클릭만으로 자연스럽게 연결이 되는 걸 보면 정말 부럽습니다.&lt;/p&gt;
 &lt;p&gt;물론 GObject  객체의 속성 묶기(property binding)를 지원하기 위해 
-&lt;a href=&#34;/2008/12/15/exobinding/&#34;&gt;ExoBinding&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/12/15/exobinding/&#34;&gt;ExoBinding&lt;/a&gt;
 과 같은 라이브러리도 존재하지만, 이 역시 개발자가 직접 코드를 추가해주어야 하는 방식일 뿐 Glade와 같은 인터페이스 빌더에서 직접 사용할 수는 없습니다. 아쉽게도 
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-April/msg00048.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 3.0 로드맵&lt;/a&gt;
  / 
@@ -2753,9 +2753,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GTK&#43; 메모리 관리</title>
-      <link>/2008/12/28/gtk-memory-management/</link>
+      <link>https://lethean.github.io/2008/12/28/gtk-memory-management/</link>
       <pubDate>Sun, 28 Dec 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/12/28/gtk-memory-management/</guid>
+      <guid>https://lethean.github.io/2008/12/28/gtk-memory-management/</guid>
       <description>&lt;p&gt;GTK+ 포럼에 
 &lt;a href=&#34;http://www.gtkforums.com/viewtopic.php?t=2412&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 메모리 관리하기&lt;/a&gt;
 라는 글이 올라왔는데 내용이 간결해서 이를 참고로 다시 정리해 보았습니다.&lt;/p&gt;
@@ -2799,9 +2799,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GObject Private 데이터 접근 오버헤드 줄이기</title>
-      <link>/2008/12/23/reduce-accesing-overhead-for-gobject-private-data/</link>
+      <link>https://lethean.github.io/2008/12/23/reduce-accesing-overhead-for-gobject-private-data/</link>
       <pubDate>Tue, 23 Dec 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/12/23/reduce-accesing-overhead-for-gobject-private-data/</guid>
+      <guid>https://lethean.github.io/2008/12/23/reduce-accesing-overhead-for-gobject-private-data/</guid>
       <description>&lt;p&gt;GTK+ 개발자 메일링 리스트에서 
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2008-December/thread.html#00061&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 속도 관련 질의 응답&lt;/a&gt;
 이 오가는 걸 지켜보는 도중 g_type_class_add_private() + g_type_instance_get_private() 조합을 사용하면 편하지만, 오버헤드가 크고 느리기 때문에 이를 
@@ -2907,9 +2907,9 @@ foo_object_do_something (FooObject *foo)
     
     <item>
       <title>GTK&#43; / GLib 경고 메시지 추적하기</title>
-      <link>/2008/11/14/tracing-gtk-glib-warning-messages/</link>
+      <link>https://lethean.github.io/2008/11/14/tracing-gtk-glib-warning-messages/</link>
       <pubDate>Fri, 14 Nov 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/11/14/tracing-gtk-glib-warning-messages/</guid>
+      <guid>https://lethean.github.io/2008/11/14/tracing-gtk-glib-warning-messages/</guid>
       <description>&lt;p&gt;GTK+ 또는 GLib 기반 프로그래밍을 할때 g_warning() / g_return_if_fail() 등과 같은 API를 사용한 경고 메시지가 어디서 발생했는지 찾기 어려운 경우가 있습니다. 더 나아가 해당 함수를 호출하는 부분을 알아야 하는데, 사실 메시지만으로는 찾기가 매우 어려운 경우가 많습니다.&lt;/p&gt;
 &lt;p&gt;예를 들어 수만라인짜리 프로그램이 실행 도중 다음과 같은 메시지를 출력합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;Gtk-CRITICAL **: gtk_widget_set_sensitive: 
@@ -2929,13 +2929,13 @@ assertion `GTK_IS_WIDGET (widget)&#39; failed
     
     <item>
       <title>GLib 쓰레드 프로그래밍</title>
-      <link>/2008/08/06/glib-thread-programming/</link>
+      <link>https://lethean.github.io/2008/08/06/glib-thread-programming/</link>
       <pubDate>Wed, 06 Aug 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/08/06/glib-thread-programming/</guid>
+      <guid>https://lethean.github.io/2008/08/06/glib-thread-programming/</guid>
       <description>&lt;p&gt;소프트웨어를 개발하면서 멀티 쓰레드 방식을 사용하는 경우는 많습니다. 하지만 그만큼 복잡도가 증가해서 세심하게 고려하여 설계하지 않으면 디버깅 재앙을 얻는 경우가 많습니다. 이 글은 &amp;lsquo;
-&lt;a href=&#34;/2008/12/28/gtk-memory-management/&#34;&gt;멀티쓰레드 프로그래밍 규칙&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2008/12/28/gtk-memory-management/&#34;&gt;멀티쓰레드 프로그래밍 규칙&lt;/a&gt;
 &amp;lsquo;에서 이어지는 내용입니다. 
-&lt;a href=&#34;/2006/01/20/multi-thread-gtk-programming/&#34;&gt;GTK+ 쓰레드 관련 잡설&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2006/01/20/multi-thread-gtk-programming/&#34;&gt;GTK+ 쓰레드 관련 잡설&lt;/a&gt;
 은 이미 언급한 적이 있으니까, 오늘은 별도의 쓰레드로 동작하는 간단한 예제 모듈을 만들면서 몇가지 유용한 GLib 쓰레드 API를 설명하겠습니다.&lt;/p&gt;
 &lt;h3 id=&#34;리소스-resources&#34;&gt;리소스 (Resources)&lt;/h3&gt;
 &lt;p&gt;한 개 이상의 쓰레드가 동작하는 방식의 소프트웨어를 설계할 경우 가장 염두에 두어야 하는 점은 **자원(resources)**입니다. 자원, 즉 리소스는 쉽게 말해 소프트웨어가 사용하는 데이터를 의미합니다. 전역 변수, 디스크 파일, 네트웍 소켓, 외부 장치 심지어 비디오 카드 같은 그래픽 장치 등이 모두 리소스입니다. 물론 넓은 의미에서 보면 리소스는 하나의 기능이나 세부 작업을 나타낼 수도 있습니다.&lt;/p&gt;
@@ -3197,9 +3197,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>GObject - Glib object system</title>
-      <link>/2007/02/05/gobject-glib-object-system/</link>
+      <link>https://lethean.github.io/2007/02/05/gobject-glib-object-system/</link>
       <pubDate>Mon, 05 Feb 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/02/05/gobject-glib-object-system/</guid>
+      <guid>https://lethean.github.io/2007/02/05/gobject-glib-object-system/</guid>
       <description>&lt;p&gt;오랜만에 Glib 객체 시스템인 GObject에 대한 글들을 다시 정독해 보았다. 아무 것도 모르고 처음 읽었을때와 몇년동안 GTK+와 친숙해진뒤 다시 읽어볼때는 역시 차이가 있는 법, 이제 GObject 객체를 프로젝트에 하나씩 적용해볼 생각이다.&lt;/p&gt;
 &lt;p&gt;참고 사이트:&lt;/p&gt;
 &lt;ol&gt;
@@ -3230,9 +3230,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>APR(Apache Portable Runtime)</title>
-      <link>/2006/01/20/aprapache-portable-runtime/</link>
+      <link>https://lethean.github.io/2006/01/20/aprapache-portable-runtime/</link>
       <pubDate>Fri, 20 Jan 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/01/20/aprapache-portable-runtime/</guid>
+      <guid>https://lethean.github.io/2006/01/20/aprapache-portable-runtime/</guid>
       <description>&lt;p&gt;크로스 플랫폼 어플리케이션 개발을 위해 지금까지 많은 라이브러리를 검토했지만 대부분 아쉬운 점이 많았다. 덩치가 너무 크거나, 의존하는 라이브러리가 너무 많거나, 반대로 너무 기능이 제한적이고 부족하거나 하는 이유로 진행하는 프로젝트에서는 직접 만들어 사용하고 있는 실정이다.&lt;/p&gt;
 &lt;p&gt;오늘 문득 
 &lt;a href=&#34;http://httpd.apache.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Apache2&lt;/a&gt;
@@ -3251,9 +3251,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>멀티쓰레드 GTK&#43; 프로그래밍</title>
-      <link>/2006/01/20/multi-thread-gtk-programming/</link>
+      <link>https://lethean.github.io/2006/01/20/multi-thread-gtk-programming/</link>
       <pubDate>Fri, 20 Jan 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/01/20/multi-thread-gtk-programming/</guid>
+      <guid>https://lethean.github.io/2006/01/20/multi-thread-gtk-programming/</guid>
       <description>&lt;p&gt;대부분의 프로젝트를 GTK+를 이용하지만, 잊어버릴만 하면 부딪히는 문제 중 하나가 바로 멀티쓰레드 프로그램에서 GTK+ 위젯을 다룰때 발생하는 여러가지 현상들이다.&lt;/p&gt;
 &lt;p&gt;우선 가장 쉽게 만나는 패턴은 XLib에서 Sync 에러를 내면서 프로그램 종료, 아니면 반대로 GUI가 블럭킹되어 아무 것도 동작안하는 현상이다. 그 다음으로는 해제된 위젯에 접근하거나, 아직 초기화가 덜된 위젯에 접근할 경우 발생하는 무수한 오동작 현상이 있지만, 이는 어플리케이션 설계의 문제이기도 하다.&lt;/p&gt;
 &lt;p&gt;첫번째 패턴은 GTK+를 멀티쓰레드에서 이용할 경우 처음 사용하는 사람은 누구나 만나게 된다. X 윈도우는 프로세스별로 접근은 제어해주지만, 쓰레드별 접근은 제어를 해주지 않기 때문에 이는 상위 라이브러리나 프로그래머가 처리해야 한다는 점을 모를 경우 말이다.&lt;/p&gt;
@@ -3267,9 +3267,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>멀티쓰레드 프로그래밍 규칙</title>
-      <link>/2005/11/20/multi-thread-programming-rules/</link>
+      <link>https://lethean.github.io/2005/11/20/multi-thread-programming-rules/</link>
       <pubDate>Sun, 20 Nov 2005 00:00:00 +0000</pubDate>
-      <guid>/2005/11/20/multi-thread-programming-rules/</guid>
+      <guid>https://lethean.github.io/2005/11/20/multi-thread-programming-rules/</guid>
       <description>&lt;p&gt;멀티 쓰레드 방식 프로그래밍은 강력한 효율을 제공하지만 그만큼 프로그래머를 힘들게 하기도 한다. 그렇다면, 멀티 쓰레드 방식을 대체할 수 있는 방법은 무엇이 있을까? 물론 많은 사람들이 이 주제에 대하여 책도 쓰고 글도 남겼지만 여기는 내 블로그니까, 가능한 내 경험에 비추어 생각해본다.&lt;/p&gt;
 &lt;h3 id=&#34;뮤텍스mutex를-사용해야-하는-구조로-설계하지-말기&#34;&gt;뮤텍스(mutex)를 사용해야 하는 구조로 설계하지 말기&lt;/h3&gt;
 &lt;p&gt;뮤텍스를 이용하는 근본적인 이유는 하나의 리소스에 대해 동시에 접근할 경우 문제가 발생할 수 있을 경우 이에 대한 상호 배제(Mutual Exclusion)를 하기 위함이다. 하지만 하나의 리소스 또는 기능에 대한 처리를 전담하는 쓰레드를 만들고, 원하는 작업을 이 쓰레드(또는 프로세스)에게 메시지로 전달하여 처리하는 방식을 이용하면 뮤텍스를 사용해야 하는 경우는 사라지게 된다. 즉, 메시지 처리 방식(message-driven)을 이용하는 것이다. 물론 이 방식은 비동기적인 메시지일 경우 별로 문제가 없지만, 동기화가 필요한 경우 복잡해진다는 단점이 있다. 또한 성능 문제도 무시할 수 없다.&lt;/p&gt;

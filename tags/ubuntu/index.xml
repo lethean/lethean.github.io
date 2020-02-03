@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Ubuntu | 대체로 무해함</title>
-    <link>/tags/ubuntu/</link>
-      <atom:link href="/tags/ubuntu/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/ubuntu/</link>
+      <atom:link href="https://lethean.github.io/tags/ubuntu/index.xml" rel="self" type="application/rss+xml" />
     <description>Ubuntu</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 22 Feb 2011 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Ubuntu</title>
-      <link>/tags/ubuntu/</link>
+      <link>https://lethean.github.io/tags/ubuntu/</link>
     </image>
     
     <item>
       <title>사진 파일 이름 변경하기</title>
-      <link>/2011/02/22/renaming-photo-files/</link>
+      <link>https://lethean.github.io/2011/02/22/renaming-photo-files/</link>
       <pubDate>Tue, 22 Feb 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/02/22/renaming-photo-files/</guid>
+      <guid>https://lethean.github.io/2011/02/22/renaming-photo-files/</guid>
       <description>&lt;p&gt;요즘 디지털 카메라나 휴대폰으로 촬영한 JPEG 파일에는 
 &lt;a href=&#34;http://en.wikipedia.org/wiki/EXIF&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;EXIF&lt;/a&gt;
  정보가 삽입되어 있어서 나름 유용할 때가 많습니다. 카메라에 대한 자세한 사양(?) 정보에는 관심이 없지만, 촬영한 시각이라든지 카메라를 세워서 촬영했는지 여부는 물론, 카메라 GPS 옵션을 켜면 기록되는 촬영 장소의 정확한 좌표는 가끔 두려울 때도 있습니다.&lt;/p&gt;
@@ -37,9 +37,9 @@ $ exiv2 -r &#39;%Y%m%d-%H%M%S-photo&#39; -k rename *.jpg
     
     <item>
       <title>LG XNOTE C1 노트북 우분투 사용시 사운드 재생 문제</title>
-      <link>/2010/08/09/sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</link>
+      <link>https://lethean.github.io/2010/08/09/sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</link>
       <pubDate>Mon, 09 Aug 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/08/09/sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2010/08/09/sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</guid>
       <description>&lt;p&gt;오랫동안 묵혀두었던 LG XNOTE C1 노트북에 우분투를 설치했는데, 사운드 카드를 통해 오디오가 재생되지 않았습니다. 한동안 오디오를 재생할 일이 없어서 그냥 사용하다가, 오늘 갑자기 필요해져서 급하게 문제를 해결했는데, 그 과정을 기록해 둡니다.&lt;/p&gt;
 &lt;p&gt;일단 확인 결과 사운드 카드 관련 드라이버는 모두 정상적으로 동작합니다. 하지만, 역시나 가장 문제 많은 &lt;code&gt;snd-hda-intel&lt;/code&gt; 드라이버를 사용하고 있었습니다. 그래서 더 정확히 사용하는 모델을 확인하기 위해 &lt;code&gt;/proc/asound/pcm&lt;/code&gt; 파일을 열어보니 다음과 같이 &lt;strong&gt;ALC883&lt;/strong&gt; 모델을 사용하고 있습니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;00-00: ALC883 Analog : ALC883 Analog : playback 1 : capture 1
@@ -82,14 +82,14 @@ $ exiv2 -r &#39;%Y%m%d-%H%M%S-photo&#39; -k rename *.jpg
     
     <item>
       <title>우분투 10.10 한글 글꼴 설정</title>
-      <link>/2010/08/06/ubuntu-10-10-korean-font-configuration/</link>
+      <link>https://lethean.github.io/2010/08/06/ubuntu-10-10-korean-font-configuration/</link>
       <pubDate>Fri, 06 Aug 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/08/06/ubuntu-10-10-korean-font-configuration/</guid>
+      <guid>https://lethean.github.io/2010/08/06/ubuntu-10-10-korean-font-configuration/</guid>
       <description>&lt;p&gt;Btrfs 파일 시스템을 사용해 보려고 새로 나온 우분투 10.10 버전을 설치했습니다. 그런데, 아니나 다를까 한글 글꼴 설정은 여전히 맘에 들지 않는군요. 예전에는 이것 저것 쉽게 찾아 고쳤는데, 시간이 점점 흘러서 그 과정을 자꾸 잊어버리게 되다 보니 오늘은 조금 더 많이 헤매게 되어 기록해 두려고 합니다.&lt;/p&gt;
 &lt;p&gt;먼저 메인 글꼴로 사용하는 나눔글꼴은 우분투 저장소에 패키지(ttf-nanum, ttf-nanum-coding)가 이미 올라와 있어서 그대로 설치해서 사용했습니다. 더불어 기본적인 MS 글꼴 패키지(ttf-mscorefonts-installer)를 설치하고, 터미널 글꼴로 사용하는 드로이드 글꼴(ttf-droid)을 설치하고 
-&lt;a href=&#34;/2010/07/19/hinting-for-different-fonts/&#34;&gt;cairo 라이브러리 패치 작업을 한 뒤&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2010/07/19/hinting-for-different-fonts/&#34;&gt;cairo 라이브러리 패치 작업을 한 뒤&lt;/a&gt;
  &amp;lsquo;&lt;strong&gt;시스템-기본 설정-모양&lt;/strong&gt;&amp;lsquo;은 다음 그림과 같이 설정했습니다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/gnome-appearance-properties.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/gnome-appearance-properties.jpg&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;이제 글꼴 설정 파일을 건드려야 하는데, 제일  먼저 &lt;code&gt;/etc/fonts/conf.d/&lt;/code&gt; 디렉토리에서 &lt;span style=&#34;text-decoration:line-through;&#34;&gt;&lt;code&gt;10-hinting-slight.conf&lt;/code&gt; 파일과&lt;/span&gt; &lt;code&gt;29-language-selector-ko-kr.conf&lt;/code&gt; 파일을 삭제합니다. 그래야 일반적인 영문 / 한글 글꼴에 대한 힌팅이 예쁘게 동작합니다. 그 다음에 같은 디렉토리의 &lt;code&gt;69-language-selector-ko-kr.conf&lt;/code&gt; 파일을 다음과 같이 수정합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot;?&amp;gt;
 &amp;lt;!DOCTYPE fontconfig SYSTEM &amp;quot;fonts.dtd&amp;quot;&amp;gt;
@@ -198,13 +198,13 @@ $ exiv2 -r &#39;%Y%m%d-%H%M%S-photo&#39; -k rename *.jpg
     
     <item>
       <title>글꼴마다 다른 힌팅 사용하기</title>
-      <link>/2010/07/19/hinting-for-different-fonts/</link>
+      <link>https://lethean.github.io/2010/07/19/hinting-for-different-fonts/</link>
       <pubDate>Mon, 19 Jul 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/07/19/hinting-for-different-fonts/</guid>
+      <guid>https://lethean.github.io/2010/07/19/hinting-for-different-fonts/</guid>
       <description>&lt;p&gt;구글 리더를 읽다가 어떤 분이 
 &lt;a href=&#34;http://blog.digital-scurf.org/2010/07/13#dev-fonts&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;터미널 글꼴로 &amp;lsquo;Droid Sans Mono&amp;rsquo; 사용한 포스트&lt;/a&gt;
 를 보고 따라해 보았습니다. 그런데, 이상하게도 글꼴이 예쁘지 않아서 확인해 보니 폰트 설정에서 힌팅(hinting)을 살짝(slight)만 사용하도록 설정해야 했습니다. 사실, 대부분의 영문 폰트는 힌팅을 살짝 주어야 원래 의도대로 멋지게 표시되는 경우가 많습니다. (아래 그림에서 폰트 설정 화면 참조)&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;/figures/gnome-font-properties.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lethean.github.io/figures/gnome-font-properties.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;그런데 문제는, 이 설정을 이용하면 나눔글꼴과 같은 일부 한글 글꼴이 오히려 안 이쁘게 표시됩니다. 특히 나눔고딕은 힌팅을 중간(hintmedium)이나 충분히(hintfull) 사용해야 합니다. 그런데 위 그림을 보면 나눔고딕 역시 정상적으로 표시되고 있습니다. 이 포스트는 그 과정을 정리한 것입니다. 사용환경은 우분투 10.04 배포판이고, 
 &lt;a href=&#34;http://packages.debian.org/sid/ttf-nanum&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;나눔글꼴&lt;/a&gt;
 과 
@@ -247,11 +247,11 @@ $ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
     
     <item>
       <title>우분투 10.10 기본 파일시스템 - Btrfs</title>
-      <link>/2010/05/16/btrfs-as-the-default-filesystem-in-ubuntu-10-10/</link>
+      <link>https://lethean.github.io/2010/05/16/btrfs-as-the-default-filesystem-in-ubuntu-10-10/</link>
       <pubDate>Sun, 16 May 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/05/16/btrfs-as-the-default-filesystem-in-ubuntu-10-10/</guid>
+      <guid>https://lethean.github.io/2010/05/16/btrfs-as-the-default-filesystem-in-ubuntu-10-10/</guid>
       <description>&lt;p&gt;
-&lt;a href=&#34;/2010/01/25/btrfs-for-a-while/&#34;&gt;Btrfs 사용기&lt;/a&gt;
+&lt;a href=&#34;https://lethean.github.io/2010/01/25/btrfs-for-a-while/&#34;&gt;Btrfs 사용기&lt;/a&gt;
 를 포스팅한 지 얼마 되지도 않았는데, 우분투 배포판 10.10 버전 기본 파일시스템으로 
 &lt;a href=&#34;http://www.netsplit.com/2010/05/14/btrfs-by-default-in-maverick/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Btrfs를 사용할지도 모른다는 소식&lt;/a&gt;
 이 들려옵니다. 인텔(Intel) 모블린(Moblin)과 노키아(Nokia) 마에모(Maemo) 플랫폼이 통합된 
@@ -264,9 +264,9 @@ $ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
     
     <item>
       <title>Gource 소스 저장소 시각화 프로그램</title>
-      <link>/2010/04/23/gource-source-visualization/</link>
+      <link>https://lethean.github.io/2010/04/23/gource-source-visualization/</link>
       <pubDate>Fri, 23 Apr 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/04/23/gource-source-visualization/</guid>
+      <guid>https://lethean.github.io/2010/04/23/gource-source-visualization/</guid>
       <description>&lt;p&gt;LWN.net 기사 중에서 
 &lt;a href=&#34;http://lwn.net/Articles/382468/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;소스 코드 작업 시각화 관련 기사&lt;/a&gt;
 를 보고 재미있을 것 같아 
@@ -303,9 +303,9 @@ $ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
     
     <item>
       <title>우분투에서 ccache 사용하기</title>
-      <link>/2010/02/04/using-ccache-in-ubuntu/</link>
+      <link>https://lethean.github.io/2010/02/04/using-ccache-in-ubuntu/</link>
       <pubDate>Thu, 04 Feb 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/02/04/using-ccache-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2010/02/04/using-ccache-in-ubuntu/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.google.co.kr/search?hl=ko&amp;amp;newwindow=1&amp;amp;q=ccache&amp;amp;btnG=%EA%B2%80%EC%83%89&amp;amp;lr=lang_ko&amp;amp;aq=f&amp;amp;oq=&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ccache&lt;/a&gt;
 는 워낙 유명하고 오래된 개발 도구라서, 검색해보면 우리말로 된 글도 많이 찾을 수 있으므로 자세한 설명은 생략하고, 최근에 다른 개발 장비를 구축할 일이 있어서 검토해보다가, 페도라는 이미 기본으로 ccache를 사용하도록 되어 있고, 우분투 / 데비안 계열에서도 매우 쉽게 사용할 수 있도록 되어 있는 걸 알게 되었습니다. 그래서 다시 한 번 정리합니다.&lt;/p&gt;
@@ -328,9 +328,9 @@ $ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
     
     <item>
       <title>아주 잠시 Btrfs 파일시스템을 사용해보고</title>
-      <link>/2010/01/25/btrfs-for-a-while/</link>
+      <link>https://lethean.github.io/2010/01/25/btrfs-for-a-while/</link>
       <pubDate>Mon, 25 Jan 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/01/25/btrfs-for-a-while/</guid>
+      <guid>https://lethean.github.io/2010/01/25/btrfs-for-a-while/</guid>
       <description>&lt;p&gt;요즘 여기
 &lt;a href=&#34;http://www.phoronix.com/scan.php?page=article&amp;amp;item=ext4_btrfs_2633&amp;amp;num=1&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;저기&lt;/a&gt;
 서 Btrfs 파일시스템 얘기가 많아서, 한번 써봐야겠다 싶어 우분투 개발버전(lucid, linux kernel 2.6.32) 저장소를 확인해보니 패키지 하나만(btrfs-tools) 설치하면 되길래 홈디렉토리를 btrfs 파일시스템으로 교체해 보았습니다. 그리고 스트레스 테스트를 위해 회사에서 유지하는 모든 프로젝트의 Git 저장소를 내려받고(clone) 동시에 컴파일을 해봤습니다.&lt;/p&gt;
@@ -342,9 +342,9 @@ $ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
     
     <item>
       <title>여러 개의 마우스 동시에 사용하기</title>
-      <link>/2010/01/20/using-multiple-mouses-with-xor/</link>
+      <link>https://lethean.github.io/2010/01/20/using-multiple-mouses-with-xor/</link>
       <pubDate>Wed, 20 Jan 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/01/20/using-multiple-mouses-with-xor/</guid>
+      <guid>https://lethean.github.io/2010/01/20/using-multiple-mouses-with-xor/</guid>
       <description>&lt;p&gt;구글 리더에서 오늘치 내용을 읽다가 &amp;lsquo;가
 &lt;a href=&#34;http://ao2.it/en/blog/2010/01/19/poor-mans-multi-touch-using-multiple-mice-xorg&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;난한 사람의 멀티 터치: Xorg에서 여러 개의 마우스 사용하기&lt;/a&gt;
 &amp;rsquo; 블로그를 보고 따라해 보았더니 바로 되는 걸 확인하고 기록으로 남겨둡니다. (참고로, 제가 사용하는 배포판은 우분투 개발 버전(lucid)입니다)&lt;/p&gt;
@@ -355,9 +355,9 @@ $ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
     
     <item>
       <title>우분투에서 이더넷 장치 변경시 장치번호 초기화</title>
-      <link>/2009/08/14/init-eth-dev-number-when-lan-card-changes-in-ubuntu/</link>
+      <link>https://lethean.github.io/2009/08/14/init-eth-dev-number-when-lan-card-changes-in-ubuntu/</link>
       <pubDate>Fri, 14 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/14/init-eth-dev-number-when-lan-card-changes-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2009/08/14/init-eth-dev-number-when-lan-card-changes-in-ubuntu/</guid>
       <description>&lt;p&gt;이더넷 랜카드를 교체하거나, 온보드 이더넷을 CMOS에서 비활성화하고 랜카드만 사용하고 싶거나 또는 그 반대인 경우, 우분투에서 사용하는 udev 데몬은 자동으로 새로 인식한 이더넷 장치에게는 기존 이더넷 장치와 충돌하지 않도록 새로운 이더넷 번호를 할당하고 기억합니다. 예를 들면, eth0 장치가 없는데도, eth0 대신 eth1 장치로 인식하게 됩니다.&lt;/p&gt;
 &lt;p&gt;이는 장치마다 다른 설정을 장비 구성이 달라지더라도 고유하게 계속 유지할 수 있도록 하기 위함인데, 때로는 거슬리기도 하고, 당연히 eth0 장치가 있다고 가정하고 동작하는 프로그램이 있는 경우 골치 아파집니다.&lt;/p&gt;
 &lt;p&gt;이럴 때 쉽게 해결하는 방법은, 다음과 같이 이 정보를 기억하고 있는 파일을 지우고 재부팅하면 됩니다.&lt;/p&gt;
@@ -372,9 +372,9 @@ $ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
     
     <item>
       <title>우분투 구글 크롬 브라우저</title>
-      <link>/2009/08/03/chromium-browser-in-ubuntu/</link>
+      <link>https://lethean.github.io/2009/08/03/chromium-browser-in-ubuntu/</link>
       <pubDate>Mon, 03 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/03/chromium-browser-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2009/08/03/chromium-browser-in-ubuntu/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.google.com/chrome&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;구글 크롬(Google Chrome)&lt;/a&gt;
 의 리눅스 버전 오픈소스 프로젝트인 크로미엄(Chromium)을 우분투에 설치하고 사용하고 있습니다. 
@@ -388,9 +388,9 @@ $ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
     
     <item>
       <title>우분투에서 서브버전 저장소 운영하기</title>
-      <link>/2009/07/16/manage-subversion-repositories-in-ubuntu/</link>
+      <link>https://lethean.github.io/2009/07/16/manage-subversion-repositories-in-ubuntu/</link>
       <pubDate>Thu, 16 Jul 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/07/16/manage-subversion-repositories-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2009/07/16/manage-subversion-repositories-in-ubuntu/</guid>
       <description>&lt;p&gt;회사에서 사용하는 버전 관리 시스템을 Git으로 이전하기 전에, 나중에 또 언젠가 다시 필요할 지 모르는 일이므로, 7년동안 운영해 왔던 Subversion 서버 구성과 운영 방식을 기록해 둡니다. 물론, 우분투 리눅스 환경이고 로컬 / 외부 네트웍 모두에서 svn.example.com 주소로 어디에서든 서브버전에 접근할 수 있도록 환경을 구성하는데 목적이 있습니다.&lt;/p&gt;
 &lt;p&gt;제일 먼저 서브버전 패키지를 설치합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ sudo apt-get install subversion
@@ -634,9 +634,9 @@ $ sudo /etc/init.d/apache2 restart
     
     <item>
       <title>우분투 9.04 릴리스, 하지만...</title>
-      <link>/2009/04/23/ubuntu-904-release-however/</link>
+      <link>https://lethean.github.io/2009/04/23/ubuntu-904-release-however/</link>
       <pubDate>Thu, 23 Apr 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/04/23/ubuntu-904-release-however/</guid>
+      <guid>https://lethean.github.io/2009/04/23/ubuntu-904-release-however/</guid>
       <description>&lt;p&gt;우분투 9.04 버전이 릴리스 되었지만 안정화되려면 업데이트를 조금 더 기다려야 할 것 같습니다. 
 &lt;a href=&#34;http://www.ubuntu.com/getubuntu/releasenotes/904&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;릴리스 노트&lt;/a&gt;
 를 보면 인텔 드라이버 성능 저하와 디스플레이 멈춤(freeze), EXT4 파일 시스템 불안정, 945보드에서 디스크 인식 문제 등 많은 문제가 언급되어 있군요. 한글 글꼴 설정도 조금 문제가 있어 수정이 필요한 것 같고&amp;hellip;&lt;/p&gt;
@@ -650,9 +650,9 @@ $ sudo /etc/init.d/apache2 restart
     
     <item>
       <title>sudo 비밀번호 안물어보게 하기</title>
-      <link>/2009/01/07/skip-sudo-password-prompt/</link>
+      <link>https://lethean.github.io/2009/01/07/skip-sudo-password-prompt/</link>
       <pubDate>Wed, 07 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/07/skip-sudo-password-prompt/</guid>
+      <guid>https://lethean.github.io/2009/01/07/skip-sudo-password-prompt/</guid>
       <description>&lt;p&gt;sudo를 이용해 루트 권한으로 프로그램을 실행하거나, 패키지 관리자처럼 루트 권한이 필요한 GUI 프로그램을 실행할때마다 비밀번호 물어보는게 귀찮다면 다음과 같이 안물어보게 할 수 있습니다.&lt;/p&gt;
 &lt;p&gt;먼저 /etc/sudoers 파일을 편집하게 위해 visudo 명령을 실행합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ sudo visudo
@@ -668,9 +668,9 @@ lethean ALL=(ALL) NOPASSWD: ALL
     
     <item>
       <title>Ubuntu 한글 글꼴 설정</title>
-      <link>/2009/01/07/ubuntu-8-10-korean-font-config/</link>
+      <link>https://lethean.github.io/2009/01/07/ubuntu-8-10-korean-font-config/</link>
       <pubDate>Wed, 07 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/07/ubuntu-8-10-korean-font-config/</guid>
+      <guid>https://lethean.github.io/2009/01/07/ubuntu-8-10-korean-font-config/</guid>
       <description>&lt;p&gt;Ubuntu 설치시 한국어를 선택하면 한글을 사용하는데 별 문제가 없는 것 같지만, 글꼴이나 입력기 등이 조금 문제가 있기 때문에 &amp;lsquo;시스템&amp;rsquo; -&amp;gt; &amp;lsquo;관리&amp;rsquo; -&amp;gt; &amp;lsquo;언어&amp;rsquo; 설정에서 &amp;lsquo;지원되는 언어&#39;에 &amp;lsquo;한국어&#39;를 선택하고, 기본 언어로 &amp;lsquo;한국어&#39;를 선택해주면 한글 관련 패키지와 설정이 자동으로 설치됩니다.&lt;/p&gt;
 &lt;p&gt;하지만 이렇게 해도 기본 한글 글꼴 설정이 별로 미려하지 않은데, 제 경우 기본 글꼴 설정을 다음과 같이 변경해서 사용하고 있습니다.&lt;/p&gt;
 &lt;p&gt;먼저 &lt;code&gt;/etc/fonts/conf.d/29-language-selector-ko-kr.conf&lt;/code&gt; 파일은 다음과 같습니다.&lt;/p&gt;
@@ -776,9 +776,9 @@ lethean ALL=(ALL) NOPASSWD: ALL
     
     <item>
       <title>X 윈도우 자동 로그인하기</title>
-      <link>/2008/07/21/x-window-auto-login/</link>
+      <link>https://lethean.github.io/2008/07/21/x-window-auto-login/</link>
       <pubDate>Mon, 21 Jul 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/07/21/x-window-auto-login/</guid>
+      <guid>https://lethean.github.io/2008/07/21/x-window-auto-login/</guid>
       <description>&lt;p&gt;GDM 등과 같이 덩치가 큰 디스플레이 관리자를 사용하지 않고, 시스템 부팅후 자동으로 X 서버를 실행하고 특정 계정으로 로그인한뒤 자동으로 특정 프로그램을 실행하는 기능은 의외로 많이 사용합니다. 이 글에서는 여러가지 방법 중에 제가 알고 있는 몇가지 방법을 정리해 보았습니다. 적용 가능한 배포판은 데비안(Debian) 혹은 우분투(Ubuntu) 리눅스 기반입니다.&lt;/p&gt;
 &lt;h3 id=&#34;첫번째-방법---init-데몬-이용하기&#34;&gt;첫번째 방법 - init 데몬 이용하기&lt;/h3&gt;
 &lt;p&gt;&amp;ldquo;
@@ -843,9 +843,9 @@ done
     
     <item>
       <title>ThinkPad X40 &#43; Ubuntu &#43; Power Saving</title>
-      <link>/2007/09/21/thinkpad-x40-ubuntu-power-saving/</link>
+      <link>https://lethean.github.io/2007/09/21/thinkpad-x40-ubuntu-power-saving/</link>
       <pubDate>Fri, 21 Sep 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/09/21/thinkpad-x40-ubuntu-power-saving/</guid>
+      <guid>https://lethean.github.io/2007/09/21/thinkpad-x40-ubuntu-power-saving/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.linuxpowertop.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PowerTop&lt;/a&gt;
  유틸리티를 실행하면 전원을 절약할 수 있는 여러가지 방법도 친절하게 설명해주는데, 이 정보를 바탕으로 ThinkPad X40 노트북에 맞게 켤때마다 자동으로 설정하는 스크립트를 만들어봤다. Ubuntu Gutsy 배포판에서 사용하면 약간 과장해서 50% 이상 배터리 수명이 연장되는 걸 체감할 수 있다.&lt;/p&gt;
@@ -888,9 +888,9 @@ echo 5 &amp;gt; /proc/sys/vm/laptop_mode
     
     <item>
       <title>우분투에서 루트 파일시스템 마운트 옵션 변경하기</title>
-      <link>/2007/08/09/root-filesystem-mount-options-in-ubuntu/</link>
+      <link>https://lethean.github.io/2007/08/09/root-filesystem-mount-options-in-ubuntu/</link>
       <pubDate>Thu, 09 Aug 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/08/09/root-filesystem-mount-options-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2007/08/09/root-filesystem-mount-options-in-ubuntu/</guid>
       <description>&lt;p&gt;커널트랩에 올라온 
 &lt;a href=&#34;http://kerneltrap.org/node/14148&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;마운트 옵션을 이용한 성능 최적화&lt;/a&gt;
  글을 보고 우분투 리눅스에도 적용시켜보기로 했다. 다른 파티션은 모두 &lt;code&gt;/etc/fstab&lt;/code&gt; 파일에서 직접 &amp;lsquo;noatime,data=writeback&amp;rsquo; 옵션만 추가하면 되는데 루트 파일 시스템은 조금 손질이 더 갔다.&lt;/p&gt;
@@ -904,9 +904,9 @@ echo 5 &amp;gt; /proc/sys/vm/laptop_mode
     
     <item>
       <title>DBus or Upstart</title>
-      <link>/2007/07/25/dbus-or-upstart/</link>
+      <link>https://lethean.github.io/2007/07/25/dbus-or-upstart/</link>
       <pubDate>Wed, 25 Jul 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/07/25/dbus-or-upstart/</guid>
+      <guid>https://lethean.github.io/2007/07/25/dbus-or-upstart/</guid>
       <description>&lt;p&gt;Dbus를 이용해 이제는 시스템 데몬과 같은 프로그램까지 실행할 수 있게 될 것 같다.(
 &lt;a href=&#34;http://hughsient.livejournal.com/31169.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Dbus System Activation is upstream&lt;/a&gt;
  참고) 디자인 문서를 보니, 다음과 같이 서비스 파일을 정의하면 해당 메시지가 발생했을때 해당 서버가 동작하는 방식이다.&lt;/p&gt;
@@ -928,9 +928,9 @@ User=ftp
     
     <item>
       <title>Ubuntu 7.04 (feisty) 느린 SSH 접속</title>
-      <link>/2007/04/19/ubuntu-704-feisty-slow-ssh/</link>
+      <link>https://lethean.github.io/2007/04/19/ubuntu-704-feisty-slow-ssh/</link>
       <pubDate>Thu, 19 Apr 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/04/19/ubuntu-704-feisty-slow-ssh/</guid>
+      <guid>https://lethean.github.io/2007/04/19/ubuntu-704-feisty-slow-ssh/</guid>
       <description>&lt;p&gt;Ubuntu 7.04에서 ssh 접속 등을 시도할때 다른 시스템보다 초기 접속이 느린 이유가 
 &lt;a href=&#34;https://bugs.launchpad.net/ubuntu/&amp;#43;source/avahi/&amp;#43;bug/94940&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;avahi-daemon 관련 설정 때문&lt;/a&gt;
 이라고 한다. 그래서 /etc/nsswitch.conf 파일에서 &amp;lsquo;hosts:&amp;rsquo; 부분을 다음과 같이 수정해보았더니, 역시 빨리 접속된다.&lt;/p&gt;
@@ -942,9 +942,9 @@ User=ftp
     
     <item>
       <title>Pango 1.15.2 한글 표시 문제</title>
-      <link>/2006/12/23/pango-1152-hangul-display-problem/</link>
+      <link>https://lethean.github.io/2006/12/23/pango-1152-hangul-display-problem/</link>
       <pubDate>Sat, 23 Dec 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/12/23/pango-1152-hangul-display-problem/</guid>
+      <guid>https://lethean.github.io/2006/12/23/pango-1152-hangul-display-problem/</guid>
       <description>&lt;p&gt;한글 메일링 리스트에서 pango 라이브러리 최적화 논의가 오고 가더니 그 결과가 최신 버전에 이미 반영된 모양이다. 엊그제(?) 우분투 개발 버전에 새로 1.15.2-0ubuntu1 버전 패키지가 올라왔는데, 릴리스 변동 사항에 포함되어 있었다. 문제는 몇몇 한글 글자가 흩어져서(?) 표시되는 현상이 발생하길래, 조금 있으면 버그가 수정되어 올라오겠지 기다리다가 참지 못하고 오늘 결국 직접 원인을 찾아보았더니, 의외로 빨리 해결책을 얻을 수 있었다.&lt;/p&gt;
 &lt;p&gt;그놈 버그질라에 이미 &amp;lsquo;
 &lt;a href=&#34;http://bugzilla.gnome.org/show_bug.cgi?id=388581&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Composing jamo is broken in pango-1.15.2&amp;rsquo;&lt;/a&gt;
@@ -955,9 +955,9 @@ User=ftp
     
     <item>
       <title>Upstart 0.3</title>
-      <link>/2006/12/19/upstart-03/</link>
+      <link>https://lethean.github.io/2006/12/19/upstart-03/</link>
       <pubDate>Tue, 19 Dec 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/12/19/upstart-03/</guid>
+      <guid>https://lethean.github.io/2006/12/19/upstart-03/</guid>
       <description>&lt;p&gt;어느샌가 Upstart가 0.3 버전으로 올라가더니(우분투 개발버전 feisty), 공식적인 Upstart 홈페이지도 생겼다.(아래 링크 참고) 개발자가 0.3 버전에서 새로 추가된 사항을 정리해 놨으니 나도 한 번 다시 정리해 본다.&lt;/p&gt;
 &lt;span style=&#34;font-weight:bold;&#34;&gt;
  작업 만들기(Writing Jobs)&lt;/span&gt;
@@ -1044,18 +1044,18 @@ pre-stop script   # disable the queue, wait for it to become empty   fooctl disa
     
     <item>
       <title>FontConfig 2.4 in Ubuntu Feisty</title>
-      <link>/2006/12/01/fontconfig-24-in-ubuntu-feisty-2/</link>
+      <link>https://lethean.github.io/2006/12/01/fontconfig-24-in-ubuntu-feisty-2/</link>
       <pubDate>Fri, 01 Dec 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/12/01/fontconfig-24-in-ubuntu-feisty-2/</guid>
+      <guid>https://lethean.github.io/2006/12/01/fontconfig-24-in-ubuntu-feisty-2/</guid>
       <description>&lt;p&gt;폰트 설정 방식이 바뀐다고 적은지 하루만에 &lt;code&gt;language-selector.conf&lt;/code&gt; 파일을 적용하는 기능이 추가되었다. 다만 파이어폭스 등에서 은돋움 폰트 모양이 내 맘에 안들기 때문에 &lt;code&gt;/usr/share/language-selector/fontconfig/ko_KR&lt;/code&gt; 파일에서 &lt;code&gt;hintmedium&lt;/code&gt; 을 모두 &lt;code&gt;hintfull&lt;/code&gt; 로 변경만 해주니 다시 쾌적한 폰트 환경으로 돌아오게 되었다.&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>FontConfig 2.4 in Ubuntu Feisty</title>
-      <link>/2006/11/30/fontconfig-24-in-ubuntu-feisty/</link>
+      <link>https://lethean.github.io/2006/11/30/fontconfig-24-in-ubuntu-feisty/</link>
       <pubDate>Thu, 30 Nov 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/11/30/fontconfig-24-in-ubuntu-feisty/</guid>
+      <guid>https://lethean.github.io/2006/11/30/fontconfig-24-in-ubuntu-feisty/</guid>
       <description>&lt;p&gt;그렇다. 한동안 잠잠하더니 fontconfig 패키지가 2.4.1 버전으로 올라가면서 폰트 관련 설정이 대폭 변경되었다.&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;/etc/fonts/language-selector.conf&lt;/code&gt; 파일은 아예 참조도 안하고, 설정 파일도 철저하게(?) 분리되고 위치도 &lt;code&gt;/etc/fonts/conf.d&lt;/code&gt;와 &lt;code&gt;/etc/fonts/conf.avail&lt;/code&gt;로 나뉘어 설치와 사용을 구분하고 있다. 폰트 캐시 파일은 폰트가 위치한 각 디렉토리에 &lt;code&gt;fonts.cache-1&lt;/code&gt;로 유지하더니 이제는 &lt;code&gt;/var/cache/fontconfig&lt;/code&gt;로 통합되었다. 변동사항을 보니 이렇게 한군데로 모은뒤 메모리맵핑된 영역을 모든 프로세스가 공유하는 방식으로 바뀌면서 전체적인 어플리케이션 시작 속도 향상을 꾀한 것도 같다.&lt;/p&gt;
 </description>
@@ -1063,9 +1063,9 @@ pre-stop script   # disable the queue, wait for it to become empty   fooctl disa
     
     <item>
       <title>I810 &#43; Compiz in Ubuntu</title>
-      <link>/2006/11/30/i810-compiz-in-ubuntu/</link>
+      <link>https://lethean.github.io/2006/11/30/i810-compiz-in-ubuntu/</link>
       <pubDate>Thu, 30 Nov 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/11/30/i810-compiz-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2006/11/30/i810-compiz-in-ubuntu/</guid>
       <description>&lt;p&gt;많은 사람들이 3D 데스크탑 효과를 얻기 위해 
 &lt;a href=&#34;http://www.beryl-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Beryl 프로젝트&lt;/a&gt;
  결과물을 이용하는데, 내 경우 Beryl 보다 심플한 설정 인터페이스를 지닌 오리지널 
@@ -1080,9 +1080,9 @@ pre-stop script   # disable the queue, wait for it to become empty   fooctl disa
     
     <item>
       <title>Upstart in Universe of Ubuntu Edgy</title>
-      <link>/2006/09/08/upstart-in-universe-of-ubuntu-edgy/</link>
+      <link>https://lethean.github.io/2006/09/08/upstart-in-universe-of-ubuntu-edgy/</link>
       <pubDate>Fri, 08 Sep 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/09/08/upstart-in-universe-of-ubuntu-edgy/</guid>
+      <guid>https://lethean.github.io/2006/09/08/upstart-in-universe-of-ubuntu-edgy/</guid>
       <description>&lt;p&gt;(&lt;a href=&#34;http://www.netsplit.com/blog/work/canonical/upstart.html&#34;&gt;http://www.netsplit.com/blog/work/canonical/upstart.html&lt;/a&gt;)&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;caps&#34;&gt;UNIX&lt;/span&gt; System V부터 현재 대부분의 리눅스 배포판에 지금까지 사용하는 sysvinit 시스템이 Ubuntu Edgy 버전에서 upstart라는 이벤트-작업(job) 기반 시스템으로 교체되고 있다. 현존하는 initng, launchd, SMF 등과 같은 sysvinit의 다른 대안을 선택하지 않고 우분투 팀에서 새로 만들어가고 있는 것 같다.&lt;/p&gt;
 &lt;p&gt;아마도 가장 큰 변화는 USB 메모리나 USB 네트웍 장치처럼 실행 중에 추가되고 삭제되는 환경을 고려한다는 점이고, 이벤트 기반으로 시스템 초기화 스크립트(/etc/rcS.d)가 재작성되고, 결국에는 모든 패키지의 데몬이 upstart 방식으로 변경될 것 같다.&lt;/p&gt;
@@ -1093,9 +1093,9 @@ pre-stop script   # disable the queue, wait for it to become empty   fooctl disa
     
     <item>
       <title>VMWare USB in Ubuntu</title>
-      <link>/2006/03/11/vmware-usb-in-ubuntu/</link>
+      <link>https://lethean.github.io/2006/03/11/vmware-usb-in-ubuntu/</link>
       <pubDate>Sat, 11 Mar 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/03/11/vmware-usb-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2006/03/11/vmware-usb-in-ubuntu/</guid>
       <description>&lt;p&gt;우분투 리눅스는 항상 최신 아키텍쳐를 반영하기 때문에 기존 API나 아키텍쳐를 기반으로 동작하는 써드파티 어플리케이션이 동작 안하는 경우가 가끔 있는데, VMWare도 그 중 하나인 것 같다.&lt;/p&gt;
 &lt;p&gt;언젠가부터 USB 장치를 VMWare 윈도우즈에서 인식을 못한다고 생각했는데, 오늘 검색해 보니 VMWare가 근거로 하는 &lt;code&gt;/proc/bus/usb&lt;/code&gt; 디렉토리 내용이 없어서였다. 다음 줄을 &lt;code&gt;/etc/fstab&lt;/code&gt; 파일에 추가해 주고 재부팅하거나, &lt;code&gt;mount -a&lt;/code&gt; 명령으로 마운트해준 다음 VMWare를 재시작하면 정상적으로 USB 장치를 인식하게 된다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;none        /proc/bus/usb    usbfs  defaults      0    0
@@ -1105,9 +1105,9 @@ pre-stop script   # disable the queue, wait for it to become empty   fooctl disa
     
     <item>
       <title>VMware /dev/parport0 in Ubuntu</title>
-      <link>/2006/02/28/vmware-devparport0-in-ubuntu/</link>
+      <link>https://lethean.github.io/2006/02/28/vmware-devparport0-in-ubuntu/</link>
       <pubDate>Tue, 28 Feb 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/02/28/vmware-devparport0-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2006/02/28/vmware-devparport0-in-ubuntu/</guid>
       <description>&lt;p&gt;Ubuntu 리눅스에서 VMware를 돌리고, 그 안에서 JTAG 케이블을 이용해 부트로더를 올리는 작업을 하기 위해서는 무엇보다 VMware가 &lt;code&gt;/dev/parport0&lt;/code&gt; 를 찾을 수 있도록 해주어야 한다. 매번 반복되면서 기록을 남기지 않아 오늘도 다시 고생&amp;hellip; 여기에 그 방법을 남겨 놓는다.&lt;/p&gt;
 &lt;p&gt;먼저 ppdev 커널 모듈을 올린다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;modprobe ppdev
@@ -1122,9 +1122,9 @@ pre-stop script   # disable the queue, wait for it to become empty   fooctl disa
     
     <item>
       <title>SCIM in Ubuntu</title>
-      <link>/2006/01/12/scim-in-ubuntu/</link>
+      <link>https://lethean.github.io/2006/01/12/scim-in-ubuntu/</link>
       <pubDate>Thu, 12 Jan 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/01/12/scim-in-ubuntu/</guid>
+      <guid>https://lethean.github.io/2006/01/12/scim-in-ubuntu/</guid>
       <description>&lt;p&gt;Ubuntu(dapper) 리눅스에서 지금까지 사용하던 
 &lt;a href=&#34;http://nabi.kldp.net/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;나비(nabi)&lt;/a&gt;
  입력기를 

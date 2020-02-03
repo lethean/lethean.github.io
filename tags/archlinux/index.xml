@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>ArchLinux | 대체로 무해함</title>
-    <link>/tags/archlinux/</link>
-      <atom:link href="/tags/archlinux/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://lethean.github.io/tags/archlinux/</link>
+      <atom:link href="https://lethean.github.io/tags/archlinux/index.xml" rel="self" type="application/rss+xml" />
     <description>ArchLinux</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>ko-kr</language><copyright>© lethean</copyright><lastBuildDate>Tue, 22 Feb 2011 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>ArchLinux</title>
-      <link>/tags/archlinux/</link>
+      <link>https://lethean.github.io/tags/archlinux/</link>
     </image>
     
     <item>
       <title>사진 파일 이름 변경하기</title>
-      <link>/2011/02/22/renaming-photo-files/</link>
+      <link>https://lethean.github.io/2011/02/22/renaming-photo-files/</link>
       <pubDate>Tue, 22 Feb 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/02/22/renaming-photo-files/</guid>
+      <guid>https://lethean.github.io/2011/02/22/renaming-photo-files/</guid>
       <description>&lt;p&gt;요즘 디지털 카메라나 휴대폰으로 촬영한 JPEG 파일에는 
 &lt;a href=&#34;http://en.wikipedia.org/wiki/EXIF&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;EXIF&lt;/a&gt;
  정보가 삽입되어 있어서 나름 유용할 때가 많습니다. 카메라에 대한 자세한 사양(?) 정보에는 관심이 없지만, 촬영한 시각이라든지 카메라를 세워서 촬영했는지 여부는 물론, 카메라 GPS 옵션을 켜면 기록되는 촬영 장소의 정확한 좌표는 가끔 두려울 때도 있습니다.&lt;/p&gt;
@@ -37,9 +37,9 @@ $ exiv2 -r &#39;%Y%m%d-%H%M%S-photo&#39; -k rename *.jpg
     
     <item>
       <title>아치 리눅스(Arch Linux)로 갈아타다</title>
-      <link>/2011/02/21/migrated-to-arch-linux/</link>
+      <link>https://lethean.github.io/2011/02/21/migrated-to-arch-linux/</link>
       <pubDate>Mon, 21 Feb 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/02/21/migrated-to-arch-linux/</guid>
+      <guid>https://lethean.github.io/2011/02/21/migrated-to-arch-linux/</guid>
       <description>&lt;p&gt;1996년부터 리눅스를 사용하면서 
 &lt;a href=&#34;http://slackware.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;슬랙웨어&lt;/a&gt;
 , 
