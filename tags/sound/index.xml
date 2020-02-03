@@ -14,9 +14,9 @@
     
     <item>
       <title>LG XNOTE C1 노트북 우분투 사용시 사운드 재생 문제</title>
-      <link>/2010/08/09/2010-08-09-sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</link>
+      <link>/2010/08/09/sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</link>
       <pubDate>Mon, 09 Aug 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/08/09/2010-08-09-sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</guid>
+      <guid>/2010/08/09/sound-problem-on-lg-xnote-c1-notebook-in-ubuntu/</guid>
       <description>&lt;p&gt;오랫동안 묵혀두었던 LG XNOTE C1 노트북에 우분투를 설치했는데, 사운드 카드를 통해 오디오가 재생되지 않았습니다. 한동안 오디오를 재생할 일이 없어서 그냥 사용하다가, 오늘 갑자기 필요해져서 급하게 문제를 해결했는데, 그 과정을 기록해 둡니다.&lt;/p&gt;
 &lt;p&gt;일단 확인 결과 사운드 카드 관련 드라이버는 모두 정상적으로 동작합니다. 하지만, 역시나 가장 문제 많은 &lt;code&gt;snd-hda-intel&lt;/code&gt; 드라이버를 사용하고 있었습니다. 그래서 더 정확히 사용하는 모델을 확인하기 위해 &lt;code&gt;/proc/asound/pcm&lt;/code&gt; 파일을 열어보니 다음과 같이 &lt;strong&gt;ALC883&lt;/strong&gt; 모델을 사용하고 있습니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;00-00: ALC883 Analog : ALC883 Analog : playback 1 : capture 1

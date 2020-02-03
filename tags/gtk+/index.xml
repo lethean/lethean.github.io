@@ -14,9 +14,9 @@
     
     <item>
       <title>X 윈도우 마우스 포인터 장벽(barrier)</title>
-      <link>/2012/07/02/2012-07-02-mouse-pointer-barriers-in-x-window/</link>
+      <link>/2012/07/02/mouse-pointer-barriers-in-x-window/</link>
       <pubDate>Mon, 02 Jul 2012 00:00:00 +0000</pubDate>
-      <guid>/2012/07/02/2012-07-02-mouse-pointer-barriers-in-x-window/</guid>
+      <guid>/2012/07/02/mouse-pointer-barriers-in-x-window/</guid>
       <description>&lt;p&gt;그놈3 데스크탑 환경을 사용할때 불편했던 점 중 하나는,  프로그램을 실행하는 등의 창 작업을 위해 화면 상단 왼쪽 구석으로 마우스를 이동했을때 듀얼 모니터에서 마우스가 미끌어져 버리는 현상이었습니다. 그런데, 어느 날부터인가 이 현상, 즉 마우스를 화면 구석으로 이동해도 마우스가 다음 모니터로 미끌어져 넘어가는 현상이 발생하지 않았습니다. 제가 &amp;lsquo;어느 날&#39;이라는 표현을 사용한 이유는, 
 &lt;a href=&#34;/2011/02/21/migrated-to-arch-linux/&#34;&gt;아치 리눅스로 이전&lt;/a&gt;
 한 이후로 아직까지 한 번도 시스템을 재설치하지 않고, 생각날 때마다 최소 2~3일에 한 번씩 패키지를 업그레이드하는 습관 때문입니다.&lt;/p&gt;
@@ -183,9 +183,9 @@ DestroyPointerBarrier
     
     <item>
       <title>GNOME 개발 설명서 / 동영상</title>
-      <link>/2011/07/15/2011-07-15-gnome-development-screencasts-and-tutorials/</link>
+      <link>/2011/07/15/gnome-development-screencasts-and-tutorials/</link>
       <pubDate>Fri, 15 Jul 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/07/15/2011-07-15-gnome-development-screencasts-and-tutorials/</guid>
+      <guid>/2011/07/15/gnome-development-screencasts-and-tutorials/</guid>
       <description>&lt;p&gt;오랜만에 
 &lt;a href=&#34;http://developer.gnome.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME 개발자 센터&lt;/a&gt;
 를 들어갔더니, 모양 뿐 아니라 내용도 확 바뀌어 있습니다. 예전에도 있었는데 제가 몰랐던 건지도 모르지만, 
@@ -243,9 +243,9 @@ DestroyPointerBarrier
     
     <item>
       <title>2010년 1학기에 작성한 프로그램</title>
-      <link>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</link>
+      <link>/2010/09/28/programs-written-in-2010-spring-semester/</link>
       <pubDate>Tue, 28 Sep 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</guid>
+      <guid>/2010/09/28/programs-written-in-2010-spring-semester/</guid>
       <description>&lt;p&gt;뭐, 전혀 관심 없는 분이 대부분이겠지만, 제 하드 디스크에서 묵히는 것보다 누군가에게 도움이 되는 편이 좋을 것 같아, 별로 품질이 좋은 소스는 아니지만, 오픈 소스만 사용해도 무난하게 과제 수행에 문제가 없음을 보여주기 위해, 지난 학기 수업 과제물로 제출했던 과제물의 문서와 프로그램 소스를 공개합니다.&lt;/p&gt;
 &lt;p&gt;참고로, 앞의 두 프로그램은 GTK+ 라이브러리를 이용해서 리눅스에서 개발했지만, 과제 시연을 위해 윈도우에서도 문제없이 컴파일되고 실행되도록 만들었습니다. 그리고, 안드로이드 뷰어는 라이브 보기만 구현된 소스입니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;1. Image Histogram Viewer&lt;/strong&gt;&lt;/p&gt;
@@ -260,9 +260,9 @@ DestroyPointerBarrier
     
     <item>
       <title>GLib 테스트 프레임워크 사용하기</title>
-      <link>/2010/02/12/2010-02-12-using-glib-test-framework/</link>
+      <link>/2010/02/12/using-glib-test-framework/</link>
       <pubDate>Fri, 12 Feb 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/02/12/2010-02-12-using-glib-test-framework/</guid>
+      <guid>/2010/02/12/using-glib-test-framework/</guid>
       <description>&lt;p&gt;GLib 라이브러리 2.16 버전부터 지원하는 
 &lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;테스트 프레임워크&lt;/a&gt;
 는 C 언어용 
@@ -390,9 +390,9 @@ $ gtester-report sample-log.xml &amp;gt; sample-log.html
     
     <item>
       <title>GLib 메인루프 이용하기</title>
-      <link>/2009/09/21/2009-09-21-using-glib-mainloop/</link>
+      <link>/2009/09/21/using-glib-mainloop/</link>
       <pubDate>Mon, 21 Sep 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/09/21/2009-09-21-using-glib-mainloop/</guid>
+      <guid>/2009/09/21/using-glib-mainloop/</guid>
       <description>&lt;p&gt;GLib API를 이용한 멀티쓰레드 프로그래밍에서 비동기 메시지 큐를 이용하는 방법은 지난 
 &lt;a href=&#34;/2008/08/06/glib-thread-programming/&#34;&gt;포스트&lt;/a&gt;
 에서 설명한 적이 있는데, 이번에는 
@@ -509,9 +509,9 @@ add_socket_to_my_thread (gint sock_fd)
     
     <item>
       <title>GLib 메인루프와 애플 GCD의 libdispatch</title>
-      <link>/2009/09/17/2009-09-17-glib-mainloop-vs-libdispatch-of-apple-gcd/</link>
+      <link>/2009/09/17/glib-mainloop-vs-libdispatch-of-apple-gcd/</link>
       <pubDate>Thu, 17 Sep 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/09/17/2009-09-17-glib-mainloop-vs-libdispatch-of-apple-gcd/</guid>
+      <guid>/2009/09/17/glib-mainloop-vs-libdispatch-of-apple-gcd/</guid>
       <description>&lt;p&gt;GTK 메일링 리스트에 
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-September/msg00036.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;흥미있는 포스트&lt;/a&gt;
 가 있어서 정리해 봅니다.&lt;/p&gt;
@@ -551,9 +551,9 @@ add_socket_to_my_thread (gint sock_fd)
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (4)</title>
-      <link>/2009/08/24/2009-08-24-oop-with-gobject-4/</link>
+      <link>/2009/08/24/oop-with-gobject-4/</link>
       <pubDate>Mon, 24 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/24/2009-08-24-oop-with-gobject-4/</guid>
+      <guid>/2009/08/24/oop-with-gobject-4/</guid>
       <description>&lt;p&gt;이전 글에 계속 이어집니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;객체 속성 정보 얻기&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;EdcHost 객체의 속성 정보를 실행 중에 얻어볼까 합니다.&lt;/p&gt;
@@ -741,9 +741,9 @@ edc_host_set_property (GObject      *object,
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (3)</title>
-      <link>/2009/08/18/2009-08-18-oop-with-gobject-3/</link>
+      <link>/2009/08/18/oop-with-gobject-3/</link>
       <pubDate>Tue, 18 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/18/2009-08-18-oop-with-gobject-3/</guid>
+      <guid>/2009/08/18/oop-with-gobject-3/</guid>
       <description>&lt;p&gt;이 글은 회사 개발팀 내부 세미나를 위해 작성중인 글입니다. 하지만, 블로그란 매체의 특성상 외부에도 공개되고 있는데, 댓글은 달지 않아도 접속하는 사람들 대부분이 제가 아는 분일 거라 생각하고 한마디 하자면, 세상에 공짜가 어디 있는가, 주저하지 말고 내게 연락해서 술 한 잔 사게! (언젠가부터 술 강요 청탁 협박 블로그가 되어 가고 있군&amp;hellip;)&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;속성 (Properties) 추가하기&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;이제, GObject 속성(properties) 기능을 추가하려고 하는데, 왜 쓸데없이 일을 만들어서 하냐고 물으면 할 말이 있어야할 것 같아서, GObject 속성의 특징을 요약해 봤습니다.&lt;/p&gt;
@@ -1005,9 +1005,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (2)</title>
-      <link>/2009/08/14/2009-08-14-oop-with-gobject-2/</link>
+      <link>/2009/08/14/oop-with-gobject-2/</link>
       <pubDate>Fri, 14 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/14/2009-08-14-oop-with-gobject-2/</guid>
+      <guid>/2009/08/14/oop-with-gobject-2/</guid>
       <description>&lt;p&gt;첫번째 글이 당연한 내용을 너무 길게 설명했다는 의견이 있어서, 이번 글부터는 더 짧고 간결하게 정리해 보려고 노력하고 있습니다. 그리고, 이 글의 대상은 한 번이라도 GTK+ / GLib 라이브러리를 사용한 경험이 있는 개발자입니다. 그래서 정말로 기초적인 내용은 피하고 있습니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;접근자 (Accessors)&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;소프트웨어 공학에서 모듈이나 객체 설계시 기본적으로 강조하는 정보은닉(information hiding), 캡슐화(encapsulation), 결합도(coupling) 등과 같은 개념에 의하면, C 언어처럼 구조체의 필드 변수를 외부로 직접 공개하는 건 좋지 않다고 합니다. 그리고 대부분의 경우 직접 접근 방식보다 읽고 쓰는 접근자(accessors)를 제공하는 게 여러모로 좋다고 하지요. 물론 성능 문제로 직접 접근 방식을 고려해야 하는 경우도 있지만, 지금까지 경험에 비춰보면, 병목을 일으키는 부분은 프로파일러를 돌려서 정확하게 파악한 다음에 해결하는 게 대부분 좋기 때문에 처음부터 그럴 필요는 없을 것 같습니다.&lt;/p&gt;
@@ -1159,9 +1159,9 @@ edc_host_set_name (EdcHost     *host,
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (1)</title>
-      <link>/2009/08/10/2009-08-10-oop-with-gobject-1/</link>
+      <link>/2009/08/10/oop-with-gobject-1/</link>
       <pubDate>Mon, 10 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/10/2009-08-10-oop-with-gobject-1/</guid>
+      <guid>/2009/08/10/oop-with-gobject-1/</guid>
       <description>&lt;p&gt;GTK+, Clutter 등과 같은 라이브러리는 C 언어로 구현되었지만 객체 지향 개념을 충실히 따르고 있는데, 그 중심에는 GLib 라이브러리의 GObject가 있습니다. 따라서 이러한 라이브러리를 제대로 이해하고 사용하려면 필수적으로 GObject 개념을 잘 이해하고 있어야 합니다. 그런데, 생각보다 GObject 개념은 이해하기 어렵습니다. 이해하더라도 이를 응용하려면 그만큼 시간이 또 필요합니다.&lt;/p&gt;
 &lt;p&gt;그래서 이번 글을 시작으로 GObject 라이브러리를 이용한 C 언어에서 객체 지향 프로그래밍이라는 거창한 주제를 예제 형식을 이용해 다루어 보려고 합니다. 바로 새 GTK+ 위젯을 구현하거나 클러터 객체를 분석하는 방식이 아니라 왜 GObject가 이런 방식으로 설계되었는지 그 철학을 따라가 보려고 합니다. 그리고, 가능한 기존 GObject 튜토리얼의 어려운 설명이 아니라 실제 사용하는 코드를 중심으로 설명할 예정이니, 그래도 무슨 말인지 모르겠거나 더 풀어서 설명을 하는 게 좋을 것 같을 경우 의견 주시기 바랍니다.&lt;/p&gt;
 &lt;p&gt;여기서 예제로 사용할 개념은 네트워크 카메라 호스트와 호스트 목록입니다. (하는 일이 이쪽 분야라서&amp;hellip; :)&lt;/p&gt;
@@ -1571,9 +1571,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GObject Property Binding 기능이 필요함</title>
-      <link>/2009/04/20/2009-04-20-gobject-property-binding-required/</link>
+      <link>/2009/04/20/gobject-property-binding-required/</link>
       <pubDate>Mon, 20 Apr 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/04/20/2009-04-20-gobject-property-binding-required/</guid>
+      <guid>/2009/04/20/gobject-property-binding-required/</guid>
       <description>&lt;p&gt;맥 코코아 프레임웍을 공부하면서 GTK+ / GObject 라이브러리에도 있으면 참 좋겠다고 생각한 것 중 하나가 특정 속성(property)을 다른 객체의 속성과 결합하는(binding) 개념입니다. 이를 이용해 자동으로 모델과 뷰를 클릭 몇 번으로 연결하고, 더 나아가 객체 배열은 물론 선택한 항목까지 자동으로 동기화되는 걸 보면서 정말 잘 만들어진 프레임웍이라는 걸 새삼 느낍니다. 또한 사용자가 직접 설계한 클래스를 인터페이스 빌더의 객체로 등록해서 마우스 클릭만으로 자연스럽게 연결이 되는 걸 보면 정말 부럽습니다.&lt;/p&gt;
 &lt;p&gt;물론 GObject  객체의 속성 묶기(property binding)를 지원하기 위해 
 &lt;a href=&#34;/2008/12/15/exobinding/&#34;&gt;ExoBinding&lt;/a&gt;
@@ -1587,9 +1587,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GLib과 GTK&#43;도 Subversion에서 Git으로 이동</title>
-      <link>/2009/04/01/2009-04-01-glib-gtk-moved-to-git/</link>
+      <link>/2009/04/01/glib-gtk-moved-to-git/</link>
       <pubDate>Wed, 01 Apr 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/04/01/2009-04-01-glib-gtk-moved-to-git/</guid>
+      <guid>/2009/04/01/glib-gtk-moved-to-git/</guid>
       <description>&lt;p&gt;2009년 4월 1일을 기준으로 GNOME 프로젝트의 핵심이 되는 glib, gtk, pango, atk 프로젝트가 기존 서브버전에서 
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-March/msg00206.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;git으로 소스 버전 관리 시스템을 변경&lt;/a&gt;
 했습니다. 한동안 어떤 버전 관리 시스템을 사용할지 논의가 많았는데, 결국 대세를 거를 수는 없었던 모양입니다. 달라진 사용법은 
@@ -1601,9 +1601,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GTK&#43; 2.16 릴리스</title>
-      <link>/2009/03/23/2009-03-23-gtk-216-release/</link>
+      <link>/2009/03/23/gtk-216-release/</link>
       <pubDate>Mon, 23 Mar 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/03/23/2009-03-23-gtk-216-release/</guid>
+      <guid>/2009/03/23/gtk-216-release/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2009-March/msg00101.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 2.16 버전이 릴리스&lt;/a&gt;
 되었는데, 추가된 기능 중에서 관심 있는 부분만 우리말로 정리해 보았습니다.&lt;/p&gt;
@@ -1642,9 +1642,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GTK&#43; 글자 외곽선 효과 (GtkOutlineLabel)</title>
-      <link>/2009/03/06/2009-03-06-gtk-outline-label/</link>
+      <link>/2009/03/06/gtk-outline-label/</link>
       <pubDate>Fri, 06 Mar 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/03/06/2009-03-06-gtk-outline-label/</guid>
+      <guid>/2009/03/06/gtk-outline-label/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-list/2009-March/msg00031.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 메일링 리스트&lt;/a&gt;
 에서 카이로(cairo) API를 이용해 깔끔하게 
@@ -1690,9 +1690,9 @@ main (int argc, char **argv)
     
     <item>
       <title>리눅스에서 위치 인식 소프트웨어</title>
-      <link>/2009/02/03/2009-02-03-location-aware-softwares-in-linux/</link>
+      <link>/2009/02/03/location-aware-softwares-in-linux/</link>
       <pubDate>Tue, 03 Feb 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/02/03/2009-02-03-location-aware-softwares-in-linux/</guid>
+      <guid>/2009/02/03/location-aware-softwares-in-linux/</guid>
       <description>&lt;p&gt;&amp;lsquo;
 &lt;a href=&#34;http://arstechnica.com/open-source/news/2009/01/location-awareness-comes-to-the-linux-platform.ars&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Location-aware software comes to the Linux platform&lt;/a&gt;
 &amp;rsquo; 글에서 모바일 위치 정보와 지도 렌더링을 오픈소스 리눅스 플랫폼에서 처리하는 방법을 정리해 놓았는데, 나중을 위해 간략하게 정리해 보았습니다.&lt;/p&gt;
@@ -1711,9 +1711,9 @@ main (int argc, char **argv)
     
     <item>
       <title>GTK&#43; 멀티 포인터 X 지원</title>
-      <link>/2009/01/21/2009-01-21-mpx-gtk-multi-pointer-x-support/</link>
+      <link>/2009/01/21/mpx-gtk-multi-pointer-x-support/</link>
       <pubDate>Wed, 21 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/21/2009-01-21-mpx-gtk-multi-pointer-x-support/</guid>
+      <guid>/2009/01/21/mpx-gtk-multi-pointer-x-support/</guid>
       <description>&lt;p&gt;&amp;lsquo;
 &lt;a href=&#34;http://www.phoronix.com/scan.php?page=news_item&amp;amp;px=NzAwNw&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Multi-Pointer X Support For GTK+&lt;/a&gt;
 &amp;rsquo; 기사를 보면 이미 GTK+ 라이브러리에 멀티 포인터 기능을 지원하기 위한 작업이 진행중입니다. 비록 X 서버는 Ubuntu 9.04 버전에 탑재될 1.6 버전에 멀티 포인터 기능이 이미 포함되어 있지만 기본적으로 비활성화되어 있고, 올해 말 즈음에 릴리스할 1.7 버전에 X Input 2.0 스펙과 함께 포함되면서 공식적으로 지원이 될 것 같습니다.&lt;/p&gt;
@@ -1726,9 +1726,9 @@ main (int argc, char **argv)
     
     <item>
       <title>GTK&#43; 반투명 배경 만들기 (OSD 효과)</title>
-      <link>/2009/01/14/2009-01-14-gtk-osd-semi-transparent/</link>
+      <link>/2009/01/14/gtk-osd-semi-transparent/</link>
       <pubDate>Wed, 14 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/14/2009-01-14-gtk-osd-semi-transparent/</guid>
+      <guid>/2009/01/14/gtk-osd-semi-transparent/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://bloc.eurion.net/archives/2009/standalone-pygtk-desktop-widgets/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PyGTK를 이용해 데스크탑 위젯을 만드는 블로그&lt;/a&gt;
 를 보고 이를 C 언어로 바꾸어 보았습니다. Compiz나 Metacity의 컴포지팅(compositing) 기능이 활성화되어 있을 경우에만 제대로 동작합니다. 먼저 스크린샷부터.&lt;/p&gt;
@@ -1866,9 +1866,9 @@ main (int argc, char **argv)
     
     <item>
       <title>GTK&#43; 투명 배경 만들기 (OSD 효과)</title>
-      <link>/2009/01/14/2009-01-14-gtk-transparent-background-osd-effect/</link>
+      <link>/2009/01/14/gtk-transparent-background-osd-effect/</link>
       <pubDate>Wed, 14 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/14/2009-01-14-gtk-transparent-background-osd-effect/</guid>
+      <guid>/2009/01/14/gtk-transparent-background-osd-effect/</guid>
       <description>&lt;p&gt;이번에는 컴피즈와 같은 비디오 카드 3D 기능이 필요하지 않은 기법으로 OSD 효과를 만들어 보겠습니다. 물론 부드러운 반투명 배경 등의 효과는 불가능하지만, 윈도우의 특정 영역을 아예 마스킹(masking)해서 비워버리는 방식이기 때문에 마우스 입력도 통과해 버립니다. 이번에도 역시 스크린샷 먼저!&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;/figures/osd-test.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;여기서 사용한 기법은 
@@ -1896,9 +1896,9 @@ main (int argc, char **argv)
     
     <item>
       <title>클러터(Clutter) 사용하기 (1)</title>
-      <link>/2009/01/14/2009-01-14-using-clutter-1/</link>
+      <link>/2009/01/14/using-clutter-1/</link>
       <pubDate>Wed, 14 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/14/2009-01-14-using-clutter-1/</guid>
+      <guid>/2009/01/14/using-clutter-1/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.clutter-project.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;클러터(Clutter)&lt;/a&gt;
 는 C 언어로 구현한 2D 그래픽 사용자 인터페이스 라이브러리입니다. 2D임에도 불구하고 OpenGL 또는 OpenGL ES를 렌더링에 사용하며, GLib의 GObject 기반으로 API가 구성되어 있습니다. 뭐, 소개하자면 끝이 없고, 더 궁금한 분은 공식 홈페이지를 참고하기 바랍니다. 이 글은 
@@ -2077,9 +2077,9 @@ int main(int argc, char *argv[])
     
     <item>
       <title>GTK&#43; 메모리 관리</title>
-      <link>/2008/12/28/2008-12-28-gtk-memory-management/</link>
+      <link>/2008/12/28/gtk-memory-management/</link>
       <pubDate>Sun, 28 Dec 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/12/28/2008-12-28-gtk-memory-management/</guid>
+      <guid>/2008/12/28/gtk-memory-management/</guid>
       <description>&lt;p&gt;GTK+ 포럼에 
 &lt;a href=&#34;http://www.gtkforums.com/viewtopic.php?t=2412&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 메모리 관리하기&lt;/a&gt;
 라는 글이 올라왔는데 내용이 간결해서 이를 참고로 다시 정리해 보았습니다.&lt;/p&gt;
@@ -2123,9 +2123,9 @@ int main(int argc, char *argv[])
     
     <item>
       <title>GObject Private 데이터 접근 오버헤드 줄이기</title>
-      <link>/2008/12/23/2008-12-23-reduce-accesing-overhead-for-gobject-private-data/</link>
+      <link>/2008/12/23/reduce-accesing-overhead-for-gobject-private-data/</link>
       <pubDate>Tue, 23 Dec 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/12/23/2008-12-23-reduce-accesing-overhead-for-gobject-private-data/</guid>
+      <guid>/2008/12/23/reduce-accesing-overhead-for-gobject-private-data/</guid>
       <description>&lt;p&gt;GTK+ 개발자 메일링 리스트에서 
 &lt;a href=&#34;http://mail.gnome.org/archives/gtk-devel-list/2008-December/thread.html#00061&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GTK+ 속도 관련 질의 응답&lt;/a&gt;
 이 오가는 걸 지켜보는 도중 g_type_class_add_private() + g_type_instance_get_private() 조합을 사용하면 편하지만, 오버헤드가 크고 느리기 때문에 이를 
@@ -2231,9 +2231,9 @@ foo_object_do_something (FooObject *foo)
     
     <item>
       <title>ExoBinding 소개</title>
-      <link>/2008/12/15/2008-12-15-exobinding/</link>
+      <link>/2008/12/15/exobinding/</link>
       <pubDate>Mon, 15 Dec 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/12/15/2008-12-15-exobinding/</guid>
+      <guid>/2008/12/15/exobinding/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.xfce.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Xfce&lt;/a&gt;
  프로젝트에서 사용하는 라이브러리에 포함되어 있는 
@@ -2264,9 +2264,9 @@ foo_object_do_something (FooObject *foo)
     
     <item>
       <title>GtkCellRenderer 이해하기</title>
-      <link>/2008/12/01/2008-12-01-understanding-gtktreeview-cellrenderer/</link>
+      <link>/2008/12/01/understanding-gtktreeview-cellrenderer/</link>
       <pubDate>Mon, 01 Dec 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/12/01/2008-12-01-understanding-gtktreeview-cellrenderer/</guid>
+      <guid>/2008/12/01/understanding-gtktreeview-cellrenderer/</guid>
       <description>&lt;p&gt;GTK+ 프로그램 개발시 
 &lt;a href=&#34;http://library.gnome.org/devel/gtk/stable/GtkTreeView.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GtkTreeView&lt;/a&gt;
  / 
@@ -2385,9 +2385,9 @@ gtk_cell_layout_set_cell_data_func (GTK_CELL_LAYOUT (combobox),
     
     <item>
       <title>GTK&#43; / GLib 경고 메시지 추적하기</title>
-      <link>/2008/11/14/2008-11-14-tracing-gtk-glib-warning-messages/</link>
+      <link>/2008/11/14/tracing-gtk-glib-warning-messages/</link>
       <pubDate>Fri, 14 Nov 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/11/14/2008-11-14-tracing-gtk-glib-warning-messages/</guid>
+      <guid>/2008/11/14/tracing-gtk-glib-warning-messages/</guid>
       <description>&lt;p&gt;GTK+ 또는 GLib 기반 프로그래밍을 할때 g_warning() / g_return_if_fail() 등과 같은 API를 사용한 경고 메시지가 어디서 발생했는지 찾기 어려운 경우가 있습니다. 더 나아가 해당 함수를 호출하는 부분을 알아야 하는데, 사실 메시지만으로는 찾기가 매우 어려운 경우가 많습니다.&lt;/p&gt;
 &lt;p&gt;예를 들어 수만라인짜리 프로그램이 실행 도중 다음과 같은 메시지를 출력합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;Gtk-CRITICAL **: gtk_widget_set_sensitive: 
@@ -2407,9 +2407,9 @@ assertion `GTK_IS_WIDGET (widget)&#39; failed
     
     <item>
       <title>GLib 쓰레드 프로그래밍</title>
-      <link>/2008/08/06/2008-08-06-glib-thread-programming/</link>
+      <link>/2008/08/06/glib-thread-programming/</link>
       <pubDate>Wed, 06 Aug 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/08/06/2008-08-06-glib-thread-programming/</guid>
+      <guid>/2008/08/06/glib-thread-programming/</guid>
       <description>&lt;p&gt;소프트웨어를 개발하면서 멀티 쓰레드 방식을 사용하는 경우는 많습니다. 하지만 그만큼 복잡도가 증가해서 세심하게 고려하여 설계하지 않으면 디버깅 재앙을 얻는 경우가 많습니다. 이 글은 &amp;lsquo;
 &lt;a href=&#34;/2008/12/28/gtk-memory-management/&#34;&gt;멀티쓰레드 프로그래밍 규칙&lt;/a&gt;
 &amp;lsquo;에서 이어지는 내용입니다. 
@@ -2675,9 +2675,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>Glade 카탈로그 작성 / 설치하기</title>
-      <link>/2008/07/24/2008-07-24-glade-catalog/</link>
+      <link>/2008/07/24/glade-catalog/</link>
       <pubDate>Thu, 24 Jul 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/07/24/2008-07-24-glade-catalog/</guid>
+      <guid>/2008/07/24/glade-catalog/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://glade.gnome.org/docs/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;글레이드(Glade) 매뉴얼&lt;/a&gt;
 에서 
@@ -2740,9 +2740,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>GtkTreeModel 확장하기</title>
-      <link>/2008/07/15/2008-07-15-leveraging-gtktreemodel/</link>
+      <link>/2008/07/15/leveraging-gtktreemodel/</link>
       <pubDate>Tue, 15 Jul 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/07/15/2008-07-15-leveraging-gtktreemodel/</guid>
+      <guid>/2008/07/15/leveraging-gtktreemodel/</guid>
       <description>&lt;p&gt;GTK+ 프로그래밍에서 많이 사용하는 GtkTreeModel(GtkListStore / GtkTreeStore)에는 일반적으로 데이터(객체)에서 표시할 내용만 추가해서 사용합니다. 따라서 실제로 데이터가 변경되면 그때마다 GtkTreeModel 내용을 변경해주어야 합니다.(일종의 동기화) 하지만 이러한 프로그래밍 방식은 매우 귀찮고 개발 시간도 오래 걸리는 것은 물론 런타임 오버헤드도 발생할 수 밖에 없습니다. 아예 GtkTreeModel에서 하나의 컬럼에 데이터(객체)를 넣고 관리하는 방법도 있지만, 이 역시 이러한 오버헤드와 비효율은 피할 수 없습니다.&lt;/p&gt;
 &lt;p&gt;
 &lt;a href=&#34;http://davyd.livejournal.com/252351.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;leveraging GtkTreeModel&lt;/a&gt;
@@ -2762,9 +2762,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>GTK&#43; Animation Effects</title>
-      <link>/2007/07/25/2007-07-25-gtk-animation-effects/</link>
+      <link>/2007/07/25/gtk-animation-effects/</link>
       <pubDate>Wed, 25 Jul 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/07/25/2007-07-25-gtk-animation-effects/</guid>
+      <guid>/2007/07/25/gtk-animation-effects/</guid>
       <description>&lt;p&gt;점점 화려해지는 GUI 추세를 이제서야 인식했는지, GTK+ / GNOME 에서도 애니메이션 효과에 대한 논의와 구현이 점점 활발해지고 있는 것 같다. 아직 GTK+ 메인 소스에 반영되려면 시간이 더 걸릴 것 같지만 
 &lt;a href=&#34;http://bugzilla.gnome.org/show_bug.cgi?id=444659&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GtkTimeline&lt;/a&gt;
  이라는 기본적인 시간 관리 객체가 이미 논의 중이고, 이를 기반으로 여러 개발자들이 여기저기에 적용해보기도 하고 있다. (
@@ -2800,9 +2800,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>GObject - Glib object system</title>
-      <link>/2007/02/05/2007-02-05-gobject-glib-object-system/</link>
+      <link>/2007/02/05/gobject-glib-object-system/</link>
       <pubDate>Mon, 05 Feb 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/02/05/2007-02-05-gobject-glib-object-system/</guid>
+      <guid>/2007/02/05/gobject-glib-object-system/</guid>
       <description>&lt;p&gt;오랜만에 Glib 객체 시스템인 GObject에 대한 글들을 다시 정독해 보았다. 아무 것도 모르고 처음 읽었을때와 몇년동안 GTK+와 친숙해진뒤 다시 읽어볼때는 역시 차이가 있는 법, 이제 GObject 객체를 프로젝트에 하나씩 적용해볼 생각이다.&lt;/p&gt;
 &lt;p&gt;참고 사이트:&lt;/p&gt;
 &lt;ol&gt;
@@ -2833,9 +2833,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>Pango 1.15.2 한글 표시 문제</title>
-      <link>/2006/12/23/2006-12-23-pango-1152-hangul-display-problem/</link>
+      <link>/2006/12/23/pango-1152-hangul-display-problem/</link>
       <pubDate>Sat, 23 Dec 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/12/23/2006-12-23-pango-1152-hangul-display-problem/</guid>
+      <guid>/2006/12/23/pango-1152-hangul-display-problem/</guid>
       <description>&lt;p&gt;한글 메일링 리스트에서 pango 라이브러리 최적화 논의가 오고 가더니 그 결과가 최신 버전에 이미 반영된 모양이다. 엊그제(?) 우분투 개발 버전에 새로 1.15.2-0ubuntu1 버전 패키지가 올라왔는데, 릴리스 변동 사항에 포함되어 있었다. 문제는 몇몇 한글 글자가 흩어져서(?) 표시되는 현상이 발생하길래, 조금 있으면 버그가 수정되어 올라오겠지 기다리다가 참지 못하고 오늘 결국 직접 원인을 찾아보았더니, 의외로 빨리 해결책을 얻을 수 있었다.&lt;/p&gt;
 &lt;p&gt;그놈 버그질라에 이미 &amp;lsquo;
 &lt;a href=&#34;http://bugzilla.gnome.org/show_bug.cgi?id=388581&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Composing jamo is broken in pango-1.15.2&amp;rsquo;&lt;/a&gt;
@@ -2846,9 +2846,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>E-페이퍼에 GTK&#43; 사용</title>
-      <link>/2006/12/18/2006-12-18-gtk-for-epaper-device/</link>
+      <link>/2006/12/18/gtk-for-epaper-device/</link>
       <pubDate>Mon, 18 Dec 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/12/18/2006-12-18-gtk-for-epaper-device/</guid>
+      <guid>/2006/12/18/gtk-for-epaper-device/</guid>
       <description>&lt;p&gt;iRex 테크놀로지에서 만든 E-페이퍼, 종이처럼 구부러지면서 컴퓨터 화면처럼 동작하는 디스플레이 장치에 들어가는 소프트웨어 개발자들이 GTK+ 라이브러리를 이용한다고 한다. 여러가지 이유로 GTK+ 라이브러리를 거의 모든 회사 프로젝트에 이용하고 있는 입장으로 반갑기도 하고, 놀라운 점도 있다.&lt;/p&gt;
 &lt;p&gt;참고:&lt;/p&gt;
 &lt;ol&gt;
@@ -2861,9 +2861,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>멀티쓰레드 GTK&#43; 프로그래밍</title>
-      <link>/2006/01/20/2006-01-20-multi-thread-gtk-programming/</link>
+      <link>/2006/01/20/multi-thread-gtk-programming/</link>
       <pubDate>Fri, 20 Jan 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/01/20/2006-01-20-multi-thread-gtk-programming/</guid>
+      <guid>/2006/01/20/multi-thread-gtk-programming/</guid>
       <description>&lt;p&gt;대부분의 프로젝트를 GTK+를 이용하지만, 잊어버릴만 하면 부딪히는 문제 중 하나가 바로 멀티쓰레드 프로그램에서 GTK+ 위젯을 다룰때 발생하는 여러가지 현상들이다.&lt;/p&gt;
 &lt;p&gt;우선 가장 쉽게 만나는 패턴은 XLib에서 Sync 에러를 내면서 프로그램 종료, 아니면 반대로 GUI가 블럭킹되어 아무 것도 동작안하는 현상이다. 그 다음으로는 해제된 위젯에 접근하거나, 아직 초기화가 덜된 위젯에 접근할 경우 발생하는 무수한 오동작 현상이 있지만, 이는 어플리케이션 설계의 문제이기도 하다.&lt;/p&gt;
 &lt;p&gt;첫번째 패턴은 GTK+를 멀티쓰레드에서 이용할 경우 처음 사용하는 사람은 누구나 만나게 된다. X 윈도우는 프로세스별로 접근은 제어해주지만, 쓰레드별 접근은 제어를 해주지 않기 때문에 이는 상위 라이브러리나 프로그래머가 처리해야 한다는 점을 모를 경우 말이다.&lt;/p&gt;

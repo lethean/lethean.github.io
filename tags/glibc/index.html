@@ -449,7 +449,7 @@
     
     
     <div>
-      <h2><a href="/2015/02/17/2015-02-17-detect-time-change-with-timerfd-in-linux/" >리눅스에서 시간 변경 감지하기</a></h2>
+      <h2><a href="/2015/02/17/detect-time-change-with-timerfd-in-linux/" >리눅스에서 시간 변경 감지하기</a></h2>
       <div class="article-style">
         
           systemd 데몬은 가끔 &ldquo;Time has been changed&quot;라는 로그 메시지를 출력합니다. 그래서 과연 어떤 방식으로 시간이 변경되는 이벤트를 감지하는지 궁금해서 소스 코
@@ -461,7 +461,7 @@
     
     
     <div>
-      <h2><a href="/2012/03/19/2012-03-19-detect-change-of-ip-address-and-link-status-in-linux/" >리눅스 IP 주소 / 링크 상태 변경 여부 감지하기</a></h2>
+      <h2><a href="/2012/03/19/detect-change-of-ip-address-and-link-status-in-linux/" >리눅스 IP 주소 / 링크 상태 변경 여부 감지하기</a></h2>
       <div class="article-style">
         
           리눅스에서 IP 주소가 변경되었거나 링크 상태 변경 여부(예를 들어 랜선이 꽂히거나 빠졌을때)를 자동으로 감지하는 C 코드입니다. ifconfig 명령등의 결과를 파싱하는 방법
@@ -473,7 +473,7 @@
     
     
     <div>
-      <h2><a href="/2011/07/07/2011-07-07-eventfd/" >eventfd 소개</a></h2>
+      <h2><a href="/2011/07/07/eventfd/" >eventfd 소개</a></h2>
       <div class="article-style">
         
           리눅스에서 비단 부모 자식 프로세스간 통신 뿐 아니라, 쓰레드간 메시지 전달에도 pipe() 를 자주 이용합니다. 읽거나 쓸때 별도로 뮤텍스로 보호해줄 필요가 없기 때문이기도
@@ -485,7 +485,7 @@
     
     
     <div>
-      <h2><a href="/2011/04/05/2011-04-05-get-domain-mx-host-name/" >도메인 메일 호스트(MX) 주소 얻기</a></h2>
+      <h2><a href="/2011/04/05/get-domain-mx-host-name/" >도메인 메일 호스트(MX) 주소 얻기</a></h2>
       <div class="article-style">
         
           예를 들어 nobody@hades.net이라는 메일 주소의 서버는 hades.net인 것 같지만 실제로 메일을 호스팅하는 서버는 해당 도메인 서버에 질의해
@@ -497,7 +497,7 @@
     
     
     <div>
-      <h2><a href="/2011/01/12/2011-01-12-allocate-file-space-in-advance/" >파일 공간 미리 할당하기</a></h2>
+      <h2><a href="/2011/01/12/allocate-file-space-in-advance/" >파일 공간 미리 할당하기</a></h2>
       <div class="article-style">
         
           비단 비트토런트(BitTorrent)나 어뮬(aMule) 같은 P2P 응용 프로그램이 아니라도 파일 크기를 (대략이라도) 미리 알고 있을 경우, 디스크 공간을
@@ -509,7 +509,7 @@
     
     
     <div>
-      <h2><a href="/2009/12/27/2009-12-27-get-number-of-cpu-on-linux-and-macosx/" >리눅스 / 맥오에스에서 CPU 갯수 얻기</a></h2>
+      <h2><a href="/2009/12/27/get-number-of-cpu-on-linux-and-macosx/" >리눅스 / 맥오에스에서 CPU 갯수 얻기</a></h2>
       <div class="article-style">
         
           Linux / MacOS X 플랫폼에서 CPU 갯수를 얻어오는 함수입니다. 잊어버릴까봐 기록해 둡니다. #include &lt;stdio.h&gt; #ifdef __linux__ #include &lt;sys/sysinfo.h&gt; #else #ifdef __APPLE__ #include &lt;sys/param.h&gt; #include &lt;sys/sysctl.h&gt; #else #error &quot;Only Linux or OSX is supported!&quot; #endif /* __APPLE__ */ #endif /* __linux__ */ static int get_cpu_nr (void) {
@@ -521,7 +521,7 @@
     
     
     <div>
-      <h2><a href="/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/" >TCMalloc 구글 성능 도구를 이용한 메모리 누수 디버깅</a></h2>
+      <h2><a href="/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/" >TCMalloc 구글 성능 도구를 이용한 메모리 누수 디버깅</a></h2>
       <div class="article-style">
         
           리눅스에서 메모리 침범이나 메모리 누수, 혹은 복잡한 메모리 접근 관련 오류를 디버깅할때는 대부분 Valgrind 도구를 이용합니다. 하지만 Valgrind는 많은 메모리를
@@ -533,7 +533,7 @@
     
     
     <div>
-      <h2><a href="/2009/04/29/2009-04-29-tcmalloc-google-perftools/" >TCMalloc, 구글 성능 도구</a></h2>
+      <h2><a href="/2009/04/29/tcmalloc-google-perftools/" >TCMalloc, 구글 성능 도구</a></h2>
       <div class="article-style">
         
           장기간 실행되면서 빈번하게 메모리를 할당 / 해제하는 것은 물론 수십 개의 쓰레드가 동작하는 프로그램에서는 어쩔 수 없이 메모리 단편화(Memory Fragme
@@ -545,7 +545,7 @@
     
     
     <div>
-      <h2><a href="/2009/04/08/2009-04-08-pthread-man-pages-in-ubuntu-or-debian/" >우분투에서 C 라이브러리 맨페이지(manpage) 설치하기</a></h2>
+      <h2><a href="/2009/04/08/pthread-man-pages-in-ubuntu-or-debian/" >우분투에서 C 라이브러리 맨페이지(manpage) 설치하기</a></h2>
       <div class="article-style">
         
           리눅스에서 개발할때 &lsquo;man&rsquo; 명령을 이용해 매뉴얼 페이지를 많이 참고하는데, 자주 시스템을 다시 설치하다 보니 설치되지 않은 매뉴얼 때문에 매번 구글을 찾는라 귀찮은 적이
@@ -557,7 +557,7 @@
     
     
     <div>
-      <h2><a href="/2006/12/21/2006-12-21-linux-multithread-futex-call-debugging/" >리눅스 멀티쓰레드(futex) 호출 디버깅</a></h2>
+      <h2><a href="/2006/12/21/linux-multithread-futex-call-debugging/" >리눅스 멀티쓰레드(futex) 호출 디버깅</a></h2>
       <div class="article-style">
         
           리눅스 커널 2.6 이후, 즉 최신 리눅스 환경에서 어플리케이션을 개발할때 멀티쓰레드인 경우 데드락이나 블럭킹 현상을 디버깅하려면 매우 골치가 아프다. strace

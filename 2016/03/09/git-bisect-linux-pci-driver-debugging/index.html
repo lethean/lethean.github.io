@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="리눅스 커널 4.3 버전으로 업그레이드하면서부터 RocketRAID RAID 장치가 동작하지 않았다. 컴파일 오류도 없고 로딩에도 문제가 없는데, 응답이 너무 느려서 거의 동작하지 않는 거나">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2016/03/09/git-bisect-linux-pci-driver-debugging/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2016/03/09/git-bisect-linux-pci-driver-debugging/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2016/03/09/git-bisect-linux-pci-driver-debugging/">
+  <meta property="og:title" content="git bisect 이용한 리눅스 PCI 드라이버 디버깅 | 대체로 무해함">
+  <meta property="og:description" content="리눅스 커널 4.3 버전으로 업그레이드하면서부터 RocketRAID RAID 장치가 동작하지 않았다. 컴파일 오류도 없고 로딩에도 문제가 없는데, 응답이 너무 느려서 거의 동작하지 않는 거나"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2016-03-09T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T20:31:01&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2016/03/09/git-bisect-linux-pci-driver-debugging/"
+  },
+  "headline": "git bisect 이용한 리눅스 PCI 드라이버 디버깅",
+  
+  "datePublished": "2016-03-09T00:00:00Z",
+  "dateModified": "2020-02-03T20:31:01+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "리눅스 커널 4.3 버전으로 업그레이드하면서부터 RocketRAID RAID 장치가 동작하지 않았다. 컴파일 오류도 없고 로딩에도 문제가 없는데, 응답이 너무 느려서 거의 동작하지 않는 거나"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>git bisect 이용한 리눅스 PCI 드라이버 디버깅 | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>git bisect 이용한 리눅스 PCI 드라이버 디버깅</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <a href="/2016/03/09/git-bisect-linux-pci-driver-debugging/#disqus_thread"></a>
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>리눅스 커널 4.3 버전으로 업그레이드하면서부터 
+<a href="http://www.highpoint-tech.com/USA_new/series_rr272x_configuration.htm" target="_blank" rel="noopener">RocketRAID</a>
+ RAID 장치가 동작하지 않았다. 컴파일 오류도 없고 로딩에도 문제가 없는데, 응답이 너무 느려서 거의 동작하지 않는 거나 마찬가지다. 구글링을 해도 해결 방법을 찾을 수 없었는데, 아마도 업체에서 제공하는 커널 드라이버라서 사용자가 적어서일 수도 있다. 이렇게 심각한 문제라면 4.3.x 안정 버전이나 4.4 버전에서 해결될 것이라 생각하고 기다렸다. 하지만 4.4 버전이 출시되어도 증상은 동일했다. 결국 직접 원인을 찾기로 했다. 분명한 건 리눅스 커널 4.2 버전까지 정상적으로 동작했는데 4.3 버전부터 동작하지 않는다는 사실이다.</p>
+<p>정상적으로 동작하는 리눅스 커널 4.2.5 버전에서는 <code>rr272x_1x</code> 모듈이 인터럽트 16을 할당받아 동작하는데,</p>
+<pre><code class="language-sh">$ cat /proc/interrupts
+...
+ 16:      13629       3699       2326       1683  IR-IO-APIC  16-fasteoi   ehci_hcd:usb1, rr272x_1x
+...
+
+$ dmesg | grep rr272x
+...
+[    1.619829] rr272x_1x:adapter at PCI 1:0:0, IRQ 16
+...
+</code></pre>
+<p>오동작하는 리눅스 커널 4.4.1 버전에서는 인터럽트 11을 할당받지만 실제 인터럽트xi는 발생하지 않고,</p>
+<pre><code class="language-sh">$ cat /proc/interrupts
+...
+ 11:          0          0          0          0  IR-IO-APIC  11-edge      rr272x_1x
+ 16:     199999          0          1          1  IR-IO-APIC  16-fasteoi   ehci_hcd:usb1
+...
+
+$ dmesg | grep rr272x
+...
+[    1.639672] rr272x_1x:adapter at PCI 1:0:0, IRQ 11
+...
+</code></pre>
+<p>인터럽트 16을 아무도 처리하지 않아서 커널이 경고 메시지를 출력한다.</p>
+<pre><code>[    5.750969] irq 16: nobody cared (try booting with the &quot;irqpoll&quot; option)
+[    5.750973] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G     U     O    4.4.1-1-ARCH #1
+[    5.750974] Hardware name: Supermicro C7Z97-OCE/C7Z97-OCE, BIOS 2.0 06/22/2015
+[    5.750975]  0000000000000000 bf85cf29362dfeed ffff880856c03e68 ffffffff812c7f39
+[    5.750977]  ffff88082e06ae00 ffff880856c03e90 ffffffff810d1053 ffff88082e06ae00
+[    5.750978]  0000000000000000 0000000000000010 ffff880856c03ec8 ffffffff810d13de
+[    5.750980] Call Trace:
+[    5.750981]  &lt;IRQ&gt;  [&lt;ffffffff812c7f39&gt;] dump_stack+0x4b/0x72
+[    5.750988]  [&lt;ffffffff810d1053&gt;] __report_bad_irq+0x33/0xc0
+[    5.750990]  [&lt;ffffffff810d13de&gt;] note_interrupt+0x23e/0x280
+[    5.750992]  [&lt;ffffffff810ce6d7&gt;] handle_irq_event_percpu+0xa7/0x1b0
+[    5.750994]  [&lt;ffffffff810ce819&gt;] handle_irq_event+0x39/0x60
+[    5.750995]  [&lt;ffffffff810d1be9&gt;] handle_fasteoi_irq+0x89/0x150
+[    5.750997]  [&lt;ffffffff81018c7a&gt;] handle_irq+0x1a/0x30
+[    5.751000]  [&lt;ffffffff815944db&gt;] do_IRQ+0x4b/0xd0
+[    5.751002]  [&lt;ffffffff815925c2&gt;] common_interrupt+0x82/0x82
+[    5.751002]  &lt;EOI&gt;  [&lt;ffffffff81447c14&gt;] ? cpuidle_enter_state+0x124/0x290
+[    5.751006]  [&lt;ffffffff81447db7&gt;] cpuidle_enter+0x17/0x20
+[    5.751008]  [&lt;ffffffff810b79b2&gt;] call_cpuidle+0x32/0x60
+[    5.751010]  [&lt;ffffffff81447d93&gt;] ? cpuidle_select+0x13/0x20
+[    5.751012]  [&lt;ffffffff810b7c72&gt;] cpu_startup_entry+0x292/0x370
+[    5.751014]  [&lt;ffffffff815858c9&gt;] rest_init+0x89/0x90
+[    5.751015]  [&lt;ffffffff81906013&gt;] start_kernel+0x483/0x4a4
+[    5.751017]  [&lt;ffffffff81905120&gt;] ? early_idt_handler_array+0x120/0x120
+[    5.751019]  [&lt;ffffffff81905339&gt;] x86_64_start_reservations+0x2a/0x2c
+[    5.751020]  [&lt;ffffffff81905485&gt;] x86_64_start_kernel+0x14a/0x16d
+[    5.751021] handlers:
+[    5.751025] [&lt;ffffffffa0093410&gt;] usb_hcd_irq [usbcore]
+[    5.751026] Disabling IRQ #16
+</code></pre>
+<p>인터럽트 번호가 잘못 할당된 것 같은데 원인을 찾아야 했다. 결국 무식하지만 가장 확실한 방법을 사용하기로 결심하고, <code>git bisect</code> 명령을 이용해 리눅스 커널 4.2 버전과 4.3 버전 사이에서 문제를 일으키는 커밋을 찾아야 했다. 물론 매번 커널을 다시 컴파일하고 테스트하는 작업은 오래 걸리지만 다행히 성능 좋은 개발 서버에서 돌려서 시간을 많이 단축할 수 있었고 약 하루 정도 만에 문제의 커밋을 찾았다.</p>
+<pre><code class="language-sh">
+$ git bisect start 6a13feb9c82803e2b815eca72fa7a9f5561d7861 64291f7db5bd8150a74ad2036f1037e6a0428df2
+$ git bisect log
+# bad: [6a13feb9c82803e2b815eca72fa7a9f5561d7861] Linux 4.3
+# good: [64291f7db5bd8150a74ad2036f1037e6a0428df2] Linux 4.2
+git bisect start '6a13feb9c82803e2b815eca72fa7a9f5561d7861' '64291f7db5bd8150a74ad2036f1037e6a0428df2'
+# bad: [807249d3ada1ff28a47c4054ca4edd479421b671] Merge branch 'upstream' of git://git.linux-mips.org/pub/scm/ralf/upstream-linus
+git bisect bad 807249d3ada1ff28a47c4054ca4edd479421b671
+# bad: [102178108e2246cb4b329d3fb7872cd3d7120205] Merge tag 'armsoc-drivers' of git://git.kernel.org/pub/scm/linux/kernel/git/arm/arm-soc
+git bisect bad 102178108e2246cb4b329d3fb7872cd3d7120205
+# good: [c8192ba416397ad6ce493f186da40767ce086c3b] Merge tag 'for-v4.3' of git://git.kernel.org/pub/scm/linux/kernel/git/sre/linux-power-supply
+git bisect good c8192ba416397ad6ce493f186da40767ce086c3b
+# bad: [7073bc66126e3ab742cce9416ad6b4be8b03c4f7] Merge branch 'core-rcu-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+git bisect bad 7073bc66126e3ab742cce9416ad6b4be8b03c4f7
+# bad: [26f8b7edc9eab56638274f5db90848a6df602081] Merge tag 'pci-v4.3-changes' of git://git.kernel.org/pub/scm/linux/kernel/git/helgaas/pci
+git bisect bad 26f8b7edc9eab56638274f5db90848a6df602081
+# good: [cf9d615f7f5842ca1ef0f28ed9f67a97d20cf6fc] Merge tag 'regulator-v4.3' of git://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator
+git bisect good cf9d615f7f5842ca1ef0f28ed9f67a97d20cf6fc
+# good: [edc837da4b54a01ba6fa3c29b411e35d1a8430ca] Merge tag 'leds_for_4.3' of git://git.kernel.org/pub/scm/linux/kernel/git/j.anaszewski/linux-leds
+git bisect good edc837da4b54a01ba6fa3c29b411e35d1a8430ca
+# bad: [5a4f3cf0d1f02884c0a64488d22b3bb4bce31b44] Merge branches 'pci/irq', 'pci/misc', 'pci/resource' and 'pci/virtualization' into next
+git bisect bad 5a4f3cf0d1f02884c0a64488d22b3bb4bce31b44
+# good: [932c435caba8a2ce473a91753bad0173269ef334] PCI: Add dev_flags bit to access VPD through function 0
+git bisect good 932c435caba8a2ce473a91753bad0173269ef334
+# good: [cd66d5c3df7c96cbf75010b964b94032ceca8889] Merge branches 'pci/host-designware', 'pci/host-xgene' and 'pci/host-xilinx' into next
+git bisect good cd66d5c3df7c96cbf75010b964b94032ceca8889
+# bad: [5f2269916b0e509f2926346b58209abfa8316143] PCI/MSI: Free legacy IRQ when enabling MSI/MSI-X
+git bisect bad 5f2269916b0e509f2926346b58209abfa8316143
+# bad: [991de2e59090e55c65a7f59a049142e3c480f7bd] PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()
+git bisect bad 991de2e59090e55c65a7f59a049142e3c480f7bd
+# good: [890e4847587fcff5eb0438e90992ad7d2a261f33] PCI: Add pcibios_alloc_irq() and pcibios_free_irq()
+git bisect good 890e4847587fcff5eb0438e90992ad7d2a261f33
+# first bad commit: [991de2e59090e55c65a7f59a049142e3c480f7bd] PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()
+</code></pre>
+<p>바로 이 커밋이 원인이었다.</p>
+<pre><code>commit 991de2e59090e55c65a7f59a049142e3c480f7bd
+Author: Jiang Liu &lt;jiang.liu@linux.intel.com&gt;
+Date:   Wed Jun 10 16:54:59 2015 +0800
+
+    PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()
+
+    To support IOAPIC hotplug, we need to allocate PCI IRQ resources on demand
+    and free them when not used anymore.
+
+    Implement pcibios_alloc_irq() and pcibios_free_irq() to dynamically
+    allocate and free PCI IRQs.
+
+    Remove mp_should_keep_irq(), which is no longer used.
+
+    [bhelgaas: changelog]
+    Signed-off-by: Jiang Liu &lt;jiang.liu@linux.intel.com&gt;
+    Signed-off-by: Bjorn Helgaas &lt;bhelgaas@google.com&gt;
+    Acked-by: Thomas Gleixner &lt;tglx@linutronix.de&gt;
+
+:040000 040000 765e2d5232d53247ec260b34b51589c3bccb36ae f680234a27685e94b1a35ae2a7218f8eafa9071a M	arch
+:040000 040000 d55a682bcde72682e883365e88ad1df6186fd54d f82c470a04a6845fcf5e0aa934512c75628f798d M	drivers
+</code></pre>
+<p>이 커밋에 대한 자세한 정보를 얻기 위해 인터넷을 검색하니, 약간 허무하지만, 동일한 문제가 이미 보고되어 있었다.</p>
+<ul>
+<li>
+<a href="http://www.spinics.net/lists/linux-pci/msg48507.html" target="_blank" rel="noopener">PCI device driver broken between 4.2 and 4.3</a>
+</li>
+<li>
+<a href="https://bugzilla.kernel.org/show_bug.cgi?id=111211" target="_blank" rel="noopener">TA1-PCI card worked in v4.2, fails in v4.3</a>
+</li>
+</ul>
+<p>해당 
+<a href="https://bugzilla.kernel.org/show_bug.cgi?id=111211" target="_blank" rel="noopener">버그질라</a>
+에 간단한 댓글을 달면서 공식 해결 방법을 기다렸지만, 공식 커널에 적용되려면 너무 시간이 오래 걸릴 것 같아서 직접 드라이버 
+<a href="https://gist.github.com/lethean/e2e53ca15b1c97cee45a" target="_blank" rel="noopener">패치</a>
+를 만들어 적용했더니 문제없이 동작했다. 일종의 편법이긴 하지만, <code>pci_register_driver()</code> 함수를 미리 호출한 다음에 <code>pci_get_device()</code> 함수를 이용하는 원래 초기화 함수를 호출하도록 변경했다.</p>
+<p>그런데 조금 성급했는지, 아니면 심각한 버그라고 판단했는지 리눅스 4.5 RC 버전에 바로 
+<a href="https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=6c777e8799a93e3bdb67bec622429e1b48dc90fb" target="_blank" rel="noopener">반영</a>
+되었다.</p>
+<pre><code>commit 6c777e8799a93e3bdb67bec622429e1b48dc90fb
+Author: Bjorn Helgaas &lt;bhelgaas@google.com&gt;
+Date:   Wed Feb 17 12:26:42 2016 -0600
+
+    Revert &quot;PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()&quot;
+
+    991de2e59090 (&quot;PCI, x86: Implement pcibios_alloc_irq() and
+    pcibios_free_irq()&quot;) appeared in v4.3 and helps support IOAPIC hotplug.
+
+    Олег reported that the Elcus-1553 TA1-PCI driver worked in v4.2 but not
+    v4.3 and bisected it to 991de2e59090.  Sunjin reported that the RocketRAID
+    272x driver worked in v4.2 but not v4.3.  In both cases booting with
+    &quot;pci=routirq&quot; is a workaround.
+
+    I think the problem is that after 991de2e59090, we no longer call
+    pcibios_enable_irq() for upstream bridges.  Prior to 991de2e59090, when a
+    driver called pci_enable_device(), we recursively called
+    pcibios_enable_irq() for upstream bridges via pci_enable_bridge().
+
+    After 991de2e59090, we call pcibios_enable_irq() from pci_device_probe()
+    instead of the pci_enable_device() path, which does *not* call
+    pcibios_enable_irq() for upstream bridges.
+
+    Revert 991de2e59090 to fix these driver regressions.
+
+    Link: https://bugzilla.kernel.org/show_bug.cgi?id=111211
+    Fixes: 991de2e59090 (&quot;PCI, x86: Implement pcibios_alloc_irq() and pcibios_free_irq()&quot;)
+    Reported-and-tested-by: Олег Мороз &lt;oleg.moroz@mcc.vniiem.ru&gt;
+    Reported-by: Sunjin Yang &lt;fan4326@gmail.com&gt;
+    Signed-off-by: Bjorn Helgaas &lt;bhelgaas@google.com&gt;
+    Acked-by: Rafael J. Wysocki &lt;rafael@kernel.org&gt;
+    CC: Jiang Liu &lt;jiang.liu@linux.intel.com&gt;
+
+ arch/x86/include/asm/pci_x86.h |  2 ++
+ arch/x86/pci/common.c          | 20 +++++++++++---------
+ arch/x86/pci/intel_mid_pci.c   |  7 ++-----
+ arch/x86/pci/irq.c             | 15 ++++++++++++++-
+ drivers/acpi/pci_irq.c         |  9 ++++++++-
+ 5 files changed, 37 insertions(+), 16 deletions(-)
+</code></pre>
+<p>참 좋은 세상이다 ;)</p>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/git/">Git</a>
+  
+  <a class="badge badge-light" href="/tags/linux/">Linux</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2016/03/09/git-bisect-linux-pci-driver-debugging/&amp;text=git%20bisect%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a6%ac%eb%88%85%ec%8a%a4%20PCI%20%eb%93%9c%eb%9d%bc%ec%9d%b4%eb%b2%84%20%eb%94%94%eb%b2%84%ea%b9%85" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2016/03/09/git-bisect-linux-pci-driver-debugging/&amp;t=git%20bisect%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a6%ac%eb%88%85%ec%8a%a4%20PCI%20%eb%93%9c%eb%9d%bc%ec%9d%b4%eb%b2%84%20%eb%94%94%eb%b2%84%ea%b9%85" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=git%20bisect%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a6%ac%eb%88%85%ec%8a%a4%20PCI%20%eb%93%9c%eb%9d%bc%ec%9d%b4%eb%b2%84%20%eb%94%94%eb%b2%84%ea%b9%85&amp;body=/2016/03/09/git-bisect-linux-pci-driver-debugging/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2016/03/09/git-bisect-linux-pci-driver-debugging/&amp;title=git%20bisect%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a6%ac%eb%88%85%ec%8a%a4%20PCI%20%eb%93%9c%eb%9d%bc%ec%9d%b4%eb%b2%84%20%eb%94%94%eb%b2%84%ea%b9%85" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=git%20bisect%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a6%ac%eb%88%85%ec%8a%a4%20PCI%20%eb%93%9c%eb%9d%bc%ec%9d%b4%eb%b2%84%20%eb%94%94%eb%b2%84%ea%b9%85%20/2016/03/09/git-bisect-linux-pci-driver-debugging/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2016/03/09/git-bisect-linux-pci-driver-debugging/&amp;title=git%20bisect%20%ec%9d%b4%ec%9a%a9%ed%95%9c%20%eb%a6%ac%eb%88%85%ec%8a%a4%20PCI%20%eb%93%9c%eb%9d%bc%ec%9d%b4%eb%b2%84%20%eb%94%94%eb%b2%84%ea%b9%85" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+<section id="comments">
+  
+    
+<div id="disqus_thread"></div>
+<script>
+  let disqus_config = function () {
+    
+    
+    
+  };
+  (function() {
+    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+      document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+      return;
+    }
+    var d = document, s = d.createElement('script'); s.async = true;
+    s.src = 'https://' + "lethean" + '.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+  
+</section>
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2016/03/07/exit-less-without-clearing-the-screen/">less 명령어가 끝나도 내용을 지우지 않게 하기</a></li>
+      
+      <li><a href="/2015/02/17/detect-time-change-with-timerfd-in-linux/">리눅스에서 시간 변경 감지하기</a></li>
+      
+      <li><a href="/2015/02/16/try-cogl-with-x11-on-raspberry-pi/">Raspberry Pi &#43; X11 &#43; Clutter(&#43; Cogl)</a></li>
+      
+      <li><a href="/2015/02/10/send-receive-raw-ethernet-frames-with-custom-ether-type-in-linux/">리눅스에서 이더넷 프레임 보내고 받기</a></li>
+      
+      <li><a href="/2012/03/19/detect-change-of-ip-address-and-link-status-in-linux/">리눅스 IP 주소 / 링크 상태 변경 여부 감지하기</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    <script id="dsq-count-scr" src="https://lethean.disqus.com/count.js" async></script>
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

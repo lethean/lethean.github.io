@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="구글 리더를 읽다가 어떤 분이 터미널 글꼴로 &lsquo;Droid Sans Mono&rsquo; 사용한 포스트 를 보고 따라해 보았습니다. 그런데, 이상하게도 글꼴이 예쁘지 않아서 확인해 보니 폰트 설정에서 힌팅">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2010/07/19/hinting-for-different-fonts/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2010/07/19/hinting-for-different-fonts/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2010/07/19/hinting-for-different-fonts/">
+  <meta property="og:title" content="글꼴마다 다른 힌팅 사용하기 | 대체로 무해함">
+  <meta property="og:description" content="구글 리더를 읽다가 어떤 분이 터미널 글꼴로 &lsquo;Droid Sans Mono&rsquo; 사용한 포스트 를 보고 따라해 보았습니다. 그런데, 이상하게도 글꼴이 예쁘지 않아서 확인해 보니 폰트 설정에서 힌팅"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2010-07-19T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T20:31:01&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2010/07/19/hinting-for-different-fonts/"
+  },
+  "headline": "글꼴마다 다른 힌팅 사용하기",
+  
+  "datePublished": "2010-07-19T00:00:00Z",
+  "dateModified": "2020-02-03T20:31:01+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "구글 리더를 읽다가 어떤 분이 터미널 글꼴로 \u0026lsquo;Droid Sans Mono\u0026rsquo; 사용한 포스트 를 보고 따라해 보았습니다. 그런데, 이상하게도 글꼴이 예쁘지 않아서 확인해 보니 폰트 설정에서 힌팅"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>글꼴마다 다른 힌팅 사용하기 | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>글꼴마다 다른 힌팅 사용하기</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <a href="/2010/07/19/hinting-for-different-fonts/#disqus_thread"></a>
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>구글 리더를 읽다가 어떤 분이 
+<a href="http://blog.digital-scurf.org/2010/07/13#dev-fonts" target="_blank" rel="noopener">터미널 글꼴로 &lsquo;Droid Sans Mono&rsquo; 사용한 포스트</a>
+를 보고 따라해 보았습니다. 그런데, 이상하게도 글꼴이 예쁘지 않아서 확인해 보니 폰트 설정에서 힌팅(hinting)을 살짝(slight)만 사용하도록 설정해야 했습니다. 사실, 대부분의 영문 폰트는 힌팅을 살짝 주어야 원래 의도대로 멋지게 표시되는 경우가 많습니다. (아래 그림에서 폰트 설정 화면 참조)</p>
+<p><img src="/figures/gnome-font-properties.png" alt=""></p>
+<p>그런데 문제는, 이 설정을 이용하면 나눔글꼴과 같은 일부 한글 글꼴이 오히려 안 이쁘게 표시됩니다. 특히 나눔고딕은 힌팅을 중간(hintmedium)이나 충분히(hintfull) 사용해야 합니다. 그런데 위 그림을 보면 나눔고딕 역시 정상적으로 표시되고 있습니다. 이 포스트는 그 과정을 정리한 것입니다. 사용환경은 우분투 10.04 배포판이고, 
+<a href="http://packages.debian.org/sid/ttf-nanum" target="_blank" rel="noopener">나눔글꼴</a>
+과 
+<a href="http://packages.debian.org/sid/ttf-nanum-coding" target="_blank" rel="noopener">나눔고딕코딩</a>
+ 글꼴은 데비안 패키지를 직접 내려받아 설치했습니다. 우분투 저장소에도 조만간 반영되겠지요.</p>
+<p>먼저 폰트별로 다른 힌팅 스타일을 사용하기 위해 폰트 설정에서, 나눔글꼴 계열 힌팅 스타일을 충분히(hintfull)로 변경합니다. <code>~/.fonts.conf</code> 파일을 편집해도 되지만, 제 경우 그냥 ﻿﻿<code>﻿/etc/fonts/conf.avail/69-language-selector-ko-kr.conf</code> 파일에 다음 내용을 추가했습니다. 그래야 루트 사용자를 포함한 모든 사용자가 사용할 수 있고, 다른 설정 항목도 모두 거기 있어서 나중에 다시 설치할때 파일 하나만 복사해서 사용하기 때문입니다.</p>
+<pre><code>&lt;match target=&quot;font&quot;&gt;
+  &lt;test name=&quot;family&quot;&gt;
+    &lt;string&gt;나눔고딕&lt;/string&gt;
+    &lt;string&gt;NanumGothic&lt;/string&gt;
+    &lt;string&gt;나눔명조&lt;/string&gt;
+    &lt;string&gt;NanumMyeongjo&lt;/string&gt;
+    &lt;string&gt;나눔고딕코딩&lt;/string&gt;
+    &lt;string&gt;NanumGothicCoding&lt;/string&gt;
+  &lt;/test&gt;
+  &lt;edit name=&quot;hintstyle&quot; mode=&quot;assign&quot;&gt;
+    &lt;const&gt;hintfull&lt;/const&gt;
+  &lt;/edit&gt;
+&lt;/match&gt;
+</code></pre>
+<p>그런데 문제는, 이 설정이 먹혀들지 않는다는 점입니다. 이상하게도 파이어폭스나 크롬브라우저, KDE 등에서는 잘 적용되는데, 정작 그놈 터미널이나 모든 그놈 프로그램에서는 적용이 되지 않았습니다. 검색해보니, GTK+ 툴킷을 포함한 대부분 그놈 프로그램이 사용하는 카이로(cairo) 라이브러리에 
+<a href="http://bugs.freedesktop.org/show_bug.cgi?id=11838" target="_blank" rel="noopener">관련 버그</a>
+가 이미 보고되어 있는데 아직 패키가 반영되지 않은 상태였습니다. 카이로 라이브러리가 힌팅의 경우 FontConfig 설정을 따르지 않고 무조건 그놈 글꼴 설정, 더 정확히 말하면 X 리소스의 Xft.hintstyle 값만 사용하기 때문이었습니다.</p>
+<p>그래서 다음과 같은 과정을 거쳐 직접 빌드한 패키지를 설치해서 사용하고 있습니다.</p>
+<pre><code class="language-sh">$ apt-get source libcairo2 # 패키지 소스 내려받기
+$ sudo apt-get build-dep libcairo2 # 빌드를 위한 패키지 내려받기
+$ cd cairo-*
+$ vi src/cairo-ft-font.c # 위 버그질라에 등록된 패치 적용
+$ vi debian/changelog # 패키지 버전 올림
+$ dpkg-buildpackage -rfakeroot # 패키지 생성
+$ cd ..; sudo dpkg -i libcairo*.deb # 패키지 설치
+</code></pre>
+<p>패키지 생성 방법을 익힌게 거의 10년 전 쯤 데비안 사용 시절이라 요즘은 어떻게 만드는지 잘 모르겠지만, 다행히도 위 방식도 제대로 동작하는 것 같아 그냥 사용하고 있습니다. 요즘은 우분투 PPA도 활성화되었고, 빌드 방식도 더 간단해진 것 같긴 한데, 게을러서&hellip; :)</p>
+<p>결론은, Droid Sans Mono 글꼴을 터미널 글꼴로 잘 사용하고 있습니다. 참, 이 글꼴 역시 다음과 같이 쉽게 설치할 수 있습니다.</p>
+<pre><code class="language-sh">$ sudo apt-get install ttf-droid
+</code></pre>
+<p>그런데, 위 패치가 아직까지도 최근 cairo 소스에는 반영되지 않은 것 같아 약간 아쉽군요.</p>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/cairo/">Cairo</a>
+  
+  <a class="badge badge-light" href="/tags/fontconfig/">FontConfig</a>
+  
+  <a class="badge badge-light" href="/tags/ubuntu/">Ubuntu</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2010/07/19/hinting-for-different-fonts/&amp;text=%ea%b8%80%ea%bc%b4%eb%a7%88%eb%8b%a4%20%eb%8b%a4%eb%a5%b8%20%ed%9e%8c%ed%8c%85%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2010/07/19/hinting-for-different-fonts/&amp;t=%ea%b8%80%ea%bc%b4%eb%a7%88%eb%8b%a4%20%eb%8b%a4%eb%a5%b8%20%ed%9e%8c%ed%8c%85%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=%ea%b8%80%ea%bc%b4%eb%a7%88%eb%8b%a4%20%eb%8b%a4%eb%a5%b8%20%ed%9e%8c%ed%8c%85%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0&amp;body=/2010/07/19/hinting-for-different-fonts/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2010/07/19/hinting-for-different-fonts/&amp;title=%ea%b8%80%ea%bc%b4%eb%a7%88%eb%8b%a4%20%eb%8b%a4%eb%a5%b8%20%ed%9e%8c%ed%8c%85%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=%ea%b8%80%ea%bc%b4%eb%a7%88%eb%8b%a4%20%eb%8b%a4%eb%a5%b8%20%ed%9e%8c%ed%8c%85%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0%20/2010/07/19/hinting-for-different-fonts/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2010/07/19/hinting-for-different-fonts/&amp;title=%ea%b8%80%ea%bc%b4%eb%a7%88%eb%8b%a4%20%eb%8b%a4%eb%a5%b8%20%ed%9e%8c%ed%8c%85%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+<section id="comments">
+  
+    
+<div id="disqus_thread"></div>
+<script>
+  let disqus_config = function () {
+    
+    
+    
+  };
+  (function() {
+    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+      document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+      return;
+    }
+    var d = document, s = d.createElement('script'); s.async = true;
+    s.src = 'https://' + "lethean" + '.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+  
+</section>
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2010/05/16/btrfs-as-the-default-filesystem-in-ubuntu-10-10/">우분투 10.10 기본 파일시스템 - Btrfs</a></li>
+      
+      <li><a href="/2010/04/23/gource-source-visualization/">Gource 소스 저장소 시각화 프로그램</a></li>
+      
+      <li><a href="/2010/02/04/using-ccache-in-ubuntu/">우분투에서 ccache 사용하기</a></li>
+      
+      <li><a href="/2010/01/25/btrfs-for-a-while/">아주 잠시 Btrfs 파일시스템을 사용해보고</a></li>
+      
+      <li><a href="/2010/01/20/using-multiple-mouses-with-xor/">여러 개의 마우스 동시에 사용하기</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    <script id="dsq-count-scr" src="https://lethean.disqus.com/count.js" async></script>
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

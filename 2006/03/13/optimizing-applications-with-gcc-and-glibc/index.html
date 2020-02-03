@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="gcc와 glibc로 어플리케이션 최적화하기 ( Optimizing Applications with gcc &amp; glibc ) glibc 개발자인 Ulrich Drepper 가 1999년에 작성한 40페이지 분량의 글이다. 대략 관심있는 내용을 정리해">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2006/03/13/optimizing-applications-with-gcc-and-glibc/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2006/03/13/optimizing-applications-with-gcc-and-glibc/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2006/03/13/optimizing-applications-with-gcc-and-glibc/">
+  <meta property="og:title" content="GCC와 GLIBC로 최적화하기 | 대체로 무해함">
+  <meta property="og:description" content="gcc와 glibc로 어플리케이션 최적화하기 ( Optimizing Applications with gcc &amp; glibc ) glibc 개발자인 Ulrich Drepper 가 1999년에 작성한 40페이지 분량의 글이다. 대략 관심있는 내용을 정리해"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2006-03-13T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T20:31:01&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2006/03/13/optimizing-applications-with-gcc-and-glibc/"
+  },
+  "headline": "GCC와 GLIBC로 최적화하기",
+  
+  "datePublished": "2006-03-13T00:00:00Z",
+  "dateModified": "2020-02-03T20:31:01+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "gcc와 glibc로 어플리케이션 최적화하기 ( Optimizing Applications with gcc \u0026amp; glibc ) glibc 개발자인 Ulrich Drepper 가 1999년에 작성한 40페이지 분량의 글이다. 대략 관심있는 내용을 정리해"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>GCC와 GLIBC로 최적화하기 | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>GCC와 GLIBC로 최적화하기</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <a href="/2006/03/13/optimizing-applications-with-gcc-and-glibc/#disqus_thread"></a>
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>gcc와 glibc로 어플리케이션 최적화하기 (
+<a href="http://people.redhat.com/drepper/optimtut1.ps.gz" target="_blank" rel="noopener">Optimizing Applications with gcc &amp; glibc</a>
+)</p>
+<p>glibc 개발자인 
+<a href="http://people.redhat.com/drepper/" target="_blank" rel="noopener">Ulrich Drepper</a>
+가 1999년에 작성한 40페이지 분량의 글이다. 대략 관심있는 내용을 정리해본다.</p>
+<span style="font-weight:bold;">
+ 사용 안되는 코드 컴파일시 제거 </span>
+<p>다음 코드는 주어진 타입에 따라 다른 작업을 하는데, <code>int</code>형과 <code>long int</code>형이 같은 플랫폼일 경우 좋지 않은 성능을 보인다.</p>
+<pre><code>long intadd (long int a, void *ptr, int type)
+{
+  if (type == 0)
+    return a + *(int *)ptr;
+  else
+    return a + *(long int *)ptr;
+}
+</code></pre>
+<p>위 코드는 다음과 같이 최적화할 수 있다. 이는 컴파일러가 알아서 최적화해준다.</p>
+<pre><code>long intadd (long int a, void *ptr, int type)
+{
+  if (sizeof(int) == sizeof(long int) || type == 0)
+    return a + *(int *)ptr;
+  else
+    return a + *(long int *)ptr;
+}
+</code></pre>
+<p>다음과 같은 방법을 이용하면 전처리기(preprocessor)가 알아서 최적화해준다.</p>
+<pre><code>long intadd (long int a, void *ptr, int type)
+{
+#if LONG_MAX != INT_MAX
+  if (type == 0)
+    return a + *(int *)ptr;
+  else
+#endif
+  return a + *(long int *)ptr;
+}
+</code></pre>
+<span style="font-weight:bold;">
+ 컴파일러 내부 함수(intrinsics) 이용하기</span>
+<p>gcc 2.96 이후부터 많은 <code>__builtin_*</code> 함수가 존재한다. 이 함수들은 컴파일시에 컴파일러가 판단하여 인수가 상수이거나 정해진 크기 등일 경우 최적화된 코드를 생성해 준다. 이 함수들은 매크로인 경우도 있고 컴파일시 정적으로 링크되는 라이브러리일 수도 있다. 어떤 함수들은 컴파일러 내부 함수를 이용해 최적화되어 있다. 따라서 가능한 이러한 함수들은 별도 랩핑을 두지 않고 헤더파일을 포함하여 그대로 사용하면 더 좋은 성능의 코드를 얻을 수 있다. 내부 함수를 이용하는 함수 중에 대표적인 것들은 다음과 같은 것들이 있다.</p>
+<pre><code>alloca()
+memcpy(), memcmp(), memset()
+strcmp(), strcpy(), strlen()
+</code></pre>
+<p>더 많은 함수는 원문을 참고하면 된다.</p>
+<span style="font-weight:bold;">
+ strcpy()와 memcpy()</span>
+<p>문자열의 크기를 이미 알고 있다면 <code>str*()</code> 류의 함수보다 <code>mem*()</code> 류의 함수를 이용하는 것이 좋다. 우선 매 바이트마다 문자열 끝 코드인 0x00을 검사하는 코드가 없어 빠르고, 무엇보다도 <code>memcpy()</code>는 플랫폼 기본 단위(예를 들어 32비트 플랫폼에서는 4바이트) 연산을 하기 때문에, 항상 바이트 단위로 작업하는 <code>strcpy()</code> 또는 <code>strncpy()</code>보다 빠를 수 밖에 없다.</p>
+<span style="font-weight:bold;">
+ strcat(), strncat()</span>
+<p>절대로 <code>strcat()</code>, <code>strncat()</code> 함수는 사용하지 말아야 한다. 문자열을 합치는데 이 함수를 이용하는 것은 성능에 치명적이다. 내부적으로 <code>strlen()</code>을 호출하는 것 뿐 아니라 문자열을 처리하기 위한 여러 조건을 검사하기 때문에 매우 느리다. 이보다는 직접 <code>strlen()</code>으로 문자열 길이를 구한 뒤 <code>memcpy()</code>를 이용해 해당 위치에 복사하거나 필요한 작업을 하는 것이 더 현명한 방법이다.</p>
+<p>다음은 이에 대한 샘플 코드이다.</p>
+<pre><code>{
+  char *buf = ...;
+  size_t bufmax = ...;
+
+  /* Add 's' to the string in buffer 'buf'. */
+  if (strlen(buf) + strlen(s) + 1 &gt; bufmax)
+    buf = (char *)realloc(buf, (bufmax *= 2));
+  strcat(buf, s);
+}
+</code></pre>
+<p>프로그래머 관점에서 이 코드는 괜찮아 보이지만, 성능은 최악이다. 다음과 같이 고치면 더 좋은 성능을 낼 수 있다.</p>
+<pre><code>{
+  char *buf = ...;
+  size_t bufmax = ...;
+  size_t slen, buflen;
+
+  /* Add 's' to the string in buffer 'buf'. */
+  slen = strlen(s) + 1;
+  buflen = strlen(buf);
+
+  if (buflen + slen &gt; bufmax)
+    buf = (char *)realloc(buf, (bufmax *= 2));
+
+  memcpy(buf + buflen, s, slen);
+}
+</code></pre>
+<span style="font-weight:bold;">
+ 메모리 할당 최적화</span>
+<p><code>malloc()</code>과 <code>calloc()</code>의 차이점을 모르는 프로그래머는 없겠지만, 그래서 <code>calloc()</code>보다 직접 <code>malloc()</code> 호출 이후 <code>memset()</code> 등을 이용해 0으로 초기화하는 방법을 많이 이용하기도 한다. 하지만 <code>calloc()</code>은 커널 페이지에서 이미 0으로 초기화되어 있는 영역이 있을 경우 불필요한 초기화 과정을 건너뛰기 때문에 더 좋은 성능을 낼 수 있다.</p>
+<p><code>alloca()</code> 함수를 모르는 사람도 많은데, 이 함수는 지정한 크기의 영역을 현재 스택 영역에 할당한다. 메모리 관리자를 거치지 않고 단순히 스택 포인터 레지스터 조작만으로 할당 작업이 이루어지기 때문에 매우 성능이 좋을 뿐 아니라, 따로 해제하지 않아도 함수가 끝나는 시점에서 자동으로 해제된다. 따라서 함수 내부에서 임시로 할당하여 사용하는 많은 구현에서 <code>malloc()</code> 보다 <code>alloca()</code> 를 사용한 코드의 성능은 매우 향상된다. glibc에서 확장으로 제공하는 <code>strdupa()</code>, <code>strndupa()</code> 등의 API는 모두 이 방법을 이용한 최적화된 성능을 보장한다.</p>
+<p><span style="font-weight:bold;">그외&hellip;</span></p>
+<p>기타 이 글에서는 gprof, sprof 등을 이용한 코드 프로파일링 방법과 GCC 컴파일러 확장을 이용한 다양한 최적화 방법을 제시하고 있다. 더불어 저자는 같은 내용에 조금 더 내용이 보강된 
+<a href="http://people.redhat.com/drepper/optimtut2.ps.gz" target="_blank" rel="noopener">Application Optimization on Linux</a>
+ 글에서 프로필과 관련된 더 자세한 정보를 제공하고 있다.</p>
+<p>이 글에서도 언급한 내용이지만, 많은 프로그래머는 자신이 작성한 프로그램이 정말 잘 쓰여지고 성능이 좋다고 생각하지만, 불행하게도 아닌 경우가 대부분이다. 최적화된 프로그램을 작성하는 것은 항상 진행중인 배우는 과정(learning process)이다. 항상 새로운 테크닉을 배우고, 자신의 코드를 검토하고, 상호작용하는 라이브러리와 프로세서에 대해 생각해야 한다.</p>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/gcc/">GCC</a>
+  
+  <a class="badge badge-light" href="/tags/glibc/">glibc</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2006/03/13/optimizing-applications-with-gcc-and-glibc/&amp;text=GCC%ec%99%80%20GLIBC%eb%a1%9c%20%ec%b5%9c%ec%a0%81%ed%99%94%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2006/03/13/optimizing-applications-with-gcc-and-glibc/&amp;t=GCC%ec%99%80%20GLIBC%eb%a1%9c%20%ec%b5%9c%ec%a0%81%ed%99%94%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=GCC%ec%99%80%20GLIBC%eb%a1%9c%20%ec%b5%9c%ec%a0%81%ed%99%94%ed%95%98%ea%b8%b0&amp;body=/2006/03/13/optimizing-applications-with-gcc-and-glibc/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2006/03/13/optimizing-applications-with-gcc-and-glibc/&amp;title=GCC%ec%99%80%20GLIBC%eb%a1%9c%20%ec%b5%9c%ec%a0%81%ed%99%94%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=GCC%ec%99%80%20GLIBC%eb%a1%9c%20%ec%b5%9c%ec%a0%81%ed%99%94%ed%95%98%ea%b8%b0%20/2006/03/13/optimizing-applications-with-gcc-and-glibc/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2006/03/13/optimizing-applications-with-gcc-and-glibc/&amp;title=GCC%ec%99%80%20GLIBC%eb%a1%9c%20%ec%b5%9c%ec%a0%81%ed%99%94%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+<section id="comments">
+  
+    
+<div id="disqus_thread"></div>
+<script>
+  let disqus_config = function () {
+    
+    
+    
+  };
+  (function() {
+    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+      document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+      return;
+    }
+    var d = document, s = d.createElement('script'); s.async = true;
+    s.src = 'https://' + "lethean" + '.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+  
+</section>
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2006/02/24/good-practices-in-library-design-implementation-and-maintenance/">라이브러리 설계, 구현, 유지에 좋은 습관</a></li>
+      
+      <li><a href="/2006/01/31/gcc-symbol-visibility-patch/">GCC Symbol Visibility Patch</a></li>
+      
+      <li><a href="/2006/01/20/using-gcc-extensions/">GCC 확장 기능 이용하기</a></li>
+      
+      <li><a href="/2006/01/17/linux-gateso1/">linux-gate.so.1</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    <script id="dsq-count-scr" src="https://lethean.disqus.com/count.js" async></script>
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

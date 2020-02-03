@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="실시간 시스템의 핵심 요구사항 중 하나는 빠른 대기시간(latency)이 아니라 가장 느린 대기시간을 미리 가늠할 수 있어야(predictability)">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2010/11/19/real-time-on-android-os/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2010/11/19/real-time-on-android-os/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2010/11/19/real-time-on-android-os/">
+  <meta property="og:title" content="안드로이드 운영체제에서 실시간 시스템 | 대체로 무해함">
+  <meta property="og:description" content="실시간 시스템의 핵심 요구사항 중 하나는 빠른 대기시간(latency)이 아니라 가장 느린 대기시간을 미리 가늠할 수 있어야(predictability)"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2010-11-19T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T20:31:01&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2010/11/19/real-time-on-android-os/"
+  },
+  "headline": "안드로이드 운영체제에서 실시간 시스템",
+  
+  "datePublished": "2010-11-19T00:00:00Z",
+  "dateModified": "2020-02-03T20:31:01+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "실시간 시스템의 핵심 요구사항 중 하나는 빠른 대기시간(latency)이 아니라 가장 느린 대기시간을 미리 가늠할 수 있어야(predictability)"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>안드로이드 운영체제에서 실시간 시스템 | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>안드로이드 운영체제에서 실시간 시스템</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <a href="/2010/11/19/real-time-on-android-os/#disqus_thread"></a>
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>실시간 시스템의 핵심 요구사항 중 하나는 빠른 대기시간(latency)이 아니라 가장 느린 대기시간을 미리 가늠할 수 있어야(predictability) 한다는 점입니다. 즉, 아무리 짧은 응답시간을 제공하더라도 시스템 부하(load)나 입출력(I/O), 태스크 동기화(synchronization) 등에 의해 느려지거나 최대 응답시간을 예측할 수 없다면 실시간 운영체제가 아닙니다. 물론 응답시간이 가능한 짧으면서 편차가 크지 않으면 더 바랄게 없겠지만, 그렇지 못할 경우라도 운영체제가 대기시간을 어느 정도까지 보장할 수 있느냐가 더 중요합니다. 참고로 여기서 언급하는 대기시간(latency)은 인터럽트, 태스크 스케줄링, I/O 스케줄링 등 여러 문맥에서 다른 의미를 가집니다.</p>
+<p>실시간 시스템의 또 하나의 중요한 특징은 실시간 태스크의 스케줄링을 보장하는 일입니다. 즉, 시스템에 어떤 상황이 발생하더라도 미리 지정한 실시간 태스크가 마감시간(deadline)을 지킬 수 있어야 합니다. 이를 위해 전통적인 실시간 운영체제들은 마감시간 스케줄러(deadline scheduler), 스포래딕 서버(sporadic server) 등을 이용해 이를 보장합니다.</p>
+<p>최근 리눅스 커널과 관련된 이슈를 살펴보면 위에서 설명한 두 가지 조건을 만족하기 위한 작업이 한창이지만, 이 글에서는 안드로이드(Android) 운영체제가 스마트폰 뿐 아니라 여러 내장 시스템(embedded system)에 도입되기 위한 필수조건을 일단 정리했습니다.</p>
+<p>일반적으로 기능적 오류가 아닌 시간적 오류, 즉 안드로이드가 실시간 시스템 설계 명세에서 제한한 마감시간(deadline)을 얼마나 잘 지원하는지를 실험한 결과를 보면[1], 측정을 크게 둘로 나뉘어, 첫번째는 하드웨어 인터럽트 이벤트가 커널 내부의 이벤트 처리 모듈에게 전달되는데까지 소요되는 대기시간(latency)을 측정한 것이고, 두번째는 커널 이벤트 처리 모듈이 이벤트를 안드로이드 달빅(Dalvik) 가상머신 위에서 동작하는 어플리케이션에게 전달하기까지 걸리는 시간을 측정합니다. 더불어 대기시간의 변동량(variation)을 관찰해 실시간 시스템에 적합한 지 여부도 확인해 봅니다. 안드로이드 하부는 리눅스 커널이므로, 이 실험은 결국 안드로이드 플랫폼에 사용되는 리눅스 커널에 대한 실험이기도 합니다.</p>
+<p>실험 결과는 흥미로운데, 정상적인 부하가 걸릴때보다(under normal load) 아무 부하도 없을때(under no load) 대기시간이 더 들쑥날쑥 합니다. 그 원인은 아무 작업도 없을 경우 저전력모드(low power mode)로 있다가 인터럽트가 발생하면 그때서야 정상적인 상태로 돌아와 이벤트를 처리하기 때문입니다. 하지만 타이머 인터럽트 주기를 100밀리초에서 1밀리초로 변경하면, 거의 제 시간에 처리하지 못하는 결과가 발생하는 모습을 보여줍니다.</p>
+<p>안드로이드 자바 어플리케이션의 각 쓰레드는 리눅스 pthread에 일대일로 대응합니다. 안드로이드에서 자바 쓰레드 우선순위는 10단계로 조정할 수 있는데, 이 값은 리눅스 쓰레드의 nice값으로 변환됩니다. 즉, 리눅스 커널 스케줄링 클래스 중에서 SCHED_OTHER 클래스만 사용하고 실시간 우선순위를 사용하는 SCHED_FIFO, SCHED_RR 클래스는 사용하지 않습니다.[2] 달빅(Dalvik) 가상머신은 고전적인 자바 가상머신이 실시간 시스템에서 고생하는 원인 중 하나로 지목되는 가비지 컬렉션(garbage collection)으로 인한 예측불가능한 프로세스 멈춤(freeze) 현상을 여전히 가지고 있습니다. 자체적으로 구현한 C 라이브러리(bionic)는 SystemV IPC 등과 같은 기존 프로세스간 동기화 메카니즘을 없애고 Binder라는 고유 IPC 메카니즘을 제공하는데,  태스크간 우선순위 역전(priority inversion)을 막기 위한 우선순위 상속(priority inheritance),  우선순위 한계(priority ceiling) 같은 프로토콜을 아직 제공하지 않습니다.</p>
+<p>안드로이드는 인터럽트 핸들러가 우선순위가 더 높은 실시간 태스크를 선점하거나 지연하지 않기 위해 반드시 해결되어야 하는 리눅스 커널 인터럽트 처리 방식의 구조적 한계도 그대로 가지고 있습니다. 이를 해결하려면, 사용하는 모든 드라이버의 인터럽트 핸들러를 리눅스 2.6.30 버전부터 추가된 쓰레드 방식으로 바꾸거나 PREEMPT_RT 패치를 적용해야 합니다.</p>
+<p>그래서 결론은, 역시 아직 안드로이드 운영체제는 실시간 시스템에 적합하지 않지만, 이를 보완하기 위한 많은 작업과 연구가 더 필요합니다.</p>
+<p>[1]﻿ 
+<a href="http://www.ece.gatech.edu/~vkm/Android_Real_Time.pdf" target="_blank" rel="noopener">Bhupinder S. Mongia, Vijay K. Madisetti, ﻿Reliable Real-Time Applications on Android OS</a>
+
+[2] 
+<a href="http://www.cister.isep.ipp.pt/docs/evaluating&#43;android&#43;os&#43;for&#43;embedded&#43;real-time&#43;systems/569/" target="_blank" rel="noopener">Claudio Mia, Luis Nogueira, Evaluating Android OS for Embedded Real-Time Systems</a>
+</p>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/android/">Android</a>
+  
+  <a class="badge badge-light" href="/tags/kernel/">Kernel</a>
+  
+  <a class="badge badge-light" href="/tags/linux/">Linux</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2010/11/19/real-time-on-android-os/&amp;text=%ec%95%88%eb%93%9c%eb%a1%9c%ec%9d%b4%eb%93%9c%20%ec%9a%b4%ec%98%81%ec%b2%b4%ec%a0%9c%ec%97%90%ec%84%9c%20%ec%8b%a4%ec%8b%9c%ea%b0%84%20%ec%8b%9c%ec%8a%a4%ed%85%9c" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2010/11/19/real-time-on-android-os/&amp;t=%ec%95%88%eb%93%9c%eb%a1%9c%ec%9d%b4%eb%93%9c%20%ec%9a%b4%ec%98%81%ec%b2%b4%ec%a0%9c%ec%97%90%ec%84%9c%20%ec%8b%a4%ec%8b%9c%ea%b0%84%20%ec%8b%9c%ec%8a%a4%ed%85%9c" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=%ec%95%88%eb%93%9c%eb%a1%9c%ec%9d%b4%eb%93%9c%20%ec%9a%b4%ec%98%81%ec%b2%b4%ec%a0%9c%ec%97%90%ec%84%9c%20%ec%8b%a4%ec%8b%9c%ea%b0%84%20%ec%8b%9c%ec%8a%a4%ed%85%9c&amp;body=/2010/11/19/real-time-on-android-os/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2010/11/19/real-time-on-android-os/&amp;title=%ec%95%88%eb%93%9c%eb%a1%9c%ec%9d%b4%eb%93%9c%20%ec%9a%b4%ec%98%81%ec%b2%b4%ec%a0%9c%ec%97%90%ec%84%9c%20%ec%8b%a4%ec%8b%9c%ea%b0%84%20%ec%8b%9c%ec%8a%a4%ed%85%9c" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=%ec%95%88%eb%93%9c%eb%a1%9c%ec%9d%b4%eb%93%9c%20%ec%9a%b4%ec%98%81%ec%b2%b4%ec%a0%9c%ec%97%90%ec%84%9c%20%ec%8b%a4%ec%8b%9c%ea%b0%84%20%ec%8b%9c%ec%8a%a4%ed%85%9c%20/2010/11/19/real-time-on-android-os/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2010/11/19/real-time-on-android-os/&amp;title=%ec%95%88%eb%93%9c%eb%a1%9c%ec%9d%b4%eb%93%9c%20%ec%9a%b4%ec%98%81%ec%b2%b4%ec%a0%9c%ec%97%90%ec%84%9c%20%ec%8b%a4%ec%8b%9c%ea%b0%84%20%ec%8b%9c%ec%8a%a4%ed%85%9c" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+<section id="comments">
+  
+    
+<div id="disqus_thread"></div>
+<script>
+  let disqus_config = function () {
+    
+    
+    
+  };
+  (function() {
+    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+      document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+      return;
+    }
+    var d = document, s = d.createElement('script'); s.async = true;
+    s.src = 'https://' + "lethean" + '.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+  
+</section>
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2010/10/06/linux-kernel-scheduling-domains-and-classes/">리눅스 커널 스케줄링 영역과 클래스</a></li>
+      
+      <li><a href="/2010/10/05/linux-kernel-io-scheduler-priority/">리눅스 커널 I/O 스케줄링 우선순위</a></li>
+      
+      <li><a href="/2010/09/30/linux-kernel-realtime-scheduling-priority/">리눅스 커널 실시간 스케줄링 우선순위</a></li>
+      
+      <li><a href="/2010/09/28/programs-written-in-2010-spring-semester/">2010년 1학기에 작성한 프로그램</a></li>
+      
+      <li><a href="/2010/07/28/reading-linux-kernel-log-buffer/">리눅스 커널 로그 버퍼 읽기</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    <script id="dsq-count-scr" src="https://lethean.disqus.com/count.js" async></script>
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

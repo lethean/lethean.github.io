@@ -14,9 +14,9 @@
     
     <item>
       <title>perf top 사용하기</title>
-      <link>/2011/01/16/2011-01-16-using-perf-top/</link>
+      <link>/2011/01/16/using-perf-top/</link>
       <pubDate>Sun, 16 Jan 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/01/16/2011-01-16-using-perf-top/</guid>
+      <guid>/2011/01/16/using-perf-top/</guid>
       <description>&lt;p&gt;리눅스에서 병목 현상 디버깅이나 현재 실행중인 프로세스 중에서 가장 CPU 리소스를 많이 소모하는 녀석을 찾아야 할 경우가 있습니다. 이런 경우 가장 전통적이고 간단한 방법은 &lt;code&gt;top&lt;/code&gt; 명령어를 실행해서 키보드 단축키 &amp;lsquo;1&amp;rsquo; / &amp;lsquo;H&#39;를 눌러 CPU / 쓰레드별 사용량을 확인하는 것입니다. 또한 이와 관련된 전통적인 유닉스 명령어도 많지만, 리눅스에서 실행 루틴 수준에서 더 정밀하게 분석하고 싶다면 
 &lt;a href=&#34;http://www.google.co.kr/search?q=OProfile&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;OProfile&lt;/a&gt;
 , 

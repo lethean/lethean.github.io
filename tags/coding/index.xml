@@ -14,9 +14,9 @@
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (5)</title>
-      <link>/2012/02/24/2012-02-24-oop-with-gobject-5/</link>
+      <link>/2012/02/24/oop-with-gobject-5/</link>
       <pubDate>Fri, 24 Feb 2012 00:00:00 +0000</pubDate>
-      <guid>/2012/02/24/2012-02-24-oop-with-gobject-5/</guid>
+      <guid>/2012/02/24/oop-with-gobject-5/</guid>
       <description>&lt;p&gt;거의 2년만에 GObject 객체 지향 프로그래밍 연재 글을 포스팅합니다. 사실 이 글의 일부는 예전에 작성해 둔 것인데, 이번 
 &lt;a href=&#34;http://gnome-kr.blogspot.com/2012/02/2-gnome-tech-talks.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME Tech Talks&lt;/a&gt;
 에서 발표 하나를 맡게 되면서, 슬라이드 자료를 따로 만들 시간은 없고 그렇다고 오래된 자료를 재탕하는 건 실례인 것 같아 조금 보완해서 작성했습니다. 참고로, GObject 개념을 잘 모르는 분이라면 이전 연재 글을 먼저 읽어 보시면 도움이 될 수 있습니다. :)&lt;/p&gt;
@@ -534,9 +534,9 @@ main (int    argc,
     
     <item>
       <title>Dr. Memory 메모리 오류 / 누수 감지 도구</title>
-      <link>/2012/02/08/2012-02-08-detect-memory-leaks-and-corruption-with-dr-memory/</link>
+      <link>/2012/02/08/detect-memory-leaks-and-corruption-with-dr-memory/</link>
       <pubDate>Wed, 08 Feb 2012 00:00:00 +0000</pubDate>
-      <guid>/2012/02/08/2012-02-08-detect-memory-leaks-and-corruption-with-dr-memory/</guid>
+      <guid>/2012/02/08/detect-memory-leaks-and-corruption-with-dr-memory/</guid>
       <description>&lt;p&gt;대부분의 작업을 리눅스 환경에서 진행하지만 가끔은 어쩔 수 없이 윈도우 프로그램을 디버깅합니다. 그런데 메모리 오류를 디버깅할 때 리눅스에서 애용하는 
 &lt;a href=&#34;http://valgrind.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Valgrind&lt;/a&gt;
  같은 괜찮은 무료(!) 도구가 없어서 아쉬었는데, 오늘 발견한 
@@ -552,9 +552,9 @@ main (int    argc,
     
     <item>
       <title>Clutter 메모리 누수 디버깅</title>
-      <link>/2011/09/28/2011-09-28-clutter-memory-leak-debugging/</link>
+      <link>/2011/09/28/clutter-memory-leak-debugging/</link>
       <pubDate>Wed, 28 Sep 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/09/28/2011-09-28-clutter-memory-leak-debugging/</guid>
+      <guid>/2011/09/28/clutter-memory-leak-debugging/</guid>
       <description>&lt;p&gt;최근 
 &lt;a href=&#34;/2011/09/15/note-about-using-clutter/&#34;&gt;클러터를 이용한 프로그램을 개발&lt;/a&gt;
 하면서 메모리 누수 현상을 발견했습니다. 코드를 하나 하나 막아가면서 테스트를 한 결과 
@@ -659,9 +659,9 @@ Dumping heap profile to /tmp/profile.0004.heap (...)
     
     <item>
       <title>코딩하던 노인</title>
-      <link>/2010/07/10/2010-07-10-old-man-who-was-coding/</link>
+      <link>/2010/07/10/old-man-who-was-coding/</link>
       <pubDate>Sat, 10 Jul 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/07/10/2010-07-10-old-man-who-was-coding/</guid>
+      <guid>/2010/07/10/old-man-who-was-coding/</guid>
       <description>&lt;p&gt;한 10년만에 가져보는 방학(?)을 만끽하느라, 오랜만에 올리는 글입니다.&lt;/p&gt;
 &lt;p&gt;다른게 아니라, Xper 메일링 리스트에 어느 분이 
 &lt;a href=&#34;http://groups.google.com/group/xper/browse_thread/thread/4d79bc2343024442&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;재미있는 글&lt;/a&gt;
@@ -673,9 +673,9 @@ Dumping heap profile to /tmp/profile.0004.heap (...)
     
     <item>
       <title>GLib 테스트 프레임워크 사용하기</title>
-      <link>/2010/02/12/2010-02-12-using-glib-test-framework/</link>
+      <link>/2010/02/12/using-glib-test-framework/</link>
       <pubDate>Fri, 12 Feb 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/02/12/2010-02-12-using-glib-test-framework/</guid>
+      <guid>/2010/02/12/using-glib-test-framework/</guid>
       <description>&lt;p&gt;GLib 라이브러리 2.16 버전부터 지원하는 
 &lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;테스트 프레임워크&lt;/a&gt;
 는 C 언어용 
@@ -803,9 +803,9 @@ $ gtester-report sample-log.xml &amp;gt; sample-log.html
     
     <item>
       <title>구글 프로토콜 버퍼(Protocol Buffers)</title>
-      <link>/2010/02/12/2010-02-12-google-protocol-buffers/</link>
+      <link>/2010/02/12/google-protocol-buffers/</link>
       <pubDate>Fri, 12 Feb 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/02/12/2010-02-12-google-protocol-buffers/</guid>
+      <guid>/2010/02/12/google-protocol-buffers/</guid>
       <description>&lt;p&gt;구글 
 &lt;a href=&#34;http://code.google.com/p/protobuf/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;프로토콜 버퍼&lt;/a&gt;
  라이브러리에 대해서는 몇 번 
@@ -824,9 +824,9 @@ $ gtester-report sample-log.xml &amp;gt; sample-log.html
     
     <item>
       <title>Power of 10: 안전성이 중요한 코드 개발을 위한 규칙</title>
-      <link>/2010/01/25/2010-01-25-power-of-10-rules-for-developing-safety-critical-code/</link>
+      <link>/2010/01/25/power-of-10-rules-for-developing-safety-critical-code/</link>
       <pubDate>Mon, 25 Jan 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/01/25/2010-01-25-power-of-10-rules-for-developing-safety-critical-code/</guid>
+      <guid>/2010/01/25/power-of-10-rules-for-developing-safety-critical-code/</guid>
       <description>&lt;p&gt;`
 &lt;a href=&#34;http://www.embedded.com/design/222301487&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;정적 분석과 코딩 규칙을 이용한 임베디드 소프트웨어 버그 줄이기&lt;/a&gt;
 &amp;lsquo;라는 제목의 기사를 읽다가 `
@@ -860,9 +860,9 @@ $ gtester-report sample-log.xml &amp;gt; sample-log.html
     
     <item>
       <title>GLib 메인루프 이용하기</title>
-      <link>/2009/09/21/2009-09-21-using-glib-mainloop/</link>
+      <link>/2009/09/21/using-glib-mainloop/</link>
       <pubDate>Mon, 21 Sep 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/09/21/2009-09-21-using-glib-mainloop/</guid>
+      <guid>/2009/09/21/using-glib-mainloop/</guid>
       <description>&lt;p&gt;GLib API를 이용한 멀티쓰레드 프로그래밍에서 비동기 메시지 큐를 이용하는 방법은 지난 
 &lt;a href=&#34;/2008/08/06/glib-thread-programming/&#34;&gt;포스트&lt;/a&gt;
 에서 설명한 적이 있는데, 이번에는 
@@ -979,9 +979,9 @@ add_socket_to_my_thread (gint sock_fd)
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (4)</title>
-      <link>/2009/08/24/2009-08-24-oop-with-gobject-4/</link>
+      <link>/2009/08/24/oop-with-gobject-4/</link>
       <pubDate>Mon, 24 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/24/2009-08-24-oop-with-gobject-4/</guid>
+      <guid>/2009/08/24/oop-with-gobject-4/</guid>
       <description>&lt;p&gt;이전 글에 계속 이어집니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;객체 속성 정보 얻기&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;EdcHost 객체의 속성 정보를 실행 중에 얻어볼까 합니다.&lt;/p&gt;
@@ -1169,9 +1169,9 @@ edc_host_set_property (GObject      *object,
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (3)</title>
-      <link>/2009/08/18/2009-08-18-oop-with-gobject-3/</link>
+      <link>/2009/08/18/oop-with-gobject-3/</link>
       <pubDate>Tue, 18 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/18/2009-08-18-oop-with-gobject-3/</guid>
+      <guid>/2009/08/18/oop-with-gobject-3/</guid>
       <description>&lt;p&gt;이 글은 회사 개발팀 내부 세미나를 위해 작성중인 글입니다. 하지만, 블로그란 매체의 특성상 외부에도 공개되고 있는데, 댓글은 달지 않아도 접속하는 사람들 대부분이 제가 아는 분일 거라 생각하고 한마디 하자면, 세상에 공짜가 어디 있는가, 주저하지 말고 내게 연락해서 술 한 잔 사게! (언젠가부터 술 강요 청탁 협박 블로그가 되어 가고 있군&amp;hellip;)&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;속성 (Properties) 추가하기&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;이제, GObject 속성(properties) 기능을 추가하려고 하는데, 왜 쓸데없이 일을 만들어서 하냐고 물으면 할 말이 있어야할 것 같아서, GObject 속성의 특징을 요약해 봤습니다.&lt;/p&gt;
@@ -1433,9 +1433,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (2)</title>
-      <link>/2009/08/14/2009-08-14-oop-with-gobject-2/</link>
+      <link>/2009/08/14/oop-with-gobject-2/</link>
       <pubDate>Fri, 14 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/14/2009-08-14-oop-with-gobject-2/</guid>
+      <guid>/2009/08/14/oop-with-gobject-2/</guid>
       <description>&lt;p&gt;첫번째 글이 당연한 내용을 너무 길게 설명했다는 의견이 있어서, 이번 글부터는 더 짧고 간결하게 정리해 보려고 노력하고 있습니다. 그리고, 이 글의 대상은 한 번이라도 GTK+ / GLib 라이브러리를 사용한 경험이 있는 개발자입니다. 그래서 정말로 기초적인 내용은 피하고 있습니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;접근자 (Accessors)&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;소프트웨어 공학에서 모듈이나 객체 설계시 기본적으로 강조하는 정보은닉(information hiding), 캡슐화(encapsulation), 결합도(coupling) 등과 같은 개념에 의하면, C 언어처럼 구조체의 필드 변수를 외부로 직접 공개하는 건 좋지 않다고 합니다. 그리고 대부분의 경우 직접 접근 방식보다 읽고 쓰는 접근자(accessors)를 제공하는 게 여러모로 좋다고 하지요. 물론 성능 문제로 직접 접근 방식을 고려해야 하는 경우도 있지만, 지금까지 경험에 비춰보면, 병목을 일으키는 부분은 프로파일러를 돌려서 정확하게 파악한 다음에 해결하는 게 대부분 좋기 때문에 처음부터 그럴 필요는 없을 것 같습니다.&lt;/p&gt;
@@ -1587,9 +1587,9 @@ edc_host_set_name (EdcHost     *host,
     
     <item>
       <title>GObject 객체 지향 프로그래밍 (1)</title>
-      <link>/2009/08/10/2009-08-10-oop-with-gobject-1/</link>
+      <link>/2009/08/10/oop-with-gobject-1/</link>
       <pubDate>Mon, 10 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/10/2009-08-10-oop-with-gobject-1/</guid>
+      <guid>/2009/08/10/oop-with-gobject-1/</guid>
       <description>&lt;p&gt;GTK+, Clutter 등과 같은 라이브러리는 C 언어로 구현되었지만 객체 지향 개념을 충실히 따르고 있는데, 그 중심에는 GLib 라이브러리의 GObject가 있습니다. 따라서 이러한 라이브러리를 제대로 이해하고 사용하려면 필수적으로 GObject 개념을 잘 이해하고 있어야 합니다. 그런데, 생각보다 GObject 개념은 이해하기 어렵습니다. 이해하더라도 이를 응용하려면 그만큼 시간이 또 필요합니다.&lt;/p&gt;
 &lt;p&gt;그래서 이번 글을 시작으로 GObject 라이브러리를 이용한 C 언어에서 객체 지향 프로그래밍이라는 거창한 주제를 예제 형식을 이용해 다루어 보려고 합니다. 바로 새 GTK+ 위젯을 구현하거나 클러터 객체를 분석하는 방식이 아니라 왜 GObject가 이런 방식으로 설계되었는지 그 철학을 따라가 보려고 합니다. 그리고, 가능한 기존 GObject 튜토리얼의 어려운 설명이 아니라 실제 사용하는 코드를 중심으로 설명할 예정이니, 그래도 무슨 말인지 모르겠거나 더 풀어서 설명을 하는 게 좋을 것 같을 경우 의견 주시기 바랍니다.&lt;/p&gt;
 &lt;p&gt;여기서 예제로 사용할 개념은 네트워크 카메라 호스트와 호스트 목록입니다. (하는 일이 이쪽 분야라서&amp;hellip; :)&lt;/p&gt;
@@ -1999,9 +1999,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>doxy2dbook: Doxygen-DocBook 변환기</title>
-      <link>/2009/07/06/2009-07-06-doxy2dbook-doxygen-to-docbook-converter/</link>
+      <link>/2009/07/06/doxy2dbook-doxygen-to-docbook-converter/</link>
       <pubDate>Mon, 06 Jul 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/07/06/2009-07-06-doxy2dbook-doxygen-to-docbook-converter/</guid>
+      <guid>/2009/07/06/doxy2dbook-doxygen-to-docbook-converter/</guid>
       <description>&lt;p&gt;소스 코드 문서화에 
 &lt;a href=&#34;http://www.stack.nl/~dimitri/doxygen/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Doxygen&lt;/a&gt;
 을 이용하고 매뉴얼이나 공식 문서 작성에는 
@@ -2017,9 +2017,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>코딩 잘하는 방법?</title>
-      <link>/2009/07/06/2009-07-06-how-to-code-well/</link>
+      <link>/2009/07/06/how-to-code-well/</link>
       <pubDate>Mon, 06 Jul 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/07/06/2009-07-06-how-to-code-well/</guid>
+      <guid>/2009/07/06/how-to-code-well/</guid>
       <description>&lt;p&gt;저는 개발자(developer)보다 프로그래머(programmer)라고 부르는 걸 더 좋아합니다. 왜냐하면 프로그래머라는 단어는 프로그램(program)을 만드는 이라고 명확하게 나타내주기 때문입니다. 개발자라는 단어는 어쩐지 프로그래머라는 직업이 단순 코더(coder)로 인식되기 시작하면서, 그보다 더 많은 일을 하고 있다고 포장하기 위해 그럴듯한 단어로 대체한 것처럼 느껴집니다.&lt;/p&gt;
 &lt;p&gt;프로그램은 코드(code)입니다. 아무리 많은 기술과 기법을 사용했어도 그 마지막 결과물은 결국 코드입니다. 그래서 저한테 프로그래밍(programming)이란 곧 코딩(coding)을 의미합니다. 또한 코딩은 머릿속 추상적인 개념이 구체화되는 과정이기도 합니다.  언제부터 소프트웨어 공학이 프로그래밍에서 설계와 구현(코딩)을  구분했는지는 모르지만, 제게는 코딩이 곧 프로그래밍의 중심입니다. 나머지는 코딩을 더 잘하기 위해 필요한 도구이며 과정일 뿐입니다. (물론 디버깅도 프로그래밍의 큰 과정 중 하나입니다. 정확하게 요구사항을 분석하는 것, 코딩을 시작하기 위한 기본 개념을 선택하고 설계하는 것 등도 당연히 프로그래머의 일입니다. 하지만, 이 글에서는 코딩이 주인공이라서 다른 부분은 과소평가 할테니 소프트웨어 공학 하시는 분은 태클 걸지 말아 주시길 :)&lt;/p&gt;
 &lt;p&gt;아무튼, 댓가를 받고 업으로 프로그래밍을 하기 시작한지 약 15년 즈음 되는 지금, 언젠가부터 현업 프로그래머 중에서는 선배보다 후배들이 많아지다 보니, 가끔 술자리에서 실력도 안되는 제게 어려운 질문을 하는 후배들에게 항상 취중에 중언부언하던 개인적인 생각을, (역시 취중에) 대략 세 가지로 &lt;strong&gt;감히&lt;/strong&gt; 정리해 보았습니다.&lt;/p&gt;
@@ -2041,9 +2041,9 @@ edc_host_class_init (EdcHostClass *klass)
     
     <item>
       <title>TCMalloc 구글 성능 도구를 이용한 메모리 누수 디버깅</title>
-      <link>/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/</link>
+      <link>/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/</link>
       <pubDate>Thu, 18 Jun 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/06/18/2009-06-18-debugging-memory-leaks-with-tcmalloc-google-perftools/</guid>
+      <guid>/2009/06/18/debugging-memory-leaks-with-tcmalloc-google-perftools/</guid>
       <description>&lt;p&gt;리눅스에서 메모리 침범이나 메모리 누수, 혹은 복잡한 메모리 접근 관련 오류를 디버깅할때는 대부분 
 &lt;a href=&#34;http://valgrind.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Valgrind&lt;/a&gt;
  도구를 이용합니다. 하지만 Valgrind는 많은 메모리를 사용하고 실행 속도가 현저하게 느려지기 때문에, 별도의 타겟 장비에서 제한된 조건으로 동작하는 어플리케이션에는 조금 무리가 있습니다. 게다가 Valgrind의 메모리 검사 도구는 프로그램이 종료된 시점에서 누수된 메모리만 찾기 때문에, 실행 중에는 엄청나게 메모리를 사용하다가 정상적인 객체 해제 루틴이 호출되면 모든 메모리가 정리되어 찾을 수 없는 경우는 발견하지 못합니다.&lt;/p&gt;
@@ -2106,9 +2106,9 @@ $ sudo make install
     
     <item>
       <title>TCMalloc, 구글 성능 도구</title>
-      <link>/2009/04/29/2009-04-29-tcmalloc-google-perftools/</link>
+      <link>/2009/04/29/tcmalloc-google-perftools/</link>
       <pubDate>Wed, 29 Apr 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/04/29/2009-04-29-tcmalloc-google-perftools/</guid>
+      <guid>/2009/04/29/tcmalloc-google-perftools/</guid>
       <description>&lt;p&gt;장기간 실행되면서 빈번하게 메모리를 할당 / 해제하는 것은 물론 수십 개의 쓰레드가 동작하는 프로그램에서는 어쩔 수 없이 메모리 단편화(Memory Fragmentation)가 발생합니다. 메모리 단편화가 많을 경우 어플리케이션 로직에 메모리 누수(memork leak)가 없어도 C 라이브러리 메모리 관리자가 메모리를 커널에 반환하지 않기 때문에 프로세스의 메모리 사용량은 계속 늘어납니다.(참고로 이러한 경우인지 여부는 주기적으로 &lt;code&gt;mallinfo()&lt;/code&gt; 정보를 확인하면 됩니다) 물론 이를 회피하기 위한 기법이나 아키텍쳐는 많이 있지만, 그리 쉽게 원하는 성능과 효율을 얻기는 힘들더군요.&lt;/p&gt;
 &lt;p&gt;그런데, 며칠 동안 이와 비슷한 문제를 디버깅하다가 예전에 무심코 지나쳤던 
 &lt;a href=&#34;http://code.google.com/p/google-perftools/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Google Performance Tools&lt;/a&gt;
@@ -2128,9 +2128,9 @@ $ sudo make install
     
     <item>
       <title>우분투에서 C 라이브러리 맨페이지(manpage) 설치하기</title>
-      <link>/2009/04/08/2009-04-08-pthread-man-pages-in-ubuntu-or-debian/</link>
+      <link>/2009/04/08/pthread-man-pages-in-ubuntu-or-debian/</link>
       <pubDate>Wed, 08 Apr 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/04/08/2009-04-08-pthread-man-pages-in-ubuntu-or-debian/</guid>
+      <guid>/2009/04/08/pthread-man-pages-in-ubuntu-or-debian/</guid>
       <description>&lt;p&gt;리눅스에서 개발할때 &amp;lsquo;man&amp;rsquo; 명령을 이용해 매뉴얼 페이지를 많이 참고하는데, 자주 시스템을 다시 설치하다 보니 설치되지 않은 매뉴얼 때문에 매번 구글을 찾는라 귀찮은 적이 많아 적어둡니다. 우분투나 데비안에서만 유효합니다.&lt;/p&gt;
 &lt;p&gt;기본적인 C 라이브러리 관련 매뉴얼 패이지는 `manpages-dev&amp;rsquo; 패키지를 설치하면 되고, pthread_*()  류의 함수는 `glibc-doc&amp;rsquo; 패키지를 설치하면 됩니다. 즉, 터미널에서 다음과 같이 입력하면 됩니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;sudo apt-get install manpages-dev glibc-doc
@@ -2140,9 +2140,9 @@ $ sudo make install
     
     <item>
       <title>윈도우 심볼 패키지 사용하기</title>
-      <link>/2009/02/12/2009-02-12-using-windows-symbol-packages/</link>
+      <link>/2009/02/12/using-windows-symbol-packages/</link>
       <pubDate>Thu, 12 Feb 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/02/12/2009-02-12-using-windows-symbol-packages/</guid>
+      <guid>/2009/02/12/using-windows-symbol-packages/</guid>
       <description>&lt;p&gt;윈도우 비주얼 스튜디오 환경에서 디버깅을 하다보면 시스템에서 기본으로 제공하는 DLL 라이브러리에 대한 디버깅 심볼 정보가 없어 불편한 경우가 많습니다. 이 문제를 해결하려면 DLL 라이브러리에 대한 디버깅 심볼을 설치하면 됩니다.&lt;/p&gt;
 &lt;p&gt;
 &lt;a href=&#34;http://www.microsoft.com/whdc/DevTools/Debugging/debugstart.mspx&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;이 사이트&lt;/a&gt;
@@ -2154,9 +2154,9 @@ $ sudo make install
     
     <item>
       <title>Presenter First 개발</title>
-      <link>/2008/12/17/2008-12-17-presenter-first-development/</link>
+      <link>/2008/12/17/presenter-first-development/</link>
       <pubDate>Wed, 17 Dec 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/12/17/2008-12-17-presenter-first-development/</guid>
+      <guid>/2008/12/17/presenter-first-development/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://en.wikipedia.org/wiki/Presenter_First&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;프리젠터 먼저하기(Presenter First)&lt;/a&gt;
 는
@@ -2199,9 +2199,9 @@ Model &amp;lt;===== Presenter =====&amp;gt; View
     
     <item>
       <title>GLib 쓰레드 프로그래밍</title>
-      <link>/2008/08/06/2008-08-06-glib-thread-programming/</link>
+      <link>/2008/08/06/glib-thread-programming/</link>
       <pubDate>Wed, 06 Aug 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/08/06/2008-08-06-glib-thread-programming/</guid>
+      <guid>/2008/08/06/glib-thread-programming/</guid>
       <description>&lt;p&gt;소프트웨어를 개발하면서 멀티 쓰레드 방식을 사용하는 경우는 많습니다. 하지만 그만큼 복잡도가 증가해서 세심하게 고려하여 설계하지 않으면 디버깅 재앙을 얻는 경우가 많습니다. 이 글은 &amp;lsquo;
 &lt;a href=&#34;/2008/12/28/gtk-memory-management/&#34;&gt;멀티쓰레드 프로그래밍 규칙&lt;/a&gt;
 &amp;lsquo;에서 이어지는 내용입니다. 
@@ -2467,9 +2467,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>라이브러리 설계, 구현, 유지에 좋은 습관</title>
-      <link>/2006/02/24/2006-02-24-good-practices-in-library-design-implementation-and-maintenance/</link>
+      <link>/2006/02/24/good-practices-in-library-design-implementation-and-maintenance/</link>
       <pubDate>Fri, 24 Feb 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/02/24/2006-02-24-good-practices-in-library-design-implementation-and-maintenance/</guid>
+      <guid>/2006/02/24/good-practices-in-library-design-implementation-and-maintenance/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.gnu.org/software/libc/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;glibc(GNU libc)&lt;/a&gt;
  관리자이며 개발자인 
@@ -2503,9 +2503,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>printf() 함정에 빠지다</title>
-      <link>/2006/01/20/2006-01-20-printf-pitfall/</link>
+      <link>/2006/01/20/printf-pitfall/</link>
       <pubDate>Fri, 20 Jan 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/01/20/2006-01-20-printf-pitfall/</guid>
+      <guid>/2006/01/20/printf-pitfall/</guid>
       <description>&lt;p&gt;C/C++ 프로그래밍을 10년 넘게 해오면서 아마도 언젠가는 이런 문제를 부딪힌 적이 있었을 지도 모른다. 다만 잊어버리고, 다음에 또 반복하고&amp;hellip;&lt;/p&gt;
 &lt;p&gt;몇 주에 걸쳐 원인을 알 수 없는 세그멘테이션 폴트를 발생하는 문제를 디버깅했다. 프로그램은 e2fsck 명령 실행 결과를 &lt;code&gt;popen()&lt;/code&gt;을 이용하여 얻어온뒤 &lt;code&gt;syslog()&lt;/code&gt;를 통해 출력한다. gdb 백트레이스는 &lt;code&gt;syslog()&lt;/code&gt; 함수 내부에서 호출하는 &lt;code&gt;printf()&lt;/code&gt; 종류의 함수에서 멈추고 있었다. 지금까지 그랬던 것처럼 그 시점 이전 어디선가 메모리 침범이 발생한 것이라 판단하고 모든 관련 코드를 재검토하고 의심이 가는 부분을 재작성하기를 반복했으나 해결할 수 없었다. 그러다가 항상 같은 문자열에서 오류를 낸다는 패턴을 다시 검토하게 되었는데, 문제의 문자열은 &amp;lsquo;%&amp;rsquo; 기호를 포함하고 있었다. 순간 머리를 스치는 생각&amp;hellip; 역시 &lt;code&gt;syslog()&lt;/code&gt;의 매뉴얼 페이지를 확인해 보니 &lt;code&gt;syslog()&lt;/code&gt;는 &lt;code&gt;printf()&lt;/code&gt; 스타일의 가변 인수를 지원하는 함수였던 것이다. 즉, 문자열의 &amp;lsquo;%&amp;rsquo; 기호를 보고 뒤에 오는 &amp;lsquo;s&amp;rsquo;, &amp;lsquo;d&amp;rsquo; 등의 문자와 연동하여 있지도 않은 인수를 접근하면서 발생하는 문제였다. 즉, 다음 코드는&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;syslog(LOG_INFO, msg);
@@ -2519,9 +2519,9 @@ drink_connect (Drink *drink, const gchar *host, gint port)
     
     <item>
       <title>Duff&#39;s Device</title>
-      <link>/2006/01/11/2006-01-11-duffs-device/</link>
+      <link>/2006/01/11/duffs-device/</link>
       <pubDate>Wed, 11 Jan 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/01/11/2006-01-11-duffs-device/</guid>
+      <guid>/2006/01/11/duffs-device/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://en.wikipedia.org/wiki/Duff%27s_device&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Duff&amp;rsquo;s Device&lt;/a&gt;
 는 연속적인 복사 작업을 수행하는 알고리즘에 있어 C 언어로 구현된 가장 최적화된 기법이다. 일반적으로 어셈블리에서 사용되는 기술을 &lt;code&gt;switch&lt;/code&gt; 문과 루프 풀기(Loop Unrolling) 기법을 이용하여 구현하는데, 이 기법이 발표된 1983년 이후 아직까지 이보다 더 최적화된 구현은 없다고 한다. 코드를 보면 다음과 같다.&lt;/p&gt;
@@ -2552,9 +2552,9 @@ case 1:      *to = *from++;
     
     <item>
       <title>멀티쓰레드 프로그래밍 규칙</title>
-      <link>/2005/11/20/2005-11-20-multi-thread-programming-rules/</link>
+      <link>/2005/11/20/multi-thread-programming-rules/</link>
       <pubDate>Sun, 20 Nov 2005 00:00:00 +0000</pubDate>
-      <guid>/2005/11/20/2005-11-20-multi-thread-programming-rules/</guid>
+      <guid>/2005/11/20/multi-thread-programming-rules/</guid>
       <description>&lt;p&gt;멀티 쓰레드 방식 프로그래밍은 강력한 효율을 제공하지만 그만큼 프로그래머를 힘들게 하기도 한다. 그렇다면, 멀티 쓰레드 방식을 대체할 수 있는 방법은 무엇이 있을까? 물론 많은 사람들이 이 주제에 대하여 책도 쓰고 글도 남겼지만 여기는 내 블로그니까, 가능한 내 경험에 비추어 생각해본다.&lt;/p&gt;
 &lt;h3 id=&#34;뮤텍스mutex를-사용해야-하는-구조로-설계하지-말기&#34;&gt;뮤텍스(mutex)를 사용해야 하는 구조로 설계하지 말기&lt;/h3&gt;
 &lt;p&gt;뮤텍스를 이용하는 근본적인 이유는 하나의 리소스에 대해 동시에 접근할 경우 문제가 발생할 수 있을 경우 이에 대한 상호 배제(Mutual Exclusion)를 하기 위함이다. 하지만 하나의 리소스 또는 기능에 대한 처리를 전담하는 쓰레드를 만들고, 원하는 작업을 이 쓰레드(또는 프로세스)에게 메시지로 전달하여 처리하는 방식을 이용하면 뮤텍스를 사용해야 하는 경우는 사라지게 된다. 즉, 메시지 처리 방식(message-driven)을 이용하는 것이다. 물론 이 방식은 비동기적인 메시지일 경우 별로 문제가 없지만, 동기화가 필요한 경우 복잡해진다는 단점이 있다. 또한 성능 문제도 무시할 수 없다.&lt;/p&gt;
@@ -2570,9 +2570,9 @@ case 1:      *to = *from++;
     
     <item>
       <title>Quake3 Source Skimming</title>
-      <link>/2005/11/15/2005-11-15-quake3-source-skimming/</link>
+      <link>/2005/11/15/quake3-source-skimming/</link>
       <pubDate>Tue, 15 Nov 2005 00:00:00 +0000</pubDate>
-      <guid>/2005/11/15/2005-11-15-quake3-source-skimming/</guid>
+      <guid>/2005/11/15/quake3-source-skimming/</guid>
       <description>&lt;p&gt;퀘이크3(Quake3) 소스가 GPL 라이센스로 풀리면서 나같은 사람도 한번 얼핏 훑어볼 기회가 생겼다. 얼핏 훑어본 퀘이크3 소스 코드의 특징은 다음과 같다.&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;메모리 할당은 대부분 필요한 크기를 정해서 초기에 한꺼번에 할당한다. 즉, 프로그램 실행 도중에 메모리를 할당하고 해제하는 일이 거의 없다.&lt;/li&gt;

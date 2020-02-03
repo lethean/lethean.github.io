@@ -14,9 +14,9 @@
     
     <item>
       <title>Evolus Pencil 프로토타이핑 도구</title>
-      <link>/2012/07/02/2012-07-02-evolus-pencil-gui-prototyping-tool/</link>
+      <link>/2012/07/02/evolus-pencil-gui-prototyping-tool/</link>
       <pubDate>Mon, 02 Jul 2012 00:00:00 +0000</pubDate>
-      <guid>/2012/07/02/2012-07-02-evolus-pencil-gui-prototyping-tool/</guid>
+      <guid>/2012/07/02/evolus-pencil-gui-prototyping-tool/</guid>
       <description>&lt;p&gt;GUI 설계 단계에서 사용하는 프로토타이핑(prototyping) 도구는 매우 많습니다. 그냥 김프(Gimp)나 포토샵, 잉크스케이프(Inkscape) 등과 같은 일반적인 그래픽 도구에 익숙한 사람에게는 더 이상의 도구가 필요없겠지만, 저처럼 디자인에 문외한인 프로그래머에게는 더 쉽고 자동화된 도구가 필요할 수 밖에 없습니다. 그래서, 그냥 오픈오피스나 파워포인트, 워드 등과 같은 오피스 슈트를 이용해서 그린 적도 있었고, 조금 더 특화된 비지오(Visio), 다이아(Dia) 등을 이용하기도 하다가 최근까지는 
 &lt;a href=&#34;http://www.balsamiq.com/products/mockups&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;발사믹 목업(Balsamiq Mockups)&lt;/a&gt;
  등과 같은 도구를 이용했습니다.&lt;/p&gt;
@@ -45,9 +45,9 @@
     
     <item>
       <title>2010년 1학기에 작성한 프로그램</title>
-      <link>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</link>
+      <link>/2010/09/28/programs-written-in-2010-spring-semester/</link>
       <pubDate>Tue, 28 Sep 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/09/28/2010-09-28-programs-written-in-2010-spring-semester/</guid>
+      <guid>/2010/09/28/programs-written-in-2010-spring-semester/</guid>
       <description>&lt;p&gt;뭐, 전혀 관심 없는 분이 대부분이겠지만, 제 하드 디스크에서 묵히는 것보다 누군가에게 도움이 되는 편이 좋을 것 같아, 별로 품질이 좋은 소스는 아니지만, 오픈 소스만 사용해도 무난하게 과제 수행에 문제가 없음을 보여주기 위해, 지난 학기 수업 과제물로 제출했던 과제물의 문서와 프로그램 소스를 공개합니다.&lt;/p&gt;
 &lt;p&gt;참고로, 앞의 두 프로그램은 GTK+ 라이브러리를 이용해서 리눅스에서 개발했지만, 과제 시연을 위해 윈도우에서도 문제없이 컴파일되고 실행되도록 만들었습니다. 그리고, 안드로이드 뷰어는 라이브 보기만 구현된 소스입니다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;1. Image Histogram Viewer&lt;/strong&gt;&lt;/p&gt;
@@ -62,9 +62,9 @@
     
     <item>
       <title>여러 개의 마우스 동시에 사용하기</title>
-      <link>/2010/01/20/2010-01-20-using-multiple-mouses-with-xor/</link>
+      <link>/2010/01/20/using-multiple-mouses-with-xor/</link>
       <pubDate>Wed, 20 Jan 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/01/20/2010-01-20-using-multiple-mouses-with-xor/</guid>
+      <guid>/2010/01/20/using-multiple-mouses-with-xor/</guid>
       <description>&lt;p&gt;구글 리더에서 오늘치 내용을 읽다가 &amp;lsquo;가
 &lt;a href=&#34;http://ao2.it/en/blog/2010/01/19/poor-mans-multi-touch-using-multiple-mice-xorg&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;난한 사람의 멀티 터치: Xorg에서 여러 개의 마우스 사용하기&lt;/a&gt;
 &amp;rsquo; 블로그를 보고 따라해 보았더니 바로 되는 걸 확인하고 기록으로 남겨둡니다. (참고로, 제가 사용하는 배포판은 우분투 개발 버전(lucid)입니다)&lt;/p&gt;
@@ -75,9 +75,9 @@
     
     <item>
       <title>클러터와 GTK</title>
-      <link>/2009/09/08/2009-09-08-clutter-and-gtk/</link>
+      <link>/2009/09/08/clutter-and-gtk/</link>
       <pubDate>Tue, 08 Sep 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/09/08/2009-09-08-clutter-and-gtk/</guid>
+      <guid>/2009/09/08/clutter-and-gtk/</guid>
       <description>&lt;p&gt;`
 &lt;a href=&#34;http://blog.didrocks.fr/index.php/post/Design-experience-and-demos-in-GTK-Clutter&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Design experience and demos in GTK and Clutter&lt;/a&gt;
 &amp;rsquo; 라는 포스트가 얼마 전에 올라왔는데 이제야 리뷰를 해봅니다. 이 포스트를 클릭해서 들어가 보시면 데모 동영상이 여러개 있는데, 클러터 안에 GTK 노트북 위젯을 넣어 여러가지 효과를 보여주고 있습니다. 이 포스트는 &lt;span style=&#34;background-color:#ffffff;&#34;&gt;`
@@ -90,9 +90,9 @@
     
     <item>
       <title>사용자 인터페이스 실수 줄이기</title>
-      <link>/2009/08/03/2009-08-03-avoid-common-user-interface-bloopers/</link>
+      <link>/2009/08/03/avoid-common-user-interface-bloopers/</link>
       <pubDate>Mon, 03 Aug 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/08/03/2009-08-03-avoid-common-user-interface-bloopers/</guid>
+      <guid>/2009/08/03/avoid-common-user-interface-bloopers/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.grancanariadesktopsummit.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;2009 GCDS / GUADEC&lt;/a&gt;
  발표 슬라이드가 
@@ -115,9 +115,9 @@
     
     <item>
       <title>아이폰 증강 현실 어플리케이션</title>
-      <link>/2009/07/23/2009-07-23-iphone-augmented-reality-application/</link>
+      <link>/2009/07/23/iphone-augmented-reality-application/</link>
       <pubDate>Thu, 23 Jul 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/07/23/2009-07-23-iphone-augmented-reality-application/</guid>
+      <guid>/2009/07/23/iphone-augmented-reality-application/</guid>
       <description>&lt;p&gt;아이폰 3GS용으로 이런 어플리케이션도 있군요. &amp;lsquo;acrossair&#39;의 &amp;lsquo;
 &lt;a href=&#34;http://www.acrossair.com/apps_newyorknearestsubway.htm&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;New York Nearest Subway&lt;/a&gt;
 &amp;lsquo;라는 어플리케이션인데, 기술과 아이디어가 절묘하게 결합한 멋진 작품인 것 같습니다.&lt;/p&gt;
@@ -129,9 +129,9 @@
     
     <item>
       <title>GTK&#43; 멀티 포인터 X 지원</title>
-      <link>/2009/01/21/2009-01-21-mpx-gtk-multi-pointer-x-support/</link>
+      <link>/2009/01/21/mpx-gtk-multi-pointer-x-support/</link>
       <pubDate>Wed, 21 Jan 2009 00:00:00 +0000</pubDate>
-      <guid>/2009/01/21/2009-01-21-mpx-gtk-multi-pointer-x-support/</guid>
+      <guid>/2009/01/21/mpx-gtk-multi-pointer-x-support/</guid>
       <description>&lt;p&gt;&amp;lsquo;
 &lt;a href=&#34;http://www.phoronix.com/scan.php?page=news_item&amp;amp;px=NzAwNw&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Multi-Pointer X Support For GTK+&lt;/a&gt;
 &amp;rsquo; 기사를 보면 이미 GTK+ 라이브러리에 멀티 포인터 기능을 지원하기 위한 작업이 진행중입니다. 비록 X 서버는 Ubuntu 9.04 버전에 탑재될 1.6 버전에 멀티 포인터 기능이 이미 포함되어 있지만 기본적으로 비활성화되어 있고, 올해 말 즈음에 릴리스할 1.7 버전에 X Input 2.0 스펙과 함께 포함되면서 공식적으로 지원이 될 것 같습니다.&lt;/p&gt;
@@ -144,9 +144,9 @@
     
     <item>
       <title>Presenter First 개발</title>
-      <link>/2008/12/17/2008-12-17-presenter-first-development/</link>
+      <link>/2008/12/17/presenter-first-development/</link>
       <pubDate>Wed, 17 Dec 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/12/17/2008-12-17-presenter-first-development/</guid>
+      <guid>/2008/12/17/presenter-first-development/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://en.wikipedia.org/wiki/Presenter_First&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;프리젠터 먼저하기(Presenter First)&lt;/a&gt;
 는
@@ -189,9 +189,9 @@ Model &amp;lt;===== Presenter =====&amp;gt; View
     
     <item>
       <title>GTK&#43; Animation Effects</title>
-      <link>/2007/07/25/2007-07-25-gtk-animation-effects/</link>
+      <link>/2007/07/25/gtk-animation-effects/</link>
       <pubDate>Wed, 25 Jul 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/07/25/2007-07-25-gtk-animation-effects/</guid>
+      <guid>/2007/07/25/gtk-animation-effects/</guid>
       <description>&lt;p&gt;점점 화려해지는 GUI 추세를 이제서야 인식했는지, GTK+ / GNOME 에서도 애니메이션 효과에 대한 논의와 구현이 점점 활발해지고 있는 것 같다. 아직 GTK+ 메인 소스에 반영되려면 시간이 더 걸릴 것 같지만 
 &lt;a href=&#34;http://bugzilla.gnome.org/show_bug.cgi?id=444659&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GtkTimeline&lt;/a&gt;
  이라는 기본적인 시간 관리 객체가 이미 논의 중이고, 이를 기반으로 여러 개발자들이 여기저기에 적용해보기도 하고 있다. (
@@ -227,9 +227,9 @@ Model &amp;lt;===== Presenter =====&amp;gt; View
     
     <item>
       <title>reactable : 테이블 표면 실감형 다중 접촉 인터페이스를 통한 협업 전자 음악 악기</title>
-      <link>/2007/05/22/2007-05-22-reactable/</link>
+      <link>/2007/05/22/reactable/</link>
       <pubDate>Tue, 22 May 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/05/22/2007-05-22-reactable/</guid>
+      <guid>/2007/05/22/reactable/</guid>
       <description>&lt;p&gt;어설픈 영한번역을 거치게 된 
 &lt;a href=&#34;http://mtg.upf.edu/reactable/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;reactable&lt;/a&gt;
  프로젝트의 영어 설명은 이렇다.&lt;/p&gt;
@@ -254,9 +254,9 @@ Model &amp;lt;===== Presenter =====&amp;gt; View
     
     <item>
       <title>멀티 터치 스크린과 X 서버</title>
-      <link>/2007/02/16/2007-02-16-multi-touch-screen-and-x-server/</link>
+      <link>/2007/02/16/multi-touch-screen-and-x-server/</link>
       <pubDate>Fri, 16 Feb 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/02/16/2007-02-16-multi-touch-screen-and-x-server/</guid>
+      <guid>/2007/02/16/multi-touch-screen-and-x-server/</guid>
       <description>&lt;p&gt;멀티 터치 스크린 관련 데모 동영상:&lt;/p&gt;
 &lt;p&gt;이와 더불어 X 서버에서 복수 마우스 입력을 지원하기 위한 프로젝트인 
 &lt;a href=&#34;http://wearables.unisa.edu.au/mpx/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MPX&lt;/a&gt;
@@ -278,9 +278,9 @@ Model &amp;lt;===== Presenter =====&amp;gt; View
     
     <item>
       <title>MacOS X 탑재한 아이폰(iPhone) / 애플TV(Apple TV)</title>
-      <link>/2007/01/10/2007-01-10-macosx-inside-iphone-appletv/</link>
+      <link>/2007/01/10/macosx-inside-iphone-appletv/</link>
       <pubDate>Wed, 10 Jan 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/01/10/2007-01-10-macosx-inside-iphone-appletv/</guid>
+      <guid>/2007/01/10/macosx-inside-iphone-appletv/</guid>
       <description>&lt;p&gt;드디어 스티브 잡스가 맥월드 2007에서 
 &lt;a href=&#34;http://www.apple.com/iphone&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;아이폰(iPhone)&lt;/a&gt;
 을 주제로 한 
@@ -310,9 +310,9 @@ Model &amp;lt;===== Presenter =====&amp;gt; View
     
     <item>
       <title>E-페이퍼에 GTK&#43; 사용</title>
-      <link>/2006/12/18/2006-12-18-gtk-for-epaper-device/</link>
+      <link>/2006/12/18/gtk-for-epaper-device/</link>
       <pubDate>Mon, 18 Dec 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/12/18/2006-12-18-gtk-for-epaper-device/</guid>
+      <guid>/2006/12/18/gtk-for-epaper-device/</guid>
       <description>&lt;p&gt;iRex 테크놀로지에서 만든 E-페이퍼, 종이처럼 구부러지면서 컴퓨터 화면처럼 동작하는 디스플레이 장치에 들어가는 소프트웨어 개발자들이 GTK+ 라이브러리를 이용한다고 한다. 여러가지 이유로 GTK+ 라이브러리를 거의 모든 회사 프로젝트에 이용하고 있는 입장으로 반갑기도 하고, 놀라운 점도 있다.&lt;/p&gt;
 &lt;p&gt;참고:&lt;/p&gt;
 &lt;ol&gt;
@@ -325,9 +325,9 @@ Model &amp;lt;===== Presenter =====&amp;gt; View
     
     <item>
       <title>애플의 새 일루미누스(Illuminous) 인터페이스</title>
-      <link>/2006/12/18/2006-12-18-apple-illuminous-interface/</link>
+      <link>/2006/12/18/apple-illuminous-interface/</link>
       <pubDate>Mon, 18 Dec 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/12/18/2006-12-18-apple-illuminous-interface/</guid>
+      <guid>/2006/12/18/apple-illuminous-interface/</guid>
       <description>&lt;p&gt;애플(Apple) Mac OS X의 아쿠아(Aqua) 인터페이스가 일루미누스(Illuminous) 인터페이스로 교체된다고 한다. 이미 iTunes 7에서 일부분 선보였듯이, 전체적으로 어둡고 반투명의 검은 유리 같은 패널 위에 심플한 버튼으로 구성되었다. 윈도우즈 비스타의 에어로(Aero)와 비교될 것도 같지만, 언제나 그렇듯이 평범한 것도 애플이 하면 혁신으로 취급받게 되는 것 같다.&lt;/p&gt;
 &lt;p&gt;전혀 허락없이 무단 링크하는 스크린샷은 다음과 같다.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;/figures/d0045736_08120648.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
@@ -352,9 +352,9 @@ Model &amp;lt;===== Presenter =====&amp;gt; View
     
     <item>
       <title>Crazy Multi-Input Touch Screen</title>
-      <link>/2006/02/18/2006-02-18-crazy-multi-input-touch-screen/</link>
+      <link>/2006/02/18/crazy-multi-input-touch-screen/</link>
       <pubDate>Sat, 18 Feb 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/02/18/2006-02-18-crazy-multi-input-touch-screen/</guid>
+      <guid>/2006/02/18/crazy-multi-input-touch-screen/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.youtube.com/watch?v=zp-y3ZNaCqs&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;YouTube - Crazy Multi-Input Touch Screen&lt;/a&gt;
 &lt;/p&gt;

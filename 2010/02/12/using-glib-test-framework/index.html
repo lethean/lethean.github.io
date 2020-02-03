@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="GLib 라이브러리 2.16 버전부터 지원하는 테스트 프레임워크 는 C 언어용 유닛테스트 도구입니다. 물론 많은 유닛 테스트 도구가 이미 존재하지만, GLib 라이브러리 기반 C 언어">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2010/02/12/using-glib-test-framework/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2010/02/12/using-glib-test-framework/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2010/02/12/using-glib-test-framework/">
+  <meta property="og:title" content="GLib 테스트 프레임워크 사용하기 | 대체로 무해함">
+  <meta property="og:description" content="GLib 라이브러리 2.16 버전부터 지원하는 테스트 프레임워크 는 C 언어용 유닛테스트 도구입니다. 물론 많은 유닛 테스트 도구가 이미 존재하지만, GLib 라이브러리 기반 C 언어"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2010-02-12T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T20:31:01&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2010/02/12/using-glib-test-framework/"
+  },
+  "headline": "GLib 테스트 프레임워크 사용하기",
+  
+  "datePublished": "2010-02-12T00:00:00Z",
+  "dateModified": "2020-02-03T20:31:01+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "GLib 라이브러리 2.16 버전부터 지원하는 테스트 프레임워크 는 C 언어용 유닛테스트 도구입니다. 물론 많은 유닛 테스트 도구가 이미 존재하지만, GLib 라이브러리 기반 C 언어"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>GLib 테스트 프레임워크 사용하기 | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>GLib 테스트 프레임워크 사용하기</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <a href="/2010/02/12/using-glib-test-framework/#disqus_thread"></a>
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>GLib 라이브러리 2.16 버전부터 지원하는 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Testing.html" target="_blank" rel="noopener">테스트 프레임워크</a>
+는 C 언어용 
+<a href="http://en.wikipedia.org/wiki/Unit_testing" target="_blank" rel="noopener">유닛테스트</a>
+ 도구입니다. 물론 많은 유닛 테스트 도구가 이미 존재하지만, GLib 라이브러리 기반 C 언어 프로그램이라면 굳이 다른 라이브러리를 사용하는 것보다는 이미 지원하는 훌륭한 도구를 사용하는게 더 좋겠지요. 참고로,
+<a href="http://www.gtk.org/" target="_blank" rel="noopener">GTK+</a>
+, 
+<a href="http://clutter-project.org/" target="_blank" rel="noopener">Clutter</a>
+ 등 같은 프로젝트도 이미 이 기능을 이용해 테스트 코드를 작성하고 있으므로 알아두면 도움이 됩니다. 모든게 그렇지만, 알고나면 별게 아니므로 기본 개념과 API 사용법만 충실히 이해하면 됩니다.</p>
+<p>**기본 개념 및 사용법
+**</p>
+<p>유닛테스트 개념은 스몰토크, 자바, C++처럼 언어적으로 객체지향 개념을 지원하는 언어에서 시작했기 때문에 C 언어에 그대로 적용하기에는 조금 까다로운 점이 많습니다. 그래서 GLib 테스트 프레임워크는 유닛테스트에서 기본 개념과 테스트 실행 방식만 빌려옵니다. 우선 알아야하는 기본 개념은 다음과 같습니다.</p>
+<ul>
+<li>테스트 케이스 (Test Case) : 가장 기본이 되는 하나의 테스트 단위입니다. GLib에서는 하나의 테스트 함수(function)가 이 역할을 합니다.</li>
+<li>픽스쳐 (Fixture) : 고정 설치된 물건이라는 뜻처럼, 테스트 케이스 실행 전후에 항상 실행하는 함수를 의미합니다. 실제로는, 테스트 함수를 실행하기 위해 필요한 환경을 미리 구축하거나(setup) 실행 후 리소스를 정리하는(teardown) 함수, 그리고 이와 함께 사용되는 사용자 데이터(data)로 구성됩니다. 참고로, GLib에서는 각 테스트간 의존성을 피하기 위해 모든 테스트 케이스를 실행할때마다 매번 픽스쳐를 새로 구성하는 방식(fresh fixture)을 사용합니다.</li>
+<li>테스트 슈트 (Test Suite) : 여러 테스트 케이스를 묶은 그룹입니다. 트리 구조처럼 테스트 슈트 여러개를 묶어 더 큰 테스트 슈트를 구성할 수도 있습니다. GLib에서는 테스트 경로(path)라는 개념으로 사용합니다.</li>
+</ul>
+<p>개념은 조금 복잡한 것 같지만, 복잡하고 다양한 테스트 케이스를 그룹화하면 나중에 테스트 슈트별로 테스트를 진행할 수도 있는 등 많은 장점이 있습니다. 그리고 GLib이 제공하는 커맨드라인 도구를 이용하면 테스트 결과를 XML로 출력할 수도 있고, HTML 문서로 자동 변환할 수도 있는데 이 경우에도 테스트 슈트를 구성해 두면 많은 도움이 됩니다.</p>
+<p>물론 GLib은 정교하게 테스트 슈트와 테스트 케이스, 픽스쳐를 구성할 수 있는 많은 API를 제공하지만, 복잡한 과정을 API 호출 하나로 처리할 수 있는 기능도 제공합니다.</p>
+<pre><code class="language-c">g_test_add_func (&quot;/onvif/nvc-connections&quot;, test_onvif_nvc_connections);
+</code></pre>
+<p>위 예제에서 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add-func" target="_blank" rel="noopener"><code>g_test_add_func()</code></a>
+ 함수는 &ldquo;onvif&rdquo; 테스트 슈트 밑에 &ldquo;nvc-connections&rdquo; 이름의 테스트 케이스를 추가합니다. 테스트시 실행할 함수는 사용자가 직접 구현한 <code>test_onvif_nvc_connections()</code> 함수입니다. <code>g_test_add_func()</code> 함수가 테스트 슈트를 자동으로 생성해 주기 때문에 별도의 추가 작업이 불필요합니다. 비슷한 기능의 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add-data-func" target="_blank" rel="noopener"><code>g_test_add_data_func()</code></a>
+ 함수는 테스트 함수에 데이터를 전달할 수 있어서, 한 함수로 데이터만 바꿔서 테스트하고자 할때 유용합니다. 하지만, 두 API는 픽스쳐를 지정할 수 없으므로, 픽스쳐를 사용하려면 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add" target="_blank" rel="noopener"><code>g_test_add()</code></a>
+ 함수를 이용해야 합니다.일단, 간단한 예제 코드를 보여드리면 다음과 같습니다. (&quot;
+<a href="http://blogs.gnome.org/timj/2008/06/24/23062008-writing-unit-tests-with-glib/" target="_blank" rel="noopener">Writing Unit Tests with GLib</a>
+&rdquo; 글에서 발췌했습니다)</p>
+<pre><code class="language-c">#include &lt;glib.h&gt;
+
+static void
+simple_test_case (void)
+{
+  /* a suitable test */
+  g_assert (g_bit_storage (1) == 1);
+
+  /* a test with verbose error message */
+  g_assert_cmpint (g_bit_storage (1), ==, 1);
+}
+
+int
+main (int argc, char **argv)
+{
+  /* initialize test program */
+  g_test_init (&amp;argc, &amp;argv, NULL);
+
+  /* hook up your test functions */
+  g_test_add_func (&quot;/Simple Test Case&quot;, simple_test_case);
+
+  /* run tests from the suite */
+  return g_test_run ();
+}
+</code></pre>
+<p>이 코드를 <code>g-test-sample1.c</code> 파일로 저장하고 컴파일 후 실행하면 다음과 같은 결과를 볼 수 있습니다.</p>
+<pre><code class="language-sh">$ gcc -o g-test-sample1 g-test-sample1.c `pkg-config --cflags --libs glib-2.0`
+$ ./g-test-sample1
+/Simple Test Case: OK
+</code></pre>
+<p>이 결과를 재활용하기 위해 XML 형식으로 저장하거나, HTML 문서로 만들고 싶다면 
+<a href="http://library.gnome.org/devel/glib/stable/gtester.html" target="_blank" rel="noopener">gtester</a>
+ / 
+<a href="http://library.gnome.org/devel/glib/stable/gtester-report.html" target="_blank" rel="noopener">gtester-report</a>
+ 프로그램을 사용하면 됩니다.</p>
+<pre><code class="language-sh">$ gtester -o sample-log.xml g-test-sample1
+TEST: g-test-sample1... (pid=2771)
+PASS: g-test-sample1
+$ gtester-report sample-log.xml &gt; sample-log.html
+</code></pre>
+<p>위와 같이 실행하여 생성한 HTML 문서 결과는 다음과 같습니다.</p>
+<p><img src="/figures/gtester-report-screenshot.png" alt="" title="gtester-report screenshot"></p>
+<p>참고로, gtester 프로그램의 인수로 여러 테스트 실행 파일을 한꺼번에 전달하면 모든 테스트 실행 파일의 테스트 슈트가 하나의 결과로 통합됩니다.</p>
+<p>위 코드에서 사용한 테스트 코드를 보면 제일 먼저 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-init" target="_blank" rel="noopener"><code>g_test_init()</code></a>
+ 함수가 나타납니다. 이 함수는 테스트 기능을 초기화하는데, 리퍼런스 매뉴얼을 보시면 프로그램 실행 인수를 통해 사용자가 여러 테스트 옵션을 지정할 수 있는 걸 알 수 있습니다. 물론 특정 테스트 슈트만 실행하게 하는 옵션도 인수로 지정할 수 있습니다.</p>
+<p>테스트 함수를 보면 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-assert-cmpint" target="_blank" rel="noopener"><code>g_assert_cmpint()</code></a>
+라는 다소 생소한 API가 보이는데, GLib은 테스트 코드를 위해 이와 비슷한 매크로를 더 제공합니다.</p>
+<pre><code class="language-c">#define g_assert             (expr)
+#define g_assert_not_reached ()
+#define g_assert_cmpstr      (s1, cmp, s2)
+#define g_assert_cmpint      (n1, cmp, n2)
+#define g_assert_cmpuint     (n1, cmp, n2)
+#define g_assert_cmphex      (n1, cmp, n2)
+#define g_assert_cmpfloat    (n1,cmp,n2)
+#define g_assert_no_error    (err)
+#define g_assert_error       (err, dom, c)
+</code></pre>
+<p>위 매크로를 사용하여 테스트 코드를 작성하면 더 친절하고 자세한 에러 메시지를 출력합니다. 예를 들어 다음 코드는,</p>
+<pre><code class="language-c">gchar *string = &quot;foo&quot;; g_assert_cmpstr (string, ==, &quot;bar&quot;);
+</code></pre>
+<p>이런 메시지를 출력합니다.</p>
+<pre><code class="language-c">ERROR: assertion failed (string == &quot;bar&quot;): (&quot;foo&quot; ==  &quot;bar&quot;)
+</code></pre>
+<p>물론 기본적으로 실패한 경우에만 메시지를 보여줍니다.</p>
+<p><strong>그 외 더 많은&hellip;</strong></p>
+<p>지금까지 설명한 기본 기능 외에도 표준출력 / 표준에러 메시지를 표시하지 않도록 한 뒤 이 메시지에서 특정 문자열을 확인한다든가, 항상 동일한 패턴의 난수를 생성하여 이를 테스트에 이용하거나,  테스트에 시간이 얼마나 더 걸리는지 측정할 수도 있습니다. 프로그램을 종료시키는 치명적인 에러가 발생하는 경우도 테스트할 수 있고, 여러가지 테스트 모드(quick / slow / performace 등)를 두어 프로그램 인자를 이용해 원하는 테스트 코드만 실행할 수도 있습니다.</p>
+<p>더 많은 활용 예제가 GLib 자체 테스트 코드에(
+<a href="http://git.gnome.org/browse/glib/tree/glib/tests/testing.c" target="_blank" rel="noopener">glib/tests/testing.c</a>
+) 있으므로, 별로 길지 않으니, 직접 확인해 보시기 바랍니다.</p>
+<p><strong>프로젝트에 활용하기</strong></p>
+<p>MVP 개발 모델과 TDD + 유닛테스트 도구를 이용하여 응용 프로그램을 개발하면(
+<a href="/2008/12/17/presenter-first-development/">Presenter First 개발</a>
+) 더 빠르고 쉽게 튼튼한 코드를 만들 수 있으니, 한 번 검토해 보시기 바랍니다. 개발자가 TDD 방법론을 주저하는 이유 중 하나가 테스트 코드까지 만들다 보니 늘어나는 코드량과 늘어나는 개발 시간 때문인데, 테스트 코드를 그대로 실제 코드로 재활용할 수 있다면 얘기가 달라지겠죠.</p>
+<p>프로젝트 일일빌드시 테스트 루틴도 동작하도록 한뒤 자동으로 테스트 결과를 웹사이트에 게재하는 것도 좋은 개발 습관입니다. 아예 코드 수정 후 저장소에 커밋하면 반드시 모든 테스트 케이스를 통과해야만 커밋되도록 저장소를 설정할 수도 있지만, 엄청난 서버 부하를 야기할 수 있으므로, 테스트 케이스를 통과한 코드만 커밋할 수 있도록 가이드라인을 규정하는 것도 좋습니다.</p>
+<p>유닛테스트는 특정 객체나 모듈의 모든 API가 항상 정상적으로 동작하는지를 검사하기 위해 사용합니다. 그래서 가장 기본적인 사용법은 공개 함수를 다양한 인수로 호출한 뒤 그 결과값을 확인하는 방식입니다. 하지만 실무에서는 그렇게 단순한(?) 버그만 존재하는게 아니라서, 특정 시나리오나 특정 조건을 만족할 경우에만 버그 현상이 재현되는 경우도 많습니다. 이러한 경우, 버그에 대한 테스트 케이스를 추가하고 이 케이스에 대한 테스트가 통과할때까지 디버깅을 합니다. 이렇게 해두면 동일한 버그가 나중에 재발하는 걸 방지할 수 있습니다. 대부분 회사에서는 버그(이슈)관리시스템을 사용하므로 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-bug" target="_blank" rel="noopener"><code>g_test_bug()</code></a>
+ API를 사용하면 편리합니다.</p>
+<p>참고로, GTK+ 라이브러리는 GLib 테스트 프레임워크를 기반으로 마우스 버튼 동작이나 키보드 입력을 에뮬레이션하는 기능처럼 
+<a href="http://library.gnome.org/devel/gtk/stable/gtk-Testing.html" target="_blank" rel="noopener">GUI 프로그램 테스트용 API</a>
+를 제공합니다. 더불어 
+<a href="http://en.wikipedia.org/wiki/Xvfb" target="_blank" rel="noopener">Xvfb</a>
+ 같은 더미 X서버를 이용하면 원격 터미널이나 cron 작업처럼 실제 X서버가 없는 환경에서도 GUI 프로그램 테스트 진행이 가능합니다. 꼭 GTK+ 프로그램이 아니더라도, 폰트 렌더링 루틴이 정확한 그래픽 비트맵을 생성하는지, 특정 항목을 선택하고 특정 행동을 취했을때 정상적으로 문자열이 표시되는지 등도 테스트 케이스로 작성할 수 있습니다.</p>
+<p><strong>테스트 케이스 실행 방식 및 테스트 코드 위치</strong></p>
+<p>위 예제처럼 테스트 케이스를 특정 주제별로 나누어 각각의 실행파일로 만들어도 되지만, 테스트 케이스를 초기화하는 부분을 잘 정리하여 테스트 케이스를 여러 모듈로 분리한 뒤,  모든 테스트 케이스를 통째로 하나의 실행파일로 만들어도 됩니다. 이렇게 하면 추가적인 스크립트나 도구의 도움없이도 명령어 한번 실행으로 모든 테스트 케이스를 실행할 수 있기 때문에 더 편리할 수 있습니다. 또는 Clutter 프로젝트처럼 테스트 모듈을 각각 공유라이브러리로 만들어 플러그인처럼 로드해서 실행하는 방법도 있습니다.</p>
+<p>하지만, 위 방식은 모두 실제 코드와 테스트 코드가 서로 다른 파일에 존재하는 방식입니다. 테스트 코드가 실제 코드와 하나의 파일에 존재한다면 테스트 코드 작성이 더 일상화되고 자연스러워질 수 있습니다. 그러므로, 프로그램 실행 파일 크기가 별로 문제가 되지 않는다면, 또는 릴리스 / 디버그 모드를 분리하여 컴파일하도록 구성된 프로젝트라면,  프로그램에 특정 옵션을 주었을 경우에만 테스트 케이스 실행 모드로 동작하게 하면 됩니다. 물론 특정 테스트 프로그램은 예제로 사용하기 위해 분리할 수도 있겠지만, 모듈이나 객체의 고유 기능만 테스트하는 코드라면 같은 파일에 있는게 더 자연스러울 수 있습니다. 예를 들어 GObject 객체라면, 속성(properties) / 시그널(signal) 이름이 갑자기 변경되었을때 이를 참조하는 모듈이 문제를 일으키지 않도록 하기 위해, &lsquo;validate-properties&rsquo;, &lsquo;validate-signals&rsquo; 등의 테스트 케이스를 추가한뒤 통과하지 못했을 경우 
+<a href="http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-message" target="_blank" rel="noopener"><code>g_test_message()</code></a>
+ 등을 이용해 이를 참조하는 모듈을 찾아 수정하라는 강조 메시지를 표시하는 것도 가능합니다. 또한 특정 시그널이 정상적으로 발생하는지, 순서대로 발생하는지 확인할 수 있습니다. 그리고 무엇보다도, 같은 파일에 있으면 내부 자료구조에도 접근할 수 있으므로 내부 로직에 대한 테스트 코드를 작성하는 것도 가능해집니다.</p>
+<p>따라서 무조건 한 가지 방식만 고집하기보다, 적절하게 필요에 따라 알맞는 방식을 선택하는 것이 중요합니다.</p>
+<p><strong>결론</strong></p>
+<p>뭐 다른 결론이 있을리 없을만큼 유닛 테스트와 리그레션 테스트(regression test) 등은 이미 소프트웨어 개발 분야 전반에 광범위하게 사용하고 있습니다. 다만, C 언어를 이용해 개발하는 경우 리거시(legacy) 코드가 너무 많거나, 마땅한 테스트 도구를 찾지 못했거나, 여러가지 이유로 도입하지 못하는 경우가 많은데, 함께 잘 극복하고 익숙해져서 더 좋은 방향으로 나아가야 하지 않을까&hellip; 생각해 봅니다.</p>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/agile/">Agile</a>
+  
+  <a class="badge badge-light" href="/tags/clutter/">Clutter</a>
+  
+  <a class="badge badge-light" href="/tags/coding/">Coding</a>
+  
+  <a class="badge badge-light" href="/tags/glib/">GLib</a>
+  
+  <a class="badge badge-light" href="/tags/gtk&#43;/">GTK&#43;</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2010/02/12/using-glib-test-framework/&amp;text=GLib%20%ed%85%8c%ec%8a%a4%ed%8a%b8%20%ed%94%84%eb%a0%88%ec%9e%84%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2010/02/12/using-glib-test-framework/&amp;t=GLib%20%ed%85%8c%ec%8a%a4%ed%8a%b8%20%ed%94%84%eb%a0%88%ec%9e%84%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=GLib%20%ed%85%8c%ec%8a%a4%ed%8a%b8%20%ed%94%84%eb%a0%88%ec%9e%84%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0&amp;body=/2010/02/12/using-glib-test-framework/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2010/02/12/using-glib-test-framework/&amp;title=GLib%20%ed%85%8c%ec%8a%a4%ed%8a%b8%20%ed%94%84%eb%a0%88%ec%9e%84%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=GLib%20%ed%85%8c%ec%8a%a4%ed%8a%b8%20%ed%94%84%eb%a0%88%ec%9e%84%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0%20/2010/02/12/using-glib-test-framework/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2010/02/12/using-glib-test-framework/&amp;title=GLib%20%ed%85%8c%ec%8a%a4%ed%8a%b8%20%ed%94%84%eb%a0%88%ec%9e%84%ec%9b%8c%ed%81%ac%20%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+<section id="comments">
+  
+    
+<div id="disqus_thread"></div>
+<script>
+  let disqus_config = function () {
+    
+    
+    
+  };
+  (function() {
+    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+      document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+      return;
+    }
+    var d = document, s = d.createElement('script'); s.async = true;
+    s.src = 'https://' + "lethean" + '.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+  
+</section>
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2009/08/24/oop-with-gobject-4/">GObject 객체 지향 프로그래밍 (4)</a></li>
+      
+      <li><a href="/2009/08/18/oop-with-gobject-3/">GObject 객체 지향 프로그래밍 (3)</a></li>
+      
+      <li><a href="/2009/08/14/oop-with-gobject-2/">GObject 객체 지향 프로그래밍 (2)</a></li>
+      
+      <li><a href="/2009/08/10/oop-with-gobject-1/">GObject 객체 지향 프로그래밍 (1)</a></li>
+      
+      <li><a href="/2009/09/21/using-glib-mainloop/">GLib 메인루프 이용하기</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    <script id="dsq-count-scr" src="https://lethean.disqus.com/count.js" async></script>
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

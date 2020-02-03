@@ -14,9 +14,9 @@
     
     <item>
       <title>구글 프로토콜 버퍼(Protocol Buffers)</title>
-      <link>/2010/02/12/2010-02-12-google-protocol-buffers/</link>
+      <link>/2010/02/12/google-protocol-buffers/</link>
       <pubDate>Fri, 12 Feb 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/02/12/2010-02-12-google-protocol-buffers/</guid>
+      <guid>/2010/02/12/google-protocol-buffers/</guid>
       <description>&lt;p&gt;구글 
 &lt;a href=&#34;http://code.google.com/p/protobuf/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;프로토콜 버퍼&lt;/a&gt;
  라이브러리에 대해서는 몇 번 
@@ -35,9 +35,9 @@
     
     <item>
       <title>이클립스(Eclipse) &#43; 원격 SSH 서버 작업하기</title>
-      <link>/2008/08/11/2008-08-11-eclipse-with-remote-ssh-server/</link>
+      <link>/2008/08/11/eclipse-with-remote-ssh-server/</link>
       <pubDate>Mon, 11 Aug 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/08/11/2008-08-11-eclipse-with-remote-ssh-server/</guid>
+      <guid>/2008/08/11/eclipse-with-remote-ssh-server/</guid>
       <description>&lt;p&gt;프로젝트를 빌드할때마다 매번 ssh 프로그램으로 로그인해서 emacs / vi 등의 에디터로 컴파일해서 다시 이를 타겟 장비에 scp 명령어로 복사하고&amp;hellip; 조금 복잡하고 번거롭죠. 또한 개발환경으로 터미널 에디터 밖에 사용이 불가능합니다. 이 글은 이러한 개발 환경을 조금 탈피해서, 실제 소스 파일은 빌드 호스트에 두고 빌드 작업도 빌드 호스트에서 실행하면서, 이클립스(Eclipse) 개발 환경을 이용해 개발하는 방법을 간단하게 설명합니다.&lt;/p&gt;
 &lt;p&gt;이 글은 개인 장비에 우분투 리눅스 + Eclipse 개발 환경(3.4 Ganymede 기준)이 구축되어 있다는 가정하에 설명합니다. 원격 빌드 호스트 장비(build-dvr24)는 SSH 서버가 설치되어 있고 개인 계정도 이미 만들어져 있다고 가정합니다.(여기서는 lethean)&lt;/p&gt;
 &lt;h3 id=&#34;ssh-로그인-비밀번호-안물어보게-하기&#34;&gt;SSH 로그인 비밀번호 안물어보게 하기&lt;/h3&gt;

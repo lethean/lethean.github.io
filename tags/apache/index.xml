@@ -14,9 +14,9 @@
     
     <item>
       <title>APR(Apache Portable Runtime)</title>
-      <link>/2006/01/20/2006-01-20-aprapache-portable-runtime/</link>
+      <link>/2006/01/20/aprapache-portable-runtime/</link>
       <pubDate>Fri, 20 Jan 2006 00:00:00 +0000</pubDate>
-      <guid>/2006/01/20/2006-01-20-aprapache-portable-runtime/</guid>
+      <guid>/2006/01/20/aprapache-portable-runtime/</guid>
       <description>&lt;p&gt;크로스 플랫폼 어플리케이션 개발을 위해 지금까지 많은 라이브러리를 검토했지만 대부분 아쉬운 점이 많았다. 덩치가 너무 크거나, 의존하는 라이브러리가 너무 많거나, 반대로 너무 기능이 제한적이고 부족하거나 하는 이유로 진행하는 프로젝트에서는 직접 만들어 사용하고 있는 실정이다.&lt;/p&gt;
 &lt;p&gt;오늘 문득 
 &lt;a href=&#34;http://httpd.apache.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Apache2&lt;/a&gt;

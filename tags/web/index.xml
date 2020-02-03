@@ -14,9 +14,9 @@
     
     <item>
       <title>libmicrohttpd 내장 웹서버 라이브러리</title>
-      <link>/2011/05/02/2011-05-02-libmicrohttpd-embedded-web-server-library/</link>
+      <link>/2011/05/02/libmicrohttpd-embedded-web-server-library/</link>
       <pubDate>Mon, 02 May 2011 00:00:00 +0000</pubDate>
-      <guid>/2011/05/02/2011-05-02-libmicrohttpd-embedded-web-server-library/</guid>
+      <guid>/2011/05/02/libmicrohttpd-embedded-web-server-library/</guid>
       <description>&lt;p&gt;최근 프로젝트에서 내장 웹서버를 운영하기 위해 
 &lt;a href=&#34;http://www.gnu.org/software/libmicrohttpd/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;libmicrohttpd&lt;/a&gt;
  라이브러리를 적용해 보았습니다. 물론, 임베디드 시스템에서 많이 사용하는 
@@ -33,9 +33,9 @@
     
     <item>
       <title>lighttpd 웹 서버</title>
-      <link>/2007/04/08/2007-04-08-lighttpd-web-server/</link>
+      <link>/2007/04/08/lighttpd-web-server/</link>
       <pubDate>Sun, 08 Apr 2007 00:00:00 +0000</pubDate>
-      <guid>/2007/04/08/2007-04-08-lighttpd-web-server/</guid>
+      <guid>/2007/04/08/lighttpd-web-server/</guid>
       <description>&lt;p&gt;&amp;lsquo;
 &lt;a href=&#34;http://www.onlamp.com/pub/a/onlamp/2007/04/05/the-lighttpd-web-server.html&#34; title=&#34;The lighttpd Web Server&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The lighttpd Web Server&amp;rsquo;&lt;/a&gt;
 라는 글을 읽다 보니 

@@ -14,9 +14,9 @@
     
     <item>
       <title>libuv 사용기</title>
-      <link>/2016/03/08/2016-03-08-note-about-libuv/</link>
+      <link>/2016/03/08/note-about-libuv/</link>
       <pubDate>Tue, 08 Mar 2016 00:00:00 +0000</pubDate>
-      <guid>/2016/03/08/2016-03-08-note-about-libuv/</guid>
+      <guid>/2016/03/08/note-about-libuv/</guid>
       <description>&lt;p&gt;요즘은 비동기 이벤트 루프가 필요하면 
 &lt;a href=&#34;https://en.wikipedia.org/wiki/GLib&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GLib&lt;/a&gt;
  라이브러리 대신 

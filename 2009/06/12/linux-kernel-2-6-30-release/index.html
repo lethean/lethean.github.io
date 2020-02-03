@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ko-kr">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="어김없이 리눅스 커널 2.6.30 버전 이 나왔습니다. 에휴&hellip; 20대에는 릴리스마다 변경된 커널 코드를 읽어 보기도 했는데, 30대 초반 들어서는 기술 분석 문">
+
+  
+  <link rel="alternate" hreflang="ko-kr" href="/2009/06/12/linux-kernel-2-6-30-release/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#3f51b5">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3202603-9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-3202603-9', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu95c16a3019ad21b24832aeafe533c33c_47314_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/2009/06/12/linux-kernel-2-6-30-release/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="대체로 무해함">
+  <meta property="og:url" content="/2009/06/12/linux-kernel-2-6-30-release/">
+  <meta property="og:title" content="리눅스 커널 2.6.30 릴리스 | 대체로 무해함">
+  <meta property="og:description" content="어김없이 리눅스 커널 2.6.30 버전 이 나왔습니다. 에휴&hellip; 20대에는 릴리스마다 변경된 커널 코드를 읽어 보기도 했는데, 30대 초반 들어서는 기술 분석 문"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
+  
+    
+      <meta property="article:published_time" content="2009-06-12T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-03T20:31:01&#43;09:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/2009/06/12/linux-kernel-2-6-30-release/"
+  },
+  "headline": "리눅스 커널 2.6.30 릴리스",
+  
+  "datePublished": "2009-06-12T00:00:00Z",
+  "dateModified": "2020-02-03T20:31:01+09:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "대체로 무해함"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "대체로 무해함",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "어김없이 리눅스 커널 2.6.30 버전 이 나왔습니다. 에휴\u0026hellip; 20대에는 릴리스마다 변경된 커널 코드를 읽어 보기도 했는데, 30대 초반 들어서는 기술 분석 문"
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>리눅스 커널 2.6.30 릴리스 | 대체로 무해함</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="네비게이션">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">대체로 무해함</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/lethean/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>리눅스 커널 2.6.30 릴리스</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    2020-02-03
+  </span>
+  
+
+  
+
+  
+
+  
+  
+  
+  <span class="middot-divider"></span>
+  <a href="/2009/06/12/linux-kernel-2-6-30-release/#disqus_thread"></a>
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p>어김없이 
+<a href="http://lwn.net/Articles/336506/" target="_blank" rel="noopener">리눅스 커널 2.6.30 버전</a>
+이 나왔습니다. 에휴&hellip;</p>
+<p>20대에는 릴리스마다 변경된 커널 코드를 읽어 보기도 했는데, 30대 초반 들어서는 기술 분석 문서를 읽는 것도 벅차더니, 30대 중반을 달리고 있는 요즘은 어디 잘 요약해 놓은데 없나 찾아 다니기만 하는 것 같습니다. 물론 갈수록 게을러지는 게 가장 큰 원인이겠지만, 매 릴리스마다 변경되는 기술의 폭이 커지는 것도 하나의 변명이 될 수 있지 않을까 생각합니다. 게다가 요즘은 초창기와 다르게 릴리스 전에 많은 전문가들이 먼저 시험해 보고 잘 정리해 놓으니까, 직접 API를 사용해 보거나 코드를 확인하는 건 정말 업무에 사용하게될 때 뿐인 것 같습니다. 어찌되었든, 중요한 변경 사항은 놓치지 않고 확인해놔야 먹고 사는데 지장이 없을 것 같아 제가 관심 있는 부분만 정리해 봅니다. 물론 더 자세한 내용은 
+<a href="http://kernelnewbies.org/Linux_2_6_30" target="_blank" rel="noopener">커널 뉴비 사이트</a>
+를 보시면 지나치게 잘 정리되어 있으니 놓치지 마시길!</p>
+<p><strong>파일시스템 잔치 : NILFS2, POHMELFS, DST, EXOFS, EXT4, EXT3, &hellip;</strong></p>
+<p>일본 NTT Lab에서 개발한 NILFS2 파일시스템이 정식으로 커널에 포함되었습니다. 아직 개선이 조금 더 필요하지만 SSD 저장장치에서 엄청난 성능을 뿜어낸다고 하는군요. 아주 오래전부터 공식 커널 밖에서 개발되던 로그-구조(Log-structured) 방식 파일시스템이 드디어 실생활에 사용될 수 있을지 조금 기대가 됩니다. 참고로 로그-구조란, 로그 파일에 로그 메시지가 계속 추가되듯이, 기존 내용을 덮어쓰지 않고 추가 / 수정된 부분만 계속 새로운 공간에 배치하기 때문에 공간이 허락하는 한 무한대 롤백 / 스냅샷이 가능합니다. 그리고 이러한 특성 때문에 쓰기 제한이 있는 SSD 매체에 적합한 파일시스템이라는 얘기도 가능합니다.</p>
+<p>오랫동안 
+<a href="http://planet.kernel.org/" target="_blank" rel="noopener">커널 플래닛</a>
+에서 개발 과정을 지켜봤던 POHMELFS 파일시스템도 포함되었습니다. 지금까지 존재하는 어떤 네트웍 파일시스템보다 성능이 더 좋다고 하는데, 써 볼 기회가 없는게 아쉽네요. 또한 NFS / AFS 등의 성능 개선을 이끌어낸 FS-Cache 캐싱 파일시스템도 추가되었다고 합니다. DST, EXOS 파일시스템은 잘 모르는 거라서&hellip;</p>
+<p>EXT3 / EXT4 파일시스템에서 fsync() 호출에 대한 반응속도(latency)도 많은 논의 끝에(?) 개선되었고, EXT3 파일시스템에서 relatime 옵션이 기본으로 켜지게 되었습니다. 더불어 EXT4 파일시스템도 많이 안정화된 것처럼 보입니다.</p>
+<p>아무튼, 요즘 리눅스 커널은 BTRFS, EXT4, UnionFS 등을 포함한 차세대 파일시스템들이 EXT3 다음 자리를 놓고 치열하게 경쟁하는 덕분에, 개발자들 공부 많이 하게 해 주는군요&hellip;</p>
+<p><strong>쓰레드 방식 인터럽트 핸들러 지원</strong></p>
+<p>솔라리스나 실시간 커널에서는 이미 몇십년 전부터 사용하고 있는 방식이지만, 여러 정치적인 이유로 실시간 커널 브랜치에만 있던 
+<a href="http://lwn.net/Articles/302043/" target="_blank" rel="noopener">쓰레드 방식 인터럽트 핸들러 기능</a>
+이 이제서야 메인 커널에 추가되었습니다. 물론 인터럽트 핸들러가 실행이 길어질수록 시스템의 다른 부분이 아무 일도 할 수 없기 때문에 리눅스 커널은 아주 오래전부터 상단/하단 부분(top/bottom half)이나 태스크릿(tasklet)을 비롯해 많은 메카니즘을 제공함으로써 커널 레이턴시(latency)를 훌륭하게 보장하고 있지만, 아무래도 실시간 시스템 하는 사람들에겐 부족했던 모양입니다.</p>
+<p>기존 방식으로 동작하려면 지금과 동일하게 request_irq() 함수를 사용하면 되고, 각각의 핸들러가 별도 커널 쓰레드로 동작하게 하려면 request_threaded_irq() 함수를 이용해 등록하면 됩니다. 두번째 방식은 핸들러 함수(quick_check_handler)가 하나 더 있는데, 인터럽트가 발생하면 이 핸들러가 먼저 실행된 후 인터럽트가 자신의 것이 맞는지 여부와, 그렇다면 그에 따라 인터럽트 핸들러 쓰레드를 깨울지, 직접 인터럽트 문맥에서 실행할 지 등을 결정하는 리턴값을 돌려주면 그에 따라 인터럽트 핸들러 쓰레드가 동작하는 방식입니다. 따라서 이로 인해 기존 태스크릿(tasklet)은 사라질 수도 있다고 합니다.</p>
+<p><strong>기타</strong></p>
+<p>커널 부팅 속도를 빠르게 하기 위해 한번에 하나씩 장치를 스캔하지 않고, 한꺼번에 장치 스캔 요청을 보낸 뒤 나중에 
+<a href="http://lwn.net/Articles/314808/" target="_blank" rel="noopener">비동기(async)로 응답을 받아 처리할 수 있는 API</a>
+도 추가되었습니다.</p>
+<p>메모리 관리자는 또 개선되어, 커널 메모리 추적자(kmemtrace)라는 녀석도 추가되어 kmalloc(), kfree(), kmem_cache_alloc() 등과 같은 메모리 관련 API 추적 정보를 사용자 영역 프로세스에게 전달해 분석에 사용할 수 있게 되었습니다. 더불어 
+<a href="http://lwn.net/Articles/308237/" target="_blank" rel="noopener">DMA API 디버깅을 위한 기능</a>
+도 추가되었습니다.</p>
+<p>X86_32 아키텍쳐에서 커널 스택 보호 기능도 추가되고, 이제 더 이상 zImage 형식은 지원하지 않게 되었고, /sys 밑에 새로운 항목들이 추가되고, 수많은 디바이스 드라이버가 업데이트되고 추가되었고&hellip;</p>
+<p>아무튼, 오늘은 여기까지!</p>
+
+    </div>
+
+    
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/kernel/">Kernel</a>
+  
+  <a class="badge badge-light" href="/tags/linux/">Linux</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/2009/06/12/linux-kernel-2-6-30-release/&amp;text=%eb%a6%ac%eb%88%85%ec%8a%a4%20%ec%bb%a4%eb%84%90%202.6.30%20%eb%a6%b4%eb%a6%ac%ec%8a%a4" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/2009/06/12/linux-kernel-2-6-30-release/&amp;t=%eb%a6%ac%eb%88%85%ec%8a%a4%20%ec%bb%a4%eb%84%90%202.6.30%20%eb%a6%b4%eb%a6%ac%ec%8a%a4" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=%eb%a6%ac%eb%88%85%ec%8a%a4%20%ec%bb%a4%eb%84%90%202.6.30%20%eb%a6%b4%eb%a6%ac%ec%8a%a4&amp;body=/2009/06/12/linux-kernel-2-6-30-release/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/2009/06/12/linux-kernel-2-6-30-release/&amp;title=%eb%a6%ac%eb%88%85%ec%8a%a4%20%ec%bb%a4%eb%84%90%202.6.30%20%eb%a6%b4%eb%a6%ac%ec%8a%a4" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=%eb%a6%ac%eb%88%85%ec%8a%a4%20%ec%bb%a4%eb%84%90%202.6.30%20%eb%a6%b4%eb%a6%ac%ec%8a%a4%20/2009/06/12/linux-kernel-2-6-30-release/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/2009/06/12/linux-kernel-2-6-30-release/&amp;title=%eb%a6%ac%eb%88%85%ec%8a%a4%20%ec%bb%a4%eb%84%90%202.6.30%20%eb%a6%b4%eb%a6%ac%ec%8a%a4" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+<section id="comments">
+  
+    
+<div id="disqus_thread"></div>
+<script>
+  let disqus_config = function () {
+    
+    
+    
+  };
+  (function() {
+    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+      document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+      return;
+    }
+    var d = document, s = d.createElement('script'); s.async = true;
+    s.src = 'https://' + "lethean" + '.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+  
+</section>
+
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/2009/03/26/linux-kernel-2629-release/">리눅스 커널 2.6.29 릴리스</a></li>
+      
+      <li><a href="/2009/01/09/linux-union-mount/">리눅스 커널 병합 마운트(union mount)</a></li>
+      
+      <li><a href="/2008/12/26/linux-kernel-2628-release/">리눅스 커널 2.6.28 릴리스</a></li>
+      
+      <li><a href="/2008/07/16/linux-2626-memory-test-function/">리눅스 커널 메모리 검사 기능</a></li>
+      
+      <li><a href="/2007/04/26/linux-kernel-2621-release/">Linux Kernel 2.6.21 Release</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "포스트",
+        'project': "Projects",
+        'publication' : "논문",
+        'talk' : "강연"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    <script id="dsq-count-scr" src="https://lethean.disqus.com/count.js" async></script>
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © lethean &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

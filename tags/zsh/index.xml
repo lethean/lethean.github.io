@@ -14,9 +14,9 @@
     
     <item>
       <title>less 명령어가 끝나도 내용을 지우지 않게 하기</title>
-      <link>/2016/03/07/2016-03-07-exit-less-without-clearing-the-screen/</link>
+      <link>/2016/03/07/exit-less-without-clearing-the-screen/</link>
       <pubDate>Mon, 07 Mar 2016 00:00:00 +0000</pubDate>
-      <guid>/2016/03/07/2016-03-07-exit-less-without-clearing-the-screen/</guid>
+      <guid>/2016/03/07/exit-less-without-clearing-the-screen/</guid>
       <description>&lt;p&gt;&lt;code&gt;git diff&lt;/code&gt;, &lt;code&gt;git log&lt;/code&gt; 같은 명령어는 내부적으로 다시 &lt;code&gt;less&lt;/code&gt; 프로그램을
 사용합니다. 그런데 언젠가부터 갑자기 명령어가 끝나면 내용이 지워지면서 원래
 화면이 표시되어 여간 불편했는데, 그 이유를 조사해 보니 Zsh 셸을 사용하면서

@@ -14,9 +14,9 @@
     
     <item>
       <title>구글 프로토콜 버퍼(Protocol Buffers)</title>
-      <link>/2010/02/12/2010-02-12-google-protocol-buffers/</link>
+      <link>/2010/02/12/google-protocol-buffers/</link>
       <pubDate>Fri, 12 Feb 2010 00:00:00 +0000</pubDate>
-      <guid>/2010/02/12/2010-02-12-google-protocol-buffers/</guid>
+      <guid>/2010/02/12/google-protocol-buffers/</guid>
       <description>&lt;p&gt;구글 
 &lt;a href=&#34;http://code.google.com/p/protobuf/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;프로토콜 버퍼&lt;/a&gt;
  라이브러리에 대해서는 몇 번 
@@ -35,9 +35,9 @@
     
     <item>
       <title>Wireshark &amp; tcpdump</title>
-      <link>/2008/11/19/2008-11-19-wireshark-tcpdump/</link>
+      <link>/2008/11/19/wireshark-tcpdump/</link>
       <pubDate>Wed, 19 Nov 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/11/19/2008-11-19-wireshark-tcpdump/</guid>
+      <guid>/2008/11/19/wireshark-tcpdump/</guid>
       <description>&lt;p&gt;
 &lt;a href=&#34;http://www.wireshark.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Wireshark&lt;/a&gt;
  프로그램을 이용할때, 문제의 현상이 발생하는 패턴을 모르는 경우 무작정 발생할때까지 패킷을 캡쳐해야 하는 경우가 있습니다. 이때 Wireshark 프로그램으로 무조건 캡쳐를 하면 금방 메모리가 부족해서 프로그램이 죽어버리게 됩니다. 이런 경우 tcpdump 프로그램을 이용하여 패킷을 캡쳐하여 파일에 저장하고, 현상이 발생했을때 멈추고 난뒤 캡쳐한 파일을 다시 Wireshark 프로그램에서 볼 수 있는 방법이 있습니다.&lt;/p&gt;
@@ -63,9 +63,9 @@
     
     <item>
       <title>Wireshark Bad Checksum</title>
-      <link>/2008/11/17/2008-11-17-wireshark-bad-checksum/</link>
+      <link>/2008/11/17/wireshark-bad-checksum/</link>
       <pubDate>Mon, 17 Nov 2008 00:00:00 +0000</pubDate>
-      <guid>/2008/11/17/2008-11-17-wireshark-bad-checksum/</guid>
+      <guid>/2008/11/17/wireshark-bad-checksum/</guid>
       <description>&lt;p&gt;네트웍 패킷을 검사하기 위해 자주 사용하는 
 &lt;a href=&#34;http://www.wireshark.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Wireshark&lt;/a&gt;
  프로그램을 리눅스에서 실행할때 이더넷 장치에 따라 &amp;lsquo;Bad Checksum&#39;을 표시하며 패킷이 붉은 색으로 표시되어 눈에 거슬리는 경우가 종종 있습니다.&lt;/p&gt;
