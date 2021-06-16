@@ -284,7 +284,7 @@ $ sudo /etc/init.d/apache2 restart
 &lt;pre&gt;&lt;code&gt;cd cms/src
 svn switch $SVN/dooly/branches/cms-2.1-0-remote/cms/src
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;이렇게 하면 다른 디렉토리는 그대로 &amp;lsquo;&lt;code&gt;trunk&lt;/code&gt;&#39;를 이용하고 &amp;lsquo;&lt;code&gt;cms/src&lt;/code&gt;&amp;rsquo; 디렉토리만 &amp;lsquo;&lt;code&gt;cms-2.1-0-remote&lt;/code&gt;&amp;rsquo; 브랜치 소스로 변경됩니다. 이후 이 디렉토리에 작업하는 내용을 커밋하면 모두 해당 브랜치로 커밋됩니다. 물론 다시 원래 소스 트리로 되돌아오고 싶은 경우 다음과 같이 작업하면 됩니다.&lt;/p&gt;
+&lt;p&gt;이렇게 하면 다른 디렉토리는 그대로 &amp;lsquo;&lt;code&gt;trunk&lt;/code&gt;&amp;lsquo;를 이용하고 &amp;lsquo;&lt;code&gt;cms/src&lt;/code&gt;&amp;rsquo; 디렉토리만 &amp;lsquo;&lt;code&gt;cms-2.1-0-remote&lt;/code&gt;&amp;rsquo; 브랜치 소스로 변경됩니다. 이후 이 디렉토리에 작업하는 내용을 커밋하면 모두 해당 브랜치로 커밋됩니다. 물론 다시 원래 소스 트리로 되돌아오고 싶은 경우 다음과 같이 작업하면 됩니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;cd cms/src
 svn switch $SVN/dooly/trunk
 &lt;/code&gt;&lt;/pre&gt;

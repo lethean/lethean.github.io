@@ -538,13 +538,13 @@
 
     <div class="article-style">
       <p>C/C++ 프로그래밍을 10년 넘게 해오면서 아마도 언젠가는 이런 문제를 부딪힌 적이 있었을 지도 모른다. 다만 잊어버리고, 다음에 또 반복하고&hellip;</p>
-<p>몇 주에 걸쳐 원인을 알 수 없는 세그멘테이션 폴트를 발생하는 문제를 디버깅했다. 프로그램은 e2fsck 명령 실행 결과를 <code>popen()</code>을 이용하여 얻어온뒤 <code>syslog()</code>를 통해 출력한다. gdb 백트레이스는 <code>syslog()</code> 함수 내부에서 호출하는 <code>printf()</code> 종류의 함수에서 멈추고 있었다. 지금까지 그랬던 것처럼 그 시점 이전 어디선가 메모리 침범이 발생한 것이라 판단하고 모든 관련 코드를 재검토하고 의심이 가는 부분을 재작성하기를 반복했으나 해결할 수 없었다. 그러다가 항상 같은 문자열에서 오류를 낸다는 패턴을 다시 검토하게 되었는데, 문제의 문자열은 &lsquo;%&rsquo; 기호를 포함하고 있었다. 순간 머리를 스치는 생각&hellip; 역시 <code>syslog()</code>의 매뉴얼 페이지를 확인해 보니 <code>syslog()</code>는 <code>printf()</code> 스타일의 가변 인수를 지원하는 함수였던 것이다. 즉, 문자열의 &lsquo;%&rsquo; 기호를 보고 뒤에 오는 &lsquo;s&rsquo;, &lsquo;d&rsquo; 등의 문자와 연동하여 있지도 않은 인수를 접근하면서 발생하는 문제였다. 즉, 다음 코드는</p>
+<p>몇 주에 걸쳐 원인을 알 수 없는 세그멘테이션 폴트를 발생하는 문제를 디버깅했다. 프로그램은 e2fsck 명령 실행 결과를 <code>popen()</code>을 이용하여 얻어온뒤 <code>syslog()</code>를 통해 출력한다. gdb 백트레이스는 <code>syslog()</code> 함수 내부에서 호출하는 <code>printf()</code> 종류의 함수에서 멈추고 있었다. 지금까지 그랬던 것처럼 그 시점 이전 어디선가 메모리 침범이 발생한 것이라 판단하고 모든 관련 코드를 재검토하고 의심이 가는 부분을 재작성하기를 반복했으나 해결할 수 없었다. 그러다가 항상 같은 문자열에서 오류를 낸다는 패턴을 다시 검토하게 되었는데, 문제의 문자열은 &lsquo;%&rsquo; 기호를 포함하고 있었다. 순간 머리를 스치는 생각&hellip; 역시 <code>syslog()</code>의 매뉴얼 페이지를 확인해 보니 <code>syslog()</code>는 <code>printf()</code> 스타일의 가변 인수를 지원하는 함수였던 것이다. 즉, 문자열의 &lsquo;%&rsquo; 기호를 보고 뒤에 오는 &rsquo;s', &rsquo;d' 등의 문자와 연동하여 있지도 않은 인수를 접근하면서 발생하는 문제였다. 즉, 다음 코드는</p>
 <pre><code>syslog(LOG_INFO, msg);
 </code></pre>
 <p>다음과 같이 작성해야 하는 것이다.</p>
 <pre><code>syslog(LOG_INFO, &quot;%s&quot;, msg);
 </code></pre>
-<p><code>printf()</code> 방식의 함수는 의외로 많다. <code>sprintf()</code>, <code>scanf()</code>, <code>syslog()</code>, 심지어 자체적으로 만들어 사용하는 디버그 매크로까지&hellip; 하지만, 위와 같이 첫번째 인수인 포맷을 지정하고 않고 출력할 문자열을 그대로 전달하면 일단 컴파일과 실행에는 문제가 없지만, &lsquo;%', '&rsquo; 등의 기호가 포함되어 있다면 개발자의 삶은 고달퍼지기 시작하는 것이다.</p>
+<p><code>printf()</code> 방식의 함수는 의외로 많다. <code>sprintf()</code>, <code>scanf()</code>, <code>syslog()</code>, 심지어 자체적으로 만들어 사용하는 디버그 매크로까지&hellip; 하지만, 위와 같이 첫번째 인수인 포맷을 지정하고 않고 출력할 문자열을 그대로 전달하면 일단 컴파일과 실행에는 문제가 없지만, &lsquo;%&rsquo;, '' 등의 기호가 포함되어 있다면 개발자의 삶은 고달퍼지기 시작하는 것이다.</p>
 
     </div>
 
@@ -817,7 +817,7 @@
     
     
     
-    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+    <script src="/js/academic.min.dd3bd320b283a236b60c707f537377b7.js"></script>
 
     
 

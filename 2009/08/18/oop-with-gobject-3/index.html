@@ -709,9 +709,11 @@ edc_host_class_init (EdcHostClass *klass)
 </code></pre>
 <p>제일 먼저 정의된 열거형 타입에 대해 설명하자면, 클래스 내부에서 속성은 정수형 숫자로 관리됩니다. 예를 들어 1번 속성, 3번 속성처럼 직접 정수형을 사용해도 되지만, 관례적으로 가독성을 위해 열거형으로 정의합니다. 이렇게 정의한 번호를 클래스에 속성을 설치할때 지정하면 [
 <a href="http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-install-property" target="_blank" rel="noopener"><code>g_object_class_install_property()</code></a>
-],  <code>edc_host_{get/set}_property() </code>속성 읽기 / 쓰기 함수의 인자로 `<code>property_id</code>'가 전달되는데, 이 ID가 바로 속성 번호입니다. 물론 속성 번호는 
+],  <code>edc_host_{get/set}_property() </code>속성 읽기 / 쓰기 함수의 인자로 `<code>property_id</code>&lsquo;가 전달되는데, 이 ID가 바로 속성 번호입니다. 물론 속성 번호는 
 <a href="http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-override-property" target="_blank" rel="noopener"><code>g_object_class_override_property()</code></a>
- 같은 다른 API에서도 사용합니다.[](<a href="http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-override-property">http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-override-property</a>)</p>
+ 같은 다른 API에서도 사용합니다.
+<a href="http://library.gnome.org/devel/gobject/stable/gobject-The-Base-Object-Type.html#g-object-class-override-property" target="_blank" rel="noopener"></a>
+</p>
 <p><code>edc_host_class_init()</code> 클래스  초기화 함수를 보면, 
 <a href="http://library.gnome.org/devel/gobject/stable/gobject-Standard-Parameter-and-Value-Types.html" target="_blank" rel="noopener"><code>g_param_spec_*()</code></a>
  함수를 이용하여 각 속성의 스펙을 정의해서 
@@ -1075,7 +1077,7 @@ edc_host_class_init (EdcHostClass *klass)
     
     
     
-    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+    <script src="/js/academic.min.dd3bd320b283a236b60c707f537377b7.js"></script>
 
     
 

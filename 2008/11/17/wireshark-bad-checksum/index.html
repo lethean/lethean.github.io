@@ -24,7 +24,7 @@
   
     
   
-  <meta name="description" content="네트웍 패킷을 검사하기 위해 자주 사용하는 Wireshark 프로그램을 리눅스에서 실행할때 이더넷 장치에 따라 &lsquo;Bad Checksum&#39;을 표시하며 패킷이 붉은 색으로 표시되어 눈에">
+  <meta name="description" content="네트웍 패킷을 검사하기 위해 자주 사용하는 Wireshark 프로그램을 리눅스에서 실행할때 이더넷 장치에 따라 &lsquo;Bad Checksum&rsquo;을 표시하며 패킷이 붉은 색으로">
 
   
   <link rel="alternate" hreflang="ko-kr" href="https://lethean.github.io/2008/11/17/wireshark-bad-checksum/">
@@ -263,7 +263,7 @@
   <meta property="og:site_name" content="대체로 무해함">
   <meta property="og:url" content="https://lethean.github.io/2008/11/17/wireshark-bad-checksum/">
   <meta property="og:title" content="Wireshark Bad Checksum | 대체로 무해함">
-  <meta property="og:description" content="네트웍 패킷을 검사하기 위해 자주 사용하는 Wireshark 프로그램을 리눅스에서 실행할때 이더넷 장치에 따라 &lsquo;Bad Checksum&#39;을 표시하며 패킷이 붉은 색으로 표시되어 눈에"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="og:description" content="네트웍 패킷을 검사하기 위해 자주 사용하는 Wireshark 프로그램을 리눅스에서 실행할때 이더넷 장치에 따라 &lsquo;Bad Checksum&rsquo;을 표시하며 패킷이 붉은 색으로"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
   <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="ko-kr">
   
     
@@ -315,7 +315,7 @@
       "url": "img/https://lethean.github.io/"
     }
   },
-  "description": "네트웍 패킷을 검사하기 위해 자주 사용하는 Wireshark 프로그램을 리눅스에서 실행할때 이더넷 장치에 따라 \u0026lsquo;Bad Checksum'을 표시하며 패킷이 붉은 색으로 표시되어 눈에"
+  "description": "네트웍 패킷을 검사하기 위해 자주 사용하는 Wireshark 프로그램을 리눅스에서 실행할때 이더넷 장치에 따라 \u0026lsquo;Bad Checksum\u0026rsquo;을 표시하며 패킷이 붉은 색으로"
 }
 </script>
 
@@ -539,12 +539,12 @@
     <div class="article-style">
       <p>네트웍 패킷을 검사하기 위해 자주 사용하는 
 <a href="http://www.wireshark.org/" target="_blank" rel="noopener">Wireshark</a>
- 프로그램을 리눅스에서 실행할때 이더넷 장치에 따라 &lsquo;Bad Checksum'을 표시하며 패킷이 붉은 색으로 표시되어 눈에 거슬리는 경우가 종종 있습니다.</p>
+ 프로그램을 리눅스에서 실행할때 이더넷 장치에 따라 &lsquo;Bad Checksum&rsquo;을 표시하며 패킷이 붉은 색으로 표시되어 눈에 거슬리는 경우가 종종 있습니다.</p>
 <p><img src="/figures/wireshark-bad-checksum.png" alt=""></p>
 <p>이는 패킷 전송시 이더넷 하드웨어가 패킷 체크섬을 계산하도록 하는 기능이 자동으로 켜져있는데, 이 부분에 오류가 있는 경우입니다. 대부분의 경우 문제를 야기하지 않지만, 때로는 IP가 제대로 할당되었는데 실제 동작을 안하는 원인이 되기도 합니다. 따라서 이 기능을 끄고 싶을 경우가 발생하는데, 다음과 같은 명령어만 실행하면 됩니다.</p>
 <pre><code>$ sudo ethtool -K eth0 tx off
 </code></pre>
-<p>여기서 &lsquo;eth0'는 장치 이름입니다. 더 궁금하시면 &lsquo;man ethtool'을 통해 확인하시기 바랍니다.</p>
+<p>여기서 &lsquo;eth0&rsquo;는 장치 이름입니다. 더 궁금하시면 &lsquo;man ethtool&rsquo;을 통해 확인하시기 바랍니다.</p>
 
     </div>
 
@@ -823,7 +823,7 @@
     
     
     
-    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+    <script src="/js/academic.min.dd3bd320b283a236b60c707f537377b7.js"></script>
 
     
 

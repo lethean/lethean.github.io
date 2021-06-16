@@ -123,7 +123,7 @@ make upload
 &lt;p&gt;셸(shell)에서 가장 최신 마이너 버전을 얻는 방법은 다음과 같습니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ sort -t- -k2,3 -n list.txt | tail -1
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;sort 명령 옵션을 설명하면, &amp;lsquo;-t&#39;는 필드 구분자, &amp;lsquo;-k&#39;는 정렬 기준으로 사용할 필드 시작,끝 번호, &amp;lsquo;-n&amp;rsquo; 옵션은 필드를 문자가 아닌 숫자로 여겨서 판단하도록 하는 것입니다. 차이점이 궁금하신 분은 아래 두 명령의 결과를 비교해 보시길.&lt;/p&gt;
+&lt;p&gt;sort 명령 옵션을 설명하면, &amp;lsquo;-t&amp;rsquo;는 필드 구분자, &amp;lsquo;-k&amp;rsquo;는 정렬 기준으로 사용할 필드 시작,끝 번호, &amp;lsquo;-n&amp;rsquo; 옵션은 필드를 문자가 아닌 숫자로 여겨서 판단하도록 하는 것입니다. 차이점이 궁금하신 분은 아래 두 명령의 결과를 비교해 보시길.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ sort -t- -k2,3 -n list.txt
 $ sort -t- -k2,3 list.txt
 &lt;/code&gt;&lt;/pre&gt;

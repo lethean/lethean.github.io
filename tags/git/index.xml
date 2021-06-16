@@ -283,7 +283,7 @@ export LESS=&amp;quot;-R -F -X&amp;quot;
  프로그램을 사용하고, 맥(Mac)은 기본으로 제공하는 설치 프로그램을 이용했습니다. 
 &lt;a href=&#34;http://code.google.com/p/gitextensions/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Git Extensions&lt;/a&gt;
 은 비주얼 스튜디오 확장 기능도 있지만, 안정성이나 유용성이 조금 부족하다는 느낌을 받았습니다.&lt;/p&gt;
-&lt;p&gt;&amp;lsquo;git push&#39;시에 자동으로 메일링 리스트나 특정 메일 주소로 메일을 전송하는 기능은 Git 소스에 들어있는 기본 훅(hook) 스크립트 대신 
+&lt;p&gt;&amp;lsquo;git push&amp;rsquo;시에 자동으로 메일링 리스트나 특정 메일 주소로 메일을 전송하는 기능은 Git 소스에 들어있는 기본 훅(hook) 스크립트 대신 
 &lt;a href=&#34;http://git.gnome.org/cgit/gitadmin-bin/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GNOME Git 관리 스크립트&lt;/a&gt;
 에 들어있는 gnome-post-receive-mail 스크립트를 조금 수정해서 사용했습니다. 커밋 로그 메시지에 &amp;lsquo;Bug #1111&amp;rsquo; 같은 문자열이 있으면 자동으로 버그질라 데이터베이스에 추가하는 기능은 아직 이전하지 못했습니다. 구글링을 해보면 몇몇 비슷한 스크립트를 찾을 수 있으나 맘에 드는 게 없다는 점도 이유 중 하나이지만, GNOME 프로젝트처럼 &amp;lsquo;git bz&amp;rsquo; 같은 명령을 이용해 직접 버그질라에 버그를 등록하거나(file), 첨부파일로 커밋 로그 추가, 상태 변화 등을 할 수 있는 방식으로 변화를 꾀하는 것도 좋을 것 같아 고민 중에 있습니다.&lt;/p&gt;
 &lt;p&gt;기본 Subversion 저장소를 Git으로 이전할때 가장 고민이 되었던 부분은 Subversion의 svn:externals 속성을 이용해 복잡하게 연결되어 있는 수많은 프로젝트를 어떻게 관리할 것인가였습니다. 처음에는 Git이 제공하는 Submodules 기능을 이용하려 했으나 생각보다 복잡한 것 같아서 일단 팀원들이 모두 Git에 어느 정도 익숙해진 다음에 적용하기로 하고, 대신 자동으로 하위 모듈까지 내려 받는 스크립트(예:git-pull-all.sh)를 최상위 디렉토리에 두고 사용하기로 했습니다. 대신 여러 프로젝트에서 공유하는 여러 프로젝트를 하나의 프로젝트로 소스를 합친 뒤 모든 프로젝트에서는 단 하나의 공유 프로젝트만 연결하도록 저장소 구조를 대폭 단순화했습니다.&lt;/p&gt;

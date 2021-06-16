@@ -141,7 +141,7 @@
 &lt;p&gt;한글이 깨진 파일이나 디렉토리에서 다음 명령을 실행합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ convmv -f utf8 -t utf8 -r --nfc --notest *
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;더 자세한 사용법은 `&lt;code&gt;man convmv&lt;/code&gt;&#39;를 입력하시길~&lt;/p&gt;
+&lt;p&gt;더 자세한 사용법은 `&lt;code&gt;man convmv&lt;/code&gt;&amp;lsquo;를 입력하시길~&lt;/p&gt;
 </description>
     </item>
     
@@ -150,7 +150,7 @@
       <link>https://lethean.github.io/2009/01/07/ubuntu-8-10-korean-font-config/</link>
       <pubDate>Wed, 07 Jan 2009 00:00:00 +0000</pubDate>
       <guid>https://lethean.github.io/2009/01/07/ubuntu-8-10-korean-font-config/</guid>
-      <description>&lt;p&gt;Ubuntu 설치시 한국어를 선택하면 한글을 사용하는데 별 문제가 없는 것 같지만, 글꼴이나 입력기 등이 조금 문제가 있기 때문에 &amp;lsquo;시스템&amp;rsquo; -&amp;gt; &amp;lsquo;관리&amp;rsquo; -&amp;gt; &amp;lsquo;언어&amp;rsquo; 설정에서 &amp;lsquo;지원되는 언어&#39;에 &amp;lsquo;한국어&#39;를 선택하고, 기본 언어로 &amp;lsquo;한국어&#39;를 선택해주면 한글 관련 패키지와 설정이 자동으로 설치됩니다.&lt;/p&gt;
+      <description>&lt;p&gt;Ubuntu 설치시 한국어를 선택하면 한글을 사용하는데 별 문제가 없는 것 같지만, 글꼴이나 입력기 등이 조금 문제가 있기 때문에 &amp;lsquo;시스템&amp;rsquo; -&amp;gt; &amp;lsquo;관리&amp;rsquo; -&amp;gt; &amp;lsquo;언어&amp;rsquo; 설정에서 &amp;lsquo;지원되는 언어&amp;rsquo;에 &amp;lsquo;한국어&amp;rsquo;를 선택하고, 기본 언어로 &amp;lsquo;한국어&amp;rsquo;를 선택해주면 한글 관련 패키지와 설정이 자동으로 설치됩니다.&lt;/p&gt;
 &lt;p&gt;하지만 이렇게 해도 기본 한글 글꼴 설정이 별로 미려하지 않은데, 제 경우 기본 글꼴 설정을 다음과 같이 변경해서 사용하고 있습니다.&lt;/p&gt;
 &lt;p&gt;먼저 &lt;code&gt;/etc/fonts/conf.d/29-language-selector-ko-kr.conf&lt;/code&gt; 파일은 다음과 같습니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;&amp;lt;fontconfig&amp;gt;

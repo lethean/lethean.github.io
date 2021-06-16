@@ -1162,7 +1162,7 @@ Dumping heap profile to /tmp/profile.0004.heap (...)
 &lt;a href=&#34;http://library.gnome.org/devel/glib/stable/glib-Testing.html#g-test-add&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;g_test_add()&lt;/code&gt;&lt;/a&gt;
  함수를 이용해야 합니다.일단, 간단한 예제 코드를 보여드리면 다음과 같습니다. (&amp;quot;
 &lt;a href=&#34;http://blogs.gnome.org/timj/2008/06/24/23062008-writing-unit-tests-with-glib/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Writing Unit Tests with GLib&lt;/a&gt;
-&amp;rdquo; 글에서 발췌했습니다)&lt;/p&gt;
+&amp;quot; 글에서 발췌했습니다)&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;glib.h&amp;gt;
 
 static void
@@ -1265,9 +1265,9 @@ $ gtester-report sample-log.xml &amp;gt; sample-log.html
       <guid>https://lethean.github.io/2009/09/08/clutter-and-gtk/</guid>
       <description>&lt;p&gt;`
 &lt;a href=&#34;http://blog.didrocks.fr/index.php/post/Design-experience-and-demos-in-GTK-Clutter&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Design experience and demos in GTK and Clutter&lt;/a&gt;
-&amp;rsquo; 라는 포스트가 얼마 전에 올라왔는데 이제야 리뷰를 해봅니다. 이 포스트를 클릭해서 들어가 보시면 데모 동영상이 여러개 있는데, 클러터 안에 GTK 노트북 위젯을 넣어 여러가지 효과를 보여주고 있습니다. 이 포스트는 &lt;span style=&#34;background-color:#ffffff;&#34;&gt;`
+&#39; 라는 포스트가 얼마 전에 올라왔는데 이제야 리뷰를 해봅니다. 이 포스트를 클릭해서 들어가 보시면 데모 동영상이 여러개 있는데, 클러터 안에 GTK 노트북 위젯을 넣어 여러가지 효과를 보여주고 있습니다. 이 포스트는 &lt;span style=&#34;background-color:#ffffff;&#34;&gt;`
 &lt;a href=&#34;http://dannipenguin.livejournal.com/280866.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;animating GTK+, Clutter-Gtk, client-side-windows and demos&lt;/a&gt;
-&amp;rsquo; 포스트에서 설명한 방식을 더 확장하고 실용적인 예제를 보여주고 있는 셈인데, GTK Client Side Window + ClutterGtk를 이용하고 있습니다.&lt;/span&gt;&lt;/p&gt;
+&#39; 포스트에서 설명한 방식을 더 확장하고 실용적인 예제를 보여주고 있는 셈인데, GTK Client Side Window + ClutterGtk를 이용하고 있습니다.&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;클러터를 이용해 사용자 인터페이스를 만들때 불편한 점 중 하나는 버튼, 입력상자, 라디오 버튼 등과 같은 위젯 툴킷이 없기 때문에 모두 직접 만들어야 한다는 점입니다. 물론 모블린 프로젝트에서 사용하고 있는 클러터 기반 툴킷 라이브러리도 있고 클러터 예제 디렉토리에 여러가지 참고할 만한 샘플이 있긴 하지만, QT나 GTK 같은 라이브러리처럼 풍부한 기능은 제공하지 않습니다. 이 데모가 유용한 이유는, GTK 위젯을 그대로 클러터 안에 포함할 수 있는 것은 물론, 기존 GTK 위젯의 동작을 확장하여 자연스러운 애니메이션 효과를 마음대로 추가할 수 있다는 점을 보여주고 있기 때문입니다.&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;span style=&#34;background-color:#ffffff;&#34;&gt;물론, 단순히 예쁘고 화려한 인터페이스 효과를 추가하는게 목적이 아니라, 이를 통해 사용자가 더 쉽게 이해하고 사용하기 편한 인터페이스를 제공할 수 있다는 점이 더 중요한 것 같습니다.&lt;/span&gt;&lt;/p&gt;
 </description>

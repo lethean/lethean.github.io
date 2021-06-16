@@ -134,7 +134,7 @@ awk &#39;{ print $2, $18 }&#39; $1 |
 &lt;p&gt;한글이 깨진 파일이나 디렉토리에서 다음 명령을 실행합니다.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ convmv -f utf8 -t utf8 -r --nfc --notest *
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;더 자세한 사용법은 `&lt;code&gt;man convmv&lt;/code&gt;&#39;를 입력하시길~&lt;/p&gt;
+&lt;p&gt;더 자세한 사용법은 `&lt;code&gt;man convmv&lt;/code&gt;&amp;lsquo;를 입력하시길~&lt;/p&gt;
 </description>
     </item>
     
